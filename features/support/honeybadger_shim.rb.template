@@ -1,0 +1,8 @@
+require 'sham_rack'
+
+ShamRack.at("api.honeybadger.io") do |env|
+  response = <<-end_json
+{"id":"123456789"}
+  end_json
+  ["200 OK", { "Content-type" => "application/json" }, [response]]
+end

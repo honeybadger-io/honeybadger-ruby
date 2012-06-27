@@ -1,0 +1,68 @@
+# A test harness for RakeHandler
+#
+require 'rake'
+require 'rubygems'
+require 'honeybadger'
+require 'honeybadger/rake_handler'
+
+Honeybadger.configure do |c|
+end
+
+# Should catch exception
+task :honeybadger do
+  Honeybadger.configuration.rescue_rake_exceptions = true
+  stub_tty_output(true)
+  raise_exception
+end
+
+# Should not catch exception
+task :honeybadger_disabled do
+  Honeybadger.configuration.rescue_rake_exceptions = false
+  stub_tty_output(true)
+  raise_exception
+end
+
+# Should not catch exception as tty_output is true
+task :honeybadger_autodetect_from_terminal do
+  Honeybadger.configuration.rescue_rake_exceptions = nil
+  stub_tty_output(true)
+  raise_exception
+end
+
+# Should catch exception as tty_output is false
+task :honeybadger_autodetect_not_from_terminal do
+  Honeybadger.configuration.rescue_rake_exceptions = nil
+  stub_tty_output(false)
+  raise_exception
+end
+
+task :honeybadger_not_yet_configured do
+  Honeybadger.configuration.rescue_rake_exceptions = true
+  stub_tty_output(true)
+  stub_empty_sender
+  raise_exception
+end
+
+module Honeybadger
+  def self.notify_or_ignore(*args)
+    # TODO if you need to check more params, you'll have to use json.dump or something
+    $stderr.puts "honeybadger #{args[1][:component]}"
+  end
+end
+
+def stub_empty_sender
+  Honeybadger.sender = nil
+end
+
+def stub_tty_output(value)
+  Rake.application.instance_eval do
+    @tty_output_stub = value
+    def tty_output?
+      @tty_output_stub
+    end
+  end
+end
+
+def raise_exception
+  raise 'TEST'
+end
