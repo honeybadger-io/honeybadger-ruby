@@ -176,14 +176,19 @@ class SenderTest < Honeybadger::UnitTest
     end
 
     should "use the default DEFAULT_CERT_FILE if asked to" do
-      config = Honeybadger::Configuration.new
-      config.use_system_ssl_cert_chain = true
-      sender = Honeybadger::Sender.new(config)
+      File.expects(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).returns(true)
+
+      Honeybadger.configure do |config|
+        config.secure = true
+        config.use_system_ssl_cert_chain = true
+      end
+
+      sender = Honeybadger::Sender.new(Honeybadger.configuration)
 
       assert(sender.use_system_ssl_cert_chain?)
 
       http    = sender.send(:setup_http_connection)
-      assert_not_equal http.ca_file, config.local_cert_path
+      assert_not_equal http.ca_file, Honeybadger.configuration.local_cert_path
     end
 
     should "verify the connection when the use_ssl option is set (VERIFY_PEER)" do
