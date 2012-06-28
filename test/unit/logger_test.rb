@@ -6,7 +6,9 @@ class LoggerTest < Honeybadger::UnitTest
     @http = stub(:post => response,
                  :read_timeout= => nil,
                  :open_timeout= => nil,
-                 :use_ssl= => nil)
+                 :use_ssl= => nil,
+                 :ca_file= => nil,
+                 :verify_mode= => nil)
     Net::HTTP.stubs(:new).returns(@http)
   end
 

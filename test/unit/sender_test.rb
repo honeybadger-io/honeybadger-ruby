@@ -34,7 +34,9 @@ class SenderTest < Honeybadger::UnitTest
     http     = stub(:post          => response,
                     :read_timeout= => nil,
                     :open_timeout= => nil,
-                    :use_ssl=      => nil)
+                    :use_ssl=      => nil,
+                    :ca_file=      => nil,
+                    :verify_mode=  => nil)
     proxy    = stub(:new => http)
     Net::HTTP.stubs(:Proxy => proxy)
 

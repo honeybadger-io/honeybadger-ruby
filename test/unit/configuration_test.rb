@@ -14,7 +14,7 @@ class ConfigurationTest < Honeybadger::UnitTest
     assert_config_default :notifier_version,    Honeybadger::VERSION
     assert_config_default :notifier_name,       'Honeybadger Notifier'
     assert_config_default :notifier_url,        'https://github.com/honeybadger/honeybadger'
-    assert_config_default :secure,              false
+    assert_config_default :secure,              true
     assert_config_default :host,                'api.honeybadger.io'
     assert_config_default :http_open_timeout,   2
     assert_config_default :http_read_timeout,   5
