@@ -2,8 +2,6 @@ source "https://rubygems.org"
 
 gemspec
 
-gem 'rake'
-
 if true
   group :test do
     gem 'pry'
