@@ -258,7 +258,7 @@ added the following information to your Honeybadger configuration block.
 
 ## Supported Rails versions
 
-Honeybadger supports Rails 2.3.14 through rails 3.2.6.
+Honeybadger supports Rails 3.0.0 through rails 3.2.6.
 
 ## Credits
 
