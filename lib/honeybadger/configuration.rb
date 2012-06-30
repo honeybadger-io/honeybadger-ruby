@@ -121,23 +121,23 @@ module Honeybadger
     alias_method :use_system_ssl_cert_chain?, :use_system_ssl_cert_chain
 
     def initialize
-      @secure                   = false
-      @use_system_ssl_cert_chain= false
-      @host                     = 'api.honeybadger.io'
-      @http_open_timeout        = 2
-      @http_read_timeout        = 5
-      @params_filters           = DEFAULT_PARAMS_FILTERS.dup
-      @backtrace_filters        = DEFAULT_BACKTRACE_FILTERS.dup
-      @ignore_by_filters        = []
-      @ignore                   = IGNORE_DEFAULT.dup
-      @ignore_user_agent        = []
-      @development_environments = %w(development test cucumber)
-      @notifier_name            = 'Honeybadger Notifier'
-      @notifier_version         = VERSION
-      @notifier_url             = 'https://github.com/honeybadger/honeybadger'
-      @framework                = 'Standalone'
-      @user_information         = 'Honeybadger Error {{error_id}}'
-      @rescue_rake_exceptions   = nil
+      @secure                    = true
+      @use_system_ssl_cert_chain = false
+      @host                      = 'api.honeybadger.io'
+      @http_open_timeout         = 2
+      @http_read_timeout         = 5
+      @params_filters            = DEFAULT_PARAMS_FILTERS.dup
+      @backtrace_filters         = DEFAULT_BACKTRACE_FILTERS.dup
+      @ignore_by_filters         = []
+      @ignore                    = IGNORE_DEFAULT.dup
+      @ignore_user_agent         = []
+      @development_environments  = %w(development test cucumber)
+      @notifier_name             = 'Honeybadger Notifier'
+      @notifier_version          = VERSION
+      @notifier_url              = 'https://github.com/honeybadger/honeybadger'
+      @framework                 = 'Standalone'
+      @user_information          = 'Honeybadger Error {{error_id}}'
+      @rescue_rake_exceptions    = nil
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

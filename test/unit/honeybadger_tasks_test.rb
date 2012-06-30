@@ -40,7 +40,10 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
       context "given an optional HTTP proxy and valid options" do
         setup do
           @response         = stub("response",    :body => "stub body")
-          @http_proxy       = stub("proxy",       :request => @response)
+          @http_proxy       = stub("proxy",       :request => @response,
+                                                  :use_ssl= => nil,
+                                                  :ca_file= => nil,
+                                                  :verify_mode= => nil)
           @http_proxy_class = stub("proxy_class", :new => @http_proxy)
           @post             = stub("post",        :set_form_data => nil)
 
@@ -73,8 +76,8 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
             @output = HoneybadgerTasks.deploy(@options)
           end
 
-          before_should "post to http://api.honeybadger.io:80/deploys.txt" do
-            @http_proxy_class.expects(:new).with("api.honeybadger.io", 80).returns(@http_proxy)
+          before_should "post to https://api.honeybadger.io:443/deploys.txt" do
+            @http_proxy_class.expects(:new).with("api.honeybadger.io", 443).returns(@http_proxy)
             @post.expects(:set_form_data).with(kind_of(Hash))
             @http_proxy.expects(:request).with(any_parameters).returns(successful_response)
           end
@@ -122,6 +125,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
         Honeybadger.configure do |config| 
           config.api_key = "1234123412341234"
           config.host = "custom.host"
+          config.secure = false
         end
       end
 
