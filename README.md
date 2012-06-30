@@ -1,6 +1,8 @@
 Honeybadger
 ===============
 
+[![Build Status](https://secure.travis-ci.org/honeybadger-io/honeybadger-ruby.png?branch=master)](http://travis-ci.org/honeybadger-io/honeybadger-ruby)
+
 This is the notifier gem for integrating apps with [Honeybadger](http://honeybadger.io).
 
 When an uncaught exception occurs, Honeybadger will POST the relevant data
