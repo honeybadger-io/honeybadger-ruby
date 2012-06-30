@@ -86,7 +86,7 @@ end
 FEATURES = ['sinatra', 'rack', 'metal']
 
 desc 'Default: run unit & acceptance tests.'
-task :default => [:test, "cucumber:rails:all"] + FEATURES
+task :default => [:test, :vendor_test_gems , "cucumber:rails:all"] + FEATURES
 
 GEM_ROOT = File.dirname(__FILE__).freeze
 
