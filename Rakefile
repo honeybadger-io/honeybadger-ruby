@@ -94,15 +94,16 @@ LOCAL_GEM_ROOT = File.join(GEM_ROOT, 'tmp', 'local_gems').freeze
 RAILS_VERSIONS = IO.read('SUPPORTED_RAILS_VERSIONS').strip.split("\n")
 LOCAL_GEMS =
   [
-    ["rack","1.3.2"],
+    ['rake', nil],
+    ['rack','1.3.2']
   ] +
   RAILS_VERSIONS.collect { |version| ['rails', version] } +
   [
     ['sham_rack', nil],
     ['capistrano', nil],
     ['sqlite3-ruby', nil],
-    ["therubyracer",nil],
-    ["sinatra",nil]
+    ['therubyracer',nil],
+    ['sinatra',nil]
   ]
 
 desc "Vendor test gems: Run this once to prepare your test environment"
