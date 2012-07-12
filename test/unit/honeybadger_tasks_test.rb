@@ -55,7 +55,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
                  Honeybadger.configuration.proxy_user,
                  Honeybadger.configuration.proxy_pass).
                  returns(@http_proxy_class)
-          Net::HTTP::Post.expects(:new).with("/deploys.txt").returns(@post)
+          Net::HTTP::Post.expects(:new).with("/v1/deploys").returns(@post)
 
           @options    = { :environment => "staging", :dry_run => false }
         end
@@ -76,7 +76,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
             @output = HoneybadgerTasks.deploy(@options)
           end
 
-          before_should "post to https://api.honeybadger.io:443/deploys.txt" do
+          before_should "post to https://api.honeybadger.io:443/v1/deploys" do
             @http_proxy_class.expects(:new).with("api.honeybadger.io", 443).returns(@http_proxy)
             @post.expects(:set_form_data).with(kind_of(Hash))
             @http_proxy.expects(:request).with(any_parameters).returns(successful_response)
@@ -141,7 +141,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
           @http_proxy_class = stub("proxy_class", :new => @http_proxy)
           @http_proxy_class.expects(:new).with("custom.host", 80).returns(@http_proxy)
           Net::HTTP.expects(:Proxy).with(any_parameters).returns(@http_proxy_class)
-          Net::HTTP::Post.expects(:new).with("/deploys.txt").returns(@post)
+          Net::HTTP::Post.expects(:new).with("/v1/deploys").returns(@post)
           @post.expects(:set_form_data).with(kind_of(Hash))
           @http_proxy.expects(:request).with(any_parameters).returns(successful_response)
         end

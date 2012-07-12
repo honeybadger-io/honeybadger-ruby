@@ -47,7 +47,7 @@ module HoneybadgerTasks
       http.verify_mode  = OpenSSL::SSL::VERIFY_PEER
     end
 
-    post = Net::HTTP::Post.new("/deploys.txt")
+    post = Net::HTTP::Post.new("/v1/deploys")
     post.set_form_data(params)
     post['X-API-Key'] = api_key
 
