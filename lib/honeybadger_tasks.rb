@@ -9,9 +9,9 @@ module HoneybadgerTasks
   #
   # opts - Data about the deploy that is set to Honeybadger
   #        :api_key        - Api key of you Honeybadger application
-  #        :rails_env      - Environment of the deploy (production, staging)
-  #        :scm_revision   - The given revision/sha that is being deployed
-  #        :scm_repository - Address of your repository to help with code lookups
+  #        :environment    - Environment of the deploy (production, staging)
+  #        :revision       - The given revision/sha that is being deployed
+  #        :repository     - Address of your repository to help with code lookups
   #        :local_username - Who is deploying
   #
   # Returns true or false
@@ -22,8 +22,8 @@ module HoneybadgerTasks
       return false
     end
 
-    if opts[:rails_env].blank?
-      puts "I don't know to which Rails environment you are deploying (use the TO=production option)."
+    if opts[:environment].blank?
+      puts "I don't know to which environment you are deploying (use the TO=production option)."
       return false
     end
 

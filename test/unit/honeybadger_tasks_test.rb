@@ -29,7 +29,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
         setup { @output = HoneybadgerTasks.deploy({}) }
 
         before_should "complain about missing rails env" do
-          HoneybadgerTasks.expects(:puts).with(regexp_matches(/rails environment/i))
+          HoneybadgerTasks.expects(:puts).with(regexp_matches(/which environment/i))
         end
 
         should "return false" do
@@ -57,7 +57,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
                  returns(@http_proxy_class)
           Net::HTTP::Post.expects(:new).with("/deploys.txt").returns(@post)
 
-          @options    = { :rails_env => "staging", :dry_run => false }
+          @options    = { :environment => "staging", :dry_run => false }
         end
 
         context "performing a dry run" do
@@ -82,12 +82,12 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
             @http_proxy.expects(:request).with(any_parameters).returns(successful_response)
           end
 
-          before_should "use send the rails_env param" do
+          before_should "use send the environment param" do
             @post.expects(:set_form_data).
-              with(has_entries("deploy[rails_env]" => "staging"))
+              with(has_entries("deploy[environment]" => "staging"))
           end
 
-          [:local_username, :scm_repository, :scm_revision].each do |key|
+          [:local_username, :repository, :revision].each do |key|
             before_should "use send the #{key} param if it's passed in." do
               @options[key] = "value"
               @post.expects(:set_form_data).
@@ -129,8 +129,8 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
         end
       end
 
-      context "on deploy(:rails_env => 'staging')" do
-        setup { @output = HoneybadgerTasks.deploy(:rails_env => "staging") }
+      context "on deploy(:environment => 'staging')" do
+        setup { @output = HoneybadgerTasks.deploy(:environment => "staging") }
 
         before_should "post to the custom host" do
           @post             = stub("post",     :set_form_data => nil)
@@ -151,8 +151,8 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
     context "when not configured" do
       setup { Honeybadger.configure { |config| config.api_key = "" } }
 
-      context "on deploy(:rails_env => 'staging')" do
-        setup { @output = HoneybadgerTasks.deploy(:rails_env => "staging") }
+      context "on deploy(:environment => 'staging')" do
+        setup { @output = HoneybadgerTasks.deploy(:environment => "staging") }
 
         before_should "complain about missing api key" do
           HoneybadgerTasks.expects(:puts).with(regexp_matches(/api key/i))

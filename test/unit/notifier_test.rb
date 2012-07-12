@@ -188,7 +188,7 @@ class NotifierTest < Honeybadger::UnitTest
       assert_match /honeybadger\/rack_test\.rb$/, @hash[:file]
     end
 
-    should "set rails_env to production" do
+    should "set environment_name to production" do
       assert_equal 'production', @hash[:environment_name]
     end
 
