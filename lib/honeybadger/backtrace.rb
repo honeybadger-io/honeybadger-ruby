@@ -16,20 +16,34 @@ module Honeybadger
       # Public: The method of the line (such as index)
       attr_reader :method
 
+      # Public: An excerpt from the source file
+      attr_reader :source
+
       # Public: Parses a single line of a given backtrace
       #
       # unparsed_line - The raw line from +caller+ or some backtrace
       #
       # Returns the parsed backtrace line
-      def self.parse(unparsed_line)
-        _, file, number, method = unparsed_line.match(INPUT_FORMAT).to_a
-        new(file, number, method)
+      def self.parse(unparsed_line, opts = {})
+        filters = opts[:filters] || []
+        filtered_line = filters.inject(unparsed_line) do |line, proc|
+          proc.call(line)
+        end
+
+        if filtered_line
+          _, file, number, method = unparsed_line.match(INPUT_FORMAT).to_a
+          _, *filtered_args = filtered_line.match(INPUT_FORMAT).to_a
+          new(file, number, method, *filtered_args)
+        else
+          nil
+        end
       end
 
-      def initialize(file, number, method)
-        self.file   = file
-        self.number = number
-        self.method = method
+      def initialize(file, number, method, filtered_file = file, filtered_number = number, filtered_method = method)
+        self.file   = filtered_file
+        self.number = filtered_number
+        self.method = filtered_method
+        self.source = get_source(file, number)
       end
 
       # Public: Reconstructs the line in a readable fashion
@@ -47,7 +61,26 @@ module Honeybadger
 
       private
 
-      attr_writer :file, :number, :method
+      attr_writer :file, :number, :method, :source
+
+      # Private: Open source file and read line(s)
+      #
+      # Returns an array of line(s) from source file
+      def get_source(file, number, before = 2, after = 2)
+        if file && File.exists?(file)
+          start = (number.to_i - 1) - before
+          start = 0 and before = 1 if start <= 0
+          duration = before + 1 + after
+
+          l = 0
+          File.open(file) do |f|
+            start.times { f.gets ; l += 1 }
+            return Hash[duration.times.map { (line = f.gets) ? [(l += 1), line] : nil }.compact]
+          end
+        else
+          {}
+        end
+      end
     end
 
     # Public: holder for an Array of Backtrace::Line instances
@@ -56,16 +89,9 @@ module Honeybadger
     def self.parse(ruby_backtrace, opts = {})
       ruby_lines = split_multiline_backtrace(ruby_backtrace)
 
-      filters = opts[:filters] || []
-      filtered_lines = ruby_lines.to_a.map do |line|
-        filters.inject(line) do |line, proc|
-          proc.call(line)
-        end
+      lines = ruby_lines.collect do |unparsed_line|
+        Line.parse(unparsed_line, opts)
       end.compact
-
-      lines = filtered_lines.collect do |unparsed_line|
-        Line.parse(unparsed_line)
-      end
 
       instance = new(lines)
     end
@@ -78,7 +104,7 @@ module Honeybadger
     #
     # Returns array containing backtrace lines
     def to_ary
-      lines.map { |l| { :number => l.number, :file => l.file, :method => l.method } }
+      lines.map { |l| { :number => l.number, :file => l.file, :method => l.method, :source => l.source } }
     end
     alias :to_a :to_ary
 
