@@ -64,8 +64,8 @@ module Honeybadger
 
       # Public: An excerpt from the source file, lazily loaded to preserve
       # performance
-      def source
-        @source ||= get_source(file, number)
+      def source(radius = 2)
+        @source ||= get_source(file, number, radius)
       end
 
       private
@@ -75,8 +75,9 @@ module Honeybadger
       # Private: Open source file and read line(s)
       #
       # Returns an array of line(s) from source file
-      def get_source(file, number, before = 2, after = 2)
+      def get_source(file, number, radius = 2)
         if file && File.exists?(file)
+          before = after = radius
           start = (number.to_i - 1) - before
           start = 0 and before = 1 if start <= 0
           duration = before + 1 + after

@@ -14,6 +14,9 @@ module Honeybadger
     # Excerpt from source file
     attr_reader :source_extract
 
+    # The number of lines of context to include before and after source excerpt
+    attr_reader :source_extract_radius
+
     # The name of the server environment (such as "production")
     attr_reader :environment_name
 
@@ -102,11 +105,12 @@ module Honeybadger
 
       self.hostname         = local_hostname
 
-      self.source_extract   = if backtrace.lines.empty?
-                                nil
-                              else
-                                backtrace.lines.first.source
-                              end
+      self.source_extract_radius = args[:source_extract_radius] || 2
+      self.source_extract        = if backtrace.lines.empty?
+                                     nil
+                                   else
+                                     backtrace.lines.first.source(source_extract_radius)
+                                   end
 
       also_use_rack_params_filters
       find_session_data
@@ -184,7 +188,8 @@ module Honeybadger
       :backtrace_filters, :parameters, :params_filters, :environment_filters,
       :session_data, :project_root, :url, :ignore, :ignore_by_filters,
       :notifier_name, :notifier_url, :notifier_version, :component, :action,
-      :cgi_data, :environment_name, :hostname, :user, :source_extract
+      :cgi_data, :environment_name, :hostname, :user, :source_extract,
+      :source_extract_radius
 
     # Private: Arguments given in the initializer
     attr_accessor :args

@@ -28,6 +28,7 @@ class ConfigurationTest < Honeybadger::UnitTest
                           Honeybadger::Configuration::IGNORE_DEFAULT
     assert_config_default :framework, 'Standalone'
     assert_config_default :current_user_method,     :current_user
+    assert_config_default :source_extract_radius, 2
   end
 
   should "provide default values for secure connections" do

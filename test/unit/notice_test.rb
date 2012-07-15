@@ -57,6 +57,10 @@ class NoticeTest < Honeybadger::UnitTest
     assert_equal 'index', build_notice(:action => 'index').action
   end
 
+  should "accept source excerpt radius" do
+    assert_equal 3, build_notice(:source_extract_radius => 3).source_extract_radius
+  end
+
   should "accept a url" do
     url = 'http://some.host/uri'
     notice = build_notice(:url => url)
