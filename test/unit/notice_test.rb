@@ -68,31 +68,45 @@ class NoticeTest < Honeybadger::UnitTest
     assert_equal hostname, notice.hostname
   end
 
-  should "accept a backtrace from an exception or hash" do
-    array = ["user.rb:34:in `crazy'"]
-    exception = build_exception
-    exception.set_backtrace array
-    backtrace = Honeybadger::Backtrace.parse(array)
-    notice_from_exception = build_notice(:exception => exception)
+  context "with a backtrace" do
+    setup do
+      @backtrace_array = ['my/file/backtrace:3']
+      @exception = build_exception
+      @exception.set_backtrace(@backtrace_array)
+    end
 
+    should "accept a backtrace from an exception or hash" do
+      backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
+      notice_from_exception = build_notice(:exception => @exception)
 
-    assert_equal backtrace,
-                 notice_from_exception.backtrace,
-                 "backtrace was not correctly set from an exception"
+      assert_equal backtrace,
+        notice_from_exception.backtrace,
+        "backtrace was not correctly set from an exception"
 
-    notice_from_hash = build_notice(:backtrace => array)
-    assert_equal backtrace,
-                 notice_from_hash.backtrace,
-                 "backtrace was not correctly set from a hash"
-  end
+      notice_from_hash = build_notice(:backtrace => @backtrace_array)
+      assert_equal backtrace,
+        notice_from_hash.backtrace,
+        "backtrace was not correctly set from a hash"
+    end
 
-  should "pass its backtrace filters for parsing" do
-    backtrace_array = ['my/file/backtrace:3']
-    exception = build_exception
-    exception.set_backtrace(backtrace_array)
-    Honeybadger::Backtrace.expects(:parse).with(backtrace_array, {:filters => 'foo'})
+    should "pass its backtrace filters for parsing" do
+      Honeybadger::Backtrace.expects(:parse).with(@backtrace_array, {:filters => 'foo'}).returns(mock(:lines => []))
 
-    notice = Honeybadger::Notice.new({:exception => exception, :backtrace_filters => 'foo'})
+      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
+    end
+
+    should "pass its backtrace line filters for parsing" do
+      Honeybadger::Backtrace::Line.expects(:parse).with(@backtrace_array.first, {:filters => 'foo'})
+
+      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
+    end
+
+    should "include source extract from backtrace" do
+      backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
+      notice_from_exception = build_notice(:exception => @exception)
+
+      assert_equal backtrace.lines.first.source, notice_from_exception.source_extract
+    end
   end
 
   should "set the error class from an exception or hash" do

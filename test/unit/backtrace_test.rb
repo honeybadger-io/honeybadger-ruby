@@ -84,25 +84,23 @@ class BacktraceTest < Honeybadger::UnitTest
     end
 
     should "include a snippet from the source file for each line of the backtrace" do
-      backtrace_ary = @backtrace.to_ary
+      assert_equal 4, @backtrace.lines.first.source.keys.size
+      assert_match /\$:<</, @backtrace.lines.first.source[1]
+      assert_match /require/, @backtrace.lines.first.source[2]
+      assert_match /\n/, @backtrace.lines.first.source[3]
+      assert_match /begin/, @backtrace.lines.first.source[4]
 
-      assert_equal 4, backtrace_ary.first[:source].keys.size
-      assert_match /\$:<</, backtrace_ary.first[:source][1]
-      assert_match /require/, backtrace_ary.first[:source][2]
-      assert_match /\n/, backtrace_ary.first[:source][3]
-      assert_match /begin/, backtrace_ary.first[:source][4]
+      assert_equal 5, @backtrace.lines.second.source.keys.size
+      assert_match /require/, @backtrace.lines.second.source[2]
+      assert_match /\n/, @backtrace.lines.second.source[3]
+      assert_match /begin/, @backtrace.lines.second.source[4]
+      assert_match /StandardError/, @backtrace.lines.second.source[5]
+      assert_match /rescue/, @backtrace.lines.second.source[6]
 
-      assert_equal 5, backtrace_ary.second[:source].keys.size
-      assert_match /require/, backtrace_ary.second[:source][2]
-      assert_match /\n/, backtrace_ary.second[:source][3]
-      assert_match /begin/, backtrace_ary.second[:source][4]
-      assert_match /StandardError/, backtrace_ary.second[:source][5]
-      assert_match /rescue/, backtrace_ary.second[:source][6]
-
-      assert_equal 3, backtrace_ary.third[:source].keys.size
-      assert_match /rescue/, backtrace_ary.third[:source][6]
-      assert_match /Honeybadger/, backtrace_ary.third[:source][7]
-      assert_match /end/, backtrace_ary.third[:source][8]
+      assert_equal 3, @backtrace.lines.third.source.keys.size
+      assert_match /rescue/, @backtrace.lines.third.source[6]
+      assert_match /Honeybadger/, @backtrace.lines.third.source[7]
+      assert_match /end/, @backtrace.lines.third.source[8]
     end
   end
 
@@ -113,10 +111,9 @@ class BacktraceTest < Honeybadger::UnitTest
     ]
 
     backtrace = Honeybadger::Backtrace.parse(array)
-    backtrace_ary = backtrace.to_ary
 
-    assert_empty backtrace.to_ary.first[:source]
-    assert_empty backtrace.to_ary.second[:source]
+    assert_empty backtrace.lines.first.source
+    assert_empty backtrace.lines.second.source
   end
 
   context "with a project root" do

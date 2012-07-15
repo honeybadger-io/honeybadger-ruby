@@ -11,6 +11,9 @@ module Honeybadger
     # The name of the class of error (such as RuntimeError)
     attr_reader :error_class
 
+    # Excerpt from source file
+    attr_reader :source_extract
+
     # The name of the server environment (such as "production")
     attr_reader :environment_name
 
@@ -97,7 +100,13 @@ module Honeybadger
         "#{exception.class.name}: #{exception.message}"
       end
 
-      self.hostname        = local_hostname
+      self.hostname         = local_hostname
+
+      self.source_extract   = if backtrace.lines.empty?
+                                nil
+                              else
+                                backtrace.lines.first.source
+                              end
 
       also_use_rack_params_filters
       find_session_data
@@ -118,7 +127,8 @@ module Honeybadger
         :error => {
           :class => error_class,
           :message => error_message,
-          :backtrace => backtrace
+          :backtrace => backtrace,
+          :source => source_extract
         },
         :request => {
           :url => url,
@@ -174,7 +184,7 @@ module Honeybadger
       :backtrace_filters, :parameters, :params_filters, :environment_filters,
       :session_data, :project_root, :url, :ignore, :ignore_by_filters,
       :notifier_name, :notifier_url, :notifier_version, :component, :action,
-      :cgi_data, :environment_name, :hostname, :user
+      :cgi_data, :environment_name, :hostname, :user, :source_extract
 
     # Private: Arguments given in the initializer
     attr_accessor :args

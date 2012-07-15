@@ -16,8 +16,8 @@ module Honeybadger
       # Public: The method of the line (such as index)
       attr_reader :method
 
-      # Public: An excerpt from the source file
-      attr_reader :source
+      # Public: Filtered representations
+      attr_reader :filtered_file, :filtered_number, :filtered_method
 
       # Public: Parses a single line of a given backtrace
       #
@@ -39,16 +39,19 @@ module Honeybadger
         end
       end
 
-      def initialize(file, number, method, filtered_file = file, filtered_number = number, filtered_method = method)
-        self.file   = filtered_file
-        self.number = filtered_number
-        self.method = filtered_method
-        self.source = get_source(file, number)
+      def initialize(file, number, method, filtered_file = file,
+                     filtered_number = number, filtered_method = method)
+        self.filtered_file   = filtered_file
+        self.filtered_number = filtered_number
+        self.filtered_method = filtered_method
+        self.file            = file
+        self.number          = number
+        self.method          = method
       end
 
       # Public: Reconstructs the line in a readable fashion
       def to_s
-        "#{file}:#{number}:in `#{method}'"
+        "#{filtered_file}:#{filtered_number}:in `#{filtered_method}'"
       end
 
       def ==(other)
@@ -59,9 +62,15 @@ module Honeybadger
         "<Line:#{to_s}>"
       end
 
+      # Public: An excerpt from the source file, lazily loaded to preserve
+      # performance
+      def source
+        @source ||= get_source(file, number)
+      end
+
       private
 
-      attr_writer :file, :number, :method, :source
+      attr_writer :file, :number, :method, :filtered_file, :filtered_number, :filtered_method
 
       # Private: Open source file and read line(s)
       #
@@ -104,7 +113,7 @@ module Honeybadger
     #
     # Returns array containing backtrace lines
     def to_ary
-      lines.map { |l| { :number => l.number, :file => l.file, :method => l.method, :source => l.source } }
+      lines.map { |l| { :number => l.number, :file => l.file, :method => l.method } }
     end
     alias :to_a :to_ary
 
