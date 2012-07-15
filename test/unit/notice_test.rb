@@ -117,11 +117,16 @@ class NoticeTest < Honeybadger::UnitTest
     # TODO: I would like to stub out a real ActionView::Template::Error, but we're
     # currently locked at actionpack 2.3.8. Perhaps if one day we upgrade...
     source = <<-ERB
-      <%= current_user.name %>
+      1:   <%= current_user.name %>
+      2: </div>
+      3: 
+      4: <div>
     ERB
     exception = build_exception
     exception.stubs(:source_extract).returns(source)
-    Honeybadger::Notice.new({:exception => exception})
+    notice = Honeybadger::Notice.new({:exception => exception})
+
+    assert_equal({ '1' => '  <%= current_user.name %>', '2' => '</div>', '3' => '', '4' => '<div>'}, notice.source_extract)
   end
 
   should "set the error class from an exception or hash" do
