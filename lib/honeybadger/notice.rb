@@ -106,11 +106,7 @@ module Honeybadger
       self.hostname         = local_hostname
 
       self.source_extract_radius = args[:source_extract_radius] || 2
-      self.source_extract        = if backtrace.lines.empty?
-                                     nil
-                                   else
-                                     backtrace.lines.first.source(source_extract_radius)
-                                   end
+      self.source_extract        = extract_source_from_backtrace
 
       also_use_rack_params_filters
       find_session_data
@@ -264,6 +260,20 @@ module Honeybadger
     def clean_rack_request_data
       if cgi_data
         cgi_data.delete("rack.request.form_vars")
+      end
+    end
+
+    def extract_source_from_backtrace
+      if backtrace.lines.empty?
+        nil
+      else
+        # ActionView::Template::Error has its own source_extract method.
+        # If present, use that instead.
+        if exception.respond_to?(:source_extract)
+          exception_attribute(:source_extract)
+        else
+          backtrace.lines.first.source(source_extract_radius)
+        end
       end
     end
 

@@ -113,6 +113,17 @@ class NoticeTest < Honeybadger::UnitTest
     end
   end
 
+  should "Use source extract from view when reporting an ActionView::Template::Error" do
+    # TODO: I would like to stub out a real ActionView::Template::Error, but we're
+    # currently locked at actionpack 2.3.8. Perhaps if one day we upgrade...
+    source = <<-ERB
+      <%= current_user.name %>
+    ERB
+    exception = build_exception
+    exception.stubs(:source_extract).returns(source)
+    Honeybadger::Notice.new({:exception => exception})
+  end
+
   should "set the error class from an exception or hash" do
     assert_accepts_exception_attribute :error_class do |exception|
       exception.class.name
@@ -318,7 +329,6 @@ class NoticeTest < Honeybadger::UnitTest
       build_notice(:session => { :object => stub(:to_hash => {}) })
     end
   end
-
 
   should "ensure #to_ary is called on objects that support it" do
     assert_nothing_raised do
