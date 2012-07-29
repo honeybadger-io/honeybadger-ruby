@@ -66,7 +66,7 @@ class HoneybadgerGenerator < Rails::Generator::Base
   end
 
   def heroku_api_key
-    heroku_var("(hoptoad|honeybadger)_api_key",options[:app]).split.find {|x| x unless x.blank?}
+    heroku_var("(honeybadger)_api_key",options[:app]).split.find {|x| x unless x.blank?}
   end
 
   def heroku?
