@@ -24,7 +24,7 @@ namespace :honeybadger do
       end
 
       heroku_rails_env = heroku_var("rails_env")
-      heroku_api_key = heroku_var("(honeybadger)_api_key").split.find {|x| x unless x.blank?} ||
+      heroku_api_key = heroku_var("honeybadger_api_key").split.find {|x| x unless x.blank?} ||
         Honeybadger.configuration.api_key
 
       command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{heroku_rails_env}&api_key=#{heroku_api_key}")
