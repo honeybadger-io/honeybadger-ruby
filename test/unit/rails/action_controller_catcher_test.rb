@@ -327,7 +327,7 @@ class ActionControllerCatcherTest < Honeybadger::UnitTest
   should "include current_user in request data" do
     current_user = stub( :to_s => 'foo' )
     controller = process_action_with_automatic_notification(:current_user => current_user)
-    assert_equal controller.honeybadger_request_data[:current_user], 'foo'
+    assert_equal controller.honeybadger_request_data[:user], 'foo'
     assert_caught_and_sent
   end
 end

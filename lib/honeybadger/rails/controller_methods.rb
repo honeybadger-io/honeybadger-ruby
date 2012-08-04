@@ -8,7 +8,7 @@ module Honeybadger
           :action           => params[:action],
           :url              => honeybadger_request_url,
           :cgi_data         => honeybadger_filter_if_filtering(request.env),
-          :current_user     => honeybadger_current_user }
+          :user             => honeybadger_current_user }
       end
 
       private

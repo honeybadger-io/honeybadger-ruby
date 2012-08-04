@@ -65,7 +65,7 @@ module Honeybadger
     attr_reader :hostname
 
     # The user affected by the exception, if available
-    attr_reader :current_user
+    attr_reader :user
 
     def initialize(args)
       self.args         = args
@@ -90,7 +90,7 @@ module Honeybadger
 
       self.environment_name = args[:environment_name]
       self.cgi_data         = args[:cgi_data] || args[:rack_env]
-      self.current_user     = args[:current_user]
+      self.user             = args[:user]
       self.backtrace        = Backtrace.parse(exception_attribute(:backtrace, caller), :filters => self.backtrace_filters)
       self.error_class      = exception_attribute(:error_class) {|exception| exception.class.name }
       self.error_message    = exception_attribute(:error_message, 'Notification') do |exception|
@@ -127,7 +127,7 @@ module Honeybadger
           :params => parameters,
           :session => session_data,
           :cgi_data => cgi_data,
-          :current_user => current_user
+          :user => user
         },
         :server => {
           :project_root => project_root,
@@ -174,7 +174,7 @@ module Honeybadger
       :backtrace_filters, :parameters, :params_filters, :environment_filters,
       :session_data, :project_root, :url, :ignore, :ignore_by_filters,
       :notifier_name, :notifier_url, :notifier_version, :component, :action,
-      :cgi_data, :environment_name, :hostname, :current_user
+      :cgi_data, :environment_name, :hostname, :user
 
     # Private: Arguments given in the initializer
     attr_accessor :args
