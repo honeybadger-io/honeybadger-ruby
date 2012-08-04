@@ -135,6 +135,10 @@ class NoticeTest < Honeybadger::UnitTest
     assert_equal data, notice.cgi_data, "should take CGI data from a hash"
   end
 
+  should "accept current_user" do
+    assert_equal 'foo@bar.com', build_notice(:current_user => 'foo@bar.com').current_user
+  end
+
   should "accept notifier information" do
     params = { :notifier_name    => 'a name for a notifier',
                :notifier_version => '1.0.5',
@@ -196,12 +200,21 @@ class NoticeTest < Honeybadger::UnitTest
     assert_nil notice.url
     assert_nil notice.controller
     assert_nil notice.action
+    assert_nil notice.current_user
 
     json = notice.to_json
     payload = JSON.parse(json)
     assert_nil payload['request']['url']
     assert_nil payload['request']['component']
     assert_nil payload['request']['action']
+    assert_nil payload['request']['current_user']
+  end
+
+  should "send current_user in request" do
+    notice = build_notice(:current_user => 'foo@bar.com')
+    json = notice.to_json
+    payload = JSON.parse(json)
+    assert_equal payload['request']['current_user'], 'foo@bar.com'
   end
 
   %w(url controller action).each do |var|

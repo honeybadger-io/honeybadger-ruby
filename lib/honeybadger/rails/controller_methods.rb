@@ -7,7 +7,8 @@ module Honeybadger
           :controller       => params[:controller],
           :action           => params[:action],
           :url              => honeybadger_request_url,
-          :cgi_data         => honeybadger_filter_if_filtering(request.env) }
+          :cgi_data         => honeybadger_filter_if_filtering(request.env),
+          :current_user     => honeybadger_current_user }
       end
 
       private
@@ -51,6 +52,15 @@ module Honeybadger
           session.to_hash
         else
           session.data
+        end
+      end
+
+      def honeybadger_current_user
+        method     = Honeybadger.configuration.current_user_method
+        identifier = Honeybadger.configuration.current_user_identifier
+
+        if respond_to?(method) && user = send(method)
+          identifier.is_a?(Proc) ? identifier.call(user) : user.send(identifier)
         end
       end
 

@@ -27,6 +27,8 @@ class ConfigurationTest < Honeybadger::UnitTest
     assert_config_default :ignore,
                           Honeybadger::Configuration::IGNORE_DEFAULT
     assert_config_default :framework, 'Standalone'
+    assert_config_default :current_user_method,     :current_user
+    assert_config_default :current_user_identifier, :to_s
   end
 
   should "provide default values for secure connections" do
@@ -67,6 +69,8 @@ class ConfigurationTest < Honeybadger::UnitTest
     assert_config_overridable :notifier_url
     assert_config_overridable :environment_name
     assert_config_overridable :logger
+    assert_config_overridable :current_user_method
+    assert_config_overridable :current_user_identifier
   end
 
   should "have an api key" do
