@@ -30,7 +30,7 @@ That's it!
 Add the honeybadger gem to your app. In config/environment.rb:
 
     config.gem 'honeybadger'
-    
+
 or if you are using bundler:
 
     gem 'honeybadger', :require => 'honeybadger/rails'
@@ -67,7 +67,7 @@ middleware:
     app = Rack::Builder.app do
       run lambda { |env| raise "Rack down" }
     end
-    
+
     use Honeybadger::Rack
     run app
 
@@ -90,7 +90,7 @@ Using honeybadger in a Sinatra app is just like a Rack app:
 
 ## Usage
 
-For the most part, Honeybadger works for itself. 
+For the most part, Honeybadger works for itself.
 
 It intercepts the exception middleware calls, sends notifications and continues the middleware call chain.
 
@@ -119,6 +119,24 @@ this rake task (from RAILS_ROOT):
 
 If everything is configured properly, that task will send a notice to Honeybadger
 which will be visible immediately.
+
+## User Tracking
+
+Honeybadger will automatically try to associate errors and notices with the current user.
+
+By default, it tries to call `current_user.to_s`. If you want to
+customize this behavior, you can do so in the honeybadger initializer:
+
+    Honeybadger.configure do |config|
+      ...
+      # The current user method to call for errors rescued in ActionController
+      config.current_user_method = :a_controller_method_which_returns_the_user
+
+      # The method name to call on the current_user_method instance
+      # May also be a Proc object, in which case it will be called with the user instance as its first argument
+      config.current_user_identifier = :to_i
+    end
+
 
 ## Going beyond exceptions
 
