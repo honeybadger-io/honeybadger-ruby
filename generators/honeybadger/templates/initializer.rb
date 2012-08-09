@@ -3,6 +3,4 @@ require 'honeybadger/rails'
 <% end -%>
 Honeybadger.configure do |config|
   config.api_key = <%= api_key_expression %>
-  config.port = 443
-  config.secure = true
 end
