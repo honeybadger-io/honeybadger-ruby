@@ -14,8 +14,12 @@ Add the Honeybadger gem to your gemfile:
 
     gem 'honeybadger'
 
-Create an initializer in config/initializers and configure your API key
-for your project:
+Then generate the initializer:
+
+    rails generate honeybadger --api-key <Your Api Key>
+
+If you prefer to manually create the initializer, that's simple enough.
+Just put the code below in config/initializers/honeybadger.rb
 
     # Uncomment the following line if running lower than Rails 3.2
     # require 'honeybadger/rails'
