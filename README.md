@@ -128,19 +128,18 @@ which will be visible immediately.
 
 Honeybadger will automatically try to associate errors and notices with the current user.
 
-By default, it tries to call `current_user.to_s`. If you want to
-customize this behavior, you can do so in the honeybadger initializer:
+By default, it tries to call `current_user` when rescuing exceptions in ActionController.
+If you want to use a different method, you may do so in the honeybadger initializer:
 
     Honeybadger.configure do |config|
       ...
       # The current user method to call for errors rescued in ActionController
       config.current_user_method = :a_controller_method_which_returns_the_user
-
-      # The method name to call on the current_user_method instance
-      # May also be a Proc object, in which case it will be called with the user instance as its first argument
-      config.current_user_identifier = :to_i
     end
 
+Honeybadger assumes that the object returned by `current_user` will respond to `#id`,
+and will optionally include the user's email address if the user object also responds
+to `#email`.
 
 ## Going beyond exceptions
 

@@ -299,35 +299,26 @@ class ActionControllerCatcherTest < Honeybadger::UnitTest
     assert_caught_and_sent
   end
 
-  should "call current_user_identifier if proc" do
-    Honeybadger.configuration.current_user_identifier = Proc.new { |u| u.foo }
-
-    current_user = mock( :foo => 'foo' )
-    process_action_with_automatic_notification(:current_user => current_user)
-    assert_caught_and_sent
-  end
-
-  should "call current_user_identifier if method" do
-    Honeybadger.configuration.current_user_identifier = :foo
-
-    current_user = mock( :foo => 'foo' )
-    process_action_with_automatic_notification(:current_user => current_user)
-    assert_caught_and_sent
-  end
-
   should "call current_user_method if overridden" do
     Honeybadger.configuration.current_user_method = :rockstar
 
-    current_user = mock( :to_s => 'foo' )
+    current_user = mock( :id => 1 )
     controller = process_action_with_automatic_notification(:current_user => current_user)
     assert_received(controller, :rockstar) { |expect| expect.at_least_once }
     assert_caught_and_sent
   end
 
-  should "include current_user in request data" do
-    current_user = stub( :to_s => 'foo' )
+  should "include current_user.id in request user data" do
+    current_user = stub( :id => 1 )
     controller = process_action_with_automatic_notification(:current_user => current_user)
-    assert_equal controller.honeybadger_request_data[:user], 'foo'
+    assert_equal({ :id => 1, :email => 'N/A' }, controller.honeybadger_request_data[:user])
+    assert_caught_and_sent
+  end
+
+  should "include current_user.email in request user data" do
+    current_user = stub( :id => 1, :email => 'foo@bar.com' )
+    controller = process_action_with_automatic_notification(:current_user => current_user)
+    assert_equal({ :id => 1, :email => 'foo@bar.com' }, controller.honeybadger_request_data[:user])
     assert_caught_and_sent
   end
 end

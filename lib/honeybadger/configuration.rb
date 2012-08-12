@@ -87,10 +87,6 @@ module Honeybadger
     # The current user method to call for errors rescued in ActionController
     attr_accessor :current_user_method
 
-    # The method name to call on the current_user_method instance
-    # May also be a Proc object, in which case it will be called with the user instance as its first argument
-    attr_accessor :current_user_identifier
-
     # Should Honeybadger catch exceptions from Rake tasks?
     # (boolean or nil; set to nil to catch exceptions when rake isn't running from a terminal; default is nil)
     attr_accessor :rescue_rake_exceptions
@@ -146,7 +142,6 @@ module Honeybadger
       @user_information          = 'Honeybadger Error {{error_id}}'
       @rescue_rake_exceptions    = nil
       @current_user_method       = :current_user
-      @current_user_identifier   = :to_s
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

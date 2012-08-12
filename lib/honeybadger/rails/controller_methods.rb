@@ -8,7 +8,7 @@ module Honeybadger
           :action           => params[:action],
           :url              => honeybadger_request_url,
           :cgi_data         => honeybadger_filter_if_filtering(request.env),
-          :user             => honeybadger_current_user }
+          :user             => honeybadger_user_info }
       end
 
       private
@@ -55,12 +55,14 @@ module Honeybadger
         end
       end
 
-      def honeybadger_current_user
-        method     = Honeybadger.configuration.current_user_method
-        identifier = Honeybadger.configuration.current_user_identifier
+      def honeybadger_user_info
+        method = Honeybadger.configuration.current_user_method
 
         if respond_to?(method) && user = send(method)
-          identifier.is_a?(Proc) ? identifier.call(user) : user.send(identifier)
+          {
+            :id => user.id,
+            :email => user.respond_to?(:email) ? user.email : 'N/A'
+          }
         end
       end
 
