@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'stringio'
 
 class BacktraceTest < Honeybadger::UnitTest
   should "parse a backtrace into lines" do
@@ -53,6 +54,66 @@ class BacktraceTest < Honeybadger::UnitTest
       parse(["one:1:in `one'", "two:2:in `two'", "three:3:in `three`"])
 
     assert_equal expected_backtrace, original_backtrace
+  end
+
+  context "when source file exists" do
+    setup do
+      source = <<-RUBY
+        $:<<'lib'
+        require 'honeybadger'
+
+        begin
+          raise StandardError
+        rescue => e
+          puts Honeybadger::Notice.new(exception: e).backtrace.to_json
+        end
+      RUBY
+
+      array = [
+        "app/models/user.rb:2:in `magic'",
+        "app/concerns/authenticated_controller.rb:4:in `authorize'",
+        "app/controllers/users_controller.rb:8:in `index'"
+      ]
+
+      ['app/models/user.rb', 'app/concerns/authenticated_controller.rb', 'app/controllers/users_controller.rb'].each do |file|
+        File.expects(:exists?).with(file).returns true
+        File.expects(:open).with(file).yields StringIO.new(source)
+      end
+
+      @backtrace = Honeybadger::Backtrace.parse(array)
+    end
+
+    should "include a snippet from the source file for each line of the backtrace" do
+      assert_equal 4, @backtrace.lines.first.source.keys.size
+      assert_match /\$:<</, @backtrace.lines.first.source[1]
+      assert_match /require/, @backtrace.lines.first.source[2]
+      assert_match /\n/, @backtrace.lines.first.source[3]
+      assert_match /begin/, @backtrace.lines.first.source[4]
+
+      assert_equal 5, @backtrace.lines.second.source.keys.size
+      assert_match /require/, @backtrace.lines.second.source[2]
+      assert_match /\n/, @backtrace.lines.second.source[3]
+      assert_match /begin/, @backtrace.lines.second.source[4]
+      assert_match /StandardError/, @backtrace.lines.second.source[5]
+      assert_match /rescue/, @backtrace.lines.second.source[6]
+
+      assert_equal 3, @backtrace.lines.third.source.keys.size
+      assert_match /rescue/, @backtrace.lines.third.source[6]
+      assert_match /Honeybadger/, @backtrace.lines.third.source[7]
+      assert_match /end/, @backtrace.lines.third.source[8]
+    end
+  end
+
+  should "fail gracefully when looking up snippet and file doesn't exist" do
+    array = [
+      "app/models/user.rb:13:in `magic'",
+      "app/controllers/users_controller.rb:8:in `index'"
+    ]
+
+    backtrace = Honeybadger::Backtrace.parse(array)
+
+    assert_empty backtrace.lines.first.source
+    assert_empty backtrace.lines.second.source
   end
 
   context "with a project root" do
