@@ -5,7 +5,7 @@ module Honeybadger
                :ignore_user_agent, :notifier_name, :notifier_url, :notifier_version,
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
-               :user_information, :rescue_rake_exceptions].freeze
+               :user_information, :rescue_rake_exceptions, :source_extract_radius].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -91,11 +91,14 @@ module Honeybadger
     # (boolean or nil; set to nil to catch exceptions when rake isn't running from a terminal; default is nil)
     attr_accessor :rescue_rake_exceptions
 
+    # The radius around trace line to include in source excerpt
+    attr_accessor :source_extract_radius
+
     DEFAULT_PARAMS_FILTERS = %w(password password_confirmation).freeze
 
     DEFAULT_BACKTRACE_FILTERS = [
       lambda { |line|
-        if defined?(Honeybadger.configuration.project_root) && Honeybadger.configuration.project_root.to_s != '' 
+        if defined?(Honeybadger.configuration.project_root) && Honeybadger.configuration.project_root.to_s != ''
           line.sub(/#{Honeybadger.configuration.project_root}/, "[PROJECT_ROOT]")
         else
           line
@@ -142,6 +145,7 @@ module Honeybadger
       @user_information          = 'Honeybadger Error {{error_id}}'
       @rescue_rake_exceptions    = nil
       @current_user_method       = :current_user
+      @source_extract_radius     = 2
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When
