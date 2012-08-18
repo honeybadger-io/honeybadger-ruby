@@ -57,7 +57,7 @@ module HoneybadgerTasks
     else
       response = http.request(post)
 
-      if return Net::HTTPSuccess === response
+      if Net::HTTPSuccess === response
         puts "Succesfully recorded deployment"
         return true
       else
