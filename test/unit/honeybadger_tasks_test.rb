@@ -96,7 +96,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
           end
 
           before_should "puts the response body on success" do
-            HoneybadgerTasks.expects(:puts).with("body")
+            HoneybadgerTasks.expects(:puts).with("Succesfully recorded deployment")
             @http_proxy.expects(:request).with(any_parameters).returns(successful_response('body'))
           end
 
@@ -122,7 +122,7 @@ class HoneybadgerTasksTest < Honeybadger::UnitTest
 
     context "in a configured project with custom host" do
       setup do
-        Honeybadger.configure do |config| 
+        Honeybadger.configure do |config|
           config.api_key = "1234123412341234"
           config.host = "custom.host"
           config.secure = false
