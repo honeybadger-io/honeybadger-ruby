@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'date'
+require 'json'
 begin
   require 'cucumber/rake/task'
 rescue LoadError
@@ -191,6 +192,14 @@ namespace :cucumber do
       system(cmd)
     end
   end
+end
+
+desc "Update supported versions: Run this to pull down latest rails versions from rubygems"
+task :update_supported_versions do
+  down_to = Gem::Version.new('3.0.0')
+  versions = JSON.parse `curl https://rubygems.org/api/v1/versions/rails.json 2> /dev/null`
+  supported_versions = versions.map { |v| Gem::Version.new(v['number']) }.reject { |v| v < down_to || v.prerelease? }.sort
+  `echo '#{supported_versions.join("\n")}' > SUPPORTED_RAILS_VERSIONS`
 end
 
 #############################################################################
