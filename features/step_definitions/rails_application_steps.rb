@@ -195,12 +195,12 @@ When /^I install the "([^\"]*)" plugin$/ do |plugin_name|
   FileUtils.mkdir_p("#{rails_root}/vendor/plugins/#{plugin_name}")
 end
 
-When /^I define a response for "([^\"]*)":$/ do |controller_and_action, definition|
+When /^I define a( metal)? response for "([^\"]*)":$/ do |metal, controller_and_action, definition|
   controller_class_name, action = controller_and_action.split('#')
   controller_name = controller_class_name.underscore
   controller_file_name = File.join(rails_root, 'app', 'controllers', "#{controller_name}.rb")
   File.open(controller_file_name, "w") do |file|
-    file.puts "class #{controller_class_name} < ApplicationController"
+    file.puts "class #{controller_class_name} < #{ metal ? 'ActionController::Metal' : 'ApplicationController'}"
     file.puts "def consider_all_requests_local; false; end"
     file.puts "def local_request?; false; end"
     file.puts "def #{action}"

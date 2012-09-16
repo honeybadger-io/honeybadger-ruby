@@ -199,6 +199,17 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
 
+  Scenario: Notify honeybadger within a metal controller
+    When I configure the Honeybadger shim
+    And I configure usage of Honeybadger
+    And I define a metal response for "TestController#index":
+      """
+      raise RuntimeError, "some message"
+      """
+    And I route "/test/index" to "test#index"
+    And I perform a request to "http://example.com:123/test/index?param=value"
+    Then I should receive a Honeybadger notification
+
   Scenario: Reporting 404s
     When I configure the Honeybadger shim
     And I configure usage of Honeybadger

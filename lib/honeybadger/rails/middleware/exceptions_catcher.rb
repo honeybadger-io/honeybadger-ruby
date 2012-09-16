@@ -17,7 +17,7 @@ module Honeybadger
           controller = env['action_controller.instance']
           env['honeybadger.error_id'] = Honeybadger.
             notify_or_ignore(exception,
-                   (controller.try(:honeybadger_request_data) || {:rack_env => env})) unless skip_user_agent?(env)
+                   (controller.respond_to?(:honeybadger_request_data) ? controller.honeybadger_request_data : {:rack_env => env})) unless skip_user_agent?(env)
           if defined?(controller.rescue_action_in_public_without_honeybadger)
             controller.rescue_action_in_public_without_honeybadger(exception)
           end
