@@ -140,7 +140,7 @@ module Honeybadger
       @development_environments  = %w(development test cucumber)
       @notifier_name             = 'Honeybadger Notifier'
       @notifier_version          = VERSION
-      @notifier_url              = 'https://github.com/honeybadger/honeybadger'
+      @notifier_url              = 'https://github.com/honeybadger-io/honeybadger-ruby'
       @framework                 = 'Standalone'
       @user_information          = 'Honeybadger Error {{error_id}}'
       @rescue_rake_exceptions    = nil
