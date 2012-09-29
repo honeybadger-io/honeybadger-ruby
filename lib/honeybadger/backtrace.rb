@@ -114,7 +114,7 @@ module Honeybadger
     #
     # Returns array containing backtrace lines
     def to_ary
-      lines.map { |l| { :number => l.number, :file => l.file, :method => l.method } }
+      lines.map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method } }
     end
     alias :to_a :to_ary
 
@@ -137,8 +137,8 @@ module Honeybadger
     end
 
     def ==(other)
-      if other.respond_to?(:lines)
-        lines == other.lines
+      if other.respond_to?(:to_json)
+        to_json == other.to_json
       else
         false
       end
