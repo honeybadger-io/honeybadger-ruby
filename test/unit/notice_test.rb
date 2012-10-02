@@ -169,10 +169,6 @@ class NoticeTest < Honeybadger::UnitTest
     assert_equal data, notice.cgi_data, "should take CGI data from a hash"
   end
 
-  should "accept user" do
-    assert_equal 'foo@bar.com', build_notice(:user => 'foo@bar.com').user
-  end
-
   should "accept notifier information" do
     params = { :notifier_name    => 'a name for a notifier',
                :notifier_version => '1.0.5',
@@ -234,7 +230,6 @@ class NoticeTest < Honeybadger::UnitTest
     assert_nil notice.url
     assert_nil notice.controller
     assert_nil notice.action
-    assert_nil notice.user
 
     json = notice.to_json
     payload = JSON.parse(json)
@@ -242,13 +237,6 @@ class NoticeTest < Honeybadger::UnitTest
     assert_nil payload['request']['component']
     assert_nil payload['request']['action']
     assert_nil payload['request']['user']
-  end
-
-  should "send user in request" do
-    notice = build_notice(:user => 'foo@bar.com')
-    json = notice.to_json
-    payload = JSON.parse(json)
-    assert_equal payload['request']['user'], 'foo@bar.com'
   end
 
   %w(url controller action).each do |var|
@@ -260,7 +248,7 @@ class NoticeTest < Honeybadger::UnitTest
     end
   end
 
-  %w(parameters cgi_data session_data).each do |var|
+  %w(parameters cgi_data session_data context).each do |var|
     should "send a request if #{var} is present" do
       notice = build_notice(var.to_sym => { 'key' => 'value' })
       json = notice.to_json
@@ -327,6 +315,23 @@ class NoticeTest < Honeybadger::UnitTest
     params = { 'one' => 'two' }
     notice = build_notice(:parameters => params)
     assert_equal params, notice[:request][:params]
+  end
+
+  should "return context on notice[:request][:context]" do
+    context = { 'one' => 'two' }
+    notice = build_notice(:context => context)
+    assert_equal context, notice[:request][:context]
+  end
+
+  should "merge context from args with context from Honeybadger#context" do
+    Honeybadger.context({ 'one' => 'two', 'foo' => 'bar' })
+    notice = build_notice(:context => { 'three' => 'four', 'foo' => 'baz' })
+    assert_equal({ 'one' => 'two', 'three' => 'four', 'foo' => 'baz' }, notice[:request][:context])
+  end
+
+  should "return nil context when context is not set" do
+    notice = build_notice
+    assert_equal nil, notice[:request][:context]
   end
 
   should "ensure #to_hash is called on objects that support it" do

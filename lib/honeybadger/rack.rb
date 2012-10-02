@@ -43,6 +43,8 @@ module Honeybadger
       rescue Exception => raised
         env['honeybadger.error_id'] = notify_honeybadger(raised,env)
         raise
+      ensure
+        Honeybadger.context.clear!
       end
 
       if env['rack.exception']
