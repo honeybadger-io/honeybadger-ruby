@@ -124,22 +124,27 @@ this rake task (from RAILS_ROOT):
 If everything is configured properly, that task will send a notice to Honeybadger
 which will be visible immediately.
 
-## User Tracking
+## Sending custom data
 
-Honeybadger will automatically try to associate errors and notices with the current user.
+Honeybadger allows you to send custom data using `Honeybadger.context`.
+Here's an example of sending some user-specific information in a Rails
+`before_filter` call:
 
-By default, it tries to call `current_user` when rescuing exceptions in ActionController.
-If you want to use a different method, you may do so in the honeybadger initializer:
-
-    Honeybadger.configure do |config|
-      ...
-      # The current user method to call for errors rescued in ActionController
-      config.current_user_method = :a_controller_method_which_returns_the_user
+    before_filter do
+      Honeybadger.context({
+        user_id: current_user.id,
+        user_email: current_user.email
+      }) if current_user
     end
 
-Honeybadger assumes that the object returned by `current_user` will respond to `#id`,
-and will optionally include the user's email address if the user object also responds
-to `#email`.
+Now, whenever an error occurs, Honeybadger will display the affected
+user's id and email address, if available.
+
+Subsequent calls to `context` will merge the existing hash with any new
+data, so you can effectively build up context throughout your
+request's life cycle. Honeybadger will discard the data when a
+request completes, so that the next request will start with a blank
+slate.
 
 ## Going beyond exceptions
 
@@ -151,7 +156,7 @@ controllers:
       params = {
         # params that you pass to a method that can throw an exception
       }
-      my_unpredicable_method(params)
+      my_unpredicable_method(*params)
     rescue => e
       Honeybadger.notify(
         :error_class   => "Special Error",
@@ -175,7 +180,8 @@ Honeybadger merges the hash you pass with these default options:
       :error_message => 'Notification',
       :backtrace     => caller,
       :parameters    => {},
-      :session       => {}
+      :session       => {},
+      :context       => {}
     }
 
 You can override any of those parameters.
@@ -287,6 +293,8 @@ Original code based on the [airbrake](http://airbrake.io) gem,
 originally by Thoughtbot, Inc.
 
 Thank you to Thoughtbot and all of the Airbrake contributors!
+
+The nifty custom data (`Honeybadger.context()`) feature was inspired by Exceptional.
 
 ## License
 

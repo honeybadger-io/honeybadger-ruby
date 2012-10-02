@@ -27,12 +27,14 @@ end
 module DefinesConstants
   def setup
     @defined_constants = []
+    Honeybadger.context.clear!
   end
 
   def teardown
     @defined_constants.each do |constant|
       Object.__send__(:remove_const, constant)
     end
+    Honeybadger.context.clear!
   end
 
   def define_constant(name, value)

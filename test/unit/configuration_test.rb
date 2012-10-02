@@ -27,8 +27,12 @@ class ConfigurationTest < Honeybadger::UnitTest
     assert_config_default :ignore,
                           Honeybadger::Configuration::IGNORE_DEFAULT
     assert_config_default :framework, 'Standalone'
-    assert_config_default :current_user_method,     :current_user
     assert_config_default :source_extract_radius, 2
+  end
+
+  should "stub current_user_method" do
+    config = Honeybadger::Configuration.new
+    assert_nothing_raised { config.current_user_method = :foo }
   end
 
   should "provide default values for secure connections" do
@@ -69,7 +73,6 @@ class ConfigurationTest < Honeybadger::UnitTest
     assert_config_overridable :notifier_url
     assert_config_overridable :environment_name
     assert_config_overridable :logger
-    assert_config_overridable :current_user_method
   end
 
   should "have an api key" do

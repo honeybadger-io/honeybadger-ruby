@@ -105,6 +105,7 @@ module Honeybadger
   #             :rack_env         - The Rack environment.
   #             :session          - The contents of the user's session.
   #             :environment_name - The application environment name.
+  #             :context          - Custom hash to send
   #
   # Returns exception ID from Honeybadger on success, false on failure
   def self.notify(exception, options = {})
@@ -133,6 +134,16 @@ module Honeybadger
     end
 
     result
+  end
+
+  def self.context(hash = {})
+    Thread.current[:honeybadger_context] ||= {}
+    Thread.current[:honeybadger_context].merge!(hash)
+    self
+  end
+
+  def self.clear!
+    Thread.current[:honeybadger_context] = nil
   end
 
   private
