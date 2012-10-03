@@ -7,8 +7,7 @@ module Honeybadger
           :controller       => params[:controller],
           :action           => params[:action],
           :url              => honeybadger_request_url,
-          :cgi_data         => honeybadger_filter_if_filtering(request.env),
-          :user             => honeybadger_user_info }
+          :cgi_data         => honeybadger_filter_if_filtering(request.env) }
       end
 
       private
@@ -52,17 +51,6 @@ module Honeybadger
           session.to_hash
         else
           session.data
-        end
-      end
-
-      def honeybadger_user_info
-        method = Honeybadger.configuration.current_user_method
-
-        if respond_to?(method) && user = send(method)
-          {
-            :id => user.id,
-            :email => user.respond_to?(:email) ? user.email : 'N/A'
-          }
         end
       end
 

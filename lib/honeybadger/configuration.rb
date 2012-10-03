@@ -84,9 +84,6 @@ module Honeybadger
     # The framework Honeybadger is configured to use
     attr_accessor :framework
 
-    # The current user method to call for errors rescued in ActionController
-    attr_accessor :current_user_method
-
     # Should Honeybadger catch exceptions from Rake tasks?
     # (boolean or nil; set to nil to catch exceptions when rake isn't running from a terminal; default is nil)
     attr_accessor :rescue_rake_exceptions
@@ -144,7 +141,6 @@ module Honeybadger
       @framework                 = 'Standalone'
       @user_information          = 'Honeybadger Error {{error_id}}'
       @rescue_rake_exceptions    = nil
-      @current_user_method       = :current_user
       @source_extract_radius     = 2
     end
 
@@ -262,6 +258,10 @@ module Honeybadger
     def local_cert_path
       File.expand_path(File.join("..", "..", "..", "resources", "ca-bundle.crt"), __FILE__)
     end
+
+    # Stub deprecated current_user_method configuration option
+    # This should be removed completely once everyone has updated to > 1.2
+    def current_user_method=(null) ; end
 
     private
 

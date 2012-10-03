@@ -53,4 +53,16 @@ class RackTest < Honeybadger::UnitTest
       expect.with(exception, :rack_env => environment)
     end
   end
+
+  should "clear context after app is called" do
+    Honeybadger.context( :foo => :bar )
+    assert_equal({ :foo => :bar }, Thread.current[:honeybadger_context])
+
+    app = lambda { |env| ['response', {}, env] }
+    stack = Honeybadger::Rack.new(app)
+
+    response = stack.call({})
+
+    assert_equal nil, Thread.current[:honeybadger_context]
+  end
 end
