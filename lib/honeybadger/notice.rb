@@ -274,6 +274,8 @@ module Honeybadger
             parts = line.split(': ')
             [parts[0].strip, parts[1] || '']
           end]
+        elsif backtrace.application_lines.any?
+          backtrace.application_lines.first.source(source_extract_radius)
         else
           backtrace.lines.first.source(source_extract_radius)
         end

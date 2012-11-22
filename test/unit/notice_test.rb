@@ -74,9 +74,38 @@ class NoticeTest < Honeybadger::UnitTest
 
   context "with a backtrace" do
     setup do
-      @backtrace_array = ['my/file/backtrace:3']
+      @source = <<-RUBY
+        $:<<'lib'
+        require 'honeybadger'
+
+        begin
+          raise StandardError
+        rescue => e
+          puts Honeybadger::Notice.new(exception: e).backtrace.to_json
+        end
+      RUBY
+
+      @backtrace_array = ["my/file/backtrace:3",
+                          "test/honeybadger/rack_test.rb:2:in `build_exception'",
+                   "test/honeybadger/rack_test.rb:52:in `test_delivers_exception_from_rack'",
+                   "foo/bar/baz.rb:28:in `run'"]
+
       @exception = build_exception
       @exception.set_backtrace(@backtrace_array)
+    end
+
+    should "pass its backtrace filters for parsing" do
+      Honeybadger::Backtrace.expects(:parse).with(@backtrace_array, {:filters => 'foo'}).returns(mock(:lines => []))
+
+      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
+    end
+
+    should "pass its backtrace line filters for parsing" do
+      @backtrace_array.each do |line|
+        Honeybadger::Backtrace::Line.expects(:parse).with(line, {:filters => 'foo'})
+      end
+
+      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
     end
 
     should "accept a backtrace from an exception or hash" do
@@ -93,23 +122,41 @@ class NoticeTest < Honeybadger::UnitTest
         "backtrace was not correctly set from a hash"
     end
 
-    should "pass its backtrace filters for parsing" do
-      Honeybadger::Backtrace.expects(:parse).with(@backtrace_array, {:filters => 'foo'}).returns(mock(:lines => []))
+    context "without application trace" do
+      setup do
+        Honeybadger.configuration.project_root = '/foo/bar'
+        @string_io = StringIO.new(@source)
+        File.stubs(:exists?).with('my/file/backtrace').returns true
+        File.stubs(:open).with('my/file/backtrace').yields @string_io
+      end
 
-      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
+      should "include source extract from backtrace" do
+        backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
+        notice_from_exception = build_notice(:exception => @exception)
+        @string_io.rewind
+
+        assert_not_empty notice_from_exception.source_extract, 'Expected backtrace source extract to be found'
+        assert_equal backtrace.lines.first.source, notice_from_exception.source_extract
+      end
     end
 
-    should "pass its backtrace line filters for parsing" do
-      Honeybadger::Backtrace::Line.expects(:parse).with(@backtrace_array.first, {:filters => 'foo'})
+    context 'with an application trace' do
+      setup do
+        Honeybadger.configuration.project_root = 'test/honeybadger/'
 
-      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
-    end
+        @string_io = StringIO.new(@source)
+        File.stubs(:exists?).with('test/honeybadger/rack_test.rb').returns true
+        File.stubs(:open).with('test/honeybadger/rack_test.rb').yields @string_io
+      end
 
-    should "include source extract from backtrace" do
-      backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
-      notice_from_exception = build_notice(:exception => @exception)
+      should "include source extract from first line of application trace" do
+        backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
+        notice_from_exception = build_notice(:exception => @exception)
+        @string_io.rewind
 
-      assert_equal backtrace.lines.first.source, notice_from_exception.source_extract
+        assert_not_empty notice_from_exception.source_extract, 'Expected backtrace source extract to be found'
+        assert_equal backtrace.lines.second.source, notice_from_exception.source_extract
+      end
     end
   end
 

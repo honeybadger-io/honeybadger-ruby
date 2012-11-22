@@ -4,7 +4,7 @@ module Honeybadger
 
     # Public: Handles backtrace parsing line by line
     class Line
-      # regexp (optionnally allowing leading X: for windows support)
+      # regexp (optionally allowing leading X: for windows support)
       INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in `([^']+)')?$}.freeze
 
       # Public: The file portion of the line (such as app/models/user.rb)
@@ -62,6 +62,11 @@ module Honeybadger
         "<Line:#{to_s}>"
       end
 
+      # Public: Determines if this line is part of the application trace or not
+      def application?
+        (filtered_file =~ /^\[PROJECT_ROOT\]/i) && !(filtered_file =~ /^\[PROJECT_ROOT\]\/vendor/i)
+      end
+
       # Public: An excerpt from the source file, lazily loaded to preserve
       # performance
       def source(radius = 2)
@@ -94,7 +99,7 @@ module Honeybadger
     end
 
     # Public: holder for an Array of Backtrace::Line instances
-    attr_reader :lines
+    attr_reader :lines, :application_lines
 
     def self.parse(ruby_backtrace, opts = {})
       ruby_lines = split_multiline_backtrace(ruby_backtrace)
@@ -108,6 +113,7 @@ module Honeybadger
 
     def initialize(lines)
       self.lines = lines
+      self.application_lines = lines.select(&:application?)
     end
 
     # Public
@@ -146,7 +152,7 @@ module Honeybadger
 
     private
 
-    attr_writer :lines
+    attr_writer :lines, :application_lines
 
     def self.split_multiline_backtrace(backtrace)
       if backtrace.to_a.size == 1

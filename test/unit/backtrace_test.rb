@@ -116,10 +116,27 @@ class BacktraceTest < Honeybadger::UnitTest
     assert_empty backtrace.lines.second.source
   end
 
+  should "have an empty application trace by default" do
+    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
+    assert_equal backtrace.application_lines, []
+  end
+
   context "with a project root" do
     setup do
       @project_root = '/some/path'
       Honeybadger.configure {|config| config.project_root = @project_root }
+
+      @backtrace_with_root = Honeybadger::Backtrace.parse(
+        ["#{@project_root}/app/models/user.rb:7:in `latest'",
+         "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
+         "#{@project_root}/vendor/plugins/foo/bar.rb:42:in `baz'",
+         "/lib/something.rb:41:in `open'"],
+         :filters => default_filters)
+      @backtrace_without_root = Honeybadger::Backtrace.parse(
+        ["[PROJECT_ROOT]/app/models/user.rb:7:in `latest'",
+         "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
+         "[PROJECT_ROOT]/vendor/plugins/foo/bar.rb:42:in `baz'",
+         "/lib/something.rb:41:in `open'"])
     end
 
     teardown do
@@ -127,17 +144,15 @@ class BacktraceTest < Honeybadger::UnitTest
     end
 
     should "filter out the project root" do
-      backtrace_with_root = Honeybadger::Backtrace.parse(
-        ["#{@project_root}/app/models/user.rb:7:in `latest'",
-         "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
-         "/lib/something.rb:41:in `open'"],
-         :filters => default_filters)
-         backtrace_without_root = Honeybadger::Backtrace.parse(
-           ["[PROJECT_ROOT]/app/models/user.rb:7:in `latest'",
-            "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
-            "/lib/something.rb:41:in `open'"])
+      assert_equal @backtrace_without_root, @backtrace_with_root
+    end
 
-            assert_equal backtrace_without_root, backtrace_with_root
+    should "have an application trace" do
+      assert_equal @backtrace_without_root.application_lines, @backtrace_without_root.lines[0..1]
+    end
+
+    should "filter ./vendor from application trace" do
+      assert_does_not_contain @backtrace_without_root.application_lines, @backtrace_without_root.lines[2]
     end
   end
 
