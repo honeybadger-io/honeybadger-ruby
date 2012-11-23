@@ -1,7 +1,18 @@
 namespace :honeybadger do
   desc "Notify Honeybadger of a new deploy."
-  task :deploy => :environment do
+  task :deploy do
     require 'honeybadger_tasks'
+
+    if defined?(Rails.root)
+      initializer_file = Rails.root.join('config', 'initializers','honeybadger.rb')
+
+      if initializer_file.exist?
+        load initializer_file
+      else
+        Rake::Task[:environment].invoke
+      end
+    end
+
     HoneybadgerTasks.deploy(:environment    => ENV['TO'],
                             :revision       => ENV['REVISION'],
                             :repository     => ENV['REPO'],
