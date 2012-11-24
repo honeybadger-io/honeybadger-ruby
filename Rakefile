@@ -88,7 +88,7 @@ end
 
 Cucumber::Rake::Task.new(:cucumber) do |t|
   t.fork = true
-  t.cucumber_opts = ['--format', 'progress']
+  t.cucumber_opts = ['--format', 'progress', '--tags', '~@pending']
 end
 
 #############################################################################

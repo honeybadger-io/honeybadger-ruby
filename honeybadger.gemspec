@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('shoulda',           '~> 2.11.3')
   s.add_development_dependency('capistrano')
   s.add_development_dependency('rake')
+  s.add_development_dependency('sinatra')
   s.add_development_dependency('aruba')
   s.add_development_dependency('appraisal')
 

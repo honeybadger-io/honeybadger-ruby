@@ -24,14 +24,6 @@ module RailsHelpers
   end
   alias :version_string :rails_version
 
-  def bundler_manages_gems?
-    File.exists?(gemfile_path)
-  end
-
-  def gemfile_path
-    gemfile = File.join(rails_root, 'Gemfile')
-  end
-
   def rails_manages_gems?
     rails_version =~ /^2\.[123]/
   end
@@ -50,14 +42,6 @@ module RailsHelpers
 
   def rakefile_path
     File.join(rails_root, 'Rakefile')
-  end
-
-  def bundle_gem(gem_name, version = nil)
-    File.open(gemfile_path, 'a') do |file|
-      gem = "gem '#{gem_name}'"
-      gem += ", '#{version}'" if version
-      file.puts(gem)
-    end
   end
 
   def config_gem(gem_name, version = nil)

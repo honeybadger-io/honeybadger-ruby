@@ -24,46 +24,7 @@ Then /^I should receive a Honeybadger notification$/ do
   step %(the output should contain "123456789")
 end
 
-# OLD:
-
-When /^I run the honeybadger generator with "([^\"]*)"$/ do |generator_args|
-  if rails3?
-    When %{I run "./script/rails generate honeybadger #{generator_args}"}
-  else
-    When %{I run "./script/generate honeybadger #{generator_args}"}
-  end
-end
-
-When /^I configure my application to require the "capistrano" gem if necessary$/ do
-  When %{I configure my application to require the "capistrano" gem} if version_string >= "3.0.0"
-end
-
-When /^I configure my application to require the "([^\"]*)" gem(?: with version "(.+)")?$/ do |gem_name, version|
-  if rails_manages_gems?
-    config_gem(gem_name, version)
-  elsif bundler_manages_gems?
-    bundle_gem(gem_name, version)
-  else
-    File.open(environment_path, 'a') do |file|
-      file.puts
-      file.puts("require 'honeybadger'")
-      file.puts("require 'honeybadger/rails'")
-    end
-
-    unless rails_finds_generators_in_gems?
-      FileUtils.cp_r(File.join(PROJECT_ROOT, 'generators'), File.join(rails_root, 'lib'))
-    end
-  end
-end
-
-Then /^I should receive two Honeybadger notifications$/ do
-  @terminal.output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == 2
-end
-
 When /^I configure the Honeybadger shim$/ do
-  if bundler_manages_gems?
-    bundle_gem("sham_rack")
-  end
 
   shim_file = File.join(PROJECT_ROOT, 'features', 'support', 'honeybadger_shim.rb.template')
   if rails_supports_initializers?
@@ -77,13 +38,85 @@ When /^I configure the Honeybadger shim$/ do
   end
 end
 
+When /^I run the honeybadger generator with "([^\"]*)"$/ do |generator_args|
+  if rails3?
+    step %(I successfully run `./script/rails generate honeybadger #{generator_args}`)
+  else
+    step %(I successfully run `./script/generate honeybadger #{generator_args}`)
+  end
+end
+
+Then /^I should see the Rails version$/ do
+  step %(the output should contain "[Rails: #{rails_version}]")
+end
+
+When /^I unpack the "([^\"]*)" gem$/ do |gem_name|
+  if rails3?
+    step %(I successfully run `bundle pack`)
+  elsif rails_manages_gems?
+    step %(I successfully run `rake gems:unpack GEM=#{gem_name}`)
+  else
+    vendor_dir = File.join(rails_root, 'vendor', 'gems')
+    FileUtils.mkdir_p(vendor_dir)
+    step %(I successfully run `gem unpack #{gem_name}`)
+    gem_path =
+      Dir.glob(File.join(rails_root, 'vendor', 'gems', "#{gem_name}-*", 'lib')).first
+    File.open(environment_path, 'a') do |file|
+      file.puts
+      file.puts("$: << #{gem_path.inspect}")
+    end
+  end
+end
+
+When /^I uninstall the "([^\"]*)" gem$/ do |gem_name|
+  step %(I successfully run `gem uninstall #{gem_name}`)
+end
+
+When /^I install cached gems$/ do
+  if rails3?
+    step %(I successfully run `bundle install`)
+  end
+end
+
+Then /^I should receive two Honeybadger notifications$/ do
+  all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == 2
+end
+
+Then /^the command should have run successfully$/ do
+  step %(the exit status should be 1)
+end
+
 When /^I configure the notifier to use "([^\"]*)" as an API key$/ do |api_key|
   steps %{
-    When I configure the notifier to use the following configuration lines:
+    When I configure Honeybadger with:
       """
       config.api_key = #{api_key.inspect}
       """
   }
+end
+
+When /^I configure my application to require Honeybadger$/ do
+  if rails3?
+    # Do nothing - bundler's on it
+  elsif rails_manages_gems?
+    config_gem('honeybadger')
+  else
+    File.open(environment_path, 'a') do |file|
+      file.puts
+      file.puts("require 'honeybadger'")
+      file.puts("require 'honeybadger/rails'")
+    end
+
+    unless rails_finds_generators_in_gems?
+      FileUtils.cp_r(File.join(PROJECT_ROOT, 'generators'), File.join(rails_root, 'lib'))
+    end
+  end
+end
+
+# OLD:
+
+When /^I configure my application to require the "capistrano" gem if necessary$/ do
+  When %{I configure my application to require the "capistrano" gem} if version_string >= "3.0.0"
 end
 
 When /^I configure the notifier to use the following configuration lines:$/ do |configuration_lines|
@@ -119,37 +152,6 @@ def rails_non_initializer_honeybadger_config_file
   File.join(rails_root, 'config', 'honeybadger.rb')
 end
 
-
-When /^I uninstall the "([^\"]*)" gem$/ do |gem_name|
-  @terminal.uninstall_gem(gem_name)
-end
-
-When /^I unpack the "([^\"]*)" gem$/ do |gem_name|
-  if bundler_manages_gems?
-    @terminal.cd(rails_root)
-    @terminal.run("bundle pack")
-  elsif rails_manages_gems?
-    @terminal.cd(rails_root)
-    @terminal.run("rake gems:unpack GEM=#{gem_name}")
-  else
-    vendor_dir = File.join(rails_root, 'vendor', 'gems')
-    FileUtils.mkdir_p(vendor_dir)
-    @terminal.cd(vendor_dir)
-    @terminal.run("gem unpack #{gem_name}")
-    gem_path =
-      Dir.glob(File.join(rails_root, 'vendor', 'gems', "#{gem_name}-*", 'lib')).first
-    File.open(environment_path, 'a') do |file|
-      file.puts
-      file.puts("$: << #{gem_path.inspect}")
-    end
-  end
-end
-
-When /^I install cached gems$/ do
-  if bundler_manages_gems?
-    Then %{I run "bundle install"}
-  end
-end
 
 When /^I install the "([^\"]*)" plugin$/ do |plugin_name|
   FileUtils.mkdir_p("#{rails_root}/vendor/plugins/#{plugin_name}")
@@ -214,16 +216,8 @@ Then /^I should receive the following Honeybadger notification:$/ do |table|
   end
 end
 
-Then /^I should see the Rails version$/ do
-  Then %{I should see "[Rails: #{rails_version}]"}
-end
-
 Then /^I should see that "([^\"]*)" is not considered a framework gem$/ do |gem_name|
   Then %{I should not see "[R] #{gem_name}"}
-end
-
-Then /^the command should have run successfully$/ do
-  @terminal.status.exitstatus.should == 0
 end
 
 When /^I route "([^\"]*)" to "([^\"]*)"$/ do |path, controller_action_pair|
