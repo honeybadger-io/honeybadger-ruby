@@ -1,11 +1,12 @@
 Feature: Rescue errors in Rails middleware
 
   Background:
-    Given I have built and installed the "honeybadger" gem
-    And I generate a new Rails application
+    Given I generate a new Rails application
     And I configure the Honeybadger shim
-    And I configure my application to require the "honeybadger" gem
-    And I run the honeybadger generator with "-k myapikey"
+    And I configure Honeybadger with:
+      """
+      config.logger = Logger.new(STDOUT)
+      """
 
   Scenario: Rescue an exception in the dispatcher
     When I define a Metal endpoint called "Exploder":

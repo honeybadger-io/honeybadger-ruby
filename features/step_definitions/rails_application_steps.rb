@@ -1,40 +1,30 @@
 require 'uri'
 require 'active_support/core_ext/string/inflections'
 
-Given /^I have built and installed the "([^\"]*)" gem$/ do |gem_name|
-  @terminal.build_and_install_gem(File.join(PROJECT_ROOT, "#{gem_name}.gemspec"))
-end
+# NEW:
 
 When /^I generate a new Rails application$/ do
-  @terminal.cd(TEMP_DIR)
+  rails_create_command = 'rails'
+  rails_create_command << (rails3? ? ' new' : '')
 
-  rails3 = version_string =~ /^3/
-
-  if rails3
-    rails_create_command = 'new'
-  else
-    rails_create_command = ''
-  end
-
-  load_rails = <<-RUBY
-    gem 'rails', '#{version_string}'; \
-    load Gem.bin_path('#{version_string >= "3.2.0" ? "railties" : "rails"}', 'rails', '#{version_string}')
-  RUBY
-
-  @terminal.run(%{ruby -rrubygems -rthread -e "#{load_rails.strip!}" #{rails_create_command} rails_root})
-  if rails_root_exists?
-    @terminal.echo("Generated a Rails #{version_string} application")
-  else
-    raise "Unable to generate a Rails application:\n#{@terminal.output}"
-  end
-  require_thread
-  if version_string >= "3.1.0"
-    When %{I configure my application to require the "therubyracer" gem with version "0.10.1"}
-  elsif version_string == "2.3.14"
-    monkeypatch_old_version
-  end
-  config_gem_dependencies unless rails3
+  step %(I successfully run `#{rails_create_command} rails_root -O`)
+  step %(I cd to "rails_root")
 end
+
+When /^I configure Honeybadger with:$/ do |config|
+  File.open(File.join(rails_root, 'config', 'initializers', 'honeybadger.rb'), 'w') do |file|
+    file.puts 'Honeybadger.configure do |config|'
+    file.puts config
+    file.puts 'end'
+  end
+end
+
+Then /^I should receive a Honeybadger notification$/ do
+  step %(the output should contain "** [Honeybadger] Response from Honeybadger:")
+  step %(the output should contain "123456789")
+end
+
+# OLD:
 
 When /^I run the honeybadger generator with "([^\"]*)"$/ do |generator_args|
   if rails3?
@@ -43,15 +33,6 @@ When /^I run the honeybadger generator with "([^\"]*)"$/ do |generator_args|
     When %{I run "./script/generate honeybadger #{generator_args}"}
   end
 end
-
-When /^I print the console output$/ do
-  puts @terminal.output
-end
-
-Given /^I have installed the "([^\"]*)" gem$/ do |gem_name|
-  @terminal.install_gem(gem_name)
-end
-
 
 When /^I configure my application to require the "capistrano" gem if necessary$/ do
   When %{I configure my application to require the "capistrano" gem} if version_string >= "3.0.0"
@@ -73,16 +54,6 @@ When /^I configure my application to require the "([^\"]*)" gem(?: with version 
       FileUtils.cp_r(File.join(PROJECT_ROOT, 'generators'), File.join(rails_root, 'lib'))
     end
   end
-end
-
-When /^I run "([^\"]*)"$/ do |command|
-  @terminal.cd(rails_root)
-  @terminal.run(command)
-end
-
-Then /^I should receive a Honeybadger notification$/ do
-  Then %{I should see "** [Honeybadger] Response from Honeybadger:"}
-  And %{I should see "123456789"}
 end
 
 Then /^I should receive two Honeybadger notifications$/ do
@@ -148,17 +119,6 @@ def rails_non_initializer_honeybadger_config_file
   File.join(rails_root, 'config', 'honeybadger.rb')
 end
 
-Then /^I should see "([^\"]*)"$/ do |expected_text|
-  unless @terminal.output.include?(expected_text)
-    raise("Got terminal output:\n#{@terminal.output}\n\nExpected output:\n#{expected_text}")
-  end
-end
-
-Then /^I should not see "([^\"]*)"$/ do |unexpected_text|
-  if @terminal.output.include?(unexpected_text)
-    raise("Got terminal output:\n#{@terminal.output}\n\nDid not expect the following output:\n#{unexpected_text}")
-  end
-end
 
 When /^I uninstall the "([^\"]*)" gem$/ do |gem_name|
   @terminal.uninstall_gem(gem_name)

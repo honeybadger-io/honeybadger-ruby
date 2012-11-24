@@ -1,37 +1,36 @@
 Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new('>= 0') if s.respond_to? :required_rubygems_version=
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
   s.version           = '1.3.1'
-  s.date              = '2012-10-24'
+  s.date              = '2012-11-24'
 
-  s.summary     = "Error reports you can be happy about."
-  s.description = "Make managing application errors a more pleasant experience."
+  s.summary     = 'Error reports you can be happy about.'
+  s.description = 'Make managing application errors a more pleasant experience.'
 
-  s.authors  = ["Joshua Wood"]
+  s.authors  = ['Joshua Wood']
   s.email    = 'josh@honeybadger.io'
   s.homepage = 'http://www.honeybadger.io'
 
   s.require_paths = %w[lib]
 
-  s.rdoc_options = ["--charset=UTF-8", "--markup tomdoc"]
+  s.rdoc_options = ['--charset=UTF-8', '--markup tomdoc']
   s.extra_rdoc_files = %w[README.md MIT-LICENSE]
 
-  s.add_dependency("json")
-  s.add_dependency("activesupport")
+  s.add_dependency('json')
 
-  s.add_development_dependency("actionpack",        "~> 2.3.8")
-  s.add_development_dependency("activerecord",      "~> 2.3.8")
-  s.add_development_dependency("activesupport",     "~> 2.3.8")
-  s.add_development_dependency("bourne",            ">= 1.0")
-  s.add_development_dependency("cucumber",          "~> 0.10.6")
-  s.add_development_dependency("rspec",             "~> 2.6.0")
-  s.add_development_dependency("fakeweb",           "~> 1.3.0")
-  s.add_development_dependency("sham_rack",         "~> 1.3.0")
-  s.add_development_dependency("shoulda",           "~> 2.11.3")
-  s.add_development_dependency("capistrano",        "~> 2.8.0")
+  s.add_development_dependency('bourne',            '>= 1.0')
+  s.add_development_dependency('cucumber',          '~> 1.2.1')
+  s.add_development_dependency('rspec',             '~> 2.12.0')
+  s.add_development_dependency('fakeweb',           '~> 1.3.0')
+  s.add_development_dependency('sham_rack',         '~> 1.3.0')
+  s.add_development_dependency('shoulda',           '~> 2.11.3')
+  s.add_development_dependency('capistrano')
+  s.add_development_dependency('rake')
+  s.add_development_dependency('aruba')
+  s.add_development_dependency('appraisal')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE

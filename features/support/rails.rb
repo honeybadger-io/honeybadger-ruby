@@ -20,17 +20,9 @@ module RailsHelpers
   end
 
   def rails_version
-    @rails_version ||= begin
-      if ENV["RAILS_VERSION"]
-        ENV["RAILS_VERSION"]
-      elsif bundler_manages_gems?
-        rails_version = open(gemfile_path).read.match(/gem.*rails["'].*["'](.+)["']/)[1]
-      else
-        environment_file = File.join(rails_root, 'config', 'environment.rb')
-        rails_version = `grep RAILS_GEM_VERSION #{environment_file}`.match(/[\d.]+/)[0]
-      end
-    end
+    @rails_version ||= `rails -v`[/\d.+/]
   end
+  alias :version_string :rails_version
 
   def bundler_manages_gems?
     File.exists?(gemfile_path)
@@ -50,10 +42,6 @@ module RailsHelpers
 
   def rails_finds_generators_in_gems?
     rails3? || rails_version =~ /^2\./
-  end
-
-  def version_string
-    ENV['RAILS_VERSION'] || `tail -n 1 SUPPORTED_RAILS_VERSIONS` # use latest version if ENV["RAILS_VERSION"] is undefined
   end
 
   def environment_path
@@ -132,8 +120,7 @@ module RailsHelpers
         end
       SCRIPT
       File.open(File.join(rails_root, 'request.rb'), 'w') { |file| file.write(request_script) }
-      @terminal.cd(rails_root)
-      @terminal.run("ruby -rthread ./script/rails runner -e #{environment} request.rb")
+      step %(I run `ruby -rthread ./script/rails runner -e #{environment} request.rb`)
     elsif rails_uses_rack?
       request_script = <<-SCRIPT
         require File.expand_path('../config/environment', __FILE__)
@@ -153,8 +140,7 @@ module RailsHelpers
         puts response
       SCRIPT
       File.open(File.join(rails_root, 'request.rb'), 'w') { |file| file.write(request_script) }
-      @terminal.cd(rails_root)
-      @terminal.run("ruby -rthread ./script/runner -e #{environment} request.rb")
+      step %(I run `ruby -rthread ./script/runner -e #{environment} request.rb`)
     else
       uri = URI.parse(uri)
       request_script = <<-SCRIPT
@@ -182,8 +168,7 @@ module RailsHelpers
         Dispatcher.dispatch(cgi)
       SCRIPT
       File.open(File.join(rails_root, 'request.rb'), 'w') { |file| file.write(request_script) }
-      @terminal.cd(rails_root)
-      @terminal.run("ruby -rthread ./script/runner -e #{environment} request.rb")
+      step %(I run `ruby -rthread ./script/runner -e #{environment} request.rb`)
     end
   end
 
