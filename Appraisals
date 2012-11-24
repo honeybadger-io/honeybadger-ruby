@@ -17,3 +17,8 @@ appraise 'rails3.2' do
   gem 'rails', '3.2.9'
   gem 'honeybadger', :path => '../'
 end
+
+appraise 'sinatra' do
+  gem 'sinatra'
+  gem 'honeybadger', :path => '../'
+end

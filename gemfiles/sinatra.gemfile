@@ -2,7 +2,7 @@
 
 source :rubygems
 
-gem "rails", "3.0.17"
+gem "sinatra"
 gem "honeybadger", :path=>"../"
 
 gemspec :path=>"../"

@@ -1,4 +1,3 @@
-require 'active_support'
 require 'rspec'
 require 'aruba/cucumber'
 

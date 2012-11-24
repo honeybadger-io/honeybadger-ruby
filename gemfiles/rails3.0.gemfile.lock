@@ -2,6 +2,7 @@ PATH
   remote: /Users/josh/code/honeybadger-ruby
   specs:
     honeybadger (1.3.1)
+      activesupport
       json
 
 GEM
@@ -34,7 +35,6 @@ GEM
       activemodel (= 3.0.17)
       activesupport (= 3.0.17)
     activesupport (3.0.17)
-    addressable (2.3.2)
     appraisal (0.5.1)
       bundler
       rake
@@ -52,13 +52,6 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
-    capybara (2.0.1)
-      mime-types (>= 1.16)
-      nokogiri (>= 1.3.3)
-      rack (>= 1.0.0)
-      rack-test (>= 0.5.4)
-      selenium-webdriver (~> 2.0)
-      xpath (~> 1.0.0)
     childprocess (0.3.6)
       ffi (~> 1.0, >= 1.0.6)
     cucumber (1.2.1)
@@ -66,10 +59,6 @@ GEM
       diff-lcs (>= 1.1.3)
       gherkin (~> 2.11.0)
       json (>= 1.4.6)
-    cucumber-rails (1.3.0)
-      capybara (>= 1.1.2)
-      cucumber (>= 1.1.8)
-      nokogiri (>= 1.5.0)
     diff-lcs (1.1.3)
     erubis (2.6.6)
       abstract (>= 1.0.0)
@@ -80,8 +69,6 @@ GEM
     highline (1.6.15)
     i18n (0.5.0)
     json (1.7.5)
-    libwebsocket (0.1.5)
-      addressable
     mail (2.2.19)
       activesupport (>= 2.3.6)
       i18n (>= 0.4.0)
@@ -91,7 +78,6 @@ GEM
     mime-types (1.19)
     mocha (0.12.3)
       metaclass (~> 0.0.1)
-    multi_json (1.3.7)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
@@ -99,7 +85,6 @@ GEM
     net-ssh (2.6.2)
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
-    nokogiri (1.5.5)
     polyglot (0.3.3)
     rack (1.2.5)
     rack-mount (0.6.14)
@@ -131,12 +116,6 @@ GEM
     rspec-expectations (2.12.0)
       diff-lcs (~> 1.1.3)
     rspec-mocks (2.12.0)
-    rubyzip (0.9.9)
-    selenium-webdriver (2.25.0)
-      childprocess (>= 0.2.5)
-      libwebsocket (~> 0.1.3)
-      multi_json (~> 1.0)
-      rubyzip
     sham_rack (1.3.4)
       rack
     shoulda (2.11.3)
@@ -145,8 +124,6 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.35)
-    xpath (1.0.0)
-      nokogiri (~> 1.3)
 
 PLATFORMS
   ruby
@@ -156,7 +133,7 @@ DEPENDENCIES
   aruba
   bourne (>= 1.0)
   capistrano
-  cucumber-rails (~> 1.3.0)
+  cucumber (~> 1.2.1)
   fakeweb (~> 1.3.0)
   honeybadger!
   rails (= 3.0.17)

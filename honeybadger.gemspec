@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[README.md MIT-LICENSE]
 
   s.add_dependency('json')
+  s.add_dependency('activesupport')
 
   s.add_development_dependency('bourne',            '>= 1.0')
   s.add_development_dependency('cucumber',          '~> 1.2.1')
