@@ -1,8 +1,4 @@
 module RailsHelpers
-  def rails_root_exists?
-    File.exists?(environment_path)
-  end
-
   def application_controller_filename
     controller_filename = File.join(rails_root, 'app', 'controllers', "application_controller.rb")
   end
@@ -22,7 +18,6 @@ module RailsHelpers
   def rails_version
     @rails_version ||= `rails -v`[/\d.+/]
   end
-  alias :version_string :rails_version
 
   def rails_manages_gems?
     rails_version =~ /^2\.[123]/
@@ -44,6 +39,14 @@ module RailsHelpers
     File.join(rails_root, 'Rakefile')
   end
 
+  def rails_initializer_file
+    File.join(rails_root, 'config', 'initializers', 'honeybadger.rb')
+  end
+
+  def rails_non_initializer_honeybadger_config_file
+    File.join(rails_root, 'config', 'honeybadger.rb')
+  end
+
   def config_gem(gem_name, version = nil)
     run     = "Rails::Initializer.run do |config|"
     insert  = "  config.gem '#{gem_name}'"
@@ -55,34 +58,6 @@ module RailsHelpers
     else
       raise "Couldn't find #{run.inspect} in #{environment_path}"
     end
-  end
-
-  def config_gem_dependencies
-    insert = <<-END
-    if Gem::VERSION >= "1.3.6"
-      module Rails
-        class GemDependency
-          def requirement
-            r = super
-            (r == Gem::Requirement.default) ? nil : r
-          end
-        end
-      end
-    end
-    END
-    run     = "Rails::Initializer.run do |config|"
-    content = File.read(environment_path)
-    if content.sub!(run, "#{insert}\n#{run}")
-      File.open(environment_path, 'wb') { |file| file.write(content) }
-    else
-      raise "Couldn't find #{run.inspect} in #{environment_path}"
-    end
-  end
-
-  def require_thread
-    content = File.read(rakefile_path)
-    content = "require 'thread'\n#{content}"
-    File.open(rakefile_path, 'wb') { |file| file.write(content) }
   end
 
   def perform_request(uri, environment = 'production')
@@ -154,16 +129,6 @@ module RailsHelpers
       File.open(File.join(rails_root, 'request.rb'), 'w') { |file| file.write(request_script) }
       step %(I run `ruby -rthread ./script/runner -e #{environment} request.rb`)
     end
-  end
-
-  def monkeypatch_old_version
-    monkeypatchin= <<-MONKEYPATCHIN
-
-    MissingSourceFile::REGEXPS << [/^cannot load such file -- (.+)$/i, 1]
-
-    MONKEYPATCHIN
-
-    File.open(File.join(rails_root,"config","initializers", 'monkeypatchin.rb'), 'w') { |file| file.write(monkeypatchin) }
   end
 end
 
