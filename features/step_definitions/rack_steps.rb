@@ -15,9 +15,9 @@ When /^I perform a Rack request to "([^\"]*)"$/ do |url|
     file.puts %{headers.each { |key, value| puts "\#{key}: \#{value}"}}
     file.puts "body.each { |part| print part }"
   end
-  @terminal.run("ruby #{request_file}")
+  step %(I run `ruby #{request_file}`)
 end
 
 Then /^I should receive a Honeybadger notification for rack$/ do
-  Then %{I should see "You have accessed a deleted account."}
+  step %(The output should contain "You have accessed a deleted account.")
 end

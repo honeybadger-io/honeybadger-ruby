@@ -1,8 +1,5 @@
 Feature: Use the notifier in a plain Rack app
 
-  Background:
-    Given I have built and installed the "honeybadger" gem
-
   Scenario: Rescue and exception in a Rack app
     Given the following Rack app:
       """
@@ -52,5 +49,5 @@ Feature: Use the notifier in a plain Rack app
       end
       """
     When I perform a Rack request to "http://example.com:123/test/index?param=value"
-    Then I should not see "** [Honeybadger] Response from Honeybadger:"
+    Then the output should not contain "** [Honeybadger] Response from Honeybadger:"
 
