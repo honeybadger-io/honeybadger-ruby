@@ -3,12 +3,21 @@ require File.join(File.dirname(__FILE__), 'shared_tasks')
 
 namespace :honeybadger do
   desc "Verify your gem installation by sending a test exception to the honeybadger service"
-  task :test => [:environment] do
-    Rails.logger = defined?(ActiveSupport::TaggedLogging) ?
-      ActiveSupport::TaggedLogging.new(Logger.new(STDOUT)) :
-      Logger.new(STDOUT)
+  task :test do
+    # Delete Rails' exception middleware to prevent cluttering STDERR
+    Rails.configuration.middleware.delete ActionDispatch::DebugExceptions
+    Rails.configuration.middleware.delete ActionDispatch::ShowExceptions
 
+    # Envoke Rails environment
+    Rake::Task[:environment].invoke
+
+    Rails.logger = if defined?(ActiveSupport::TaggedLogging)
+                     ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+                   else
+                     Logger.new(STDOUT)
+                   end
     Rails.logger.level = Logger::DEBUG
+
     Honeybadger.configure(true) do |config|
       config.logger = Rails.logger
     end
@@ -43,20 +52,8 @@ namespace :honeybadger do
         raise exception_class.new, 'Testing honeybadger via "rake honeybadger:test". If you can see this, it works.'
       end
 
-      # def rescue_action(exception)
-      #   rescue_action_in_public exception
-      # end
-
       # Ensure we actually have an action to go to.
       def verify; end
-
-      # def consider_all_requests_local
-      #   false
-      # end
-
-      # def local_request?
-      #   false
-      # end
 
       def exception_class
         exception_name = ENV['EXCEPTION'] || "HoneybadgerTestingException"
@@ -64,14 +61,8 @@ namespace :honeybadger do
       rescue
         Object.const_set(exception_name, Class.new(Exception))
       end
-
-      def logger
-        nil
-      end
     end
-    class HoneybadgerVerificationController < ApplicationController; end
 
-    Rails.application.routes_reloader.execute_if_updated
     Rails.application.routes.draw do
       match 'verify' => 'application#verify', :as => 'verify'
     end
