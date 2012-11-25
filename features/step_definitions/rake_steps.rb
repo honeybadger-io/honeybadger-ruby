@@ -1,6 +1,6 @@
 When /I run rake with (.+)/ do |command|
   @rake_command = "rake #{command.gsub(' ','_')}"
-  @rake_result = `cd features/support/rake && GEM_HOME=#{BUILT_GEM_ROOT} #{@rake_command} 2>&1`
+  @rake_result = `cd features/support/rake && #{@rake_command} 2>&1`
 end
 
 Then /Honeybadger should (|not) ?catch the exception/ do |condition|

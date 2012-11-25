@@ -16,7 +16,7 @@ module RailsHelpers
   end
 
   def rails_version
-    @rails_version ||= `rails -v`[/\d.+/]
+    @rails_version ||= `bundle exec rails -v`[/\d.+/]
   end
 
   def rails_manages_gems?
@@ -53,6 +53,17 @@ module RailsHelpers
     insert += ", :version => '#{version}'" if version
     content = File.read(environment_path)
     content = "require 'thread'\n#{content}"
+    if content.sub!(run, "#{run}\n#{insert}")
+      File.open(environment_path, 'wb') { |file| file.write(content) }
+    else
+      raise "Couldn't find #{run.inspect} in #{environment_path}"
+    end
+  end
+
+  def disable_activerecord
+    run     = "Rails::Initializer.run do |config|"
+    insert  = "  config.frameworks -= [ :active_record ]"
+    content = File.read(environment_path)
     if content.sub!(run, "#{run}\n#{insert}")
       File.open(environment_path, 'wb') { |file| file.write(content) }
     else
@@ -129,6 +140,44 @@ module RailsHelpers
       File.open(File.join(rails_root, 'request.rb'), 'w') { |file| file.write(request_script) }
       step %(I run `ruby -rthread ./script/runner -e #{environment} request.rb`)
     end
+  end
+
+  def monkeypatch_old_version
+    monkeypatchin= <<-MONKEYPATCHIN
+
+    MissingSourceFile::REGEXPS << [/^cannot load such file -- (.+)$/i, 1]
+
+    MONKEYPATCHIN
+
+    File.open(File.join(rails_root,"config","initializers", 'monkeypatchin.rb'), 'w') { |file| file.write(monkeypatchin) }
+  end
+
+  def config_gem_dependencies
+    insert = <<-END
+    if Gem::VERSION >= "1.3.6"
+      module Rails
+        class GemDependency
+          def requirement
+            r = super
+            (r == Gem::Requirement.default) ? nil : r
+          end
+        end
+      end
+    end
+    END
+    run     = "Rails::Initializer.run do |config|"
+    content = File.read(environment_path)
+    if content.sub!(run, "#{insert}\n#{run}")
+      File.open(environment_path, 'wb') { |file| file.write(content) }
+    else
+      raise "Couldn't find #{run.inspect} in #{environment_path}"
+    end
+  end
+
+  def require_thread
+    content = File.read(rakefile_path)
+    content = "require 'thread'\n#{content}"
+    File.open(rakefile_path, 'wb') { |file| file.write(content) }
   end
 end
 

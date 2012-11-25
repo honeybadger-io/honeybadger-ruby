@@ -1,12 +1,21 @@
 require 'uri'
-require 'active_support/core_ext/string/inflections'
+require 'active_support/core_ext'
 
 When /^I generate a new Rails application$/ do
   rails_create_command = 'rails'
-  rails_create_command << (rails3? ? ' new' : '')
+  rails_create_command << (rails3? ? ' new -O -S -G -J -T --skip-gemfile --skip-bundle' : '')
 
-  step %(I successfully run `#{rails_create_command} rails_root -O`)
+  step %(I successfully run `bundle exec #{rails_create_command} rails_root`)
   step %(I cd to "rails_root")
+
+  require_thread
+
+  monkeypatch_old_version if rails_version == "2.3.14"
+
+  unless rails3?
+    config_gem_dependencies
+    disable_activerecord
+  end
 end
 
 When /^I configure the Honeybadger shim$/ do

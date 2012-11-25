@@ -2,17 +2,16 @@ Feature: Install the Gem in a Rails application
 
   Background:
     Given I generate a new Rails application
+    And I configure the Honeybadger shim
 
   Scenario: Use the gem without vendoring the gem in a Rails application
-    When I configure the Honeybadger shim
-    And I run the honeybadger generator with "-k myapikey"
+    When I run the honeybadger generator with "-k myapikey"
     Then I should receive a Honeybadger notification
     And I should see the Rails version
 
-  @pending
+  @wat
   Scenario: vendor the gem and uninstall
-    When I configure the Honeybadger shim
-    And I unpack the "honeybadger" gem
+    When I unpack the "honeybadger" gem
     And I run the honeybadger generator with "-k myapikey"
     When I uninstall the "honeybadger" gem
     And I install cached gems
@@ -21,15 +20,14 @@ Feature: Install the Gem in a Rails application
     And I should receive two Honeybadger notifications
 
   Scenario: Configure the notifier by hand
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I configure the notifier to use "myapikey" as an API key
     And I run the honeybadger generator with ""
     Then I should receive a Honeybadger notification
 
   Scenario: Configuration within initializer isn't overridden by Railtie
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
+    And I run the honeybadger generator with "-k myapikey"
     And I configure Honeybadger with:
       """
       config.api_key = "myapikey"
@@ -45,36 +43,31 @@ Feature: Install the Gem in a Rails application
 
   Scenario: Configure and deploy using only installed gem
     When I successfully run `capify .`
-    And I configure the Honeybadger shim
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     And I run `cap -T`
     Then the output should contain "honeybadger:deploy"
 
-  @pending
   Scenario: Configure and deploy using only vendored gem
     When I run `capify .`
-    And I configure the Honeybadger shim
     And I configure my application to require Honeybadger
     And I unpack the "honeybadger" gem
     And I run the honeybadger generator with "-k myapikey"
     And I uninstall the "honeybadger" gem
     And I install cached gems
-    And I run "cap -T"
+    And I run `cap -T`
     Then the output should contain "honeybadger:deploy"
 
   Scenario: Try to install when the honeybadger plugin still exists
     When I install the "honeybadger" plugin
-    And I configure the Honeybadger shim
-    And i configure the notifier to use "myapikey" as an api key
+    And I configure the notifier to use "myapikey" as an API key
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with ""
     Then the output should contain "You must first remove the honeybadger plugin. Please run: script/plugin remove honeybadger"
 
   Scenario: Rescue an exception in a controller
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
-    And i configure the notifier to use "myapikey" as an api key
+    When I configure my application to require Honeybadger
+    And I configure the notifier to use "myapikey" as an API key
     And I define a response for "TestController#index":
       """
       session[:value] = "test"
@@ -84,24 +77,15 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
 
-  Scenario: The gem should not be considered a framework gem
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
-    And I run `rake gems`
-    Then the output should not contain "[R] honeybadger"
-
   Scenario: The app uses Vlad instead of Capistrano
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run `touch config/deploy.rb`
     And I run `rm Capfile`
     And I run the honeybadger generator with "-k myapikey"
     Then the file "config/deploy.rb" should not contain "capistrano"
 
   Scenario: Support the Heroku addon in the generator
-    When I configure the Honeybadger shim
-    And I configure the Heroku gem shim with "myapikey"
+    When I configure the Heroku gem shim with "myapikey"
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "--heroku"
     Then I should receive a Honeybadger notification
@@ -112,8 +96,7 @@ Feature: Install the Gem in a Rails application
       """
 
   Scenario: Support the --app option for the Heroku addon in the generator
-    When I configure the Honeybadger shim
-    And I configure the Heroku gem shim with "myapikey" and multiple app support
+    When I configure the Heroku gem shim with "myapikey" and multiple app support
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "--heroku -a myapp"
     Then I should receive a Honeybadger notification
@@ -125,8 +108,7 @@ Feature: Install the Gem in a Rails application
 
   @wat
   Scenario: Filtering parameters in a controller
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     When I configure Honeybadger with:
       """
@@ -144,8 +126,7 @@ Feature: Install the Gem in a Rails application
 
   @wat
   Scenario: Filtering session in a controller
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     When I configure Honeybadger with:
       """
@@ -161,9 +142,9 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
 
+  @wat
   Scenario: Filtering session and params based on Rails parameter filters
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     And I configure the application to filter parameter "secret"
     And I define a response for "TestController#index":
@@ -177,8 +158,7 @@ Feature: Install the Gem in a Rails application
     Then I should receive a Honeybadger notification
 
   Scenario: Notify honeybadger within the controller
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     And I define a response for "TestController#index":
       """
@@ -191,8 +171,7 @@ Feature: Install the Gem in a Rails application
     Then I should receive a Honeybadger notification
 
   Scenario: Notify honeybadger within a metal controller
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     And I define a metal response for "TestController#index":
       """
@@ -203,8 +182,7 @@ Feature: Install the Gem in a Rails application
     Then I should receive a Honeybadger notification
 
   Scenario: Reporting 404s
-    When I configure the Honeybadger shim
-    And I configure my application to require Honeybadger
+    When I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     And I configure Honeybadger with:
     """

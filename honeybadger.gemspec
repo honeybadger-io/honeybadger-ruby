@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
   ## THE MANIFEST COMMENTS, they are used as delimiters by the task.
   # = MANIFEST =
   s.files = %w[
+    Appraisals
     Gemfile
     Gemfile.lock
     Guardfile
@@ -52,7 +53,6 @@ Gem::Specification.new do |s|
     features/rails.feature
     features/rake.feature
     features/sinatra.feature
-    features/step_definitions/file_steps.rb
     features/step_definitions/metal_steps.rb
     features/step_definitions/rack_steps.rb
     features/step_definitions/rails_application_steps.rb
@@ -61,7 +61,16 @@ Gem::Specification.new do |s|
     features/support/honeybadger_shim.rb.template
     features/support/rails.rb
     features/support/rake/Rakefile
-    features/support/terminal.rb
+    gemfiles/rails2.3.gemfile
+    gemfiles/rails2.3.gemfile.lock
+    gemfiles/rails3.0.gemfile
+    gemfiles/rails3.0.gemfile.lock
+    gemfiles/rails3.1.gemfile
+    gemfiles/rails3.1.gemfile.lock
+    gemfiles/rails3.2.gemfile
+    gemfiles/rails3.2.gemfile.lock
+    gemfiles/sinatra.gemfile
+    gemfiles/sinatra.gemfile.lock
     generators/honeybadger/honeybadger_generator.rb
     generators/honeybadger/lib/insert_commands.rb
     generators/honeybadger/lib/rake_commands.rb
