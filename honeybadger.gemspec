@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.3.1'
-  s.date              = '2012-11-24'
+  s.date              = '2012-11-25'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -47,7 +47,6 @@ Gem::Specification.new do |s|
     README.md
     Rakefile
     SUPPORTED_RAILS_VERSIONS
-    TESTING.md
     features/metal.feature
     features/rack.feature
     features/rails.feature
@@ -55,7 +54,7 @@ Gem::Specification.new do |s|
     features/sinatra.feature
     features/step_definitions/metal_steps.rb
     features/step_definitions/rack_steps.rb
-    features/step_definitions/rails_application_steps.rb
+    features/step_definitions/rails_steps.rb
     features/step_definitions/rake_steps.rb
     features/support/env.rb
     features/support/honeybadger_shim.rb.template

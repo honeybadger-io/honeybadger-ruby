@@ -9,16 +9,6 @@ Feature: Install the Gem in a Rails application
     Then I should receive a Honeybadger notification
     And I should see the Rails version
 
-  @wat
-  Scenario: vendor the gem and uninstall
-    When I unpack the "honeybadger" gem
-    And I run the honeybadger generator with "-k myapikey"
-    When I uninstall the "honeybadger" gem
-    And I install cached gems
-    And I run `rake honeybadger:test`
-    Then the output should contain "** [Honeybadger] Response from Honeybadger:"
-    And I should receive two Honeybadger notifications
-
   Scenario: Configure the notifier by hand
     When I configure my application to require Honeybadger
     And I configure the notifier to use "myapikey" as an API key
@@ -41,20 +31,10 @@ Feature: Install the Gem in a Rails application
     And I run the honeybadger generator with ""
     Then the output should contain "Must pass --api-key or --heroku or create config/initializers/honeybadger.rb"
 
-  Scenario: Configure and deploy using only installed gem
+  Scenario: Configure and deploy with Capistrano
     When I successfully run `capify .`
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
-    And I run `cap -T`
-    Then the output should contain "honeybadger:deploy"
-
-  Scenario: Configure and deploy using only vendored gem
-    When I run `capify .`
-    And I configure my application to require Honeybadger
-    And I unpack the "honeybadger" gem
-    And I run the honeybadger generator with "-k myapikey"
-    And I uninstall the "honeybadger" gem
-    And I install cached gems
     And I run `cap -T`
     Then the output should contain "honeybadger:deploy"
 
@@ -67,7 +47,11 @@ Feature: Install the Gem in a Rails application
 
   Scenario: Rescue an exception in a controller
     When I configure my application to require Honeybadger
-    And I configure the notifier to use "myapikey" as an API key
+    And I configure Honeybadger with:
+    """
+    config.api_key = 'myapikey'
+    config.logger = Logger.new(STDOUT)
+    """
     And I define a response for "TestController#index":
       """
       session[:value] = "test"
@@ -109,10 +93,10 @@ Feature: Install the Gem in a Rails application
   @wat
   Scenario: Filtering parameters in a controller
     When I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
-    When I configure Honeybadger with:
+    And I configure Honeybadger with:
       """
       config.api_key = "myapikey"
+      config.logger = Logger.new(STDOUT)
       config.params_filters << "credit_card_number"
       """
     And I define a response for "TestController#index":
@@ -127,10 +111,10 @@ Feature: Install the Gem in a Rails application
   @wat
   Scenario: Filtering session in a controller
     When I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
-    When I configure Honeybadger with:
+    And I configure Honeybadger with:
       """
       config.api_key = "myapikey"
+      config.logger = Logger.new(STDOUT)
       config.params_filters << "secret"
       """
     And I define a response for "TestController#index":
@@ -145,7 +129,11 @@ Feature: Install the Gem in a Rails application
   @wat
   Scenario: Filtering session and params based on Rails parameter filters
     When I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
+    And I configure Honeybadger with:
+    """
+    config.api_key = 'myapikey'
+    config.logger = Logger.new(STDOUT)
+    """
     And I configure the application to filter parameter "secret"
     And I define a response for "TestController#index":
       """
@@ -159,7 +147,11 @@ Feature: Install the Gem in a Rails application
 
   Scenario: Notify honeybadger within the controller
     When I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
+    And I configure Honeybadger with:
+    """
+    config.api_key = 'myapikey'
+    config.logger = Logger.new(STDOUT)
+    """
     And I define a response for "TestController#index":
       """
       session[:value] = "test"
@@ -172,7 +164,11 @@ Feature: Install the Gem in a Rails application
 
   Scenario: Notify honeybadger within a metal controller
     When I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
+    And I configure Honeybadger with:
+    """
+    config.api_key = 'myapikey'
+    config.logger = Logger.new(STDOUT)
+    """
     And I define a metal response for "TestController#index":
       """
       raise RuntimeError, "some message"
@@ -183,9 +179,10 @@ Feature: Install the Gem in a Rails application
 
   Scenario: Reporting 404s
     When I configure my application to require Honeybadger
-    And I run the honeybadger generator with "-k myapikey"
     And I configure Honeybadger with:
     """
+    config.api_key = 'myapikey'
+    config.logger = Logger.new(STDOUT)
     config.ignore_only = []
     """
     And I perform a request to "http://example.com:123/this/route/does/not/exist"

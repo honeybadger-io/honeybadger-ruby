@@ -81,13 +81,15 @@ When /^I run the honeybadger generator with "([^\"]*)"$/ do |generator_args|
   end
 end
 
-Then /^I should receive a Honeybadger notification$/ do
-  step %(the output should contain "** [Honeybadger] Response from Honeybadger:")
-  step %(the output should contain "123456789")
-end
+Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
+  number = case number
+           when /^(one|a)$/ then 1
+           when 'two' then 2
+           else number end
 
-Then /^I should receive two Honeybadger notifications$/ do
-  all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == 2
+  all_output.scan(/\*\* \[Honeybadger\] Response from Honeybadger:/).size.should == number
+  all_output.scan(/123456789/).size.should == number
+  all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == number
 end
 
 Then /^I should see the Rails version$/ do
@@ -219,34 +221,6 @@ end
 
 When /^I install the "([^\"]*)" plugin$/ do |plugin_name|
   FileUtils.mkdir_p("#{rails_root}/vendor/plugins/#{plugin_name}")
-end
-
-When /^I unpack the "([^\"]*)" gem$/ do |gem_name|
-  if rails3?
-    step %(I successfully run `bundle pack`)
-  elsif rails_manages_gems?
-    step %(I successfully run `rake gems:unpack GEM=#{gem_name}`)
-  else
-    vendor_dir = File.join(rails_root, 'vendor', 'gems')
-    FileUtils.mkdir_p(vendor_dir)
-    step %(I successfully run `gem unpack #{gem_name}`)
-    gem_path =
-      Dir.glob(File.join(rails_root, 'vendor', 'gems', "#{gem_name}-*", 'lib')).first
-    File.open(environment_path, 'a') do |file|
-      file.puts
-      file.puts("$: << #{gem_path.inspect}")
-    end
-  end
-end
-
-When /^I uninstall the "([^\"]*)" gem$/ do |gem_name|
-  step %(I successfully run `gem uninstall #{gem_name}`)
-end
-
-When /^I install cached gems$/ do
-  if rails3?
-    step %(I successfully run `bundle install`)
-  end
 end
 
 When /^I configure the notifier to use "([^\"]*)" as an API key$/ do |api_key|

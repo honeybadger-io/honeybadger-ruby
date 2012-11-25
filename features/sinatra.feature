@@ -8,6 +8,7 @@ Feature: Use the notifier in a Sinatra app
 
       Honeybadger.configure do |config|
         config.api_key = 'my_api_key'
+        config.logger = Logger.new(STDOUT)
       end
 
       class FontaneApp < Sinatra::Base
