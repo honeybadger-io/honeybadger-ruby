@@ -12,6 +12,6 @@ end
 
 Before do
   @dirs = ["tmp"]
-  @aruba_timeout_seconds = 25
-  @aruba_io_wait_seconds = 3
+  @aruba_timeout_seconds = 35
+  @aruba_io_wait_seconds = 5
 end
