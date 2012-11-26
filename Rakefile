@@ -13,7 +13,7 @@ end
 
 #############################################################################
 #
-# Helper functions
+# Helper methods
 #
 #############################################################################
 
@@ -59,6 +59,11 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
+Cucumber::Rake::Task.new(:cucumber) do |t|
+  t.fork = true
+  t.cucumber_opts = ['--format', 'progress', '--tags', '~@pending']
+end
+
 desc "Generate RCov test coverage and open in your browser"
 task :coverage do
   require 'rcov'
@@ -70,25 +75,6 @@ end
 desc "Open an irb session preloaded with this library"
 task :console do
   sh "irb -rubygems -r ./lib/#{name}.rb"
-end
-
-#############################################################################
-#
-# Custom tasks (add your own tasks here)
-#
-#############################################################################
-
-desc "Update supported versions: Run this to pull down latest rails versions from rubygems"
-task :update_supported_versions do
-  down_to = Gem::Version.new('2.3.14')
-  versions = JSON.parse `curl https://rubygems.org/api/v1/versions/rails.json 2> /dev/null`
-  supported_versions = versions.map { |v| Gem::Version.new(v['number']) }.reject { |v| v < down_to || v.prerelease? }.sort
-  `echo '#{supported_versions.join("\n")}' > SUPPORTED_RAILS_VERSIONS`
-end
-
-Cucumber::Rake::Task.new(:cucumber) do |t|
-  t.fork = true
-  t.cucumber_opts = ['--format', 'progress', '--tags', '~@pending']
 end
 
 #############################################################################
