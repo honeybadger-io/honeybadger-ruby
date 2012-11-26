@@ -48,10 +48,10 @@ Feature: Install the Gem in a Rails application
   Scenario: Rescue an exception in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
-    """
-    config.api_key = 'myapikey'
-    config.logger = Logger.new(STDOUT)
-    """
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      """
     And I define a response for "TestController#index":
       """
       session[:value] = "test"
@@ -130,10 +130,10 @@ Feature: Install the Gem in a Rails application
   Scenario: Filtering session and params based on Rails parameter filters
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
-    """
-    config.api_key = 'myapikey'
-    config.logger = Logger.new(STDOUT)
-    """
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      """
     And I configure the application to filter parameter "secret"
     And I define a response for "TestController#index":
       """
@@ -148,10 +148,10 @@ Feature: Install the Gem in a Rails application
   Scenario: Notify honeybadger within the controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
-    """
-    config.api_key = 'myapikey'
-    config.logger = Logger.new(STDOUT)
-    """
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      """
     And I define a response for "TestController#index":
       """
       session[:value] = "test"
@@ -165,10 +165,10 @@ Feature: Install the Gem in a Rails application
   Scenario: Notify honeybadger within a metal controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
-    """
-    config.api_key = 'myapikey'
-    config.logger = Logger.new(STDOUT)
-    """
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      """
     And I define a metal response for "TestController#index":
       """
       raise RuntimeError, "some message"

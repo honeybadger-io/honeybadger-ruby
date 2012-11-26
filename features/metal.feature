@@ -5,6 +5,7 @@ Feature: Rescue errors in Rails middleware
     And I configure the Honeybadger shim
     And I configure Honeybadger with:
       """
+      config.api_key = 'myapikey'
       config.logger = Logger.new(STDOUT)
       """
 

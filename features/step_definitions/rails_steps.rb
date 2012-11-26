@@ -87,9 +87,8 @@ Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
            when 'two' then 2
            else number end
 
-  all_output.scan(/\*\* \[Honeybadger\] Response from Honeybadger:/).size.should == number
-  all_output.scan(/123456789/).size.should == number
   all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == number
+  step %(the output should contain "123456789")
 end
 
 Then /^I should see the Rails version$/ do
@@ -101,7 +100,7 @@ When /^I define a( metal)? response for "([^\"]*)":$/ do |metal, controller_and_
   controller_name = controller_class_name.underscore
   controller_file_name = File.join(rails_root, 'app', 'controllers', "#{controller_name}.rb")
   File.open(controller_file_name, "w") do |file|
-    file.puts "class #{controller_class_name} < #{ metal ? 'ActionController::Metal' : 'ApplicationController'}"
+    file.puts "class #{controller_class_name} < #{ (metal && rails3?) ? 'ActionController::Metal' : 'ApplicationController'}"
     file.puts "def consider_all_requests_local; false; end"
     file.puts "def local_request?; false; end"
     file.puts "def #{action}"
