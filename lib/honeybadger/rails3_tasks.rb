@@ -3,14 +3,7 @@ require File.join(File.dirname(__FILE__), 'shared_tasks')
 
 namespace :honeybadger do
   desc "Verify your gem installation by sending a test exception to the honeybadger service"
-  task :test do
-    # Delete Rails' exception middleware to prevent cluttering STDERR
-    Rails.configuration.middleware.delete ActionDispatch::DebugExceptions
-    Rails.configuration.middleware.delete ActionDispatch::ShowExceptions
-
-    # Envoke Rails environment
-    Rake::Task[:environment].invoke
-
+  task :test => :environment do
     Rails.logger = if defined?(ActiveSupport::TaggedLogging)
                      ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
                    else
@@ -21,6 +14,14 @@ namespace :honeybadger do
     Honeybadger.configure(true) do |config|
       config.logger = Rails.logger
     end
+
+    # Suppress error logging in Rails' exception handling middleware. Rails 3.0
+    # uses ActionDispatch::ShowExceptions to rescue/show exceptions, but does
+    # not log anything but application trace. Rails 3.2 now falls back to
+    # logging the framework trace (moved to ActionDispatch::DebugExceptions),
+    # which caused cluttered output while running the test task.
+    class ActionDispatch::DebugExceptions ; def logger(*args) ; @logger ||= Logger.new('/dev/null') ; end ; end
+    class ActionDispatch::ShowExceptions ; def logger(*args) ; @logger ||= Logger.new('/dev/null') ; end ; end
 
     require './app/controllers/application_controller'
 

@@ -2,10 +2,10 @@ require 'uri'
 require 'active_support/core_ext'
 
 When /^I generate a new Rails application$/ do
-  rails_create_command = 'rails'
-  rails_create_command << (rails3? ? ' new -O -S -G -J -T --skip-gemfile --skip-bundle' : '')
+  rails_create_command = !rails3? ? 'rails rails_root' :
+    'rails new rails_root -O -S -G -J -T --skip-gemfile --skip-bundle'
 
-  step %(I successfully run `bundle exec #{rails_create_command} rails_root`)
+  step %(I successfully run `bundle exec #{rails_create_command}`)
   step %(I cd to "rails_root")
 
   require_thread
