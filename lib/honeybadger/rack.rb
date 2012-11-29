@@ -34,21 +34,22 @@ module Honeybadger
     end
 
     def notify_honeybadger(exception,env)
-      Honeybadger.notify_or_ignore(exception,:rack_env => env) unless ignored_user_agent?(env)
+      Honeybadger.notify_or_ignore(exception, :rack_env => env) unless ignored_user_agent?(env)
     end
 
     def call(env)
       begin
         response = @app.call(env)
       rescue Exception => raised
-        env['honeybadger.error_id'] = notify_honeybadger(raised,env)
+        env['honeybadger.error_id'] = notify_honeybadger(raised, env)
         raise
       ensure
         Honeybadger.context.clear!
       end
 
-      if env['rack.exception']
-        env['honeybadger.error_id'] = notify_honeybadger(env['rack.exception'],env)
+      framework_exception = env['rack.exception'] || env['sinatra.error']
+      if framework_exception
+        env['honeybadger.error_id'] = notify_honeybadger(framework_exception, env)
       end
 
       response
