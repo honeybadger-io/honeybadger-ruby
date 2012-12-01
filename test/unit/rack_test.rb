@@ -54,6 +54,26 @@ class RackTest < Honeybadger::UnitTest
     end
   end
 
+  should "deliver an exception in sinatra.error" do
+    Honeybadger.stubs(:notify_or_ignore)
+    exception = build_exception
+    environment = { 'key' => 'value' }
+
+    response = [200, {}, ['okay']]
+    app = lambda do |env|
+      env['sinatra.error'] = exception
+      response
+    end
+    stack = Honeybadger::Rack.new(app)
+
+    actual_response = stack.call(environment)
+
+    assert_equal response, actual_response
+    assert_received(Honeybadger, :notify_or_ignore) do |expect|
+      expect.with(exception, :rack_env => environment)
+    end
+  end
+
   should "clear context after app is called" do
     Honeybadger.context( :foo => :bar )
     assert_equal({ :foo => :bar }, Thread.current[:honeybadger_context])
