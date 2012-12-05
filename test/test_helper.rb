@@ -1,7 +1,5 @@
 require 'test/unit'
 
-require 'bundler/setup'
-
 require 'mocha'
 require 'shoulda'
 require 'bourne'
