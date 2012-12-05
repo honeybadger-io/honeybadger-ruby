@@ -112,8 +112,8 @@ class BacktraceTest < Honeybadger::UnitTest
 
     backtrace = Honeybadger::Backtrace.parse(array)
 
-    assert_empty backtrace.lines.first.source
-    assert_empty backtrace.lines.second.source
+    assert_equal backtrace.lines.first.source, {}
+    assert_equal backtrace.lines.second.source, {}
   end
 
   should "have an empty application trace by default" do

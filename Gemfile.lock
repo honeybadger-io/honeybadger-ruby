@@ -75,7 +75,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   aruba
-  bourne (>= 1.0)
+  bourne (~> 1.1.2)
   capistrano
   cucumber (~> 1.2.1)
   fakeweb (~> 1.3.0)

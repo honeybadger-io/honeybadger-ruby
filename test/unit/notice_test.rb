@@ -135,7 +135,7 @@ class NoticeTest < Honeybadger::UnitTest
         notice_from_exception = build_notice(:exception => @exception)
         @string_io.rewind
 
-        assert_not_empty notice_from_exception.source_extract, 'Expected backtrace source extract to be found'
+        assert_not_equal notice_from_exception.source_extract, {}, 'Expected backtrace source extract to be found'
         assert_equal backtrace.lines.first.source, notice_from_exception.source_extract
       end
     end
@@ -154,7 +154,7 @@ class NoticeTest < Honeybadger::UnitTest
         notice_from_exception = build_notice(:exception => @exception)
         @string_io.rewind
 
-        assert_not_empty notice_from_exception.source_extract, 'Expected backtrace source extract to be found'
+        assert_not_equal notice_from_exception.source_extract, {}, 'Expected backtrace source extract to be found'
         assert_equal backtrace.lines.second.source, notice_from_exception.source_extract
       end
     end
