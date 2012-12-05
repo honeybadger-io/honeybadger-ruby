@@ -7,8 +7,6 @@ class NotifierTest < Honeybadger::UnitTest
   class ContinuedException < Exception
   end
 
-  include DefinesConstants
-
   def setup
     super
     reset_config

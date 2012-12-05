@@ -22,11 +22,12 @@ Gem::Specification.new do |s|
   s.add_dependency('json')
   s.add_dependency('activesupport')
 
-  s.add_development_dependency('bourne',            '~> 1.1.2')
   s.add_development_dependency('cucumber',          '~> 1.2.1')
   s.add_development_dependency('rspec',             '~> 2.12.0')
   s.add_development_dependency('fakeweb',           '~> 1.3.0')
   s.add_development_dependency('sham_rack',         '~> 1.3.0')
+  s.add_development_dependency('test-unit',         '>= 2.2')
+  s.add_development_dependency('bourne',            '>= 1.0')
   s.add_development_dependency('shoulda',           '~> 2.11.3')
   s.add_development_dependency('capistrano')
   s.add_development_dependency('rake')

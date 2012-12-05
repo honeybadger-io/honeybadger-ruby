@@ -25,14 +25,12 @@ end
 module DefinesConstants
   def setup
     @defined_constants = []
-    Honeybadger.context.clear!
   end
 
   def teardown
     @defined_constants.each do |constant|
       Object.__send__(:remove_const, constant)
     end
-    Honeybadger.context.clear!
   end
 
   def define_constant(name, value)
@@ -55,6 +53,10 @@ end
 
 module Honeybadger
   class UnitTest < Test::Unit::TestCase
+    teardown do
+      Honeybadger.context.clear!
+    end
+
     def assert_no_difference(expression, message = nil, &block)
       assert_difference expression, 0, message, &block
     end

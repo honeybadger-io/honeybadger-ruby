@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class ConfigurationTest < Honeybadger::UnitTest
-  include DefinesConstants
-
   should "provide default values" do
     assert_config_default :proxy_host,          nil
     assert_config_default :proxy_port,          nil
