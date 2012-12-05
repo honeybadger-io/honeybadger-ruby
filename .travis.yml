@@ -3,4 +3,5 @@ rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
-script: bundle exec appraisal:rails2.3 test
+before_script: bundle exec rake appraisal:install
+script: bundle exec rake appraisal:rails2.3 test

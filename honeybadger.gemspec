@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.3.1'
-  s.date              = '2012-11-25'
+  s.date              = '2012-12-05'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -46,7 +46,6 @@ Gem::Specification.new do |s|
     MIT-LICENSE
     README.md
     Rakefile
-    SUPPORTED_RAILS_VERSIONS
     features/metal.feature
     features/rack.feature
     features/rails.feature
@@ -68,8 +67,6 @@ Gem::Specification.new do |s|
     gemfiles/rails3.1.gemfile.lock
     gemfiles/rails3.2.gemfile
     gemfiles/rails3.2.gemfile.lock
-    gemfiles/sinatra.gemfile
-    gemfiles/sinatra.gemfile.lock
     generators/honeybadger/honeybadger_generator.rb
     generators/honeybadger/lib/insert_commands.rb
     generators/honeybadger/lib/rake_commands.rb
