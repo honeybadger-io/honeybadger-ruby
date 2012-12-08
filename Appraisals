@@ -1,7 +1,7 @@
 appraise 'rails2.3' do
   gem 'rails', '2.3.14'
   gem 'rake', '0.9.5'
-  gem 'test-unit', '>= 2.2', require: false, :group => :test
+  gem 'test-unit', '>= 2.2', :require => false, :group => :test
   gem 'honeybadger', :path => '../'
 end
 
