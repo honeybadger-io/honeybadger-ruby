@@ -146,6 +146,86 @@ request's life cycle. Honeybadger will discard the data when a
 request completes, so that the next request will start with a blank
 slate.
 
+## Notifying Honeybadger asynchronously
+
+Want to send notices in a thread, or even use Resque or Sidekiq to
+deliver notifications? The 'badger has you covered.
+
+To get started, you'll need to configure Honeybadger to accept a
+handler. A handler can be any object that responds to `#call` (usually a
+`Proc`) and accepts one argument (a `Honeybadger::Notice` instance). The
+handler can be set directly by setting the `async` configuration option,
+or by passing a block to `config.async` (in this case, a Proc instance
+will be created for you):
+
+    Honeybadger.configure do |config|
+      ...
+
+      # Configuring handler directly:
+      config.async do |notice|
+        # Delivers notification immediately
+        notice.deliver # => 'qwer-asdf-zxcv'
+      end
+
+      # Using your own handler (identical behavior):
+      config.async = Proc.new { |n| n.deliver }
+    end
+
+We've left the implementation mostly up to you, but here are a few
+examples of notifying Honeybadger asynchronously:
+
+### Using thread
+
+    Honeybadger.configure do |config|
+      config.async do |notice|
+        Thread.new { notice.deliver }
+      end
+    end
+
+### Using Resque
+
+    Honeybadger.configure do |config|
+      config.async do |notice|
+        Resque.enqueue(WorkingBadger, notice)
+      end
+    end
+
+    class WorkingBadger
+      @queue = :cobra_alert
+
+      def self.perform(notice)
+        Honeybadger.sender.send_to_honeybadger(notice)
+      end
+    end
+
+### Using Sidekiq
+
+    Honeybadger.configure do |config|
+      config.async do |notice|
+        WorkingBadger.perform_async(notice)
+      end
+    end
+
+    class WorkingBadger
+      include Sidekiq::Worker
+
+      def perform(notice)
+        Honeybadger.sender.send_to_honeybadger(notice)
+      end
+    end
+
+### Using GirlFriday
+
+    COBRA_QUEUE = GirlFriday::WorkQueue.new(:honeybadger_notices, :size => 7) do |notice|
+      notice.deliver
+    end
+
+    Honeybadger.configure do |config|
+      config.async do |notice|
+        COBRA_QUEUE.push(notice)
+      end
+    end
+
 ## Going beyond exceptions
 
 You can also pass a hash to `Honeybadger.notify` method and store whatever you want,

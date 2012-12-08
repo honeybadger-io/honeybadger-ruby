@@ -114,8 +114,9 @@ module Honeybadger
       set_context
     end
 
-    # Public: Send the notice to Honeybadger using the
-    # configured sender
+    # Public: Send the notice to Honeybadger using the configured sender
+    #
+    # Returns a reference to the error in Honeybadger
     def deliver
       Honeybadger.sender.send_to_honeybadger(to_json)
     end
