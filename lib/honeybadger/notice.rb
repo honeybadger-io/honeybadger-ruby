@@ -114,6 +114,12 @@ module Honeybadger
       set_context
     end
 
+    # Public: Send the notice to Honeybadger using the
+    # configured sender
+    def deliver
+      Honeybadger.sender.send_to_honeybadger(to_json)
+    end
+
     # Public: Template used to create JSON payload
     #
     # Returns JSON representation of notice

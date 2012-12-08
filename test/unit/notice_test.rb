@@ -22,6 +22,16 @@ class NoticeTest < Honeybadger::UnitTest
                       :env         => { 'three' => 'four' } }.update(attrs))
   end
 
+  should "deliver to sender" do
+    sender = stub_sender!
+    notice = build_notice
+    notice.stubs(:to_json => { :foo => 'bar' })
+
+    notice.deliver
+
+    assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice.to_json) }
+  end
+
   should "generate json from as_json template" do
     notice = build_notice
     hash = {'foo' => 'bar'}

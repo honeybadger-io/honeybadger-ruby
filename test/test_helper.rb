@@ -70,12 +70,14 @@ module Honeybadger
     end
 
     def stub_notice
-      stub('notice', :to_json => 'some yaml', :ignore? => false)
+      Honeybadger::Notice.new({}).tap do |notice|
+        notice.stubs(:ignored? => false, :to_json => '{"foo":"bar"}')
+      end
     end
 
     def stub_notice!
        stub_notice.tap do |notice|
-        Honeybadger::Notice.stubs(:new => notice)
+         Honeybadger::Notice.stubs(:new => notice)
       end
     end
 

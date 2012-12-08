@@ -14,7 +14,6 @@ class NotifierTest < Honeybadger::UnitTest
 
   def assert_sent(notice, notice_args)
     assert_received(Honeybadger::Notice, :new) {|expect| expect.with(has_entries(notice_args)) }
-    assert_received(notice, :to_json)
     assert_received(Honeybadger.sender, :send_to_honeybadger) {|expect| expect.with(notice.to_json) }
   end
 
@@ -55,6 +54,29 @@ class NotifierTest < Honeybadger::UnitTest
 
     assert_received(Honeybadger::Sender, :new) { |expect| expect.with(configuration) }
     assert_equal sender, Honeybadger.sender
+  end
+
+  should "create and send a notice asynchronously" do
+    set_public_env
+    notice = stub_notice!
+    notice_args = { :error_message => 'uh oh' }
+
+    async_expectation = stub(:received => true)
+    async_handler = Proc.new do |notice|
+      async_expectation.received
+      notice.deliver
+    end
+
+    Honeybadger.configure do |config|
+      config.async = async_handler
+    end
+
+    stub_sender!
+
+    Honeybadger.notify(notice_args)
+
+    assert_received(async_expectation, :received)
+    assert_sent(notice, notice_args)
   end
 
   should "create and send a notice for an exception" do
@@ -154,7 +176,7 @@ class NotifierTest < Honeybadger::UnitTest
     config_opts = { 'one' => 'two', 'three' => 'four' }
     notice = stub_notice!
     stub_sender!
-    Honeybadger.configuration = stub('config', :merge => config_opts, :public? => true)
+    Honeybadger.configuration = stub('config', :merge => config_opts, :public? => true, :async? => false)
 
     Honeybadger.notify(exception)
 
