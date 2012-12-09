@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'stringio'
 
-class BacktraceTest < Honeybadger::UnitTest
+class BacktraceTest < Test::Unit::TestCase
   should "parse a backtrace into lines" do
     array = [
       "app/models/user.rb:13:in `magic'",

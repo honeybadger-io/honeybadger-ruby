@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'json'
 
-class NoticeTest < Honeybadger::UnitTest
+class NoticeTest < Test::Unit::TestCase
   def configure
     Honeybadger::Configuration.new.tap do |config|
       config.api_key = 'abc123def456'

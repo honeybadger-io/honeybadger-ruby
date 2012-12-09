@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'honeybadger/rails'
 
-class RailsInitializerTest < Honeybadger::UnitTest
+class RailsInitializerTest < Test::Unit::TestCase
   include DefinesConstants
 
   should "trigger use of Rails' logger if logger isn't set and Rails' logger exists" do

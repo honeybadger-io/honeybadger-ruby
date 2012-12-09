@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class NotifierTest < Honeybadger::UnitTest
+class NotifierTest < Test::Unit::TestCase
   class OriginalException < Exception
   end
 
