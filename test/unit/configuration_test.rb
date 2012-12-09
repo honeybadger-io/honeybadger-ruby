@@ -41,9 +41,9 @@ class ConfigurationTest < Honeybadger::UnitTest
   should "configure async with block" do
     config = Honeybadger::Configuration.new
     assert !config.async?, 'Configuration#async? should be falsey'
-    config.async { |n| 'foo' }
+    config.async { |n| n }
     assert config.async?, 'Configuration#async? should be truthy'
-    assert_equal config.async.call, 'foo'
+    assert_equal config.async.call('foo'), 'foo'
   end
 
   should "stub current_user_method" do
