@@ -55,6 +55,7 @@ module Honeybadger
   class UnitTest < Test::Unit::TestCase
     teardown do
       Honeybadger.context.clear!
+      reset_config
     end
 
     def assert_no_difference(expression, message = nil, &block)

@@ -247,8 +247,8 @@ module Honeybadger
     #   end
     #
     # Returns configured async handler (should respond to #call(notice))
-    def async(&block)
-      @async = Proc.new(&block) if block_given?
+    def async
+      @async = Proc.new if block_given?
       @async
     end
     alias :async? :async
