@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'honeybadger/rails'
 
-class ActionControllerCatcherTest < Honeybadger::UnitTest
+class ActionControllerCatcherTest < Test::Unit::TestCase
   include DefinesConstants
 
   def setup

@@ -188,3 +188,24 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/this/route/does/not/exist"
     Then the output should contain "The page you were looking for doesn't exist."
     And I should receive a Honeybadger notification
+
+  Scenario: Asynchronous delivery
+    When I configure my application to require Honeybadger
+    And I configure Honeybadger with:
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      config.async do |notice|
+        handler = Thread.new do
+          notice.deliver
+        end
+        handler.join
+      end
+      """
+    And I define a response for "TestController#index":
+      """
+      raise RuntimeError, "some message"
+      """
+    And I route "/test/index" to "test#index"
+    And I perform a request to "http://example.com:123/test/index?param=value"
+    Then I should receive a Honeybadger notification

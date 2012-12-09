@@ -3,7 +3,7 @@ require 'test_helper'
 require 'capistrano/configuration'
 require 'honeybadger/capistrano'
 
-class CapistranoTest < Honeybadger::UnitTest
+class CapistranoTest < Test::Unit::TestCase
   def setup
     super
     reset_config

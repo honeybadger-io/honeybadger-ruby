@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SenderTest < Honeybadger::UnitTest
+class SenderTest < Test::Unit::TestCase
   def setup
     reset_config
   end

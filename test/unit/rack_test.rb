@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RackTest < Honeybadger::UnitTest
+class RackTest < Test::Unit::TestCase
   should "call the upstream app with the environment" do
     environment = { 'key' => 'value' }
     app = lambda { |env| ['response', {}, env] }

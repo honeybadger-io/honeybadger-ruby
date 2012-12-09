@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ConfigurationTest < Honeybadger::UnitTest
+class ConfigurationTest < Test::Unit::TestCase
   should "provide default values" do
     assert_config_default :proxy_host,          nil
     assert_config_default :proxy_port,          nil
@@ -26,6 +26,24 @@ class ConfigurationTest < Honeybadger::UnitTest
                           Honeybadger::Configuration::IGNORE_DEFAULT
     assert_config_default :framework, 'Standalone'
     assert_config_default :source_extract_radius, 2
+    assert_config_default :async, nil
+  end
+
+  should "configure async as Proc" do
+    config = Honeybadger::Configuration.new
+    async_handler = Proc.new { |n| n.deliver }
+    assert !config.async?, 'Configuration#async? should be falsey'
+    config.async = async_handler
+    assert config.async?, 'Configuration#async? should be truthy'
+    assert_equal config.async, async_handler
+  end
+
+  should "configure async with block" do
+    config = Honeybadger::Configuration.new
+    assert !config.async?, 'Configuration#async? should be falsey'
+    config.async { |n| n }
+    assert config.async?, 'Configuration#async? should be truthy'
+    assert_equal config.async.call('foo'), 'foo'
   end
 
   should "stub current_user_method" do
