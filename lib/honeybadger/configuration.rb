@@ -91,6 +91,9 @@ module Honeybadger
     # The radius around trace line to include in source excerpt
     attr_accessor :source_extract_radius
 
+    # A Proc object used to send notices asynchronously
+    attr_writer :async
+
     DEFAULT_PARAMS_FILTERS = %w(password password_confirmation).freeze
 
     DEFAULT_BACKTRACE_FILTERS = [
@@ -230,6 +233,25 @@ module Honeybadger
     def public?
       !development_environments.include?(environment_name)
     end
+
+    # Public: Configure async delivery
+    #
+    # block - An optional block containing an async handler
+    #
+    # Examples
+    #
+    #   config.async = Proc.new { |notice| Thread.new { notice.deliver } }
+    #
+    #   config.async do |notice|
+    #     Thread.new { notice.deliver }
+    #   end
+    #
+    # Returns configured async handler (should respond to #call(notice))
+    def async
+      @async = Proc.new if block_given?
+      @async
+    end
+    alias :async? :async
 
     def port
       @port || default_port

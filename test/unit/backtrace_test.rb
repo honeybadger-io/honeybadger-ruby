@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'stringio'
 
-class BacktraceTest < Honeybadger::UnitTest
+class BacktraceTest < Test::Unit::TestCase
   should "parse a backtrace into lines" do
     array = [
       "app/models/user.rb:13:in `magic'",
@@ -139,10 +139,6 @@ class BacktraceTest < Honeybadger::UnitTest
          "/lib/something.rb:41:in `open'"])
     end
 
-    teardown do
-      reset_config
-    end
-
     should "filter out the project root" do
       assert_equal @backtrace_without_root, @backtrace_with_root
     end
@@ -163,10 +159,6 @@ class BacktraceTest < Honeybadger::UnitTest
       Honeybadger.configure {|config| config.project_root = @project_root }
     end
 
-    teardown do
-      reset_config
-    end
-
     should "filter out the project root" do
       backtrace_with_root = Honeybadger::Backtrace.parse(
         ["#{@project_root}/app/models/user.rb:7:in `latest'",
@@ -185,10 +177,6 @@ class BacktraceTest < Honeybadger::UnitTest
   context "with a blank project root" do
     setup do
       Honeybadger.configure {|config| config.project_root = '' }
-    end
-
-    teardown do
-      reset_config
     end
 
     should "not filter line numbers with respect to any project root" do

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class LoggerTest < Honeybadger::UnitTest
+class LoggerTest < Test::Unit::TestCase
   def stub_http(response, body = nil)
     response.stubs(:body => body) if body
     @http = stub(:post => response,

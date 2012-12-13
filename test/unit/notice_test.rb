@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'json'
 
-class NoticeTest < Honeybadger::UnitTest
+class NoticeTest < Test::Unit::TestCase
   def configure
     Honeybadger::Configuration.new.tap do |config|
       config.api_key = 'abc123def456'
@@ -20,6 +20,16 @@ class NoticeTest < Honeybadger::UnitTest
                       :request_uri => '/some/uri',
                       :session     => { :to_hash => { 'a' => 'b' } },
                       :env         => { 'three' => 'four' } }.update(attrs))
+  end
+
+  should "deliver to sender" do
+    sender = stub_sender!
+    notice = build_notice
+    notice.stubs(:to_json => { :foo => 'bar' })
+
+    notice.deliver
+
+    assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice.to_json) }
   end
 
   should "generate json from as_json template" do

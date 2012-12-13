@@ -149,7 +149,11 @@ module Honeybadger
 
     def send_notice(notice)
       if configuration.public?
-        sender.send_to_honeybadger(notice.to_json)
+        if configuration.async?
+          configuration.async.call(notice)
+        else
+          notice.deliver
+        end
       end
     end
 

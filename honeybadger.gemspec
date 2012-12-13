@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.3.1'
-  s.date              = '2012-12-05'
+  s.date              = '2012-12-07'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -26,7 +26,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rspec',             '~> 2.12.0')
   s.add_development_dependency('fakeweb',           '~> 1.3.0')
   s.add_development_dependency('sham_rack',         '~> 1.3.0')
-  s.add_development_dependency('test-unit',         '>= 2.2')
   s.add_development_dependency('bourne',            '>= 1.0')
   s.add_development_dependency('shoulda',           '~> 2.11.3')
   s.add_development_dependency('capistrano')
