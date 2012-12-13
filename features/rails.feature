@@ -209,3 +209,16 @@ Feature: Install the Gem in a Rails application
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
+
+  Scenario: Asynchronous delivery in generator
+    When I configure my application to require Honeybadger
+    And I configure Honeybadger with:
+      """
+      config.api_key = 'myapikey'
+      config.async do |notice|
+        Thread.new { notice.deliver }
+      end
+      """
+    And I run the honeybadger generator with ""
+    Then the output should contain "Temporarily disabling asynchronous delivery"
+    And I should receive a Honeybadger notification

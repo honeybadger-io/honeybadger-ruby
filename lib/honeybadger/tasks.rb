@@ -17,6 +17,11 @@ namespace :honeybadger do
       exit
     end
 
+    if Honeybadger.configuration.async?
+      puts "Temporarily disabling asynchronous delivery"
+      Honeybadger.configuration.async = nil
+    end
+
     Honeybadger.configuration.development_environments = []
 
     catcher = Honeybadger::Rails::ActionControllerCatcher
