@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), 'shared_tasks')
 namespace :honeybadger do
   desc "Verify your gem installation by sending a test exception to the honeybadger service"
   task :test => ['honeybadger:log_stdout', :environment] do
-    RAILS_DEFAULT_LOGGER.level = Logger::DEBUG
+    RAILS_DEFAULT_LOGGER.level = Logger::INFO
 
     require 'action_controller/test_process'
 

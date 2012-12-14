@@ -90,7 +90,6 @@ Feature: Install the Gem in a Rails application
       config.api_key = ENV['HONEYBADGER_API_KEY']
       """
 
-  @wat
   Scenario: Filtering parameters in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
@@ -107,8 +106,9 @@ Feature: Install the Gem in a Rails application
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
+    And the request should not contain "blue42"
+    And the request params should contain "FILTERED"
 
-  @wat
   Scenario: Filtering session in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
@@ -125,8 +125,9 @@ Feature: Install the Gem in a Rails application
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
+    And the request should not contain "blue42"
+    And the request session should contain "FILTERED"
 
-  @wat
   Scenario: Filtering session and params based on Rails parameter filters
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
@@ -144,6 +145,10 @@ Feature: Install the Gem in a Rails application
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
+    And the request should not contain "red23"
+    And the request should not contain "blue42"
+    And the request session should contain "FILTERED"
+    And the request params should contain "FILTERED"
 
   Scenario: Notify honeybadger within the controller
     When I configure my application to require Honeybadger

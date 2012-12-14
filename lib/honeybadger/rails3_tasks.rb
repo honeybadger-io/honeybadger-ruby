@@ -9,7 +9,7 @@ namespace :honeybadger do
                    else
                      Logger.new(STDOUT)
                    end
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger::INFO
 
     Honeybadger.configure(true) do |config|
       config.logger = Rails.logger

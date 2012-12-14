@@ -48,9 +48,9 @@ module Honeybadger
 
       case response
       when Net::HTTPSuccess then
-        log(:info, "Success: #{response.class}", response)
+        log(:info, "Success: #{response.class}", response, data)
       else
-        log(:error, "Failure: #{response.class}", response)
+        log(:error, "Failure: #{response.class}", response, data)
       end
 
       if response && response.respond_to?(:body)
@@ -84,8 +84,14 @@ module Honeybadger
       URI.parse("#{protocol}://#{host}:#{port}").merge(NOTICES_URI)
     end
 
-    def log(level, message, response = nil)
-      logger.send(level, LOG_PREFIX + message) if logger
+    def log(level, message, response = nil, data = nil)
+      if logger
+        logger.send(level, LOG_PREFIX + message)
+
+        # Log the notice payload for debugging
+        logger.debug(LOG_PREFIX + "Notice: #{data}") if data
+      end
+
       Honeybadger.report_environment_info
       Honeybadger.report_response_body(response.body) if response && response.respond_to?(:body)
     end

@@ -91,6 +91,12 @@ Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
   step %(the output should contain "123456789")
 end
 
+Then /^the request\s?(url|component|action|params|session|cgi_data|context)? should( not)? contain "([^\"]*)"$/ do |key, negate, expected|
+  notice = all_output.match(/Notice: ({.+})/) ? JSON.parse(Regexp.last_match(1)) : {}
+  hash = key ? notice['request'][key.strip] : notice['request']
+  hash.to_s.send(negate ? :should_not : :should, match(/#{Regexp.escape(expected)}/))
+end
+
 Then /^I should see the Rails version$/ do
   step %(the output should contain "[Rails: #{rails_version}]")
 end
