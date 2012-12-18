@@ -194,7 +194,7 @@ examples of notifying Honeybadger asynchronously:
       @queue = :cobra_alert
 
       def self.perform(notice)
-        Honeybadger.sender.send_to_honeybadger(notice)
+        Honeybadger.sender.send_to_honeybadger(notice.to_json)
       end
     end
 
