@@ -118,7 +118,7 @@ module Honeybadger
     #
     # Returns a reference to the error in Honeybadger
     def deliver
-      Honeybadger.sender.send_to_honeybadger(to_json)
+      Honeybadger.sender.send_to_honeybadger(self)
     end
 
     # Public: Template used to create JSON payload

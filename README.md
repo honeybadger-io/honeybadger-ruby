@@ -186,7 +186,7 @@ examples of notifying Honeybadger asynchronously:
 
     Honeybadger.configure do |config|
       config.async do |notice|
-        Resque.enqueue(WorkingBadger, notice)
+        Resque.enqueue(WorkingBadger, notice.to_json)
       end
     end
 
@@ -202,7 +202,7 @@ examples of notifying Honeybadger asynchronously:
 
     Honeybadger.configure do |config|
       config.async do |notice|
-        WorkingBadger.perform_async(notice)
+        WorkingBadger.perform_async(notice.to_json)
       end
     end
 

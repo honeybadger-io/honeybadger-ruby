@@ -82,7 +82,7 @@ class ActionControllerCatcherTest < Test::Unit::TestCase
   end
 
   def last_sent_notice_payload
-    assert_not_nil xml = last_sent_notice_json, "No json was sent"
+    assert_not_nil last_sent_notice_json, "No json was sent"
     JSON.parse(last_sent_notice_json)
   end
 

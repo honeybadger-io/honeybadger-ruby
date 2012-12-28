@@ -14,7 +14,7 @@ class NotifierTest < Test::Unit::TestCase
 
   def assert_sent(notice, notice_args)
     assert_received(Honeybadger::Notice, :new) {|expect| expect.with(has_entries(notice_args)) }
-    assert_received(Honeybadger.sender, :send_to_honeybadger) {|expect| expect.with(notice.to_json) }
+    assert_received(Honeybadger.sender, :send_to_honeybadger) {|expect| expect.with(notice) }
   end
 
   def set_public_env

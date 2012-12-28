@@ -30,10 +30,12 @@ module Honeybadger
 
     # Public: Sends the notice data off to Honeybadger for processing.
     #
-    # data - The JSON notice to be sent off
+    # notice - The notice data to be sent (Hash or JSON string)
     #
     # Returns nothing
-    def send_to_honeybadger(data)
+    def send_to_honeybadger(notice)
+      data = notice.respond_to?(:to_json) ? notice.to_json : notice
+
       http     = setup_http_connection
       headers  = HEADERS
 

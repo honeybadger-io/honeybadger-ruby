@@ -29,7 +29,7 @@ class NoticeTest < Test::Unit::TestCase
 
     notice.deliver
 
-    assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice.to_json) }
+    assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice) }
   end
 
   should "generate json from as_json template" do
