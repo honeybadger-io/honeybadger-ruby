@@ -34,7 +34,7 @@ module Honeybadger
     #
     # Returns nothing
     def send_to_honeybadger(notice)
-      data = notice.respond_to?(:to_json) ? notice.to_json : notice
+      data = notice.is_a?(String) ? notice : notice.to_json
 
       http     = setup_http_connection
       headers  = HEADERS
