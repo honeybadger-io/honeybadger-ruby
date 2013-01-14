@@ -132,8 +132,8 @@ Here's an example of sending some user-specific information in a Rails
 
     before_filter do
       Honeybadger.context({
-        user_id: current_user.id,
-        user_email: current_user.email
+        :user_id => current_user.id,
+        :user_email => current_user.email
       }) if current_user
     end
 
