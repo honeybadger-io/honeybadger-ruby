@@ -140,32 +140,19 @@ When /^I configure the Heroku gem shim with "([^\"]*)"( and multiple app support
   heroku_script_bin = File.join(TEMP_DIR, "bin")
   FileUtils.mkdir_p(heroku_script_bin)
   heroku_script     = File.join(heroku_script_bin, "heroku")
-  heroku_env_vars = <<-VARS
-HONEYBADGER_API_KEY    => myapikey
-APP_NAME            => cold-moon-2929
-BUNDLE_WITHOUT      => development:test
-COMMIT_HASH         => lj32j42ss9332jfa2
-DATABASE_URL        => postgres://fchovwjcyb:QLPVWmBBbf4hCG_YMrtV@ec3-107-28-193-23.compute-1.amazonaws.com/fhcvojwwcyb
-LANG                => en_US.UTF-8
-LAST_GIT_BY         => kensa
-RACK_ENV            => production
-SHARED_DATABASE_URL => postgres://fchovwjcyb:QLPVwMbbbF8Hcg_yMrtV@ec2-94-29-181-224.compute-1.amazonaws.com/fhcvojcwwyb
-STACK               => bamboo-mri-1.9.2
-URL                 => cold-moon-2929.heroku.com
-  VARS
   single_app_script = <<-SINGLE
 #!/bin/bash
-if [ $1 == 'config' ]
+if [[ $1 == 'config:get' && $2 == 'HONEYBADGER_API_KEY' ]]
 then
-  echo "#{heroku_env_vars}"
+  echo "#{api_key}"
 fi
   SINGLE
 
   multi_app_script = <<-MULTI
 #!/bin/bash
-if [[ $1 == 'config' && $2 == '--app' ]]
+if [[ $1 == 'config:get' && $2 == 'HONEYBADGER_API_KEY' && $3 == '--app' ]]
 then
-  echo "#{heroku_env_vars}"
+  echo "#{api_key}"
 fi
   MULTI
 

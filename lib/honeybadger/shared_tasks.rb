@@ -31,11 +31,11 @@ namespace :honeybadger do
     task :add_deploy_notification => [:environment] do
 
       def heroku_var(var)
-        `heroku config | grep -E "#{var.upcase}" | awk '{ print $3; }'`.strip
+        `heroku config:get #{var}`
       end
 
-      heroku_rails_env = heroku_var("rails_env")
-      heroku_api_key = heroku_var("honeybadger_api_key").split.find {|x| x unless x.blank?} ||
+      heroku_rails_env = heroku_var('RAILS_ENV')
+      heroku_api_key = heroku_var('HONEYBADGER_API_KEY').split.find {|x| x unless x.blank?} ||
         Honeybadger.configuration.api_key
 
       command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{heroku_rails_env}&api_key=#{heroku_api_key}")

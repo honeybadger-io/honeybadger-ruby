@@ -53,6 +53,7 @@ class HoneybadgerGenerator < Rails::Generator::Base
       puts "... Failed."
       puts "WARNING: We were unable to detect the Honeybadger API Key from your Heroku environment."
       puts "Your Heroku application environment may not be configured correctly."
+      puts "Have you configured multiple Heroku apps? Try using the '--app [app name]' flag." unless options[:app]
       exit 1
     else
       puts "... Done."
@@ -60,13 +61,13 @@ class HoneybadgerGenerator < Rails::Generator::Base
     end
   end
 
-  def heroku_var(var,app_name = nil)
+  def heroku_var(var, app_name = nil)
     app = app_name ? "--app #{app_name}" : ''
-    `heroku config #{app} | grep -E "#{var.upcase}" | awk '{ print $3; }'`.strip
+    `heroku config:get #{var} #{app}`
   end
 
   def heroku_api_key
-    heroku_var("(honeybadger)_api_key",options[:app]).split.find {|x| x unless x.blank?}
+    heroku_var("HONEYBADGER_API_KEY",options[:app]).split.find {|x| x unless x.blank?}
   end
 
   def heroku?

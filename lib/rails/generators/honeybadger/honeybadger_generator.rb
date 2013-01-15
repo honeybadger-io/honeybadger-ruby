@@ -71,13 +71,13 @@ class HoneybadgerGenerator < Rails::Generators::Base
     end
   end
 
-  def heroku_var(var,app_name = nil)
+  def heroku_var(var, app_name = nil)
     app = app_name ? "--app #{app_name}" : ''
-    `heroku config #{app} | grep -E "#{var.upcase}" | awk '{ print $3; }'`.strip
+    `heroku config:get #{var} #{app}`
   end
 
   def heroku_api_key
-    heroku_var("honeybadger_api_key",options[:app]).split.find {|x| x unless x.blank?}
+    heroku_var("HONEYBADGER_API_KEY", options[:app]).split.find {|x| x unless x.blank?}
   end
 
   def heroku?
