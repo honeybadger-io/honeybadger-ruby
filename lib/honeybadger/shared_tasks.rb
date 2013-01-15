@@ -29,16 +29,23 @@ namespace :honeybadger do
   namespace :heroku do
     desc "Install Heroku deploy notifications addon"
     task :add_deploy_notification => [:environment] do
-
-      def heroku_var(var)
-        `heroku config:get #{var}`
+      def heroku_var(var, app_name = nil)
+        app = app_name ? "--app #{app_name}" : ''
+        `heroku config:get #{var} #{app} 2> /dev/null`.strip
       end
 
-      heroku_rails_env = heroku_var('RAILS_ENV')
-      heroku_api_key = heroku_var('HONEYBADGER_API_KEY').split.find {|x| x unless x.blank?} ||
+      heroku_rails_env = heroku_var('RAILS_ENV', ENV['APP'])
+      heroku_api_key = heroku_var('HONEYBADGER_API_KEY', ENV['APP']).split.find {|x| x unless x.blank?} ||
         Honeybadger.configuration.api_key
 
-      command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{heroku_rails_env}&api_key=#{heroku_api_key}")
+      if heroku_api_key.blank? || heroku_rails_env.blank?
+        puts "WARNING: We were unable to detect the configuration from your Heroku environment."
+        puts "Your Heroku application environment may not be configured correctly."
+        puts "Have you configured multiple Heroku apps? Try using APP=[app name]'" unless ENV['APP']
+        exit
+      end
+
+      command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{heroku_rails_env}&api_key=#{heroku_api_key}"#{ENV['APP'] ? " --app #{ENV['APP']}" : ''})
 
       puts "\nRunning:\n#{command}\n"
       puts `#{command}`
