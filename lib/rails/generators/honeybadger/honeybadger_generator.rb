@@ -63,6 +63,7 @@ class HoneybadgerGenerator < Rails::Generators::Base
       puts "... Failed."
       puts "WARNING: We were unable to detect the Honeybadger API Key from your Heroku environment."
       puts "Your Heroku application environment may not be configured correctly."
+      puts "Have you configured multiple Heroku apps? Try using the '--app [app name]' flag."
       exit 1
     else
       puts "... Done."
