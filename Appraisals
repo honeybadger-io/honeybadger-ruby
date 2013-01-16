@@ -15,6 +15,6 @@ appraise 'rails3.1' do
 end
 
 appraise 'rails3.2' do
-  gem 'rails', '3.2.9'
+  gem 'rails', '3.2.11'
   gem 'honeybadger', :path => '../'
 end
