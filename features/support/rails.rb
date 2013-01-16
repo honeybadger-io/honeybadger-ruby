@@ -82,7 +82,7 @@ module RailsHelpers
 
 
         response = response.last if response.last.is_a?(ActionDispatch::Response)
-        response = response.last.to_a if response.last.is_a?(Rack::BodyProxy)
+        response = response.last.to_a if defined?(Rack::BodyProxy) && response.last.is_a?(Rack::BodyProxy)
 
         if response.is_a?(Array)
           puts response.join
