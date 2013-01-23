@@ -6,13 +6,13 @@ When /^I define a Metal endpoint called "([^\"]*)":$/ do |class_name, definition
     file.puts definition
     file.puts "end"
   end
-  step %(the metal endpoint "#{class_name}" is mounted in the Rails 3 routes.rb) if rails3?
+  step %(the metal endpoint "#{class_name}" is mounted in the Rails 3 routes.rb) unless rails2?
 end
 
 When /^the metal endpoint "([^\"]*)" is mounted in the Rails 3 routes.rb$/ do |class_name|
   routesrb = File.join(rails_root, "config", "routes.rb")
   routes = IO.readlines(routesrb)
-  rack_route = "match '/metal(/*other)' => #{class_name}"
+  rack_route = "get '/metal(/*other)' => #{class_name}"
   routes = routes[0..-2] + [rack_route, routes[-1]]
   File.open(routesrb, "w") do |f|
     f.puts "$:<< '#{LOCAL_RAILS_ROOT}'"

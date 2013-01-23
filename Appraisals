@@ -18,3 +18,8 @@ appraise 'rails3.2' do
   gem 'rails', '3.2.11'
   gem 'honeybadger', :path => '../'
 end
+
+appraise 'rails4' do
+  gem 'rails', '4.0.0.beta', :git => 'git://github.com/rails/rails.git'
+  gem 'honeybadger', :path => '../'
+end

@@ -2,7 +2,7 @@ require 'uri'
 require 'active_support/core_ext'
 
 When /^I generate a new Rails application$/ do
-  rails_create_command = !rails3? ? 'rails rails_root' :
+  rails_create_command = rails2? ? 'rails rails_root' :
     'rails new rails_root -O -S -G -J -T --skip-gemfile --skip-bundle'
 
   step %(I successfully run `bundle exec #{rails_create_command}`)
@@ -12,7 +12,7 @@ When /^I generate a new Rails application$/ do
 
   monkeypatch_old_version if rails_version == "2.3.14"
 
-  unless rails3?
+  if rails2?
     config_gem_dependencies
     disable_activerecord
   end
@@ -32,7 +32,7 @@ When /^I configure the Honeybadger shim$/ do
 end
 
 When /^I configure my application to require Honeybadger$/ do
-  if rails3?
+  if rails_uses_bundler?
     # Do nothing - bundler's on it
   elsif rails_manages_gems?
     config_gem('honeybadger')
@@ -50,10 +50,10 @@ When /^I configure my application to require Honeybadger$/ do
 end
 
 When /^I configure Honeybadger with:$/ do |config|
-  if rails_manages_gems?
-    requires = ''
+  requires = if rails_uses_bundler? || rails_manages_gems?
+    ''
   else
-    requires = "require 'honeybadger'"
+    %(require 'honeybadger')
   end
 
   initializer_code = <<-EOF
@@ -74,10 +74,10 @@ When /^I configure Honeybadger with:$/ do |config|
 end
 
 When /^I run the honeybadger generator with "([^\"]*)"$/ do |generator_args|
-  if rails3?
-    step %(I successfully run `./script/rails generate honeybadger #{generator_args}`)
-  else
+  if rails2?
     step %(I successfully run `./script/generate honeybadger #{generator_args}`)
+  else
+    step %(I successfully run `rails generate honeybadger #{generator_args}`)
   end
 end
 
@@ -106,7 +106,7 @@ When /^I define a( metal)? response for "([^\"]*)":$/ do |metal, controller_and_
   controller_name = controller_class_name.underscore
   controller_file_name = File.join(rails_root, 'app', 'controllers', "#{controller_name}.rb")
   File.open(controller_file_name, "w") do |file|
-    file.puts "class #{controller_class_name} < #{ (metal && rails3?) ? 'ActionController::Metal' : 'ApplicationController'}"
+    file.puts "class #{controller_class_name} < #{ (metal && !rails2?) ? 'ActionController::Metal' : 'ApplicationController'}"
     file.puts "def consider_all_requests_local; false; end"
     file.puts "def local_request?; false; end"
     file.puts "def #{action}"
@@ -121,11 +121,11 @@ When /^I perform a request to "([^\"]*)"$/ do |uri|
 end
 
 When /^I route "([^\"]*)" to "([^\"]*)"$/ do |path, controller_action_pair|
-  route = if rails3?
-            %(match "#{path}", :to => "#{controller_action_pair}")
-          else
+  route = if rails2?
             controller, action = controller_action_pair.split('#')
             %(map.connect "#{path}", :controller => "#{controller}", :action => "#{action}")
+          else
+            %(get "#{path}" => "#{controller_action_pair}")
           end
   routes_file = File.join(rails_root, "config", "routes.rb")
   File.open(routes_file, "r+") do |file|
@@ -182,20 +182,7 @@ Then /^my Honeybadger configuration should contain the following line:$/ do |lin
 end
 
 When /^I configure the application to filter parameter "([^\"]*)"$/ do |parameter|
-  if rails3?
-    application_filename = File.join(rails_root, 'config', 'application.rb')
-    application_lines = File.open(application_filename).readlines
-
-    application_definition_line       = application_lines.detect { |line| line =~ /Application/ }
-    application_definition_line_index = application_lines.index(application_definition_line)
-
-    application_lines.insert(application_definition_line_index + 1,
-                             "    config.filter_parameters += [#{parameter.inspect}]")
-
-   File.open(application_filename, "w") do |file|
-     file.puts application_lines.join("\n")
-   end
-  else
+  if rails2?
    controller_filename = application_controller_filename
    controller_lines = File.open(controller_filename).readlines
 
@@ -207,6 +194,19 @@ When /^I configure the application to filter parameter "([^\"]*)"$/ do |paramete
 
    File.open(controller_filename, "w") do |file|
      file.puts controller_lines.join("\n")
+   end
+  else
+    application_filename = File.join(rails_root, 'config', 'application.rb')
+    application_lines = File.open(application_filename).readlines
+
+    application_definition_line       = application_lines.detect { |line| line =~ /Application/ }
+    application_definition_line_index = application_lines.index(application_definition_line)
+
+    application_lines.insert(application_definition_line_index + 1,
+                             "    config.filter_parameters += [#{parameter.inspect}]")
+
+   File.open(application_filename, "w") do |file|
+     file.puts application_lines.join("\n")
    end
   end
 end

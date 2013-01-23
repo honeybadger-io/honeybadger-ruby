@@ -3,8 +3,16 @@ module RailsHelpers
     controller_filename = File.join(rails_root, 'app', 'controllers', "application_controller.rb")
   end
 
+  def rails2?
+    rails_version =~ /^2/
+  end
+
   def rails3?
     rails_version =~ /^3/
+  end
+
+  def rails4?
+    rails_version =~ /^4/
   end
 
   def rails_root
@@ -12,11 +20,15 @@ module RailsHelpers
   end
 
   def rails_uses_rack?
-    rails3? || rails_version =~ /^2\.3/
+    rails4? || rails3? || rails_version =~ /^2\.3/
   end
 
   def rails_version
     @rails_version ||= `bundle exec rails -v`[/\d.+/]
+  end
+
+  def rails_uses_bundler?
+    rails4? || rails3?
   end
 
   def rails_manages_gems?
@@ -24,11 +36,11 @@ module RailsHelpers
   end
 
   def rails_supports_initializers?
-    rails3? || rails_version =~ /^2\./
+    rails4? || rails3? || rails_version =~ /^2\./
   end
 
   def rails_finds_generators_in_gems?
-    rails3? || rails_version =~ /^2\./
+    rails4? || rails3? || rails_version =~ /^2\./
   end
 
   def environment_path
@@ -72,7 +84,7 @@ module RailsHelpers
   end
 
   def perform_request(uri, environment = 'production')
-    if rails3?
+    if rails4? || rails3?
       request_script = <<-SCRIPT
         require File.expand_path('../config/environment', __FILE__)
 
@@ -91,7 +103,7 @@ module RailsHelpers
         end
       SCRIPT
       File.open(File.join(rails_root, 'request.rb'), 'w') { |file| file.write(request_script) }
-      step %(I run `ruby -rthread ./script/rails runner -e #{environment} request.rb`)
+      step %(I run `rails runner -e #{environment} request.rb`)
     elsif rails_uses_rack?
       request_script = <<-SCRIPT
         require File.expand_path('../config/environment', __FILE__)

@@ -37,13 +37,14 @@ module Honeybadger
       def honeybadger_filter_if_filtering(hash)
         return hash if ! hash.is_a?(Hash)
 
-        if respond_to?(:filter_parameters) # Rails 2
+        # Rails 2 filters parameters in the controller
+        # In Rails 3+ we use request.env['action_dispatch.parameter_filter']
+        # to filter parameters in Honeybadger::Notice (avoids filtering twice)
+        if respond_to?(:filter_parameters)
           filter_parameters(hash)
-        elsif defined?(ActionDispatch::Http::ParameterFilter) # Rails 3
-          ActionDispatch::Http::ParameterFilter.new(::Rails.application.config.filter_parameters).filter(hash)
         else
           hash
-        end rescue hash
+        end
       end
 
       def honeybadger_session_data
