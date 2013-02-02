@@ -1,6 +1,5 @@
 require 'net/http'
 require 'uri'
-require 'active_support'
 
 # Capistrano tasks for notifying Honeybadger of deploys
 module HoneybadgerTasks
@@ -17,12 +16,12 @@ module HoneybadgerTasks
   # Returns true or false
   def self.deploy(opts = {})
     api_key = opts.delete(:api_key) || Honeybadger.configuration.api_key
-    if api_key.blank?
+    unless api_key =~ /\S/
       puts "I don't seem to be configured with an API key.  Please check your configuration."
       return false
     end
 
-    if opts[:environment].blank?
+    unless opts[:environment] =~ /\S/
       puts "I don't know to which environment you are deploying (use the TO=production option)."
       return false
     end

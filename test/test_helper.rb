@@ -5,11 +5,6 @@ require 'shoulda'
 require 'bourne'
 require 'rack'
 
-require 'action_controller'
-require 'action_controller/test_process'
-require 'active_record'
-require 'active_support'
-
 require 'honeybadger'
 
 class BacktracedException < Exception

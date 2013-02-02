@@ -23,5 +23,5 @@ Feature: Use the notifier in a Sinatra app
       app = FontaneApp
       """
     When I perform a Rack request to "http://example.com:123/test/index?param=value"
-    Then I should receive a Honeybadger notification
+    Then I should receive a Honeybadger notification for rack
 

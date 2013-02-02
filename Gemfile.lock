@@ -2,15 +2,11 @@ PATH
   remote: .
   specs:
     honeybadger (1.5.0)
-      activesupport
       json
 
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (3.2.11)
-      i18n (~> 0.6)
-      multi_json (~> 1.0)
     appraisal (0.5.1)
       bundler
       rake
@@ -40,12 +36,10 @@ GEM
     gherkin (2.11.5)
       json (>= 1.4.6)
     highline (1.6.13)
-    i18n (0.6.1)
     json (1.7.3)
     metaclass (0.0.1)
     mocha (0.10.5)
       metaclass (~> 0.0.1)
-    multi_json (1.5.0)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
