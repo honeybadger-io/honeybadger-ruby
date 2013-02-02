@@ -84,23 +84,23 @@ class BacktraceTest < Test::Unit::TestCase
     end
 
     should "include a snippet from the source file for each line of the backtrace" do
-      assert_equal 4, @backtrace.lines.first.source.keys.size
-      assert_match /\$:<</, @backtrace.lines.first.source[1]
-      assert_match /require/, @backtrace.lines.first.source[2]
-      assert_match /\n/, @backtrace.lines.first.source[3]
-      assert_match /begin/, @backtrace.lines.first.source[4]
+      assert_equal 4, @backtrace.lines[0].source.keys.size
+      assert_match /\$:<</, @backtrace.lines[0].source[1]
+      assert_match /require/, @backtrace.lines[0].source[2]
+      assert_match /\n/, @backtrace.lines[0].source[3]
+      assert_match /begin/, @backtrace.lines[0].source[4]
 
-      assert_equal 5, @backtrace.lines.second.source.keys.size
-      assert_match /require/, @backtrace.lines.second.source[2]
-      assert_match /\n/, @backtrace.lines.second.source[3]
-      assert_match /begin/, @backtrace.lines.second.source[4]
-      assert_match /StandardError/, @backtrace.lines.second.source[5]
-      assert_match /rescue/, @backtrace.lines.second.source[6]
+      assert_equal 5, @backtrace.lines[1].source.keys.size
+      assert_match /require/, @backtrace.lines[1].source[2]
+      assert_match /\n/, @backtrace.lines[1].source[3]
+      assert_match /begin/, @backtrace.lines[1].source[4]
+      assert_match /StandardError/, @backtrace.lines[1].source[5]
+      assert_match /rescue/, @backtrace.lines[1].source[6]
 
-      assert_equal 3, @backtrace.lines.third.source.keys.size
-      assert_match /rescue/, @backtrace.lines.third.source[6]
-      assert_match /Honeybadger/, @backtrace.lines.third.source[7]
-      assert_match /end/, @backtrace.lines.third.source[8]
+      assert_equal 3, @backtrace.lines[2].source.keys.size
+      assert_match /rescue/, @backtrace.lines[2].source[6]
+      assert_match /Honeybadger/, @backtrace.lines[2].source[7]
+      assert_match /end/, @backtrace.lines[2].source[8]
     end
   end
 
@@ -112,8 +112,8 @@ class BacktraceTest < Test::Unit::TestCase
 
     backtrace = Honeybadger::Backtrace.parse(array)
 
-    assert_equal backtrace.lines.first.source, {}
-    assert_equal backtrace.lines.second.source, {}
+    assert_equal backtrace.lines[0].source, {}
+    assert_equal backtrace.lines[1].source, {}
   end
 
   should "have an empty application trace by default" do

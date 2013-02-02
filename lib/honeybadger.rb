@@ -2,14 +2,6 @@ require 'net/http'
 require 'net/https'
 require 'json'
 
-begin
-  require 'active_support'
-  require 'active_support/core_ext'
-rescue LoadError
-  require 'activesupport'
-  require 'activesupport/core_ext'
-end
-
 require 'honeybadger/configuration'
 require 'honeybadger/backtrace'
 require 'honeybadger/notice'
@@ -128,8 +120,8 @@ module Honeybadger
       result[:environment_name] = 'production'
 
       unless notice.backtrace.lines.empty?
-        result[:file]        = notice.backtrace.lines.first.file
-        result[:line_number] = notice.backtrace.lines.first.number
+        result[:file]        = notice.backtrace.lines[0].file
+        result[:line_number] = notice.backtrace.lines[0].number
       end
 
       result

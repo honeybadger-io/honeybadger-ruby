@@ -4,4 +4,6 @@ rvm:
   - 1.9.2
   - 1.9.3
 before_script: rake appraisal:install
-script: rake appraisal:rails2.3 test
+script:
+  - rake appraisal:rack test
+  - rake appraisal:rails2.3 test
