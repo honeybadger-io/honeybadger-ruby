@@ -1,6 +1,7 @@
 require 'net/http'
 require 'net/https'
 require 'json'
+require 'logger'
 
 require 'honeybadger/configuration'
 require 'honeybadger/backtrace'

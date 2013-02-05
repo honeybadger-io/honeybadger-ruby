@@ -17,7 +17,3 @@ When /^I perform a Rack request to "([^\"]*)"$/ do |url|
   end
   step %(I run `ruby #{request_file}`)
 end
-
-Then /^I should receive a Honeybadger notification for rack$/ do
-  step %(The output should contain "You have accessed a deleted account.")
-end

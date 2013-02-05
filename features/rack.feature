@@ -8,7 +8,6 @@ Feature: Use the notifier in a plain Rack app
 
       Honeybadger.configure do |config|
         config.api_key = 'my_api_key'
-        config.logger = Logger.new(STDOUT)
       end
 
       app = Rack::Builder.app do
@@ -17,7 +16,7 @@ Feature: Use the notifier in a plain Rack app
       end
       """
     When I perform a Rack request to "http://example.com:123/test/index?param=value"
-    Then I should receive a Honeybadger notification for rack
+    Then I should receive a Honeybadger notification
 
   Scenario: Ignore user agents
     Given the following Rack app:
@@ -27,7 +26,6 @@ Feature: Use the notifier in a plain Rack app
 
       Honeybadger.configure do |config|
         config.api_key = 'my_api_key'
-        config.logger = Logger.new(STDOUT)
         config.ignore_user_agent << /ignore/
       end
 
