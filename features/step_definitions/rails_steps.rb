@@ -1,5 +1,4 @@
 require 'uri'
-require 'active_support/core_ext'
 
 When /^I generate a new Rails application$/ do
   rails_create_command = rails2? ? 'rails rails_root' :
@@ -92,7 +91,7 @@ Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
 end
 
 Then /^the request\s?(url|component|action|params|session|cgi_data|context)? should( not)? contain "([^\"]*)"$/ do |key, negate, expected|
-  notice = all_output.match(/Notice: ({.+})/) ? JSON.parse(Regexp.last_match(1)) : {}
+  notice = all_output.match(/Notice: (\{.+\})/) ? JSON.parse(Regexp.last_match(1)) : {}
   hash = key ? notice['request'][key.strip] : notice['request']
   hash.to_s.send(negate ? :should_not : :should, match(/#{Regexp.escape(expected)}/))
 end
@@ -103,7 +102,7 @@ end
 
 When /^I define a( metal)? response for "([^\"]*)":$/ do |metal, controller_and_action, definition|
   controller_class_name, action = controller_and_action.split('#')
-  controller_name = controller_class_name.underscore
+  controller_name = controller_class_name.split(/(?=[A-Z][a-z]*)/).join('_').downcase
   controller_file_name = File.join(rails_root, 'app', 'controllers', "#{controller_name}.rb")
   File.open(controller_file_name, "w") do |file|
     file.puts "class #{controller_class_name} < #{ (metal && !rails2?) ? 'ActionController::Metal' : 'ApplicationController'}"

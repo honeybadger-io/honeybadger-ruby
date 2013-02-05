@@ -41,7 +41,7 @@ GIT
       thor (>= 0.15.4, < 2.0)
 
 PATH
-  remote: /Users/josh/code/honeybadger-ruby
+  remote: /Users/pvande/Projects/honeybadger-ruby
   specs:
     honeybadger (1.5.0)
       activesupport

@@ -163,7 +163,7 @@ class NoticeTest < Test::Unit::TestCase
         @string_io.rewind
 
         assert_not_equal notice_from_exception.source_extract, {}, 'Expected backtrace source extract to be found'
-        assert_equal backtrace.lines.second.source, notice_from_exception.source_extract
+        assert_equal backtrace.lines[1].source, notice_from_exception.source_extract
       end
     end
   end

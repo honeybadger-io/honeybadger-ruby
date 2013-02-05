@@ -39,7 +39,7 @@ module Honeybadger
       http     = setup_http_connection
       headers  = HEADERS
 
-      headers.merge!({ 'X-API-Key' => api_key}) if api_key.present?
+      headers.merge!({ 'X-API-Key' => api_key}) unless api_key.nil?
 
       response = begin
                    http.post(url.path, data, headers)
