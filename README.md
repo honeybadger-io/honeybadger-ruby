@@ -22,8 +22,6 @@ Then generate the initializer:
 If you prefer to manually create the initializer, that's simple enough.
 Just put the code below in config/initializers/honeybadger.rb
 
-    # Uncomment the following line if running lower than Rails 3.2
-    # require 'honeybadger/rails'
     Honeybadger.configure do |config|
       config.api_key = '[your-api-key]'
     end
