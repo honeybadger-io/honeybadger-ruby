@@ -145,6 +145,64 @@ request's life cycle. Honeybadger will discard the data when a
 request completes, so that the next request will start with a blank
 slate.
 
+## Tracking deploys
+
+Honeybadger has an API to keep track of project deployments. Whenever
+you deploy, all errors for that environment will be resolved
+automatically. You can choose to enable or disable deploy tracking from
+your Honeybadger project settings page.
+
+We officially support deploy tracking using Capistrano and Heroku:
+
+### Capistrano
+
+In order to track deployments using Capistrano, simply require
+Honeybadger's Capistrano task in your `config/deploy.rb` file:
+
+    require 'honeybadger/capistrano'
+
+If you ran the Honeybadger install generator in a project that was
+previously configured with Capistrano, we already added this for you.
+
+The Capistrano task will run our `rake honeybadger:deploy` task on
+the server you are deploying to, so that it can correctly report
+environment-related information. If you would prefer to notify
+Honeybadger locally without using rake, check out our blog post:
+[Honeybadger and Capistrano: the metal way](http://honeybadger.dev/blog/2012/10/06/honeybadger-and-capistrano/).
+
+### Heroku
+
+Deploy tracking via Heroku is implemented using Heroku's free [deploy
+hooks](https://devcenter.heroku.com/articles/deploy-hooks) addon. To
+install the addon and configure it for Honeybadger, run the following
+rake task from your project root:
+
+    rake honeybadger:heroku:add_deploy_notification APP=app-name
+
+Don't forget to replace "app-name" with the name of your app on
+Heroku. Or, if you want to add the deploy hook manually, run:
+
+    heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=production&api_key=asdf --app app-name
+
+You should replace the api key and app-name with your own values. You
+may also want to change the environment (set to production by default).
+
+### Via Rake
+
+If you are using other frameworks/platforms, you can still notify us of
+a deploy. We provide a rake task that uses ENV variables to report
+environment information:
+
+    rake honeybadger:deploy TO=production
+
+You can optionally add:
+
+* REPO=[scm repo url]
+* REVISION=[scm sha]
+* USER=[local user's name]
+* API_KEY=[a different api key]
+* DRY_RUN=true (simulates notification)
+
 ## Notifying Honeybadger asynchronously
 
 Want to send notices in a thread, or even use Resque or Sidekiq to
