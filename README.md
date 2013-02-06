@@ -149,8 +149,8 @@ slate.
 
 Honeybadger has an API to keep track of project deployments. Whenever
 you deploy, all errors for that environment will be resolved
-automatically. You can choose to enable or disable deploy tracking from
-your Honeybadger project settings page.
+automatically. You can choose to enable or disable the auto-resolve
+feature from your Honeybadger project settings page.
 
 We officially support deploy tracking using Capistrano and Heroku:
 
