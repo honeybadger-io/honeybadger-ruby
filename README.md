@@ -182,7 +182,7 @@ rake task from your project root:
 Don't forget to replace "app-name" with the name of your app on
 Heroku. Or, if you want to add the deploy hook manually, run:
 
-    heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=production&api_key=asdf --app app-name
+    heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=production&api_key=asdf" --app app-name
 
 You should replace the api key and app-name with your own values. You
 may also want to change the environment (set to production by default).
