@@ -1,5 +1,9 @@
 ## Honeybadger 1.6.0 (unreleased) ##
 
+* Send language in notice payload
+
+  *Joshua Wood*
+
 * Disable Rack::SSL middleware in Rails 3 test task. Rails'
   config.force_ssl setting otherwise prevents the request from reaching
   the controller.

@@ -129,7 +129,8 @@ module Honeybadger
         :notifier => {
           :name => notifier_name,
           :url => notifier_url,
-          :version => notifier_version
+          :version => notifier_version,
+          :language => 'ruby'
         },
         :error => {
           :class => error_class,
