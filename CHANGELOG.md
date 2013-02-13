@@ -1,5 +1,9 @@
 ## Honeybadger 1.6.0 (unreleased) ##
 
+* Add option to send session data (or not)
+
+  *Joshua Wood*
+
 * Send language in notice payload
 
   *Joshua Wood*

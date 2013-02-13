@@ -394,6 +394,13 @@ To replace sensitive information sent to the Honeybadger service with [FILTERED]
 Note that, when rescuing exceptions within an ActionController method,
 honeybadger will reuse filters specified by #filter_parameter_logging.
 
+To disable sending session data:
+
+    Honeybadger.configure do |config|
+      config.api_key      = '1234567890abcdef'
+      config.send_request_session = false
+    end
+
 ## Testing
 
 When you run your tests, you might notice that the Honeybadger service is recording

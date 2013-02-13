@@ -26,6 +26,9 @@ module Honeybadger
     # The message from the exception, or a general description of the error
     attr_reader :error_message
 
+    # See Configuration#send_request_session
+    attr_reader :send_request_session
+
     # See Configuration#backtrace_filters
     attr_reader :backtrace_filters
 
@@ -106,6 +109,8 @@ module Honeybadger
 
       self.source_extract_radius = args[:source_extract_radius] || 2
       self.source_extract        = extract_source_from_backtrace
+
+      self.send_request_session     = args[:send_request_session].nil? ? true : args[:send_request_session]
 
       also_use_rack_params_filters
       find_session_data
@@ -193,7 +198,7 @@ module Honeybadger
       :session_data, :project_root, :url, :ignore, :ignore_by_filters,
       :notifier_name, :notifier_url, :notifier_version, :component, :action,
       :cgi_data, :environment_name, :hostname, :context, :source_extract,
-      :source_extract_radius
+      :source_extract_radius, :send_request_session
 
     # Private: Arguments given in the initializer
     attr_accessor :args
@@ -309,8 +314,10 @@ module Honeybadger
     end
 
     def find_session_data
-      self.session_data = args[:session_data] || args[:session] || rack_session || {}
-      self.session_data = session_data[:data] if session_data[:data]
+      if send_request_session
+        self.session_data = args[:session_data] || args[:session] || rack_session || {}
+        self.session_data = session_data[:data] if session_data[:data]
+      end
     end
 
     def set_context

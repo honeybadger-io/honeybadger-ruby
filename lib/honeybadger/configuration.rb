@@ -5,7 +5,8 @@ module Honeybadger
                :ignore_user_agent, :notifier_name, :notifier_url, :notifier_version,
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
-               :user_information, :rescue_rake_exceptions, :source_extract_radius].freeze
+               :user_information, :rescue_rake_exceptions, :source_extract_radius,
+               :send_request_session].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -91,6 +92,9 @@ module Honeybadger
     # The radius around trace line to include in source excerpt
     attr_accessor :source_extract_radius
 
+    # +true+ to send session data, +false+ to exclude
+    attr_accessor :send_request_session
+
     # A Proc object used to send notices asynchronously
     attr_writer :async
 
@@ -145,6 +149,7 @@ module Honeybadger
       @user_information          = 'Honeybadger Error {{error_id}}'
       @rescue_rake_exceptions    = nil
       @source_extract_radius     = 2
+      @send_request_session      = true
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

@@ -442,6 +442,11 @@ class NoticeTest < Test::Unit::TestCase
     assert_equal session_data, notice.session_data
   end
 
+  should "not send session data when send_request_session is false" do
+    notice = build_notice(:send_request_session => false, :session_data => { :foo => :bar })
+    assert_equal nil, notice.session_data
+  end
+
   should "not allow infinite recursion" do
     hash = {:a => :a}
     hash[:hash] = hash

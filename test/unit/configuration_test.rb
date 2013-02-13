@@ -27,6 +27,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_default :framework, 'Standalone'
     assert_config_default :source_extract_radius, 2
     assert_config_default :async, nil
+    assert_config_default :send_request_session, true
   end
 
   should "configure async as Proc" do
@@ -89,6 +90,9 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_overridable :notifier_url
     assert_config_overridable :environment_name
     assert_config_overridable :logger
+    assert_config_overridable :source_extract_radius
+    assert_config_overridable :async
+    assert_config_overridable :send_request_session
   end
 
   should "have an api key" do
@@ -103,7 +107,7 @@ class ConfigurationTest < Test::Unit::TestCase
      :http_read_timeout, :ignore, :ignore_by_filters, :ignore_user_agent,
      :notifier_name, :notifier_url, :notifier_version, :params_filters,
      :project_root, :port, :protocol, :proxy_host, :proxy_pass, :proxy_port,
-     :proxy_user, :secure].each do |option|
+     :proxy_user, :secure, :source_extract_radius, :async, :send_request_session].each do |option|
       assert_equal config[option], hash[option], "Wrong value for #{option}"
     end
   end
