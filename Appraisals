@@ -1,8 +1,3 @@
-appraise 'rack' do
-  gem 'rack'
-  gem 'honeybadger', :path => '../'
-end
-
 appraise 'rails2.3' do
   gem 'rails', '2.3.14'
   gem 'rake', '0.9.5'
@@ -26,5 +21,20 @@ end
 
 appraise 'rails4' do
   gem 'rails', '4.0.0.beta', :git => 'git://github.com/rails/rails.git'
+  gem 'honeybadger', :path => '../'
+end
+
+appraise 'rake' do
+  gem 'sinatra'
+  gem 'honeybadger', :path => '../'
+end
+
+appraise 'rack' do
+  gem 'rack'
+  gem 'honeybadger', :path => '../'
+end
+
+appraise 'sinatra' do
+  gem 'sinatra'
   gem 'honeybadger', :path => '../'
 end

@@ -45,6 +45,17 @@ Feature: Install the Gem in a Rails application
     And I run the honeybadger generator with ""
     Then the output should contain "You must first remove the honeybadger plugin. Please run: script/plugin remove honeybadger"
 
+  @rails_3
+  Scenario: Running the test task with config.force_ssl enabled
+    When I configure Rails with:
+      """
+      config.force_ssl = true
+      """
+    And I configure the notifier to use "myapikey" as an API key
+    And I configure my application to require Honeybadger
+    And I run `rake honeybadger:test`
+    Then I should receive a Honeybadger notification
+
   Scenario: Rescue an exception in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:

@@ -222,3 +222,21 @@ When /^I configure the notifier to use "([^\"]*)" as an API key$/ do |api_key|
       """
   }
 end
+
+When /^I configure Rails with:$/ do |config|
+  if rails2?
+    fail 'This step definition requires Rails 3+. Please add support for Rails 2 if you need it.'
+  else
+    application_filename = File.join(rails_root, 'config', 'application.rb')
+    application_lines = File.open(application_filename).readlines
+
+    application_definition_line       = application_lines.detect { |line| line =~ /Application/ }
+    application_definition_line_index = application_lines.index(application_definition_line)
+
+    application_lines.insert(application_definition_line_index + 1, config)
+
+    File.open(application_filename, "w") do |file|
+      file.puts application_lines.join("\n")
+    end
+  end
+end

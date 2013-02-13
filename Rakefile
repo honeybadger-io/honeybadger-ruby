@@ -62,6 +62,21 @@ end
 Cucumber::Rake::Task.new(:cucumber) do |t|
   t.fork = true
   t.cucumber_opts = ['--format', 'progress', '--tags', '~@pending']
+
+  unless ENV['BUNDLE_GEMFILE'] =~ /rails(3|4)/
+    t.cucumber_opts << '--tags ~@rails_3'
+  end
+
+  case ENV['BUNDLE_GEMFILE']
+  when /rails/
+    t.cucumber_opts << 'features/rails.feature features/metal.feature'
+  when /rack/
+    t.cucumber_opts << 'features/rack.feature'
+  when /rake/
+    t.cucumber_opts << 'features/rake.feature'
+  when /sinatra/
+    t.cucumber_opts << 'features/sinatra.feature'
+  end unless ENV['FEATURE']
 end
 
 desc "Generate RCov test coverage and open in your browser"
