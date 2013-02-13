@@ -29,6 +29,12 @@ namespace :honeybadger do
     class ActionDispatch::DebugExceptions ; def logger(*args) ; @logger ||= Logger.new('/dev/null') ; end ; end
     class ActionDispatch::ShowExceptions ; def logger(*args) ; @logger ||= Logger.new('/dev/null') ; end ; end
 
+    # Detect and disable the better_errors gem
+    if defined? BetterErrors::Middleware
+      puts 'Better Errors detected: temporarily disabling middleware.'
+      class BetterErrors::Middleware ; def call(env) ; end ; end
+    end
+
     require './app/controllers/application_controller'
 
     class HoneybadgerTestingException < RuntimeError; end

@@ -1,5 +1,9 @@
 ## Honeybadger 1.6.0 (unreleased) ##
 
+* Detect and disable better_errors gem in Rails 3 test task
+
+  *Joshua Wood*
+
 * Add option to send session data (or not)
 
   *Joshua Wood*

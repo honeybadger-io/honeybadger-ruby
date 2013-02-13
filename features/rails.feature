@@ -56,6 +56,18 @@ Feature: Install the Gem in a Rails application
     And I run `rake honeybadger:test`
     Then I should receive a Honeybadger notification
 
+  @rails_3
+  Scenario: Running the test task with better_errors installed
+    When I configure Rails with:
+      """
+      require 'better_errors'
+      """
+    And I configure the notifier to use "myapikey" as an API key
+    And I configure my application to require Honeybadger
+    And I run `rake honeybadger:test`
+    Then the output should contain "Better Errors detected"
+    And I should receive a Honeybadger notification
+
   Scenario: Rescue an exception in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
