@@ -91,6 +91,11 @@ Using honeybadger in a Sinatra app is just like a Rack app:
       raise "Sinatra has left the building"
     end
 
+## Additional integrations:
+
+* [Catch exceptions in Resque jobs](https://github.com/henrik/resque-honeybadger)
+* [Sidekiq - Simple, efficient message processing for Ruby](https://github.com/mperham/sidekiq) (supports Honeybadger natively)
+
 ## Usage
 
 For the most part, Honeybadger works for itself.
