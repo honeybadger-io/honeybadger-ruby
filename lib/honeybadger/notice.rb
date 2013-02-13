@@ -167,9 +167,32 @@ module Honeybadger
       as_json.to_json(*a)
     end
 
-    # Determines if this notice should be ignored
+    # Public: Determines if error class should be ignored
+    #
+    # ignored_class_name - The name of the ignored class. May be a
+    # string or regexp (optional)
+    #
+    # Returns true/false with an argument, otherwise a Proc object
+    def ignore_by_class?(ignored_class_name = nil)
+      filter = Proc.new do |ignored_class_name|
+        case error_class
+        when ignored_class_name
+          true
+        else
+          if ignored_class_name.is_a?(String)
+            ignored_class = safe_constantize(ignored_class_name)
+            error_klass = safe_constantize(error_class)
+            error_klass && ignored_class && error_klass < ignored_class
+          end
+        end
+      end
+
+      ignored_class_name ? filter.call(ignored_class_name) : filter
+    end
+
+    # Public: Determines if this notice should be ignored
     def ignore?
-      ignored_class_names.include?(error_class) ||
+      ignored_class_names.any?(&ignore_by_class?) ||
         ignore_by_filters.any? {|filter| filter.call(self) }
     end
 
@@ -368,6 +391,28 @@ module Honeybadger
 
     def local_hostname
       Socket.gethostname
+    end
+
+    # Private: Tries to find a constant with the name specified in the argument string
+    # Borrowed from ActiveSupport 3.2
+    #
+    # camel_cased_word - A string containing the desired constant's name
+    #
+    # Returns constant if found, otherwise nil
+    def safe_constantize(camel_cased_word)
+      names = camel_cased_word.split('::')
+      names.shift if names.empty? || names.first.empty?
+
+      constant = Object
+      names.each do |name|
+        if constant.const_defined?(name)
+          constant = constant.const_get(name)
+        else
+          constant = nil
+          break
+        end
+      end
+      constant
     end
   end
 end

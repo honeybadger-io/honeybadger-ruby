@@ -325,10 +325,23 @@ class NoticeTest < Test::Unit::TestCase
     assert notice.ignore?
   end
 
-  should "ignore an exception with a matching error class name" do
+  should "ignore an exception with an equal error class name" do
     notice = build_notice(:error_class => 'ArgumentError',
                           :ignore      => ['ArgumentError'])
-    assert notice.ignore?
+    assert notice.ignore?, "Expected ArgumentError to ignore ArgumentError"
+  end
+
+  should "ignore an exception matching error class name" do
+    notice = build_notice(:error_class => 'ArgumentError',
+                          :ignore      => [/Error$/])
+    assert notice.ignore?, "Expected /Error$/ to ignore ArgumentError"
+  end
+
+  should "ignore an exception that inherits from ignored error class name" do
+    class ::FooError < ArgumentError ; end
+    notice = build_notice(:error_class => 'FooError',
+                          :ignore      => ['ArgumentError'])
+    assert notice.ignore?, "Expected ArgumentError to ignore FooError"
   end
 
   should "ignore an exception with a matching filter" do

@@ -357,10 +357,12 @@ Honeybadger ignores the following exceptions by default:
     Mongoid::Errors::DocumentNotFound
 
 To ignore errors in addition to those, specify their names in your Honeybadger
-configuration block.
+configuration block. You may use a string, regexp, or class (which is converted
+to a string):
 
     Honeybadger.configure do |config|
       config.api_key      = '1234567890abcdef'
+      config.ignore       << /IgnoredError$/
       config.ignore       << "ActiveRecord::IgnoreThisError"
     end
 
@@ -370,6 +372,9 @@ To ignore *only* certain errors (and override the defaults), use the #ignore_onl
       config.api_key      = '1234567890abcdef'
       config.ignore_only  = ["ActiveRecord::IgnoreThisError"] # or [] to ignore no exceptions.
     end
+
+Subclasses of all ignored class names (with the exception of those
+specified by regexp) will also be ignored.
 
 To ignore certain user agents, add in the #ignore_user_agent attribute as a
 string or regexp:

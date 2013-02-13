@@ -1,5 +1,9 @@
 ## Honeybadger 1.6.0 (unreleased) ##
 
+* Ignore error classes by regexp, ignore subclasses of ignored classes
+
+  *Joshua Wood*
+
 * Detect and disable better_errors gem in Rails 3 test task
 
   *Joshua Wood*
