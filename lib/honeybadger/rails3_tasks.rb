@@ -13,6 +13,8 @@ namespace :honeybadger do
 
     Honeybadger.configure(true) do |config|
       config.logger = Rails.logger
+      config.debug = true
+      config.development_environments = []
     end
 
     # Ensure force_ssl is disabled, otherwise we'll get a 301 when we
@@ -48,8 +50,6 @@ namespace :honeybadger do
       puts "Temporarily disabling asynchronous delivery"
       Honeybadger.configuration.async = nil
     end
-
-    Honeybadger.configuration.development_environments = []
 
     puts "Configuration:"
     Honeybadger.configuration.to_hash.each do |key, value|

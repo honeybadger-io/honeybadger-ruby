@@ -32,7 +32,7 @@ module Honeybadger
     #
     # notice - The notice data to be sent (Hash or JSON string)
     #
-    # Returns nothing
+    # Returns error id from successful response
     def send_to_honeybadger(notice)
       data = notice.is_a?(String) ? notice : notice.to_json
 
@@ -50,17 +50,14 @@ module Honeybadger
 
       case response
       when Net::HTTPSuccess then
-        log(:info, "Success: #{response.class}", response, data)
+        log(Honeybadger.configuration.debug ? :info : :debug, "Success: #{response.class}", response, data)
+        JSON.parse(response.body)['id']
       else
         log(:error, "Failure: #{response.class}", response, data)
-      end
-
-      if response && response.respond_to?(:body)
-        notice = JSON.parse(response.body)
-        error_id = notice['id']
+        nil
       end
     rescue => e
-      log(:error, "[Honeybadger::Sender#send_to_honeybadger] Cannot send notification. Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
+      log(:error, "[Honeybadger::Sender#send_to_honeybadger] Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
       nil
     end
 
@@ -87,19 +84,13 @@ module Honeybadger
     end
 
     def log(level, message, response = nil, data = nil)
-      if logger
-        logger.send(level, LOG_PREFIX + message)
+      # Log result:
+      Honeybadger.write_verbose_log(message, level)
 
-        # Log the notice payload for debugging
-        logger.debug(LOG_PREFIX + "Notice: #{data}") if data
-      end
-
+      # Log debug information:
       Honeybadger.report_environment_info
       Honeybadger.report_response_body(response.body) if response && response.respond_to?(:body)
-    end
-
-    def logger
-      Honeybadger.logger
+      Honeybadger.write_verbose_log("Notice: #{data}", :debug) if data && Honeybadger.configuration.debug
     end
 
     def setup_http_connection

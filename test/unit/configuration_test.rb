@@ -28,6 +28,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_default :source_extract_radius, 2
     assert_config_default :async, nil
     assert_config_default :send_request_session, true
+    assert_config_default :debug, false
   end
 
   should "configure async as Proc" do
@@ -93,6 +94,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_overridable :source_extract_radius
     assert_config_overridable :async
     assert_config_overridable :send_request_session
+    assert_config_overridable :debug
   end
 
   should "have an api key" do
@@ -103,11 +105,11 @@ class ConfigurationTest < Test::Unit::TestCase
     config = Honeybadger::Configuration.new
     hash = config.to_hash
     [:api_key, :backtrace_filters, :development_environments,
-     :environment_name, :host, :http_open_timeout,
-     :http_read_timeout, :ignore, :ignore_by_filters, :ignore_user_agent,
-     :notifier_name, :notifier_url, :notifier_version, :params_filters,
-     :project_root, :port, :protocol, :proxy_host, :proxy_pass, :proxy_port,
-     :proxy_user, :secure, :source_extract_radius, :async, :send_request_session].each do |option|
+     :environment_name, :host, :http_open_timeout, :http_read_timeout, :ignore,
+     :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
+     :notifier_version, :params_filters, :project_root, :port, :protocol,
+     :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
+     :source_extract_radius, :async, :send_request_session, :debug].each do |option|
       assert_equal config[option], hash[option], "Wrong value for #{option}"
     end
   end

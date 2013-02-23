@@ -1,5 +1,9 @@
 ## Honeybadger 1.6.0 (unreleased) ##
 
+* Default to debug log level instead of info for general logging.
+
+  *Joshua Wood*
+
 * Ignore error classes by regexp, ignore subclasses of ignored classes
 
   *Joshua Wood*

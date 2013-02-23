@@ -458,6 +458,18 @@ added the following information to your Honeybadger configuration block.
       config.proxy_pass = bar # optional
     end
 
+## Troubleshooting
+
+By default, Honeybadger is quiet when your log level is set to INFO
+(most production environments). If you would like to be notified via
+logs when Honeybadger completes a successful notification, set the
+`config.debug` option to true:
+
+    Honeybadger.configure do |config|
+      ...
+      config.debug = true
+    end
+
 ## Supported Rails versions
 
 Honeybadger supports Rails 2.3.14 through rails 3.2.9.

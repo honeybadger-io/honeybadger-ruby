@@ -1,0 +1,5 @@
+require 'sham_rack'
+
+ShamRack.at("api.honeybadger.io", 443) do |env|
+  ["500 Internal Error", { "Content-type" => "text/html" }, ['']]
+end

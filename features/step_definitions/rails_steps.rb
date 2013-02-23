@@ -17,8 +17,8 @@ When /^I generate a new Rails application$/ do
   end
 end
 
-When /^I configure the Honeybadger shim$/ do
-  shim_file = File.join(PROJECT_ROOT, 'features', 'support', 'honeybadger_shim.rb.template')
+When /^I configure the Honeybadger (failure )?shim$/ do |failure|
+  shim_file = File.join(PROJECT_ROOT, 'features', 'support', "honeybadger#{failure ? '_failure' : nil}_shim.rb.template")
   if rails_supports_initializers?
     target = File.join(rails_root, 'config', 'initializers', 'honeybadger_shim.rb')
     FileUtils.cp(shim_file, target)

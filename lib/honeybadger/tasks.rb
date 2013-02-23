@@ -22,7 +22,10 @@ namespace :honeybadger do
       Honeybadger.configuration.async = nil
     end
 
-    Honeybadger.configuration.development_environments = []
+    Honeybadger.configure(true) do |config|
+      config.debug = true
+      config.development_environments = []
+    end
 
     catcher = Honeybadger::Rails::ActionControllerCatcher
     in_controller = ApplicationController.included_modules.include?(catcher)

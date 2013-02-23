@@ -84,6 +84,59 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then I should receive a Honeybadger notification
 
+  Scenario: Rescue an exception in a metal controller
+    When I configure my application to require Honeybadger
+    And I configure Honeybadger with:
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      """
+    And I define a metal response for "TestController#index":
+      """
+      raise RuntimeError, "some message"
+      """
+    And I route "/test/index" to "test#index"
+    And I perform a request to "http://example.com:123/test/index?param=value"
+    Then I should receive a Honeybadger notification
+
+  Scenario: Log output in production environments
+    When I configure my application to require Honeybadger
+    And I configure Honeybadger with:
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      config.logger.level = Logger::INFO
+      """
+    And I define a response for "TestController#index":
+      """
+      raise RuntimeError, "some message"
+      """
+    And I route "/test/index" to "test#index"
+    And I perform a request to "http://example.com:123/test/index?param=value"
+    Then the output should match /\[Honeybadger\] Notifier (?:[\d\.]+) ready to catch errors/
+    Then the output should not contain "[Honeybadger] Success"
+    Then the output should not contain "[Honeybadger] Environment Info"
+    Then the output should not contain "[Honeybadger] Response from Honeybadger"
+    Then the output should not contain "[Honeybadger] Notice"
+
+  Scenario: Failure to notify Honeybadger in production environments
+    When I configure the Honeybadger failure shim
+    And I configure my application to require Honeybadger
+    And I configure Honeybadger with:
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      config.logger.level = Logger::INFO
+      """
+    And I define a response for "TestController#index":
+      """
+      raise RuntimeError, "some message"
+      """
+    And I route "/test/index" to "test#index"
+    And I perform a request to "http://example.com:123/test/index?param=value"
+    Then the output should contain "[Honeybadger] Failure"
+    Then the output should not contain "Honeybadger::Sender#send_to_honeybadger"
+
   Scenario: The app uses Vlad instead of Capistrano
     When I configure my application to require Honeybadger
     And I run `touch config/deploy.rb`
@@ -120,6 +173,7 @@ Feature: Install the Gem in a Rails application
       config.api_key = "myapikey"
       config.logger = Logger.new(STDOUT)
       config.params_filters << "credit_card_number"
+      config.debug = true
       """
     And I define a response for "TestController#index":
       """
@@ -139,6 +193,7 @@ Feature: Install the Gem in a Rails application
       config.api_key = "myapikey"
       config.logger = Logger.new(STDOUT)
       config.params_filters << "secret"
+      config.debug = true
       """
     And I define a response for "TestController#index":
       """
@@ -157,6 +212,7 @@ Feature: Install the Gem in a Rails application
       """
       config.api_key = 'myapikey'
       config.logger = Logger.new(STDOUT)
+      config.debug = true
       """
     And I configure the application to filter parameter "secret"
     And I define a response for "TestController#index":
@@ -185,21 +241,6 @@ Feature: Install the Gem in a Rails application
       session[:value] = "test"
       notify_honeybadger(RuntimeError.new("some message"))
       render :nothing => true
-      """
-    And I route "/test/index" to "test#index"
-    And I perform a request to "http://example.com:123/test/index?param=value"
-    Then I should receive a Honeybadger notification
-
-  Scenario: Notify honeybadger within a metal controller
-    When I configure my application to require Honeybadger
-    And I configure Honeybadger with:
-      """
-      config.api_key = 'myapikey'
-      config.logger = Logger.new(STDOUT)
-      """
-    And I define a metal response for "TestController#index":
-      """
-      raise RuntimeError, "some message"
       """
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"

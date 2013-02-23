@@ -6,7 +6,7 @@ module Honeybadger
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :rescue_rake_exceptions, :source_extract_radius,
-               :send_request_session].freeze
+               :send_request_session, :debug].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -95,6 +95,9 @@ module Honeybadger
     # +true+ to send session data, +false+ to exclude
     attr_accessor :send_request_session
 
+    # +true+ to log extra debug info, +false+ to suppress
+    attr_accessor :debug
+
     # A Proc object used to send notices asynchronously
     attr_writer :async
 
@@ -150,6 +153,7 @@ module Honeybadger
       @rescue_rake_exceptions    = nil
       @source_extract_radius     = 2
       @send_request_session      = true
+      @debug                     = false
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

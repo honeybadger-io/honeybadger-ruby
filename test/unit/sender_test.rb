@@ -18,7 +18,8 @@ class SenderTest < Test::Unit::TestCase
   end
 
   def stub_http(options = {})
-    response = stub(:body => options[:body] || 'body')
+    response = options[:response] || Net::HTTPSuccess.new('1.2', '200', 'OK')
+    response.stubs(:body => options[:body] || '{"id":"1234"}')
     http = stub(:post          => response,
                 :read_timeout= => nil,
                 :open_timeout= => nil,
@@ -65,6 +66,25 @@ class SenderTest < Test::Unit::TestCase
     assert_equal "3799307", send_exception(:secure => false)
   end
 
+  should "return nil on failed posting" do
+    http = stub_http(:response => Net::HTTPServerError.new('1.2', '500', 'Internal Error'))
+    assert_equal nil, send_exception(:secure => false)
+  end
+
+  should "should log success" do
+    http = stub_http
+    sender = build_sender
+    sender.expects(:log).with(:debug, includes('Success'), kind_of(Net::HTTPSuccess), kind_of(String))
+    send_exception(:sender => sender, :secure => false)
+  end
+
+  should "should log failure" do
+    http = stub_http(:response => Net::HTTPServerError.new('1.2', '500', 'Internal Error'))
+    sender = build_sender
+    sender.expects(:log).with(:error, includes('Failure'), kind_of(Net::HTTPServerError), kind_of(String))
+    send_exception(:sender => sender, :secure => false)
+  end
+
   context "when encountering exceptions: " do
     context "HTTP connection setup problems" do
       should "not be rescued" do
@@ -97,7 +117,7 @@ class SenderTest < Test::Unit::TestCase
         sender  = build_sender
         sender.stubs(:setup_http_connection).raises(RuntimeError.new)
 
-        sender.expects(:log).with(:error, includes('Cannot send notification. Error'))
+        sender.expects(:log).with(:error, includes('Error'))
         sender.send_to_honeybadger("stuff")
       end
 

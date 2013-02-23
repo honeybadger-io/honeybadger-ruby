@@ -31,7 +31,7 @@ module Honeybadger
 
     # Tell the log that the Notifier is good to go
     def report_ready
-      write_verbose_log("Notifier #{VERSION} ready to catch errors")
+      write_verbose_log("Notifier #{VERSION} ready to catch errors", :info)
     end
 
     # Prints out the environment info to the log for debugging help
@@ -52,8 +52,8 @@ module Honeybadger
     end
 
     # Writes out the given message to the #logger
-    def write_verbose_log(message)
-      logger.info LOG_PREFIX + message if logger
+    def write_verbose_log(message, level = Honeybadger.configuration.debug ? :info : :debug)
+      logger.send(level, LOG_PREFIX + message) if logger
     end
 
     # Look for the Rails logger currently defined
