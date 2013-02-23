@@ -128,6 +128,27 @@ this rake task (from RAILS_ROOT):
 If everything is configured properly, that task will send a notice to Honeybadger
 which will be visible immediately.
 
+## Ignored environments
+
+Please note that in development mode, Honeybadger will **not** be
+notified of exceptions that occur, except when running the test rake
+task. The following environments are ignored by default: *development*,
+*test*, and *cucumber*. You can modify which environments are ignored by
+setting the `development_environments` option in your Honeybadger
+initializer:
+
+    Honeybadger.configure do |config|
+      ...
+      # To add an additional environment to be ignored:
+      config.development_environments << 'staging'
+
+      # To override the default environments completely:
+      config.development_environments = ['test', 'cucumber']
+    end
+
+If you choose to override the `development_environments` option for
+whatever reason, please make sure your test environments are ignored.
+
 ## Sending custom data
 
 Honeybadger allows you to send custom data using `Honeybadger.context`.
