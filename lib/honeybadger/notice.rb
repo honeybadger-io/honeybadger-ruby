@@ -11,6 +11,9 @@ module Honeybadger
     # The name of the class of error (such as RuntimeError)
     attr_reader :error_class
 
+    # The constantized class of error
+    attr_reader :error_klass
+
     # Excerpt from source file
     attr_reader :source_extract
 
@@ -112,6 +115,7 @@ module Honeybadger
 
       self.send_request_session     = args[:send_request_session].nil? ? true : args[:send_request_session]
 
+      find_error_klass
       also_use_rack_params_filters
       find_session_data
       clean_params
@@ -174,20 +178,19 @@ module Honeybadger
     #
     # Returns true/false with an argument, otherwise a Proc object
     def ignore_by_class?(ignored_class_name = nil)
-      filter = Proc.new do |ignored_class_name|
+      @ignore_by_class ||= Proc.new do |ignored_class_name|
         case error_class
         when ignored_class_name
           true
         else
-          if ignored_class_name.is_a?(String)
+          if error_klass && ignored_class_name.is_a?(String)
             ignored_class = safe_constantize(ignored_class_name)
-            error_klass = safe_constantize(error_class)
-            error_klass && ignored_class && error_klass < ignored_class
+            ignored_class && ignored_class > error_klass
           end
         end
       end
 
-      ignored_class_name ? filter.call(ignored_class_name) : filter
+      ignored_class_name ? @ignore_by_class.call(ignored_class_name) : @ignore_by_class
     end
 
     # Public: Determines if this notice should be ignored
@@ -216,12 +219,12 @@ module Honeybadger
 
     private
 
-    attr_writer :exception, :backtrace, :error_class, :error_message,
-      :backtrace_filters, :parameters, :params_filters, :environment_filters,
-      :session_data, :project_root, :url, :ignore, :ignore_by_filters,
-      :notifier_name, :notifier_url, :notifier_version, :component, :action,
-      :cgi_data, :environment_name, :hostname, :context, :source_extract,
-      :source_extract_radius, :send_request_session
+    attr_writer :exception, :backtrace, :error_class, :error_klass,
+      :error_message, :backtrace_filters, :parameters, :params_filters,
+      :environment_filters, :session_data, :project_root, :url, :ignore,
+      :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
+      :component, :action, :cgi_data, :environment_name, :hostname, :context,
+      :source_extract, :source_extract_radius, :send_request_session
 
     # Private: Arguments given in the initializer
     attr_accessor :args
@@ -377,6 +380,14 @@ module Honeybadger
 
     def rack_session
       args[:rack_env]['rack.session'] if args[:rack_env]
+    end
+
+    def find_error_klass
+      self.error_klass = if exception
+                           exception.class
+                         elsif error_class
+                           safe_constantize(error_class)
+                         end
     end
 
     # Private: (Rails 3+) Adds params filters to filter list
