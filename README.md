@@ -385,6 +385,7 @@ to a string):
       config.api_key      = '1234567890abcdef'
       config.ignore       << /IgnoredError$/
       config.ignore       << "ActiveRecord::IgnoreThisError"
+      config.ignore       << OtherException
     end
 
 To ignore *only* certain errors (and override the defaults), use the #ignore_only attribute.
@@ -394,8 +395,8 @@ To ignore *only* certain errors (and override the defaults), use the #ignore_onl
       config.ignore_only  = ["ActiveRecord::IgnoreThisError"] # or [] to ignore no exceptions.
     end
 
-Subclasses of all ignored class names (with the exception of those
-specified by regexp) will also be ignored.
+Subclasses of ignored classes will also be ignored, but you must ignore
+the actual class, rather than its name.
 
 To ignore certain user agents, add in the #ignore_user_agent attribute as a
 string or regexp:

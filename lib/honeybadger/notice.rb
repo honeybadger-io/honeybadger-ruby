@@ -11,9 +11,6 @@ module Honeybadger
     # The name of the class of error (such as RuntimeError)
     attr_reader :error_class
 
-    # The constantized class of error
-    attr_reader :error_klass
-
     # Excerpt from source file
     attr_reader :source_extract
 
@@ -115,7 +112,6 @@ module Honeybadger
 
       self.send_request_session     = args[:send_request_session].nil? ? true : args[:send_request_session]
 
-      find_error_klass
       also_use_rack_params_filters
       find_session_data
       clean_params
@@ -177,25 +173,22 @@ module Honeybadger
     # string or regexp (optional)
     #
     # Returns true/false with an argument, otherwise a Proc object
-    def ignore_by_class?(ignored_class_name = nil)
-      @ignore_by_class ||= Proc.new do |ignored_class_name|
+    def ignore_by_class?(ignored_class = nil)
+      @ignore_by_class ||= Proc.new do |ignored_class|
         case error_class
-        when ignored_class_name
+        when (ignored_class.respond_to?(:name) ? ignored_class.name : ignored_class)
           true
         else
-          if error_klass && ignored_class_name.is_a?(String)
-            ignored_class = safe_constantize(ignored_class_name)
-            ignored_class && ignored_class > error_klass
-          end
+          exception && ignored_class.is_a?(Class) && exception.class < ignored_class
         end
       end
 
-      ignored_class_name ? @ignore_by_class.call(ignored_class_name) : @ignore_by_class
+      ignored_class ? @ignore_by_class.call(ignored_class) : @ignore_by_class
     end
 
     # Public: Determines if this notice should be ignored
     def ignore?
-      ignored_class_names.any?(&ignore_by_class?) ||
+      ignore.any?(&ignore_by_class?) ||
         ignore_by_filters.any? {|filter| filter.call(self) }
     end
 
@@ -219,12 +212,12 @@ module Honeybadger
 
     private
 
-    attr_writer :exception, :backtrace, :error_class, :error_klass,
-      :error_message, :backtrace_filters, :parameters, :params_filters,
-      :environment_filters, :session_data, :project_root, :url, :ignore,
-      :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
-      :component, :action, :cgi_data, :environment_name, :hostname, :context,
-      :source_extract, :source_extract_radius, :send_request_session
+    attr_writer :exception, :backtrace, :error_class, :error_message,
+      :backtrace_filters, :parameters, :params_filters, :environment_filters,
+      :session_data, :project_root, :url, :ignore, :ignore_by_filters,
+      :notifier_name, :notifier_url, :notifier_version, :component, :action,
+      :cgi_data, :environment_name, :hostname, :context, :source_extract,
+      :source_extract_radius, :send_request_session
 
     # Private: Arguments given in the initializer
     attr_accessor :args
@@ -352,18 +345,6 @@ module Honeybadger
       self.context = nil if context.empty?
     end
 
-    # Private: Converts the mixed class instances and class names into just names
-    # TODO: move this into Configuration or another class
-    def ignored_class_names
-      ignore.collect do |string_or_class|
-        if string_or_class.respond_to?(:name)
-          string_or_class.name
-        else
-          string_or_class
-        end
-      end
-    end
-
     def rack_env(method)
       rack_request.send(method) if rack_request
     end
@@ -382,14 +363,6 @@ module Honeybadger
       args[:rack_env]['rack.session'] if args[:rack_env]
     end
 
-    def find_error_klass
-      self.error_klass = if exception
-                           exception.class
-                         elsif error_class
-                           safe_constantize(error_class)
-                         end
-    end
-
     # Private: (Rails 3+) Adds params filters to filter list
     #
     # Returns nothing
@@ -402,28 +375,6 @@ module Honeybadger
 
     def local_hostname
       Socket.gethostname
-    end
-
-    # Private: Tries to find a constant with the name specified in the argument string
-    # Borrowed from ActiveSupport 3.2
-    #
-    # camel_cased_word - A string containing the desired constant's name
-    #
-    # Returns constant if found, otherwise nil
-    def safe_constantize(camel_cased_word)
-      names = camel_cased_word.split('::')
-      names.shift if names.empty? || names.first.empty?
-
-      constant = Object
-      names.each do |name|
-        if constant.const_defined?(name)
-          constant = constant.const_get(name)
-        else
-          constant = nil
-          break
-        end
-      end
-      constant
     end
   end
 end

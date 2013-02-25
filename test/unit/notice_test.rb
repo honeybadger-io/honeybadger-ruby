@@ -337,10 +337,10 @@ class NoticeTest < Test::Unit::TestCase
     assert notice.ignore?, "Expected /Error$/ to ignore ArgumentError"
   end
 
-  should "ignore an exception that inherits from ignored error class name" do
+  should "ignore an exception that inherits from ignored error class" do
     class ::FooError < ArgumentError ; end
-    notice = build_notice(:error_class => 'FooError',
-                          :ignore      => ['ArgumentError'])
+    notice = build_notice(:exception => FooError.new('Oh noes!'),
+                          :ignore      => [ArgumentError])
     assert notice.ignore?, "Expected ArgumentError to ignore FooError"
   end
 
