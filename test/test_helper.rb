@@ -121,13 +121,13 @@ class Test::Unit::TestCase
 
   def assert_logged(expected)
     assert_received(Honeybadger, :write_verbose_log) do |expect|
-      expect.with {|actual| actual =~ expected }
+      expect.with {|actual, level| actual =~ expected }
     end
   end
 
   def assert_not_logged(expected)
     assert_received(Honeybadger, :write_verbose_log) do |expect|
-      expect.with {|actual| actual =~ expected }.never
+      expect.with {|actual, level| actual =~ expected }.never
     end
   end
 
