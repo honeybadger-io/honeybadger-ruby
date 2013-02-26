@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'shared_tasks')
 
 namespace :honeybadger do
   desc "Verify your gem installation by sending a test exception to the honeybadger service"
-  task :test do
+  task :test => :environment do
     Rails.logger = if defined?(ActiveSupport::TaggedLogging)
                      ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
                    else
@@ -16,12 +16,6 @@ namespace :honeybadger do
       config.debug = true
       config.development_environments = []
     end
-
-    # Ensure force_ssl is disabled, otherwise we'll get a 301 when we
-    # try to hit the /verify action
-    Rails.configuration.middleware.delete 'Rack::SSL'
-
-    Rake::Task['environment'].invoke
 
     # Suppress error logging in Rails' exception handling middleware. Rails 3.0
     # uses ActionDispatch::ShowExceptions to rescue/show exceptions, but does
@@ -86,7 +80,9 @@ namespace :honeybadger do
     end
 
     puts 'Processing request.'
-    env = Rack::MockRequest.env_for("/verify")
+
+    ssl = defined?(Rails.configuration.force_ssl) && Rails.configuration.force_ssl
+    env = Rack::MockRequest.env_for("http#{ ssl ? 's' : nil }://www.example.com/verify")
 
     Rails.application.call(env)
   end
