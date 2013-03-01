@@ -194,7 +194,7 @@ The Capistrano task will run our `rake honeybadger:deploy` task on
 the server you are deploying to, so that it can correctly report
 environment-related information. If you would prefer to notify
 Honeybadger locally without using rake, check out our blog post:
-[Honeybadger and Capistrano: the metal way](http://honeybadger.dev/blog/2012/10/06/honeybadger-and-capistrano/).
+[Honeybadger and Capistrano: the metal way](http://honeybadger.io/blog/2012/10/06/honeybadger-and-capistrano/).
 
 ### Heroku
 
