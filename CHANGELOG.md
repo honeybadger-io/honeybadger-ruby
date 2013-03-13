@@ -1,4 +1,4 @@
-## Honeybadger 1.6.0 (unreleased) ##
+## Honeybadger 1.6.0 ##
 
 * Rescue from load error when application_controller.rb is missing.
 
