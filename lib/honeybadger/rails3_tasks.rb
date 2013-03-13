@@ -31,7 +31,11 @@ namespace :honeybadger do
       class BetterErrors::Middleware ; def call(env) ; end ; end
     end
 
-    require './app/controllers/application_controller'
+    begin
+      require './app/controllers/application_controller'
+    rescue LoadError
+      nil
+    end
 
     class HoneybadgerTestingException < RuntimeError; end
 

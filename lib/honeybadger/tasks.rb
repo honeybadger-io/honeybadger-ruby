@@ -8,7 +8,11 @@ namespace :honeybadger do
 
     require 'action_controller/test_process'
 
-    Dir["app/controllers/application*.rb"].each { |file| require(File.expand_path(file)) } 
+    begin
+      Dir["app/controllers/application*.rb"].each { |file| require(File.expand_path(file)) }
+    rescue LoadError
+      nil
+    end
 
     class HoneybadgerTestingException < RuntimeError; end
 
@@ -27,14 +31,6 @@ namespace :honeybadger do
       config.development_environments = []
     end
 
-    catcher = Honeybadger::Rails::ActionControllerCatcher
-    in_controller = ApplicationController.included_modules.include?(catcher)
-    in_base = ActionController::Base.included_modules.include?(catcher)
-    if !in_controller || !in_base
-      puts "Rails initialization did not occur"
-      exit
-    end
-
     puts "Configuration:"
     Honeybadger.configuration.to_hash.each do |key, value|
       puts sprintf("%25s: %s", key.to_s, value.inspect.slice(0, 55))
@@ -42,6 +38,14 @@ namespace :honeybadger do
 
     unless defined?(ApplicationController)
       puts "No ApplicationController found"
+      exit
+    end
+
+    catcher = Honeybadger::Rails::ActionControllerCatcher
+    in_controller = ApplicationController.included_modules.include?(catcher)
+    in_base = ActionController::Base.included_modules.include?(catcher)
+    if !in_controller || !in_base
+      puts "Rails initialization did not occur"
       exit
     end
 

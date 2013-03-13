@@ -1,5 +1,9 @@
 ## Honeybadger 1.6.0 (unreleased) ##
 
+* Rescue from load error when application_controller.rb is missing.
+
+  *Joshua Wood*
+
 * Default to debug log level instead of info for general logging.
 
   *Joshua Wood*
