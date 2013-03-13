@@ -470,9 +470,13 @@ logs when Honeybadger completes a successful notification, set the
       config.debug = true
     end
 
+## Supported Ruby versions
+
+Honeybadger supports Ruby 1.8.7 through 2.0.
+
 ## Supported Rails versions
 
-Honeybadger supports Rails 2.3.14 through rails 3.2.9.
+Honeybadger supports Rails 2.3.14 through Rails 4.0.0.beta1.
 
 ## Contributing
 
