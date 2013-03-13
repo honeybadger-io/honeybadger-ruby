@@ -21,6 +21,8 @@ namespace :honeybadger do
                             :dry_run        => ENV['DRY_RUN'])
   end
 
+  task :deploy_with_environment => [:environment, :deploy]
+
   task :log_stdout do
     require 'logger'
     RAILS_DEFAULT_LOGGER = Logger.new(STDOUT)

@@ -1,3 +1,10 @@
+## Honeybadger 1.7.0 (Unreleased) ##
+
+* Added a deploy rake task which always loads the Rails environment.
+  Also added ability to override rake task in Capistrano recipe.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.6.0 ##
 
 * Rescue from load error when application_controller.rb is missing.
