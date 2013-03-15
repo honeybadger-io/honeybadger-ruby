@@ -81,7 +81,7 @@ namespace :honeybadger do
     end
 
     Rails.application.routes.draw do
-      match 'verify' => 'application#verify', :as => 'verify'
+      match 'verify' => 'application#verify', :as => 'verify', :via => :get
     end
 
     puts 'Processing request.'
