@@ -5,6 +5,12 @@
 
   *Joshua Wood*
 
+## Honeybadger 1.6.1 ##
+
+* Fixes a bug in Rails 4 test task
+
+  *Joshua Wood*
+
 ## Honeybadger 1.6.0 ##
 
 * Rescue from load error when application_controller.rb is missing.
