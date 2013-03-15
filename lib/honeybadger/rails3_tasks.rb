@@ -15,6 +15,7 @@ namespace :honeybadger do
       config.logger = Rails.logger
       config.debug = true
       config.development_environments = []
+      config.rescue_rake_exceptions = false
     end
 
     # Suppress error logging in Rails' exception handling middleware. Rails 3.0
