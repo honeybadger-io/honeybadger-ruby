@@ -1,13 +1,13 @@
 ## Honeybadger 1.7.0 (Unreleased) ##
 
-* Added a deploy rake task which always loads the Rails environment.
-  Also added ability to override rake task in Capistrano recipe.
-
-  *Joshua Wood*
-
 ## Honeybadger 1.6.1 ##
 
 * Fixes a bug in Rails 4 test task
+
+  *Joshua Wood*
+
+* Added a deploy rake task which always loads the Rails environment.
+  Also added ability to override rake task in Capistrano recipe.
 
   *Joshua Wood*
 
