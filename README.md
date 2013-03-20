@@ -192,9 +192,14 @@ previously configured with Capistrano, we already added this for you.
 
 The Capistrano task will run our `rake honeybadger:deploy` task on
 the server you are deploying to, so that it can correctly report
-environment-related information. If you would prefer to notify
-Honeybadger locally without using rake, check out our blog post:
-[Honeybadger and Capistrano: the metal way](http://honeybadger.dev/blog/2012/10/06/honeybadger-and-capistrano/).
+environment-related information. To override the task that is run, you
+can set the `:honeybadger_deploy_task` in your *config/deploy.rb* file:
+
+    # Loads Rails environment before executing normal deploy task
+    set :honeybadger_deploy_task, 'honeybadger:deploy_with_environment'
+
+If you would prefer to notify Honeybadger locally without using rake,
+check out our blog post: [Honeybadger and Capistrano: the metal way](http://honeybadger.io/blog/2012/10/06/honeybadger-and-capistrano/).
 
 ### Heroku
 
@@ -219,7 +224,12 @@ If you are using other frameworks/platforms, you can still notify us of
 a deploy. We provide a rake task that uses ENV variables to report
 environment information:
 
+    # Skips loading the Rails environment if Rails and the honeybadger
+    # initializer are detected
     rake honeybadger:deploy TO=production
+
+    # Always loads the Rails environment
+    rake honeybadger:deploy_with_environment TO=production
 
 You can optionally add:
 
@@ -470,9 +480,13 @@ logs when Honeybadger completes a successful notification, set the
       config.debug = true
     end
 
+## Supported Ruby versions
+
+Honeybadger supports Ruby 1.8.7 through 2.0.
+
 ## Supported Rails versions
 
-Honeybadger supports Rails 2.3.14 through rails 3.2.9.
+Honeybadger supports Rails 2.3.14 through Rails 4.0.0.beta1.
 
 ## Contributing
 
@@ -504,5 +518,5 @@ The nifty custom data (`Honeybadger.context()`) feature was inspired by Exceptio
 
 ## License
 
-Honeybadger is Copyright 2012 © Honeybadger Industries LLC. It is free software, and
+Honeybadger is Copyright 2013 © Honeybadger Industries LLC. It is free software, and
 may be redistributed under the terms specified in the MIT-LICENSE file.

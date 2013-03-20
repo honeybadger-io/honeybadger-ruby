@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.5.0'
-  s.date              = '2013-01-16'
+  s.version           = '1.6.1'
+  s.date              = '2013-03-14'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
   # = MANIFEST =
   s.files = %w[
     Appraisals
+    CHANGELOG.md
     Gemfile
     Gemfile.lock
     Guardfile
@@ -55,9 +56,12 @@ Gem::Specification.new do |s|
     features/step_definitions/rails_steps.rb
     features/step_definitions/rake_steps.rb
     features/support/env.rb
+    features/support/honeybadger_failure_shim.rb.template
     features/support/honeybadger_shim.rb.template
     features/support/rails.rb
     features/support/rake/Rakefile
+    gemfiles/rack.gemfile
+    gemfiles/rack.gemfile.lock
     gemfiles/rails2.3.gemfile
     gemfiles/rails2.3.gemfile.lock
     gemfiles/rails3.0.gemfile
@@ -66,6 +70,12 @@ Gem::Specification.new do |s|
     gemfiles/rails3.1.gemfile.lock
     gemfiles/rails3.2.gemfile
     gemfiles/rails3.2.gemfile.lock
+    gemfiles/rails4.gemfile
+    gemfiles/rails4.gemfile.lock
+    gemfiles/rake.gemfile
+    gemfiles/rake.gemfile.lock
+    gemfiles/sinatra.gemfile
+    gemfiles/sinatra.gemfile.lock
     generators/honeybadger/honeybadger_generator.rb
     generators/honeybadger/lib/insert_commands.rb
     generators/honeybadger/lib/rake_commands.rb

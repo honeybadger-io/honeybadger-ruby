@@ -23,7 +23,7 @@ appraise 'rails3.2' do
 end
 
 appraise 'rails4' do
-  gem 'rails', '4.0.0.beta', :git => 'git://github.com/rails/rails.git'
+  gem 'rails', '4.0.0.beta1'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
 end

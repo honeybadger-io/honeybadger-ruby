@@ -15,6 +15,7 @@ namespace :honeybadger do
       config.logger = Rails.logger
       config.debug = true
       config.development_environments = []
+      config.rescue_rake_exceptions = false
     end
 
     # Suppress error logging in Rails' exception handling middleware. Rails 3.0
@@ -31,7 +32,11 @@ namespace :honeybadger do
       class BetterErrors::Middleware ; def call(env) ; end ; end
     end
 
-    require './app/controllers/application_controller'
+    begin
+      require './app/controllers/application_controller'
+    rescue LoadError
+      nil
+    end
 
     class HoneybadgerTestingException < RuntimeError; end
 
@@ -76,7 +81,7 @@ namespace :honeybadger do
     end
 
     Rails.application.routes.draw do
-      match 'verify' => 'application#verify', :as => 'verify'
+      match 'verify' => 'application#verify', :as => 'verify', :via => :get
     end
 
     puts 'Processing request.'

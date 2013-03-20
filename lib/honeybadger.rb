@@ -12,7 +12,7 @@ require 'honeybadger/sender'
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
 module Honeybadger
-  VERSION = '1.5.0'
+  VERSION = '1.6.1'
   LOG_PREFIX = "** [Honeybadger] "
 
   HEADERS = {

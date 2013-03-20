@@ -16,13 +16,14 @@ module Honeybadger
           task :deploy, :except => { :no_release => true } do
             rails_env = fetch(:rails_env, "production")
             honeybadger_env = fetch(:honeybadger_env, fetch(:rails_env, "production"))
+            rake_task = fetch(:honeybadger_deploy_task, 'honeybadger:deploy')
             local_user = ENV['USER'] || ENV['USERNAME']
             executable = RUBY_PLATFORM.downcase.include?('mswin') ? fetch(:rake, 'rake.bat') : fetch(:rake, 'rake')
             assync_notify = fetch(:honeybadger_assync_notify, false)
             directory = configuration.current_release
             notify_command = "cd #{directory};"
             notify_command << " nohup" if assync_notify
-            notify_command << " #{executable} RAILS_ENV=#{rails_env} honeybadger:deploy TO=#{honeybadger_env} REVISION=#{current_revision} REPO=#{repository} USER=#{local_user}"
+            notify_command << " #{executable} RAILS_ENV=#{rails_env} #{rake_task} TO=#{honeybadger_env} REVISION=#{current_revision} REPO=#{repository} USER=#{local_user}"
             notify_command << " DRY_RUN=true" if dry_run
             notify_command << " API_KEY=#{ENV['API_KEY']}" if ENV['API_KEY']
             notify_command << " >> /dev/null 2>&1 &" if assync_notify
