@@ -29,6 +29,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_default :async, nil
     assert_config_default :send_request_session, true
     assert_config_default :debug, false
+    assert_config_default :fingerprint, nil
   end
 
   should "configure async as Proc" do
@@ -46,6 +47,19 @@ class ConfigurationTest < Test::Unit::TestCase
     config.async { |n| n }
     assert config.async?, 'Configuration#async? should be truthy'
     assert_equal config.async.call('foo'), 'foo'
+  end
+
+  should "configure fingerprint as Proc" do
+    config = Honeybadger::Configuration.new
+    fingerprint_generator = Proc.new { |n| n[:error_class] }
+    config.fingerprint = fingerprint_generator
+    assert_equal config.fingerprint.call({ :error_class => 'foo' }), 'foo'
+  end
+
+  should "configure fingerprint with block" do
+    config = Honeybadger::Configuration.new
+    config.fingerprint { |n| n[:error_class] }
+    assert_equal config.fingerprint.call({ :error_class => 'foo' }), 'foo'
   end
 
   should "stub current_user_method" do
@@ -93,6 +107,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_overridable :logger
     assert_config_overridable :source_extract_radius
     assert_config_overridable :async
+    assert_config_overridable :fingerprint
     assert_config_overridable :send_request_session
     assert_config_overridable :debug
   end
@@ -109,8 +124,8 @@ class ConfigurationTest < Test::Unit::TestCase
      :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
      :notifier_version, :params_filters, :project_root, :port, :protocol,
      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
-     :source_extract_radius, :async, :send_request_session, :debug].each do |option|
-      assert_equal config[option], hash[option], "Wrong value for #{option}"
+     :source_extract_radius, :async, :send_request_session, :debug, :fingerprint].each do |option|
+       assert_equal config[option], hash[option], "Wrong value for #{option}"
     end
   end
 

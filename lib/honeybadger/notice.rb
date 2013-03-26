@@ -8,6 +8,9 @@ module Honeybadger
     # The backtrace from the given exception or hash.
     attr_reader :backtrace
 
+    # Custom fingerprint for error, used to group similar errors together (optional)
+    attr_reader :fingerprint
+
     # The name of the class of error (such as RuntimeError)
     attr_reader :error_class
 
@@ -100,6 +103,7 @@ module Honeybadger
       self.environment_name = args[:environment_name]
       self.cgi_data         = args[:cgi_data] || args[:rack_env]
       self.backtrace        = Backtrace.parse(exception_attribute(:backtrace, caller), :filters => self.backtrace_filters)
+      self.fingerprint      = generated_fingerprint
       self.error_class      = exception_attribute(:error_class) {|exception| exception.class.name }
       self.error_message    = exception_attribute(:error_message, 'Notification') do |exception|
         "#{exception.class.name}: #{exception.message}"
@@ -141,7 +145,8 @@ module Honeybadger
           :class => error_class,
           :message => error_message,
           :backtrace => backtrace,
-          :source => source_extract
+          :source => source_extract,
+          :fingerprint => fingerprint
         },
         :request => {
           :url => url,
@@ -212,12 +217,12 @@ module Honeybadger
 
     private
 
-    attr_writer :exception, :backtrace, :error_class, :error_message,
-      :backtrace_filters, :parameters, :params_filters, :environment_filters,
-      :session_data, :project_root, :url, :ignore, :ignore_by_filters,
-      :notifier_name, :notifier_url, :notifier_version, :component, :action,
-      :cgi_data, :environment_name, :hostname, :context, :source_extract,
-      :source_extract_radius, :send_request_session
+    attr_writer :exception, :backtrace, :fingerprint, :error_class,
+      :error_message, :backtrace_filters, :parameters, :params_filters,
+      :environment_filters, :session_data, :project_root, :url, :ignore,
+      :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
+      :component, :action, :cgi_data, :environment_name, :hostname, :context,
+      :source_extract, :source_extract_radius, :send_request_session
 
     # Private: Arguments given in the initializer
     attr_accessor :args
@@ -292,6 +297,14 @@ module Honeybadger
     def clean_rack_request_data
       if cgi_data
         cgi_data.delete("rack.request.form_vars")
+      end
+    end
+
+    def generated_fingerprint
+      if args[:fingerprint].respond_to?(:call)
+        args[:fingerprint].call(self)
+      else
+        args[:fingerprint]
       end
     end
 

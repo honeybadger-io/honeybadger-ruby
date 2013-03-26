@@ -1,5 +1,9 @@
 ## Honeybadger 1.7.0 (Unreleased) ##
 
+* Added a custom grouping option
+
+  *Joshua Wood*
+
 * Added option to run capistrano deploy notification asynchronously 
 
  *Sergey Efremov*

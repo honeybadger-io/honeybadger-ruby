@@ -80,6 +80,23 @@ class NoticeTest < Test::Unit::TestCase
     assert_equal hostname, notice.hostname
   end
 
+  context "custom fingerprint" do
+    should "include nil fingerprint when no fingerprint is specified" do
+      notice = build_notice
+      assert_equal nil, notice.fingerprint
+    end
+
+    should "accepts fingerprint as string" do
+      notice = build_notice({ :fingerprint => 'foo' })
+      assert_equal 'foo', notice.fingerprint
+    end
+
+    should "accepts fingerprint responding to #call" do
+      notice = build_notice({ :fingerprint => mock(:call => 'foo') })
+      assert_equal 'foo', notice.fingerprint
+    end
+  end
+
   context "with a backtrace" do
     setup do
       @source = <<-RUBY
