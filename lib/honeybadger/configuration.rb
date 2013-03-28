@@ -267,14 +267,14 @@ module Honeybadger
 
     # Public: Generate custom fingerprint (optional)
     #
-    # block - An optional block returning calculated fingerprint
+    # block - An optional block returning object responding to #to_s
     #
     # Examples
     #
     #   config.fingerprint = Proc.new { |notice| ... }
     #
     #   config.fingerprint do |notice|
-    #     Digest::SHA1.hexdigest([notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':'))
+    #     [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
     #   end
     #
     # Returns configured fingerprint generator (should respond to #call(notice))

@@ -86,14 +86,19 @@ class NoticeTest < Test::Unit::TestCase
       assert_equal nil, notice.fingerprint
     end
 
-    should "accepts fingerprint as string" do
+    should "accept fingerprint as string" do
       notice = build_notice({ :fingerprint => 'foo' })
-      assert_equal 'foo', notice.fingerprint
+      assert_equal '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', notice.fingerprint
     end
 
-    should "accepts fingerprint responding to #call" do
+    should "accept fingerprint responding to #call" do
       notice = build_notice({ :fingerprint => mock(:call => 'foo') })
-      assert_equal 'foo', notice.fingerprint
+      assert_equal '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', notice.fingerprint
+    end
+
+    should "accept fingerprint using #to_s" do
+      notice = build_notice({ :fingerprint => mock(:to_s => 'foo') })
+      assert_equal '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', notice.fingerprint
     end
   end
 

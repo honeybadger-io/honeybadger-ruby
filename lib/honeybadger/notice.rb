@@ -103,7 +103,7 @@ module Honeybadger
       self.environment_name = args[:environment_name]
       self.cgi_data         = args[:cgi_data] || args[:rack_env]
       self.backtrace        = Backtrace.parse(exception_attribute(:backtrace, caller), :filters => self.backtrace_filters)
-      self.fingerprint      = generated_fingerprint
+      self.fingerprint      = hashed_fingerprint
       self.error_class      = exception_attribute(:error_class) {|exception| exception.class.name }
       self.error_message    = exception_attribute(:error_message, 'Notification') do |exception|
         "#{exception.class.name}: #{exception.message}"
@@ -300,11 +300,18 @@ module Honeybadger
       end
     end
 
-    def generated_fingerprint
+    def fingerprint_from_args
       if args[:fingerprint].respond_to?(:call)
         args[:fingerprint].call(self)
       else
         args[:fingerprint]
+      end
+    end
+
+    def hashed_fingerprint
+      fingerprint = fingerprint_from_args
+      if fingerprint && fingerprint.respond_to?(:to_s)
+        Digest::SHA1.hexdigest(fingerprint.to_s)
       end
     end
 
