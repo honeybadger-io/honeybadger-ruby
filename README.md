@@ -13,32 +13,40 @@ to the Honeybadger server specified in your environment.
 
 Add the Honeybadger gem to your gemfile:
 
-    gem 'honeybadger'
+```ruby
+gem 'honeybadger'
+```
 
 Then generate the initializer:
 
     rails generate honeybadger --api-key <Your Api Key>
 
 If you prefer to manually create the initializer, that's simple enough.
-Just put the code below in config/initializers/honeybadger.rb
+Just put the code below in `config/initializers/honeybadger.rb`
 
-    Honeybadger.configure do |config|
-      config.api_key = '[your-api-key]'
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key = '[your-api-key]'
+end
+```
 
 That's it!
 
 ### Rails 2.x
 
-Add the honeybadger gem to your app. In config/environment.rb:
+Add the honeybadger gem to your app. In `config/environment.rb`:
 
-    config.gem 'honeybadger'
+```ruby
+config.gem 'honeybadger'
+```
 
 or if you are using bundler:
 
-    gem 'honeybadger', :require => 'honeybadger/rails'
+```ruby
+gem 'honeybadger', :require => 'honeybadger/rails'
+```
 
-Then from your project's RAILS_ROOT, and in your development environment, run:
+Then from your project's `RAILS_ROOT`, and in your development environment, run:
 
     rake gems:install
     rake gems:unpack GEM=honeybadger
@@ -46,13 +54,15 @@ Then from your project's RAILS_ROOT, and in your development environment, run:
 As always, if you choose not to vendor the honeybadger gem, make sure
 every server you deploy to has the gem installed or your application won't start.
 
-Finally, create an initializer in config/initializers and configure your
+Finally, create an initializer in `config/initializers` and configure your
 API key for your project:
 
-    require 'honeybadger/rails'
-    Honeybadger.configure do |config|
-      config.api_key = '[your-api-key]'
-    end
+```ruby
+  require 'honeybadger/rails'
+  Honeybadger.configure do |config|
+    config.api_key = '[your-api-key]'
+  end
+```
 
 ## Rack
 
@@ -60,36 +70,40 @@ In order to use honeybadger in a non-Rails rack app, just load
 honeybadger, configure your API key, and use the Honeybadger::Rack
 middleware:
 
-    require 'rack'
-    require 'honeybadger'
+```ruby
+require 'rack'
+require 'honeybadger'
 
-    Honeybadger.configure do |config|
-      config.api_key = 'my_api_key'
-    end
+Honeybadger.configure do |config|
+  config.api_key = 'my_api_key'
+end
 
-    app = Rack::Builder.app do
-      run lambda { |env| raise "Rack down" }
-    end
+app = Rack::Builder.app do
+  run lambda { |env| raise "Rack down" }
+end
 
-    use Honeybadger::Rack
-    run app
+use Honeybadger::Rack
+run app
+```
 
 ## Sinatra
 
 Using honeybadger in a Sinatra app is just like a Rack app:
 
-    require 'sinatra'
-    require 'honeybadger'
+```ruby
+require 'sinatra'
+require 'honeybadger'
 
-    Honeybadger.configure do |config|
-      config.api_key = 'my api key'
-    end
+Honeybadger.configure do |config|
+  config.api_key = 'my api key'
+end
 
-    use Honeybadger::Rack
+use Honeybadger::Rack
 
-    get '/' do
-      raise "Sinatra has left the building"
-    end
+get '/' do
+  raise "Sinatra has left the building"
+end
+```
 
 ## Additional integrations:
 
@@ -105,12 +119,14 @@ It intercepts the exception middleware calls, sends notifications and continues 
 If you want to log arbitrary things which you've rescued yourself from a
 controller, you can do something like this:
 
-    ...
-    rescue => ex
-      notify_honeybadger(ex)
-      flash[:failure] = 'Encryptions could not be rerouted, try again.'
-    end
-    ...
+```ruby
+# ...
+rescue => ex
+  notify_honeybadger(ex)
+  flash[:failure] = 'Encryptions could not be rerouted, try again.'
+end
+# ...
+```
 
 The `#notify_honeybadger` call will send the notice over to Honeybadger for later
 analysis. While in your controllers you use the `notify_honeybadger` method, anywhere
@@ -137,14 +153,16 @@ task. The following environments are ignored by default: *development*,
 setting the `development_environments` option in your Honeybadger
 initializer:
 
-    Honeybadger.configure do |config|
-      ...
-      # To add an additional environment to be ignored:
-      config.development_environments << 'staging'
+```ruby
+Honeybadger.configure do |config|
+  # ...
+  # To add an additional environment to be ignored:
+  config.development_environments << 'staging'
 
-      # To override the default environments completely:
-      config.development_environments = ['test', 'cucumber']
-    end
+  # To override the default environments completely:
+  config.development_environments = ['test', 'cucumber']
+end
+```
 
 If you choose to override the `development_environments` option for
 whatever reason, please make sure your test environments are ignored.
@@ -155,12 +173,14 @@ Honeybadger allows you to send custom data using `Honeybadger.context`.
 Here's an example of sending some user-specific information in a Rails
 `before_filter` call:
 
-    before_filter do
-      Honeybadger.context({
-        :user_id => current_user.id,
-        :user_email => current_user.email
-      }) if current_user
-    end
+```ruby
+before_filter do
+  Honeybadger.context({
+    :user_id => current_user.id,
+    :user_email => current_user.email
+  }) if current_user
+end
+```
 
 Now, whenever an error occurs, Honeybadger will display the affected
 user's id and email address, if available.
@@ -185,7 +205,9 @@ We officially support deploy tracking using Capistrano and Heroku:
 In order to track deployments using Capistrano, simply require
 Honeybadger's Capistrano task in your `config/deploy.rb` file:
 
-    require 'honeybadger/capistrano'
+```ruby
+require 'honeybadger/capistrano'
+```
 
 If you ran the Honeybadger install generator in a project that was
 previously configured with Capistrano, we already added this for you.
@@ -195,8 +217,10 @@ the server you are deploying to, so that it can correctly report
 environment-related information. To override the task that is run, you
 can set the `:honeybadger_deploy_task` in your *config/deploy.rb* file:
 
-    # Loads Rails environment before executing normal deploy task
-    set :honeybadger_deploy_task, 'honeybadger:deploy_with_environment'
+```ruby
+# Loads Rails environment before executing normal deploy task
+set :honeybadger_deploy_task, 'honeybadger:deploy_with_environment'
+```
 
 If you would prefer to notify Honeybadger locally without using rake,
 check out our blog post: [Honeybadger and Capistrano: the metal way](http://honeybadger.io/blog/2012/10/06/honeybadger-and-capistrano/).
@@ -233,11 +257,11 @@ environment information:
 
 You can optionally add:
 
-* REPO=[scm repo url]
-* REVISION=[scm sha]
-* USER=[local user's name]
-* API_KEY=[a different api key]
-* DRY_RUN=true (simulates notification)
+* `REPO=[scm repo url]`
+* `REVISION=[scm sha]`
+* `USER=[local user's name]`
+* `API_KEY=[a different api key]`
+* `DRY_RUN=true (simulates notification)`
 
 ## Notifying Honeybadger asynchronously
 
@@ -251,73 +275,83 @@ handler can be set directly by setting the `async` configuration option,
 or by passing a block to `config.async` (in this case, a Proc instance
 will be created for you):
 
-    Honeybadger.configure do |config|
-      ...
+```ruby
+Honeybadger.configure do |config|
+  # ...
 
-      # Configuring handler directly:
-      config.async do |notice|
-        # Delivers notification immediately
-        notice.deliver # => 'qwer-asdf-zxcv'
-      end
+  # Configuring handler directly:
+  config.async do |notice|
+    # Delivers notification immediately
+    notice.deliver # => 'qwer-asdf-zxcv'
+  end
 
-      # Using your own handler (identical behavior):
-      config.async = Proc.new { |n| n.deliver }
-    end
+  # Using your own handler (identical behavior):
+  config.async = Proc.new { |n| n.deliver }
+end
+```
 
 We've left the implementation mostly up to you, but here are a few
 examples of notifying Honeybadger asynchronously:
 
 ### Using thread
 
-    Honeybadger.configure do |config|
-      config.async do |notice|
-        Thread.new { notice.deliver }
-      end
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.async do |notice|
+    Thread.new { notice.deliver }
+  end
+end
+```
 
 ### Using Resque
 
-    Honeybadger.configure do |config|
-      config.async do |notice|
-        Resque.enqueue(WorkingBadger, notice.to_json)
-      end
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.async do |notice|
+    Resque.enqueue(WorkingBadger, notice.to_json)
+  end
+end
 
-    class WorkingBadger
-      @queue = :cobra_alert
+class WorkingBadger
+  @queue = :cobra_alert
 
-      def self.perform(notice)
-        Honeybadger.sender.send_to_honeybadger(notice)
-      end
-    end
+  def self.perform(notice)
+    Honeybadger.sender.send_to_honeybadger(notice)
+  end
+end
+```
 
 ### Using Sidekiq
 
-    Honeybadger.configure do |config|
-      config.async do |notice|
-        WorkingBadger.perform_async(notice.to_json)
-      end
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.async do |notice|
+    WorkingBadger.perform_async(notice.to_json)
+  end
+end
 
-    class WorkingBadger
-      include Sidekiq::Worker
+class WorkingBadger
+  include Sidekiq::Worker
 
-      def perform(notice)
-        Honeybadger.sender.send_to_honeybadger(notice)
-      end
-    end
+  def perform(notice)
+    Honeybadger.sender.send_to_honeybadger(notice)
+  end
+end
+```
 
 ### Using GirlFriday
 
-    COBRA_QUEUE = GirlFriday::WorkQueue.new(:honeybadger_notices, :size => 7) do |notice|
-      notice.deliver
-    end
+```ruby
+COBRA_QUEUE = GirlFriday::WorkQueue.new(:honeybadger_notices, :size => 7) do |notice|
+  notice.deliver
+end
 
-    Honeybadger.configure do |config|
-      config.async do |notice|
-        COBRA_QUEUE.push(notice)
-      end
-    end
+Honeybadger.configure do |config|
+  config.async do |notice|
+    COBRA_QUEUE.push(notice)
+  end
+end
+```
 
 ## Going beyond exceptions
 
@@ -325,18 +359,20 @@ You can also pass a hash to `Honeybadger.notify` method and store whatever you w
 not just an exception. And you can also use it anywhere, not just in
 controllers:
 
-    begin
-      params = {
-        # params that you pass to a method that can throw an exception
-      }
-      my_unpredicable_method(*params)
-    rescue => e
-      Honeybadger.notify(
-        :error_class   => "Special Error",
-        :error_message => "Special Error: #{e.message}",
-        :parameters    => params
-      )
-    end
+```ruby
+begin
+  params = {
+    # params that you pass to a method that can throw an exception
+  }
+  my_unpredicable_method(*params)
+rescue => e
+  Honeybadger.notify(
+    :error_class   => "Special Error",
+    :error_message => "Special Error: #{e.message}",
+    :parameters    => params
+  )
+end
+```
 
 While in your controllers you use the `notify_honeybadger` method, anywhere else in
 your code, use `Honeybadger.notify`. Honeybadger will get all the information
@@ -348,14 +384,16 @@ about the error itself. As for a hash, these are the keys you should pass:
 
 Honeybadger merges the hash you pass with these default options:
 
-    {
-      :api_key       => Honeybadger.api_key,
-      :error_message => 'Notification',
-      :backtrace     => caller,
-      :parameters    => {},
-      :session       => {},
-      :context       => {}
-    }
+```ruby
+{
+  :api_key       => Honeybadger.api_key,
+  :error_message => 'Notification',
+  :backtrace     => caller,
+  :parameters    => {},
+  :session       => {},
+  :context       => {}
+}
+```
 
 You can override any of those parameters.
 
@@ -365,8 +403,9 @@ One common request we see is to send shell environment variables along with
 manual exception notification.  We recommend sending them along with CGI data
 or Rack environment (:cgi_data or :rack_env keys, respectively.)
 
-See Honeybadger::Notice#initialize in lib/honeybadger/notice.rb for
-more details.
+See `Honeybadger::Notice#initialize` in
+[lib/honeybadger/notice.rb](https://github.com/honeybadger-io/honeybadger-ruby/blob/master/lib/honeybadger/notice.rb)
+for more details.
 
 ## Filtering
 
@@ -379,30 +418,36 @@ notifications (when #notify is called directly).
 
 Honeybadger ignores the following exceptions by default:
 
-    ActiveRecord::RecordNotFound
-    ActionController::RoutingError
-    ActionController::InvalidAuthenticityToken
-    CGI::Session::CookieStore::TamperedWithCookie
-    ActionController::UnknownAction
-    AbstractController::ActionNotFound
-    Mongoid::Errors::DocumentNotFound
+```ruby
+ActiveRecord::RecordNotFound
+ActionController::RoutingError
+ActionController::InvalidAuthenticityToken
+CGI::Session::CookieStore::TamperedWithCookie
+ActionController::UnknownAction
+AbstractController::ActionNotFound
+Mongoid::Errors::DocumentNotFound
+```
 
 To ignore errors in addition to those, specify their names in your Honeybadger
 configuration block. You may use a string, regexp, or class:
 
-    Honeybadger.configure do |config|
-      config.api_key      = '1234567890abcdef'
-      config.ignore       << /IgnoredError$/
-      config.ignore       << "ActiveRecord::IgnoreThisError"
-      config.ignore       << OtherException
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.ignore       << /IgnoredError$/
+  config.ignore       << "ActiveRecord::IgnoreThisError"
+  config.ignore       << OtherException
+end
+```
 
 To ignore *only* certain errors (and override the defaults), use the #ignore_only attribute.
 
-    Honeybadger.configure do |config|
-      config.api_key      = '1234567890abcdef'
-      config.ignore_only  = ["ActiveRecord::IgnoreThisError"] # or [] to ignore no exceptions.
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.ignore_only  = ["ActiveRecord::IgnoreThisError"] # or [] to ignore no exceptions.
+end
+```
 
 Subclasses of ignored classes will also be ignored, while strings and
 regexps are compared with the error class name only.
@@ -410,37 +455,45 @@ regexps are compared with the error class name only.
 To ignore certain user agents, add in the #ignore_user_agent attribute as a
 string or regexp:
 
-    Honeybadger.configure do |config|
-      config.api_key      = '1234567890abcdef'
-      config.ignore_user_agent  << /Ignored/
-      config.ignore_user_agent << 'IgnoredUserAgent'
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.ignore_user_agent  << /Ignored/
+  config.ignore_user_agent << 'IgnoredUserAgent'
+end
+```
 
 To ignore exceptions based on other conditions, use #ignore_by_filter:
 
-    Honeybadger.configure do |config|
-      config.api_key      = '1234567890abcdef'
-      config.ignore_by_filter do |exception_data|
-        true if exception_data[:error_class] == "RuntimeError"
-      end
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.ignore_by_filter do |exception_data|
+    true if exception_data[:error_class] == "RuntimeError"
+  end
+end
+```
 
 To replace sensitive information sent to the Honeybadger service with [FILTERED] use #params_filters:
 
-    Honeybadger.configure do |config|
-      config.api_key      = '1234567890abcdef'
-      config.params_filters << "credit_card_number"
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.params_filters << "credit_card_number"
+end
+```
 
 Note that, when rescuing exceptions within an ActionController method,
 honeybadger will reuse filters specified by #filter_parameter_logging.
 
 To disable sending session data:
 
-    Honeybadger.configure do |config|
-      config.api_key      = '1234567890abcdef'
-      config.send_request_session = false
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.send_request_session = false
+end
+```
 
 ## Testing
 
@@ -449,11 +502,13 @@ notices generated using #notify when you don't expect it to. You can
 use code like this in your test_helper.rb or spec_helper.rb files to redefine
 that method so those errors are not reported while running tests.
 
-    module Honeybadger
-      def self.notify(exception, opts = {})
-        # do nothing.
-      end
-    end
+```ruby
+module Honeybadger
+  def self.notify(exception, opts = {})
+    # do nothing.
+  end
+end
+```
 
 ## Proxy Support
 
@@ -461,12 +516,14 @@ The notifier supports using a proxy, if your server is not able to
 directly reach the Honeybadger servers. To configure the proxy settings,
 added the following information to your Honeybadger configuration block.
 
-    Honeybadger.configure do |config|
-      config.proxy_host = proxy.host.com
-      config.proxy_port = 4038
-      config.proxy_user = foo # optional
-      config.proxy_pass = bar # optional
-    end
+```ruby
+Honeybadger.configure do |config|
+  config.proxy_host = 'proxy.host.com'
+  config.proxy_port = 4038
+  config.proxy_user = 'foo' # optional
+  config.proxy_pass = 'bar' # optional
+end
+```
 
 ## Troubleshooting
 
@@ -475,10 +532,12 @@ By default, Honeybadger is quiet when your log level is set to INFO
 logs when Honeybadger completes a successful notification, set the
 `config.debug` option to true:
 
-    Honeybadger.configure do |config|
-      ...
-      config.debug = true
-    end
+```ruby
+Honeybadger.configure do |config|
+  # ...
+  config.debug = true
+end
+```
 
 ## Supported Ruby versions
 
