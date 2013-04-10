@@ -348,7 +348,7 @@ module Honeybadger
     def rack_env(method)
       rack_request.send(method) if rack_request
     rescue => e
-      { :error => "Failed to call params on Rack::Request -- #{e.message}" }
+      { :error => "Failed to call #{method} on Rack::Request -- #{e.message}" }
     end
 
     def rack_request
