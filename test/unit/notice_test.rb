@@ -455,6 +455,15 @@ class NoticeTest < Test::Unit::TestCase
     assert_equal session_data, notice.session_data
   end
 
+  unless Gem::Version.new(Rack.release) < Gem::Version.new('1.2')
+    should "fail gracefully when Rack params cannot be parsed" do
+      rack_env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
+      notice = Honeybadger::Notice.new(:rack_env => rack_env)
+      assert_equal 1, notice.params.size
+      assert_match /Failed to call params on Rack::Request/, notice.params[:error]
+    end
+  end
+
   should "not send session data when send_request_session is false" do
     notice = build_notice(:send_request_session => false, :session_data => { :foo => :bar })
     assert_equal nil, notice.session_data
