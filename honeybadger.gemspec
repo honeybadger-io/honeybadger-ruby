@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.6.1'
-  s.date              = '2013-03-14'
+  s.version           = '1.6.2'
+  s.date              = '2013-04-10'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'

@@ -1,5 +1,7 @@
 ## Honeybadger 1.7.0 (Unreleased) ##
 
+## Honeybadger 1.6.2 ##
+
 * Fail gracefully when Rack params cannot be parsed
 
   *Joshua Wood*
