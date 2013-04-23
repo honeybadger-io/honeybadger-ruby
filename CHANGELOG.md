@@ -1,4 +1,9 @@
-## Honeybadger 1.7.0 (Unreleased) ##
+## Honeybadger 1.7.0 ##
+
+* Honeybadger notification sender object is established per environment, Sender
+  for production, TestSender for test, NoopSender for development
+
+  *Mike Mondragon @monde*
 
 * Added option to run capistrano deploy notification asynchronously 
 
