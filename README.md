@@ -146,11 +146,11 @@ which will be visible immediately.
 
 ## Ignored environments
 
-Please note that in development mode, Honeybadger will **not** be
-notified of exceptions that occur, except when running the test rake
-task. The following environments are ignored by default: *development*,
-*test*, and *cucumber*. You can modify which environments are ignored by
-setting the `development_environments` option in your Honeybadger
+Please note that in development or test mode, Honeybadger will **not** be
+notified of exceptions that occur, except when running the test rake task. The
+following environments are ignored by default: *development*, *test*, and
+*cucumber*. You can modify which environments are ignored by setting the
+`development_environments` and `test_environments` option in your Honeybadger
 initializer:
 
 ```ruby
@@ -158,14 +158,17 @@ Honeybadger.configure do |config|
   # ...
   # To add an additional environment to be ignored:
   config.development_environments << 'staging'
+  config.test_environments << 'coverage'
 
   # To override the default environments completely:
-  config.development_environments = ['test', 'cucumber']
+  config.development_environments = ['development', 'staging']
+  config.test_environments = ['test', 'cucumber']
 end
 ```
 
-If you choose to override the `development_environments` option for
-whatever reason, please make sure your test environments are ignored.
+If you choose to override the `development_environments` or `test_environments`
+option for whatever reason, please make sure your development and test
+environments are ignored.
 
 ## Sending custom data
 
