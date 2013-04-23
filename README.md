@@ -170,6 +170,25 @@ If you choose to override the `development_environments` or `test_environments`
 option for whatever reason, please make sure your development and test
 environments are ignored.
 
+## Test applications
+
+In the testing environment the Honeybadger notification sender just caches
+notifications in memory and sends nothing over the wire.  The notices can be
+accessed via the `Honeybadger.sender.notices` attribute which is an array.
+
+```ruby
+class CobraTest < Test::Unit::TestCase
+  def setup
+    Honeybadger.sender.notices.clear
+  end
+
+  def test_something_that_causes_a_cobra_expection
+    Randall.eww_its_got_a_cobra!
+    assert Honeybadger.sender.notices.last.exception.is_a?(CobraException)
+  end
+end
+```
+
 ## Sending custom data
 
 Honeybadger allows you to send custom data using `Honeybadger.context`.
