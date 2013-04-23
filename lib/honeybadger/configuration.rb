@@ -1,12 +1,14 @@
 module Honeybadger
   class Configuration
-    OPTIONS = [:api_key, :backtrace_filters, :development_environments, :environment_name,
-               :host, :http_open_timeout, :http_read_timeout, :ignore, :ignore_by_filters,
-               :ignore_user_agent, :notifier_name, :notifier_url, :notifier_version,
-               :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
-               :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
-               :user_information, :rescue_rake_exceptions, :source_extract_radius,
-               :send_request_session, :debug].freeze
+    OPTIONS = [:api_key, :backtrace_filters, :development_environments,
+               :test_environments, :environment_name, :host,
+               :http_open_timeout, :http_read_timeout, :ignore,
+               :ignore_by_filters, :ignore_user_agent, :notifier_name,
+               :notifier_url, :notifier_version, :params_filters,
+               :project_root, :port, :protocol, :proxy_host, :proxy_pass,
+               :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain,
+               :framework, :user_information, :rescue_rake_exceptions,
+               :source_extract_radius, :send_request_session, :debug].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -58,8 +60,11 @@ module Honeybadger
     # A list of user agents that are being ignored. The array can be appended to.
     attr_reader :ignore_user_agent
 
-    # A list of environments in which notifications should not be sent.
+    # A list of development environments in which notifications should not be sent.
     attr_accessor :development_environments
+
+    # A list of testing environments in which notifications should not be sent.
+    attr_accessor :test_environments
 
     # The name of the environment the application is running in
     attr_accessor :environment_name
@@ -144,7 +149,8 @@ module Honeybadger
       @ignore_by_filters         = []
       @ignore                    = IGNORE_DEFAULT.dup
       @ignore_user_agent         = []
-      @development_environments  = %w(development test cucumber)
+      @development_environments  = %w(development)
+      @test_environments         = %w(test cucumber)
       @notifier_name             = 'Honeybadger Notifier'
       @notifier_version          = VERSION
       @notifier_url              = 'https://github.com/honeybadger-io/honeybadger-ruby'
@@ -240,7 +246,15 @@ module Honeybadger
     #
     # Returns false if in a development environment, true otherwise.
     def public?
+      !test? &&
       !development_environments.include?(environment_name)
+    end
+
+    # Public: Determines if the notification is for a test environment.
+    #
+    # Returns true if in a test environment, false otherwise.
+    def test?
+      test_environments.include?(environment_name)
     end
 
     # Public: Configure async delivery

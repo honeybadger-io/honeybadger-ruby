@@ -104,7 +104,7 @@ class ConfigurationTest < Test::Unit::TestCase
   should "act like a hash" do
     config = Honeybadger::Configuration.new
     hash = config.to_hash
-    [:api_key, :backtrace_filters, :development_environments,
+    [:api_key, :backtrace_filters, :development_environments, :test_environments,
      :environment_name, :host, :http_open_timeout, :http_read_timeout, :ignore,
      :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
      :notifier_version, :params_filters, :project_root, :port, :protocol,
@@ -160,9 +160,14 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_replaces(:ignore_user_agent, :ignore_user_agent_only=)
   end
 
-  should "use development and test as development environments by default" do
+  should "use development as development environments by default" do
     config = Honeybadger::Configuration.new
-    assert_same_elements %w(development test cucumber), config.development_environments
+    assert_same_elements %w(development), config.development_environments
+  end
+
+  should "use test and cucumber as test environments by default" do
+    config = Honeybadger::Configuration.new
+    assert_same_elements %w(test cucumber), config.test_environments
   end
 
   should "be public in a public environment" do
@@ -176,6 +181,22 @@ class ConfigurationTest < Test::Unit::TestCase
     config = Honeybadger::Configuration.new
     config.development_environments = %w(staging)
     config.environment_name = 'staging'
+    assert !config.public?
+  end
+
+  should "not be public in a test environment" do
+    config = Honeybadger::Configuration.new
+    config.development_environments = []
+    config.test_environments = %w(test)
+    config.environment_name = 'test'
+    assert !config.public?
+  end
+
+  should "not be public in a cucumber environment" do
+    config = Honeybadger::Configuration.new
+    config.development_environments = []
+    config.test_environments = %w(cucumber)
+    config.environment_name = 'cucumber'
     assert !config.public?
   end
 
