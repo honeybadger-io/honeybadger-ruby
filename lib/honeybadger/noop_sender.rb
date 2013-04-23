@@ -10,9 +10,6 @@ module Honeybadger
     #
     # Returns nil
     def send_to_honeybadger(notice)
-      puts "?" * 80
-      #puts notice.inspect
-      #puts "?" * 80
     end
 
   end
