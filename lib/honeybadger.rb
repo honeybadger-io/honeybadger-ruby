@@ -73,7 +73,7 @@ module Honeybadger
     # Yields Honeybadger configuration
     def configure(silent = false)
       yield(configuration)
-      self.sender = Sender.new(configuration)
+      self.sender = build_sender(configuration)
       report_ready unless silent
       self.sender
     end
@@ -165,6 +165,10 @@ module Honeybadger
       else
         exception
       end
+    end
+
+    def build_sender(notice)
+      Sender.new(configuration)
     end
   end
 end
