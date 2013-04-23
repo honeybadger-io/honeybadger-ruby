@@ -141,12 +141,10 @@ module Honeybadger
     private
 
     def send_notice(notice)
-      if configuration.public?
-        if configuration.async?
-          configuration.async.call(notice)
-        else
-          notice.deliver
-        end
+      if configuration.async?
+        configuration.async.call(notice)
+      else
+        notice.deliver
       end
     end
 
@@ -168,7 +166,15 @@ module Honeybadger
     end
 
     def build_sender(notice)
-      Sender.new(configuration)
+      if configuration.public?
+        Sender.new(configuration)
+      elsif configuration.test?
+        require 'honeybadger/test_sender'
+        TestSender.new(configuration)
+      else
+        require 'honeybadger/noop_sender'
+        NoopSender.new(configuration)
+      end
     end
   end
 end
