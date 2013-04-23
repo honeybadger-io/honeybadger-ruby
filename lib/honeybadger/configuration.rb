@@ -149,7 +149,7 @@ module Honeybadger
       @ignore_by_filters         = []
       @ignore                    = IGNORE_DEFAULT.dup
       @ignore_user_agent         = []
-      @development_environments  = %w(development)
+      @development_environments  = %w(development test cucumber)
       @test_environments         = %w(test cucumber)
       @notifier_name             = 'Honeybadger Notifier'
       @notifier_version          = VERSION
