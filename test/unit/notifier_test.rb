@@ -25,6 +25,10 @@ class NotifierTest < Test::Unit::TestCase
     Honeybadger.configure { |config| config.environment_name = 'development' }
   end
 
+  def set_test_env
+    Honeybadger.configure { |config| config.environment_name = 'test' }
+  end
+
   should "yield and save a configuration when configuring" do
     yielded_configuration = nil
     Honeybadger.configure do |config|
@@ -144,7 +148,7 @@ class NotifierTest < Test::Unit::TestCase
     Honeybadger.notify(build_exception)
     Honeybadger.notify_or_ignore(build_exception)
 
-    assert_received(sender, :send_to_honeybadger) {|expect| expect.never }
+    assert_received(sender, :send_to_honeybadger) {|expect| expect.times(2) }
   end
 
   should "not deliver an ignored exception when notifying implicitly" do
@@ -157,6 +161,16 @@ class NotifierTest < Test::Unit::TestCase
     Honeybadger.notify_or_ignore(exception)
 
     assert_received(sender, :send_to_honeybadger) {|expect| expect.never }
+  end
+
+  should "have a noop sender in the development environment" do
+    set_development_env
+    assert Honeybadger.sender.is_a?(Honeybadger::NoopSender)
+  end
+
+  should "have a test sender in the test environment" do
+    set_test_env
+    assert Honeybadger.sender.is_a?(Honeybadger::TestSender)
   end
 
   should "deliver an ignored exception when notifying manually" do
