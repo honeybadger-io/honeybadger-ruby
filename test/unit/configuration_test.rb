@@ -162,7 +162,7 @@ class ConfigurationTest < Test::Unit::TestCase
 
   should "use development as development environments by default" do
     config = Honeybadger::Configuration.new
-    assert_same_elements %w(development), config.development_environments
+    assert_same_elements %w(development test cucumber), config.development_environments
   end
 
   should "use test and cucumber as test environments by default" do
