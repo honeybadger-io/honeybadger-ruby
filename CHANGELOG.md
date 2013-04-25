@@ -5,7 +5,7 @@
 
   *Mike Mondragon @monde*
 
-* Added option to run capistrano deploy notification asynchronously 
+* Added option to run capistrano deploy notification asynchronously
 
  *Sergey Efremov*
 

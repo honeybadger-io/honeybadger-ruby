@@ -248,7 +248,7 @@ can set the `:honeybadger_deploy_task` in your *config/deploy.rb* file:
 set :honeybadger_deploy_task, 'honeybadger:deploy_with_environment'
 ```
 
-You can run deploy notification task asynchronously. 
+You can run deploy notification task asynchronously.
 Just add `:honeybadger_async_notify` in your *config/deploy.rb* file:
 
 ```ruby
