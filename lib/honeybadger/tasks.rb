@@ -29,7 +29,6 @@ namespace :honeybadger do
     Honeybadger.configure(true) do |config|
       config.debug = true
       config.development_environments = []
-      config.test_environments = []
       config.rescue_rake_exceptions = false
     end
 

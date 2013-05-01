@@ -1,14 +1,14 @@
 module Honeybadger
   class Configuration
-    OPTIONS = [:api_key, :backtrace_filters, :development_environments,
-               :test_environments, :environment_name, :host,
-               :http_open_timeout, :http_read_timeout, :ignore,
-               :ignore_by_filters, :ignore_user_agent, :notifier_name,
-               :notifier_url, :notifier_version, :params_filters,
-               :project_root, :port, :protocol, :proxy_host, :proxy_pass,
-               :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain,
-               :framework, :user_information, :rescue_rake_exceptions,
-               :source_extract_radius, :send_request_session, :debug].freeze
+    OPTIONS = [ :api_key, :backtrace_filters, :development_environments,
+                :environment_name, :host, :http_open_timeout,
+                :http_read_timeout, :ignore, :ignore_by_filters,
+                :ignore_user_agent, :notifier_name, :notifier_url,
+                :notifier_version, :params_filters, :project_root, :port,
+                :protocol, :proxy_host, :proxy_pass, :proxy_port, :proxy_user,
+                :secure, :use_system_ssl_cert_chain, :framework,
+                :user_information, :rescue_rake_exceptions,
+                :source_extract_radius, :send_request_session, :debug ].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -64,7 +64,7 @@ module Honeybadger
     attr_accessor :development_environments
 
     # A list of testing environments in which notifications should not be sent.
-    attr_accessor :test_environments
+    attr_reader :test_environments
 
     # The name of the environment the application is running in
     attr_accessor :environment_name

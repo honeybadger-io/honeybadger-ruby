@@ -104,12 +104,13 @@ class ConfigurationTest < Test::Unit::TestCase
   should "act like a hash" do
     config = Honeybadger::Configuration.new
     hash = config.to_hash
-    [:api_key, :backtrace_filters, :development_environments, :test_environments,
-     :environment_name, :host, :http_open_timeout, :http_read_timeout, :ignore,
-     :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
-     :notifier_version, :params_filters, :project_root, :port, :protocol,
-     :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
-     :source_extract_radius, :async, :send_request_session, :debug].each do |option|
+    [ :api_key, :backtrace_filters, :development_environments,
+      :environment_name, :host, :http_open_timeout, :http_read_timeout, :ignore,
+      :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
+      :notifier_version, :params_filters, :project_root, :port, :protocol,
+      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
+      :source_extract_radius, :async, :send_request_session, :debug
+    ].each do |option|
       assert_equal config[option], hash[option], "Wrong value for #{option}"
     end
   end
@@ -165,7 +166,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_same_elements %w(development test cucumber), config.development_environments
   end
 
-  should "use test and cucumber as test environments by default" do
+  should "have test and cucumber as test environments" do
     config = Honeybadger::Configuration.new
     assert_same_elements %w(test cucumber), config.test_environments
   end
@@ -187,7 +188,6 @@ class ConfigurationTest < Test::Unit::TestCase
   should "not be public in a test environment" do
     config = Honeybadger::Configuration.new
     config.development_environments = []
-    config.test_environments = %w(test)
     config.environment_name = 'test'
     assert !config.public?
   end
@@ -195,7 +195,6 @@ class ConfigurationTest < Test::Unit::TestCase
   should "not be public in a cucumber environment" do
     config = Honeybadger::Configuration.new
     config.development_environments = []
-    config.test_environments = %w(cucumber)
     config.environment_name = 'cucumber'
     assert !config.public?
   end
