@@ -15,7 +15,6 @@ namespace :honeybadger do
       config.logger = Rails.logger
       config.debug = true
       config.development_environments = []
-      config.test_environments = []
       config.rescue_rake_exceptions = false
     end
 
