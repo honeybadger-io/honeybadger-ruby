@@ -99,9 +99,10 @@ module Honeybadger
     #             :environment_name - The application environment name.
     #             :context          - Custom hash to send
     #
-    # Returns exception ID from Honeybadger on success, false on failure
+    # Returns exception ID from Honeybadger on success, false on failure or if
+    # the badger hasn't been configured yet.
     def notify(exception, options = {})
-      send_notice(build_notice_for(exception, options))
+      @configuration.nil? ? false : send_notice(build_notice_for(exception, options))
     end
 
     # Public: Sends the notice unless it is one of the default ignored exceptions

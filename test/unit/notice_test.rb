@@ -22,6 +22,11 @@ class NoticeTest < Test::Unit::TestCase
                       :env         => { 'three' => 'four' } }.update(attrs))
   end
 
+  should "notify only when configured" do
+    Honeybadger.instance_variable_set(:@configuration, nil)
+    assert_equal false, Honeybadger.notify('example')
+  end
+
   should "deliver to sender" do
     sender = stub_sender!
     notice = build_notice
