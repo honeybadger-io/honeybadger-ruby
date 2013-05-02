@@ -34,6 +34,23 @@ module DefinesConstants
   end
 end
 
+module SettingEnvironment
+
+  def set_public_env
+    Honeybadger.configure { |config| config.environment_name = 'production' }
+  end
+
+  def set_development_env
+    Honeybadger.configure { |config| config.environment_name = 'development' }
+  end
+
+  def set_test_env
+    Honeybadger.configure { |config| config.environment_name = 'test' }
+  end
+
+end
+
+
 class CollectingSender
   attr_reader :collected
 

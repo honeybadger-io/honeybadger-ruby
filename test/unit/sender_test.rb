@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class SenderTest < Test::Unit::TestCase
+
+  include SettingEnvironment
+
   def setup
     reset_config
   end
@@ -281,4 +284,15 @@ class SenderTest < Test::Unit::TestCase
       assert_received(http, :read_timeout=) {|expect| expect.with(10) }
     end
   end
+
+  context "development sender" do
+    should "write to debug log" do
+      Honeybadger.stubs(:write_verbose_log)
+      sender = set_development_env
+      sender.send_to_honeybadger('example')
+      assert_logged /^example$/
+      assert_received(Net::HTTP, :new) {|expect| expect.never }
+    end
+  end
+
 end
