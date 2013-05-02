@@ -154,9 +154,9 @@ class NotifierTest < Test::Unit::TestCase
     assert_received(sender, :send_to_honeybadger) {|expect| expect.never }
   end
 
-  should "have a noop sender in the development environment" do
+  should "have a development sender in the development environment" do
     set_development_env
-    assert Honeybadger.sender.is_a?(Honeybadger::NoopSender)
+    assert Honeybadger.sender.is_a?(Honeybadger::DevelopmentSender)
   end
 
   should "have a test sender in the test environment" do

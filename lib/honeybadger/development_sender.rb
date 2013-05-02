@@ -1,5 +1,5 @@
 module Honeybadger
-  class NoopSender
+  class DevelopmentSender
 
     def initialize(options = {})
     end

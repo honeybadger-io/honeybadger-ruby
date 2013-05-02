@@ -190,8 +190,8 @@ end
 ## Development environment
 
 In a development environment the Honeybadger notification sender is a
-`Honeybadger::NoopSender`.  This object only logs notices to the development
-log.
+`Honeybadger::DevelopmentSender`.  This object only logs notices to the development
+log at the debug level.
 
 ## Sending custom data
 
