@@ -10,6 +10,8 @@ module Honeybadger
     #
     # Returns nil
     def send_to_honeybadger(notice)
+      message = notice.is_a?(String) ? notice : notice.error_message
+      Honeybadger.write_verbose_log(message, :debug)
     end
 
   end

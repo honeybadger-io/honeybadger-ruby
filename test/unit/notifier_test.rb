@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class NotifierTest < Test::Unit::TestCase
+
+  include SettingEnvironment
+
   class OriginalException < Exception
   end
 
@@ -15,18 +18,6 @@ class NotifierTest < Test::Unit::TestCase
   def assert_sent(notice, notice_args)
     assert_received(Honeybadger::Notice, :new) {|expect| expect.with(has_entries(notice_args)) }
     assert_received(Honeybadger.sender, :send_to_honeybadger) {|expect| expect.with(notice) }
-  end
-
-  def set_public_env
-    Honeybadger.configure { |config| config.environment_name = 'production' }
-  end
-
-  def set_development_env
-    Honeybadger.configure { |config| config.environment_name = 'development' }
-  end
-
-  def set_test_env
-    Honeybadger.configure { |config| config.environment_name = 'test' }
   end
 
   should "yield and save a configuration when configuring" do
