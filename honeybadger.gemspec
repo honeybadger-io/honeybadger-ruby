@@ -97,7 +97,7 @@ Gem::Specification.new do |s|
     lib/honeybadger/railtie.rb
     lib/honeybadger/rake_handler.rb
     lib/honeybadger/sender.rb
-    lib/honeybadger/noop_sender.rb
+    lib/honeybadger/development_sender.rb
     lib/honeybadger/test_sender.rb
     lib/honeybadger/shared_tasks.rb
     lib/honeybadger/tasks.rb

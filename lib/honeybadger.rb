@@ -172,8 +172,8 @@ module Honeybadger
         require 'honeybadger/test_sender'
         TestSender.new(configuration)
       else
-        require 'honeybadger/noop_sender'
-        NoopSender.new(configuration)
+        require 'honeybadger/development_sender'
+        DevelopmentSender.new(configuration)
       end
     end
   end

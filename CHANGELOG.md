@@ -1,7 +1,7 @@
 ## Honeybadger 1.7.0 ##
 
 * Honeybadger notification sender object is established per environment, Sender
-  for production, TestSender for test, NoopSender for development
+  for production, TestSender for test, DevelopmentSender for development
 
   *Mike Mondragon @monde*
 
