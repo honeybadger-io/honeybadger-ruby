@@ -295,4 +295,13 @@ class SenderTest < Test::Unit::TestCase
     end
   end
 
+  context "test sender" do
+    should "collect notices" do
+      notice = Honeybadger::Notice.new(:error_message => 'example')
+      sender = set_test_env
+      sender.send_to_honeybadger(notice)
+      assert_equal 'example', Honeybadger.sender.notices.last.error_message
+    end
+  end
+
 end
