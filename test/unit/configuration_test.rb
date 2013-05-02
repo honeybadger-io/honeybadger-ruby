@@ -89,6 +89,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_overridable :notifier_version
     assert_config_overridable :notifier_name
     assert_config_overridable :notifier_url
+    assert_config_overridable :delivery_method
     assert_config_overridable :environment_name
     assert_config_overridable :logger
     assert_config_overridable :source_extract_radius
@@ -105,11 +106,12 @@ class ConfigurationTest < Test::Unit::TestCase
     config = Honeybadger::Configuration.new
     hash = config.to_hash
     [ :api_key, :backtrace_filters, :development_environments,
-      :environment_name, :host, :http_open_timeout, :http_read_timeout, :ignore,
-      :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
-      :notifier_version, :params_filters, :project_root, :port, :protocol,
-      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
-      :source_extract_radius, :async, :send_request_session, :debug
+      :delivery_method, :environment_name, :host, :http_open_timeout,
+      :http_read_timeout, :ignore, :ignore_by_filters, :ignore_user_agent,
+      :notifier_name, :notifier_url, :notifier_version, :params_filters,
+      :project_root, :port, :protocol, :proxy_host, :proxy_pass, :proxy_port,
+      :proxy_user, :secure, :source_extract_radius, :async,
+      :send_request_session, :debug
     ].each do |option|
       assert_equal config[option], hash[option], "Wrong value for #{option}"
     end

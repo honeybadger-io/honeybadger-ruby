@@ -8,6 +8,8 @@ require 'honeybadger/backtrace'
 require 'honeybadger/notice'
 require 'honeybadger/rack'
 require 'honeybadger/sender'
+require 'honeybadger/development_sender'
+require 'honeybadger/test_sender'
 
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
@@ -73,7 +75,7 @@ module Honeybadger
     # Yields Honeybadger configuration
     def configure(silent = false)
       yield(configuration)
-      self.sender = build_sender(configuration)
+      self.sender = build_sender
       report_ready unless silent
       self.sender
     end
@@ -165,14 +167,16 @@ module Honeybadger
       end
     end
 
-    def build_sender(notice)
-      if configuration.public?
+    def build_sender
+      if configuration.delivery_method
+        ( configuration.delivery_method.to_sym == :production ?
+          Sender : const_get("#{configuration.delivery_method.to_s.capitalize}Sender")
+        ).new(configuration)
+      elsif configuration.public?
         Sender.new(configuration)
       elsif configuration.test?
-        require 'honeybadger/test_sender'
         TestSender.new(configuration)
       else
-        require 'honeybadger/development_sender'
         DevelopmentSender.new(configuration)
       end
     end

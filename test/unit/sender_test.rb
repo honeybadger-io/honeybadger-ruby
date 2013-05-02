@@ -293,6 +293,19 @@ class SenderTest < Test::Unit::TestCase
       assert_logged /^example$/
       assert_received(Net::HTTP, :new) {|expect| expect.never }
     end
+
+    should "use development notification sender" do
+      set_development_env
+      assert_equal Honeybadger::DevelopmentSender, Honeybadger.sender.class
+    end
+
+    should "explicitly set test notification sender" do
+      Honeybadger.configure do |config|
+        config.environment_name = 'development'
+        config.delivery_method = :test
+      end
+      assert_equal Honeybadger::TestSender, Honeybadger.sender.class
+    end
   end
 
   context "test sender" do
@@ -302,6 +315,27 @@ class SenderTest < Test::Unit::TestCase
       sender.send_to_honeybadger(notice)
       assert_equal 'example', Honeybadger.sender.notices.last.error_message
     end
+
+    should "use test notification sender" do
+      set_test_env
+      assert_equal Honeybadger::TestSender, Honeybadger.sender.class
+    end
+
+    should "explicitly set development notification sender" do
+      Honeybadger.configure do |config|
+        config.environment_name = 'test'
+        config.delivery_method = :development
+      end
+      assert_equal Honeybadger::DevelopmentSender, Honeybadger.sender.class
+    end
+  end
+
+  context "production sender" do
+    should "use production notification sender" do
+      set_public_env
+      assert_equal Honeybadger::Sender, Honeybadger.sender.class
+    end
+
   end
 
 end

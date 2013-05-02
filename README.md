@@ -193,6 +193,39 @@ In a development environment the Honeybadger notification sender is a
 `Honeybadger::DevelopmentSender`.  This object only logs notices to the development
 log at the debug level.
 
+## Explicit environment
+
+Regardless RAILS_ENV or other environment variables the notification sender can
+be set explicitly on the delivery_method attribute of the configuration.  If it
+is set to `:production` the sender will always be `Honeybadger::Sender`,
+otherwise the sender class name corresponds to the named delivery_method.
+Built into the library is `Honeybadger::TestSender` when delivery_method is
+`:test` and `Honeybadger::DevelopmentSender` when delivery_method is
+`:development`.  This allows application and Honeybadger configurations that
+are not tied to RAILS_ENV in any manner.
+
+The delivery_method facility also allows for custom notification senders to be
+loaded based on the name, such as the following custom
+`Honeybadger::SyslogSender`.
+
+```ruby
+# First, define/load your sender
+require 'syslog'
+module Honeybadger
+  class SyslogSender
+    def send_to_honeybadger(notice)
+      message = notice.is_a?(String) ? notice : notice.error_message
+      Syslog.log(Syslog::LOG_INFO, message)
+    end
+  end
+end
+
+# Then configure your Honeybadger
+Honeybadger.configure do |config|
+  config.delivery_method = :syslog
+end
+```
+
 ## Sending custom data
 
 Honeybadger allows you to send custom data using `Honeybadger.context`.
