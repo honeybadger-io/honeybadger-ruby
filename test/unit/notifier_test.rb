@@ -159,6 +159,14 @@ class NotifierTest < Test::Unit::TestCase
     assert Honeybadger.sender.is_a?(Honeybadger::Sender::Development)
   end
 
+  should "have multiple sender send multiple" do
+    set_multiple_env
+    exception = build_exception
+    result = Honeybadger.notify_or_ignore(exception)
+    assert_equal exception, result[Honeybadger::Sender::One].exception
+    assert_equal exception, result[Honeybadger::Sender::Two].exception
+  end
+
   should "have a test sender in the test environment" do
     set_test_env
     assert Honeybadger.sender.is_a?(Honeybadger::Sender::Test)

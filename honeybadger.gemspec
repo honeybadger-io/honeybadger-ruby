@@ -99,6 +99,7 @@ Gem::Specification.new do |s|
     lib/honeybadger/sender.rb
     lib/honeybadger/sender/development.rb
     lib/honeybadger/sender/test.rb
+    lib/honeybadger/sender/multiple.rb
     lib/honeybadger/shared_tasks.rb
     lib/honeybadger/tasks.rb
     lib/honeybadger_tasks.rb
