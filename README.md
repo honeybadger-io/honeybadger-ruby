@@ -170,7 +170,7 @@ whatever reason, please make sure your test environments are ignored.
 ## Test environment
 
 In a testing environment the Honeybadger notification sender is a
-`Honeybadger::TestSender`.  This object caches Honeybadger notices in memory
+`Honeybadger::Sender::Test`.  This object caches Honeybadger notices in memory
 and sends nothing over the wire.  Notices can be accessed via the
 `Honeybadger.sender.notices` attribute which is an array.
 
@@ -190,8 +190,8 @@ end
 ## Development environment
 
 In a development environment the Honeybadger notification sender is a
-`Honeybadger::DevelopmentSender`.  This object only logs notices to the development
-log at the debug level.
+`Honeybadger::Sender::Development`.  This object only logs notices to the
+development log at the debug level.
 
 ## Explicit environment
 
@@ -199,8 +199,8 @@ Regardless RAILS_ENV or other environment variables the notification sender can
 be set explicitly on the delivery_method attribute of the configuration.  If it
 is set to `:production` the sender will always be `Honeybadger::Sender`,
 otherwise the sender class name corresponds to the named delivery_method.
-Built into the library is `Honeybadger::TestSender` when delivery_method is
-`:test` and `Honeybadger::DevelopmentSender` when delivery_method is
+Built into the library is `Honeybadger::Sender::Test` when delivery_method
+is `:test` and `Honeybadger::Sender::Development` when delivery_method is
 `:development`.  This allows application and Honeybadger configurations that
 are not tied to RAILS_ENV in any manner.
 

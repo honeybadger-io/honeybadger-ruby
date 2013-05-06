@@ -156,12 +156,12 @@ class NotifierTest < Test::Unit::TestCase
 
   should "have a development sender in the development environment" do
     set_development_env
-    assert Honeybadger.sender.is_a?(Honeybadger::DevelopmentSender)
+    assert Honeybadger.sender.is_a?(Honeybadger::Sender::Development)
   end
 
   should "have a test sender in the test environment" do
     set_test_env
-    assert Honeybadger.sender.is_a?(Honeybadger::TestSender)
+    assert Honeybadger.sender.is_a?(Honeybadger::Sender::Test)
   end
 
   should "deliver an ignored exception when notifying manually" do

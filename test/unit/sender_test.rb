@@ -296,7 +296,7 @@ class SenderTest < Test::Unit::TestCase
 
     should "use development notification sender" do
       set_development_env
-      assert_equal Honeybadger::DevelopmentSender, Honeybadger.sender.class
+      assert_equal Honeybadger::Sender::Development, Honeybadger.sender.class
     end
 
     should "explicitly set test notification sender" do
@@ -304,7 +304,7 @@ class SenderTest < Test::Unit::TestCase
         config.environment_name = 'development'
         config.delivery_method = :test
       end
-      assert_equal Honeybadger::TestSender, Honeybadger.sender.class
+      assert_equal Honeybadger::Sender::Test, Honeybadger.sender.class
     end
   end
 
@@ -318,7 +318,7 @@ class SenderTest < Test::Unit::TestCase
 
     should "use test notification sender" do
       set_test_env
-      assert_equal Honeybadger::TestSender, Honeybadger.sender.class
+      assert_equal Honeybadger::Sender::Test, Honeybadger.sender.class
     end
 
     should "explicitly set development notification sender" do
@@ -326,7 +326,7 @@ class SenderTest < Test::Unit::TestCase
         config.environment_name = 'test'
         config.delivery_method = :development
       end
-      assert_equal Honeybadger::DevelopmentSender, Honeybadger.sender.class
+      assert_equal Honeybadger::Sender::Development, Honeybadger.sender.class
     end
   end
 
