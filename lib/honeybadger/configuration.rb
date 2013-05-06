@@ -109,6 +109,9 @@ module Honeybadger
     # A Proc object used to send notices asynchronously
     attr_writer :async
 
+    # A Proc object used to generate optional fingerprint
+    attr_writer :fingerprint
+
     DEFAULT_PARAMS_FILTERS = %w(password password_confirmation).freeze
 
     DEFAULT_BACKTRACE_FILTERS = [
@@ -278,6 +281,24 @@ module Honeybadger
       @async
     end
     alias :async? :async
+
+    # Public: Generate custom fingerprint (optional)
+    #
+    # block - An optional block returning object responding to #to_s
+    #
+    # Examples
+    #
+    #   config.fingerprint = Proc.new { |notice| ... }
+    #
+    #   config.fingerprint do |notice|
+    #     [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
+    #   end
+    #
+    # Returns configured fingerprint generator (should respond to #call(notice))
+    def fingerprint
+      @fingerprint = Proc.new if block_given?
+      @fingerprint
+    end
 
     def port
       @port || default_port

@@ -138,6 +138,10 @@ module Honeybadger
       as_json.to_json(*a)
     end
 
+    def to_s
+      lines.map(&:to_s).join("\n")
+    end
+
     def inspect
       "<Backtrace: " + lines.collect { |line| line.inspect }.join(", ") + ">"
     end
