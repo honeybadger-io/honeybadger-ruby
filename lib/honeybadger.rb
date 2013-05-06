@@ -171,7 +171,7 @@ module Honeybadger
         Sender.new(configuration)
       elsif configuration.delivery_method
         require "honeybadger/sender/#{configuration.delivery_method.to_s}"
-        const_get("Sender::#{configuration.delivery_method.to_s.capitalize}").new(configuration)
+        const_get("Sender").const_get("#{configuration.delivery_method.to_s.capitalize}").new(configuration)
       elsif configuration.public?
         Sender.new(configuration)
       elsif configuration.test?
