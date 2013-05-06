@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class SenderTest < Test::Unit::TestCase
+
+  include SettingEnvironment
+
   def setup
     reset_config
   end
@@ -281,4 +284,58 @@ class SenderTest < Test::Unit::TestCase
       assert_received(http, :read_timeout=) {|expect| expect.with(10) }
     end
   end
+
+  context "development sender" do
+    should "write to debug log" do
+      Honeybadger.stubs(:write_verbose_log)
+      sender = set_development_env
+      sender.send_to_honeybadger('example')
+      assert_logged /^example$/
+      assert_received(Net::HTTP, :new) {|expect| expect.never }
+    end
+
+    should "use development notification sender" do
+      set_development_env
+      assert_equal Honeybadger::Sender::Development, Honeybadger.sender.class
+    end
+
+    should "explicitly set test notification sender" do
+      Honeybadger.configure do |config|
+        config.environment_name = 'development'
+        config.delivery_method = :test
+      end
+      assert_equal Honeybadger::Sender::Test, Honeybadger.sender.class
+    end
+  end
+
+  context "test sender" do
+    should "collect notices" do
+      notice = Honeybadger::Notice.new(:error_message => 'example')
+      sender = set_test_env
+      sender.send_to_honeybadger(notice)
+      assert_equal 'example', Honeybadger.sender.notices.last.error_message
+    end
+
+    should "use test notification sender" do
+      set_test_env
+      assert_equal Honeybadger::Sender::Test, Honeybadger.sender.class
+    end
+
+    should "explicitly set development notification sender" do
+      Honeybadger.configure do |config|
+        config.environment_name = 'test'
+        config.delivery_method = :development
+      end
+      assert_equal Honeybadger::Sender::Development, Honeybadger.sender.class
+    end
+  end
+
+  context "production sender" do
+    should "use production notification sender" do
+      set_public_env
+      assert_equal Honeybadger::Sender, Honeybadger.sender.class
+    end
+
+  end
+
 end

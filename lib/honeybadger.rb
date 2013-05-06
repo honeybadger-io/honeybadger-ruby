@@ -74,7 +74,7 @@ module Honeybadger
     # Yields Honeybadger configuration
     def configure(silent = false)
       yield(configuration)
-      self.sender = Sender.new(configuration)
+      self.sender = build_sender
       report_ready unless silent
       self.sender
     end
@@ -142,12 +142,10 @@ module Honeybadger
     private
 
     def send_notice(notice)
-      if configuration.public?
-        if configuration.async?
-          configuration.async.call(notice)
-        else
-          notice.deliver
-        end
+      if configuration.async?
+        configuration.async.call(notice)
+      else
+        notice.deliver
       end
     end
 
@@ -165,6 +163,23 @@ module Honeybadger
         exception.continued_exception
       else
         exception
+      end
+    end
+
+    def build_sender
+      if configuration.delivery_method && configuration.delivery_method.to_sym == :production
+        Sender.new(configuration)
+      elsif configuration.delivery_method
+        require "honeybadger/sender/#{configuration.delivery_method.to_s}"
+        const_get("Sender").const_get("#{configuration.delivery_method.to_s.capitalize}").new(configuration)
+      elsif configuration.public?
+        Sender.new(configuration)
+      elsif configuration.test?
+        require "honeybadger/sender/test"
+        Sender::Test.new(configuration)
+      else
+        require "honeybadger/sender/development"
+        Sender::Development.new(configuration)
       end
     end
   end

@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class NotifierTest < Test::Unit::TestCase
+
+  include SettingEnvironment
+
   class OriginalException < Exception
   end
 
@@ -15,14 +18,6 @@ class NotifierTest < Test::Unit::TestCase
   def assert_sent(notice, notice_args)
     assert_received(Honeybadger::Notice, :new) {|expect| expect.with(has_entries(notice_args)) }
     assert_received(Honeybadger.sender, :send_to_honeybadger) {|expect| expect.with(notice) }
-  end
-
-  def set_public_env
-    Honeybadger.configure { |config| config.environment_name = 'production' }
-  end
-
-  def set_development_env
-    Honeybadger.configure { |config| config.environment_name = 'development' }
   end
 
   should "yield and save a configuration when configuring" do
@@ -144,7 +139,7 @@ class NotifierTest < Test::Unit::TestCase
     Honeybadger.notify(build_exception)
     Honeybadger.notify_or_ignore(build_exception)
 
-    assert_received(sender, :send_to_honeybadger) {|expect| expect.never }
+    assert_received(sender, :send_to_honeybadger) {|expect| expect.times(2) }
   end
 
   should "not deliver an ignored exception when notifying implicitly" do
@@ -157,6 +152,24 @@ class NotifierTest < Test::Unit::TestCase
     Honeybadger.notify_or_ignore(exception)
 
     assert_received(sender, :send_to_honeybadger) {|expect| expect.never }
+  end
+
+  should "have a development sender in the development environment" do
+    set_development_env
+    assert Honeybadger.sender.is_a?(Honeybadger::Sender::Development)
+  end
+
+  should "have multiple sender send multiple" do
+    set_multiple_env
+    exception = build_exception
+    result = Honeybadger.notify_or_ignore(exception)
+    assert_equal exception, result[Honeybadger::Sender::One].exception
+    assert_equal exception, result[Honeybadger::Sender::Two].exception
+  end
+
+  should "have a test sender in the test environment" do
+    set_test_env
+    assert Honeybadger.sender.is_a?(Honeybadger::Sender::Test)
   end
 
   should "deliver an ignored exception when notifying manually" do

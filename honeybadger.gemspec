@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.6.2'
+  s.version           = '1.7.0'
   s.date              = '2013-04-10'
 
   s.summary     = 'Error reports you can be happy about.'
@@ -97,6 +97,9 @@ Gem::Specification.new do |s|
     lib/honeybadger/railtie.rb
     lib/honeybadger/rake_handler.rb
     lib/honeybadger/sender.rb
+    lib/honeybadger/sender/development.rb
+    lib/honeybadger/sender/test.rb
+    lib/honeybadger/sender/multiple.rb
     lib/honeybadger/shared_tasks.rb
     lib/honeybadger/tasks.rb
     lib/honeybadger_tasks.rb

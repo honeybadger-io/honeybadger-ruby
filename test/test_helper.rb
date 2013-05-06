@@ -6,6 +6,7 @@ require 'bourne'
 require 'rack'
 
 require 'honeybadger'
+require 'honeybadger/sender/test'
 
 class BacktracedException < Exception
   attr_accessor :backtrace
@@ -33,6 +34,35 @@ module DefinesConstants
     @defined_constants << name
   end
 end
+
+class Honeybadger::Sender::One < Honeybadger::Sender::Test; end
+
+class Honeybadger::Sender::Two < Honeybadger::Sender::Test; end
+
+module SettingEnvironment
+
+  def set_public_env
+    Honeybadger.configure { |config| config.environment_name = 'production' }
+  end
+
+  def set_development_env
+    Honeybadger.configure { |config| config.environment_name = 'development' }
+  end
+
+  def set_test_env
+    Honeybadger.configure { |config| config.environment_name = 'test' }
+  end
+
+  def set_multiple_env
+    Honeybadger.configure do |config|
+      config.environment_name = 'test'
+      config.delivery_method = :multiple
+    end
+    Honeybadger::Sender::Multiple.classes = [Honeybadger::Sender::One, Honeybadger::Sender::Two]
+  end
+
+end
+
 
 class CollectingSender
   attr_reader :collected

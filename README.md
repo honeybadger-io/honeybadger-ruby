@@ -167,6 +167,77 @@ end
 If you choose to override the `development_environments` option for
 whatever reason, please make sure your test environments are ignored.
 
+## Test environment
+
+In a testing environment the Honeybadger notification sender is a
+`Honeybadger::Sender::Test`.  This object caches Honeybadger notices in memory
+and sends nothing over the wire.  Notices can be accessed via the
+`Honeybadger.sender.notices` attribute which is an array.
+
+```ruby
+class CobraTest < Test::Unit::TestCase
+  def setup
+    Honeybadger.sender.notices.clear
+  end
+
+  def test_something_that_causes_a_cobra_expection
+    Randall.eww_its_got_a_cobra!
+    assert Honeybadger.sender.notices.last.exception.is_a?(CobraException)
+  end
+end
+```
+
+## Development environment
+
+In a development environment the Honeybadger notification sender is a
+`Honeybadger::Sender::Development`.  This object only logs notices to the
+development log at the debug level.
+
+## Explicit environment
+
+Regardless of RAILS_ENV or other environment variables, the notification sender
+can be set explicitly on the delivery_method attribute of the configuration.
+If it is set to `:production` the sender will always be `Honeybadger::Sender`,
+otherwise the sender class name corresponds to the named delivery_method in
+the namespace of Honeybadger::Sender::____  This allows application and
+Honeybadger configurations that are not tied to RAILS_ENV in any manner.
+
+The default delivery methods included in the libray are:
+
+* :production -> Honeybadger::Sender
+* :development -> Honeybadger::Sender::Development
+* :test -> Honeybadger::Sender::Test
+* :multiple -> Honeybadger::Sender::Multiple
+
+The delivery_method facility also allows for custom notification senders to be
+loaded based on the name.  The following example demonstrates a custom sender
+that logs to the syslog facility as well as the honeybadger service using the
+multiple sender.
+
+```ruby
+# First, define your sender
+require 'syslog'
+module Honeybadger
+  class Sender
+    class Syslog
+      def send_to_honeybadger(notice)
+        message = notice.is_a?(String) ? notice : notice.error_message
+        Syslog.log(Syslog::LOG_INFO, message)
+      end
+    end
+  end
+end
+
+# Then configure your Honeybadger
+Honeybadger.configure do |config|
+  config.delivery_method = :multiple
+end
+
+# Then configure the multiple sender so messages are sent in your custom style
+# as well as to the honeybader.io service
+Honeybadger::Sender::Multiple.classes = [Honeybadger::Sender, Honeybadger::Sender::Syslog]
+```
+
 ## Sending custom data
 
 Honeybadger allows you to send custom data using `Honeybadger.context`.
@@ -260,7 +331,7 @@ can set the `:honeybadger_deploy_task` in your *config/deploy.rb* file:
 set :honeybadger_deploy_task, 'honeybadger:deploy_with_environment'
 ```
 
-You can run deploy notification task asynchronously. 
+You can run deploy notification task asynchronously.
 Just add `:honeybadger_async_notify` in your *config/deploy.rb* file:
 
 ```ruby

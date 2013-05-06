@@ -1,5 +1,11 @@
 module Honeybadger
   class Sender
+
+    # Sender is the orignal class that emits notifications to the
+    # honeybadger.io service.  Additional senders should be name spaced
+    # Honeybadger::Sender::XXX such as Honeybadger::Sender::Development
+    # and Honeybadger::Sender::Test
+
     NOTICES_URI = '/v1/notices/'.freeze
     HTTP_ERRORS = [Timeout::Error,
                    Errno::EINVAL,
