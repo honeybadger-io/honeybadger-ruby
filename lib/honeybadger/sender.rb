@@ -34,12 +34,17 @@ module Honeybadger
     #
     # Returns error id from successful response
     def send_to_honeybadger(notice)
+      if api_key.nil?
+        log(:error, "API key not found.")
+        return nil
+      end
+
       data = notice.is_a?(String) ? notice : notice.to_json
 
       http     = setup_http_connection
       headers  = HEADERS
 
-      headers.merge!({ 'X-API-Key' => api_key}) unless api_key.nil?
+      headers.merge!({ 'X-API-Key' => api_key})
 
       response = begin
                    http.post(url.path, data, headers)

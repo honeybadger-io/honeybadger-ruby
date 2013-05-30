@@ -71,6 +71,12 @@ class SenderTest < Test::Unit::TestCase
     assert_equal nil, send_exception(:secure => false)
   end
 
+  should "log missing API key and return nil" do
+    sender = build_sender({ :api_key => nil })
+    sender.expects(:log).with(:error, includes('API key'))
+    assert_equal nil, send_exception(:sender => sender, :secure => false)
+  end
+
   should "should log success" do
     http = stub_http
     sender = build_sender
