@@ -37,7 +37,7 @@ namespace :honeybadger do
       end
 
       heroku_rails_env = heroku_var('RAILS_ENV', ENV['APP'])
-      heroku_api_key = heroku_var('HONEYBADGER_API_KEY', ENV['APP']).split.find(Honeybadger.configuration.api_key) {|x| x =~ /\S/ }
+      heroku_api_key = heroku_var('HONEYBADGER_API_KEY', ENV['APP']).split.find(lambda { Honeybadger.configuration.api_key }) {|x| x =~ /\S/ }
 
       unless heroku_api_key =~ /\S/ && heroku_rails_env =~ /\S/
         puts "WARNING: We were unable to detect the configuration from your Heroku environment."
