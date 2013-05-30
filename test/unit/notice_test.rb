@@ -22,14 +22,26 @@ class NoticeTest < Test::Unit::TestCase
                       :env         => { 'three' => 'four' } }.update(attrs))
   end
 
-  should "deliver to sender" do
-    sender = stub_sender!
-    notice = build_notice
-    notice.stubs(:to_json => { :foo => 'bar' })
+  context '#deliver' do
+    context 'sender is configured' do
+      should "deliver to sender" do
+        sender = stub_sender!
+        notice = build_notice
+        notice.stubs(:to_json => { :foo => 'bar' })
 
-    notice.deliver
+        notice.deliver
 
-    assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice) }
+        assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice) }
+      end
+    end
+
+    context 'sender is not configured' do
+      should "return false" do
+        notice = build_notice
+        Honeybadger.sender = nil
+        assert_equal false, notice.deliver
+      end
+    end
   end
 
   should "generate json from as_json template" do

@@ -125,8 +125,10 @@ module Honeybadger
 
     # Public: Send the notice to Honeybadger using the configured sender
     #
-    # Returns a reference to the error in Honeybadger
+    # Returns a reference to the error in Honeybadger, false if sender isn't
+    # configured
     def deliver
+      return false unless Honeybadger.sender
       Honeybadger.sender.send_to_honeybadger(self)
     end
 
