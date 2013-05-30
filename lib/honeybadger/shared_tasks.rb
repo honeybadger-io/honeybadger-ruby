@@ -31,13 +31,14 @@ namespace :honeybadger do
   namespace :heroku do
     desc "Install Heroku deploy notifications addon"
     task :add_deploy_notification => [:environment] do
-      def heroku_var(var, app_name = nil)
+      def heroku_var(var, app_name, default = nil)
         app = app_name ? "--app #{app_name}" : ''
-        `heroku config:get #{var} #{app} 2> /dev/null`.strip
+        result = `heroku config:get #{var} #{app} 2> /dev/null`.strip
+        result.split.find(lambda { default }) {|x| x =~ /\S/ }
       end
 
-      heroku_rails_env = heroku_var('RAILS_ENV', ENV['APP'])
-      heroku_api_key = heroku_var('HONEYBADGER_API_KEY', ENV['APP']).split.find(lambda { Honeybadger.configuration.api_key }) {|x| x =~ /\S/ }
+      heroku_rails_env = heroku_var('RAILS_ENV', ENV['APP'], Honeybadger.configuration.environment_name)
+      heroku_api_key = heroku_var('HONEYBADGER_API_KEY', ENV['APP'], Honeybadger.configuration.api_key)
 
       unless heroku_api_key =~ /\S/ && heroku_rails_env =~ /\S/
         puts "WARNING: We were unable to detect the configuration from your Heroku environment."
