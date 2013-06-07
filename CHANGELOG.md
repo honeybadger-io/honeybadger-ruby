@@ -1,4 +1,4 @@
-## Honeybadger 1.7.0 (Unreleased) ##
+## Honeybadger 1.7.0 ##
 
 * Added a custom grouping option
 
