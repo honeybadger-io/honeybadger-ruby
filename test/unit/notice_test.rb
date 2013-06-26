@@ -93,7 +93,7 @@ class NoticeTest < Test::Unit::TestCase
   end
 
   should "override the host name" do
-    notice = build_notice({ hostname: 'asdf' })
+    notice = build_notice({ :hostname => 'asdf' })
     assert_equal 'asdf', notice.hostname
   end
 
