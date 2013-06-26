@@ -92,6 +92,11 @@ class NoticeTest < Test::Unit::TestCase
     assert_equal hostname, notice.hostname
   end
 
+  should "override the host name" do
+    notice = build_notice({ hostname: 'asdf' })
+    assert_equal 'asdf', notice.hostname
+  end
+
   context "custom fingerprint" do
     should "include nil fingerprint when no fingerprint is specified" do
       notice = build_notice

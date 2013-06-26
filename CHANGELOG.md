@@ -1,3 +1,9 @@
+## Honeybadger 1.8.0 (unreleased) ##
+
+* Make hostname overridable in configuration.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.7.0 ##
 
 * Added a custom grouping option

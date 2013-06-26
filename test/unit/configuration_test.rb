@@ -30,6 +30,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_default :send_request_session, true
     assert_config_default :debug, false
     assert_config_default :fingerprint, nil
+    assert_config_default :hostname, nil
   end
 
   should "configure async as Proc" do
@@ -110,6 +111,7 @@ class ConfigurationTest < Test::Unit::TestCase
     assert_config_overridable :fingerprint
     assert_config_overridable :send_request_session
     assert_config_overridable :debug
+    assert_config_overridable :hostname
   end
 
   should "have an api key" do
@@ -124,7 +126,8 @@ class ConfigurationTest < Test::Unit::TestCase
      :ignore_by_filters, :ignore_user_agent, :notifier_name, :notifier_url,
      :notifier_version, :params_filters, :project_root, :port, :protocol,
      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
-     :source_extract_radius, :async, :send_request_session, :debug, :fingerprint].each do |option|
+     :source_extract_radius, :async, :send_request_session, :debug,
+     :fingerprint, :hostname].each do |option|
        assert_equal config[option], hash[option], "Wrong value for #{option}"
     end
   end

@@ -6,7 +6,7 @@ module Honeybadger
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :rescue_rake_exceptions, :source_extract_radius,
-               :send_request_session, :debug, :fingerprint].freeze
+               :send_request_session, :debug, :fingerprint, :hostname].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -104,6 +104,9 @@ module Honeybadger
     # A Proc object used to generate optional fingerprint
     attr_writer :fingerprint
 
+    # Override the hostname of the local server (optional)
+    attr_accessor :hostname
+
     DEFAULT_PARAMS_FILTERS = %w(password password_confirmation).freeze
 
     DEFAULT_BACKTRACE_FILTERS = [
@@ -157,6 +160,7 @@ module Honeybadger
       @source_extract_radius     = 2
       @send_request_session      = true
       @debug                     = false
+      @hostname                  = nil
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

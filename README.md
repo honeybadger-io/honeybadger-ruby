@@ -541,6 +541,19 @@ Honeybadger.configure do |config|
 end
 ```
 
+## Setting the hostname
+
+The hostname for the local server is determined by `Socket.gethostname`
+by default, but can be overridden using the `hostname` configuration
+option:
+
+```ruby
+Honeybadger.configure do |config|
+  # ...
+  config.hostname = `hostname`
+end
+```
+
 ## Testing
 
 When you run your tests, you might notice that the Honeybadger service is recording

@@ -398,7 +398,7 @@ module Honeybadger
     end
 
     def local_hostname
-      Socket.gethostname
+      args[:hostname] || Socket.gethostname
     end
   end
 end
