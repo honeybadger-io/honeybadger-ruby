@@ -130,8 +130,11 @@ module Honeybadger
     end
 
     def context(hash = nil)
-      Thread.current[:honeybadger_context] ||= {}
-      Thread.current[:honeybadger_context].merge!(hash) unless hash.nil?
+      unless hash.nil?
+        Thread.current[:honeybadger_context] ||= {}
+        Thread.current[:honeybadger_context].merge!(hash)
+      end
+
       self
     end
 
