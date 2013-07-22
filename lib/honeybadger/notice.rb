@@ -405,8 +405,21 @@ module Honeybadger
 
     # Internal: Limit size of string to bytes
     #
+    # input - The String to be trimmed.
+    # bytes - The Integer bytes to trim.
+    # block - An optional block used in place of input.
+    #
+    # Examples
+    #
+    #   trimmed = trim_size("Honeybadger doesn't care", 3)
+    #
+    #   trimmed = trim_size(3) do
+    #     "Honeybadger doesn't care"
+    #   end
+    #
     # Returns trimmed String
-    def trim_size(input = nil, bytes, &block)
+    def trim_size(*args, &block)
+      input, bytes = args.first, args.last
       input = yield if block_given?
       input = input.dup
       input = input[0...bytes] if input.respond_to?(:size) && input.size > bytes
