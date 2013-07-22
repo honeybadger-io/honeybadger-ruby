@@ -515,6 +515,14 @@ class NoticeTest < Test::Unit::TestCase
     assert_equal "[possible infinite recursion halted]", notice.parameters[:hash]
   end
 
+  should "trim error message to 1k" do
+    message = 'asdfghjkl'*200
+    e = StandardError.new(message)
+    notice = Honeybadger::Notice.new(:exception => e)
+    assert_operator 1024, :<, message.bytesize
+    assert_equal 1024, notice.error_message.bytesize
+  end
+
   def assert_accepts_exception_attribute(attribute, args = {}, &block)
     exception = build_exception
     block ||= lambda { exception.send(attribute) }

@@ -1,5 +1,9 @@
 ## Honeybadger 1.8.0 (unreleased) ##
 
+* Trim size of notice message to 1k
+
+  *Joshua Wood*
+
 * Make hostname overridable in configuration.
 
   *Joshua Wood*

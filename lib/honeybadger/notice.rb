@@ -105,8 +105,10 @@ module Honeybadger
       self.backtrace        = Backtrace.parse(exception_attribute(:backtrace, caller), :filters => self.backtrace_filters)
       self.fingerprint      = hashed_fingerprint
       self.error_class      = exception_attribute(:error_class) {|exception| exception.class.name }
-      self.error_message    = exception_attribute(:error_message, 'Notification') do |exception|
-        "#{exception.class.name}: #{exception.message}"
+      self.error_message    = trim_size(1024) do
+        exception_attribute(:error_message, 'Notification') do |exception|
+          "#{exception.class.name}: #{exception.message}"
+        end
       end
 
       self.hostname         = local_hostname
@@ -399,6 +401,16 @@ module Honeybadger
 
     def local_hostname
       args[:hostname] || Socket.gethostname
+    end
+
+    # Internal: Limit size of string to bytes
+    #
+    # Returns trimmed String
+    def trim_size(input = nil, bytes, &block)
+      input = yield if block_given?
+      input = input.dup
+      input = input[0...bytes] if input.respond_to?(:size) && input.size > bytes
+      input
     end
   end
 end
