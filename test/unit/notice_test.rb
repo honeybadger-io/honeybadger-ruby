@@ -523,6 +523,13 @@ class NoticeTest < Test::Unit::TestCase
     assert_equal 1024, notice.error_message.bytesize
   end
 
+  should "prefer notice args to exception attributes" do
+    e = RuntimeError.new('Not very helpful')
+    notice = Honeybadger::Notice.new(:exception => e, :error_class => 'MyClass', :error_message => 'Something very specific went wrong.')
+    assert_equal 'MyClass', notice.error_class
+    assert_equal 'Something very specific went wrong.', notice.error_message
+  end
+
   def assert_accepts_exception_attribute(attribute, args = {}, &block)
     exception = build_exception
     block ||= lambda { exception.send(attribute) }

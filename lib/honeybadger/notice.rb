@@ -231,15 +231,18 @@ module Honeybadger
     # Private: Arguments given in the initializer
     attr_accessor :args
 
-    # Private: Gets a property named +attribute+ of an exception, either from an actual
-    # exception or a hash.
+    # Internal: Gets a property named "attribute" of an exception, either from
+    # the #args hash or actual exception (in order of precidence)
     #
-    # If an exception is available, #from_exception will be used. Otherwise,
-    # a key named +attribute+ will be used from the #args.
+    # attribute - A Symbol existing as a key in #args and/or attribute on
+    #             Exception
+    # default   - Default value if no other value is found. (optional)
+    # block     - An optional block which receives an Exception and returns the
+    #             desired value
     #
-    # If no exception or hash key is available, +default+ will be used.
+    # Returns attribute value from args or exception, otherwise default
     def exception_attribute(attribute, default = nil, &block)
-      (exception && from_exception(attribute, &block)) || args[attribute] || default
+      args[attribute] || (exception && from_exception(attribute, &block)) || default
     end
 
     # Private: Gets a property named +attribute+ from an exception.
@@ -326,7 +329,7 @@ module Honeybadger
         # ActionView::Template::Error has its own source_extract method.
         # If present, use that instead.
         if exception.respond_to?(:source_extract)
-          Hash[exception_attribute(:source_extract).split("\n").map do |line|
+          Hash[exception.source_extract.split("\n").map do |line|
             parts = line.split(': ')
             [parts[0].strip, parts[1] || '']
           end]

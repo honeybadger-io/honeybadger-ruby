@@ -1,5 +1,9 @@
 ## Honeybadger 1.8.0 (unreleased) ##
 
+* Prefer notice args to exception attributes
+
+  *Joshua Wood*
+
 * Trim size of notice message to 1k
 
   *Joshua Wood*
