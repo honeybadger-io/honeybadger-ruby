@@ -140,6 +140,7 @@ module Honeybadger
     alias_method :use_system_ssl_cert_chain?, :use_system_ssl_cert_chain
 
     def initialize
+      @api_key                   = ENV['HONEYBADGER_API_KEY']
       @secure                    = true
       @use_system_ssl_cert_chain = false
       @host                      = 'api.honeybadger.io'

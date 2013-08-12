@@ -1,5 +1,9 @@
 ## Honeybadger 1.8.0 (unreleased) ##
 
+* Use HONEYBADGER_API_KEY as default value for api_key
+
+  *Benjamin Curtis*
+
 * Prefer notice args to exception attributes
 
   *Joshua Wood*
