@@ -1,4 +1,4 @@
-## Honeybadger 1.8.0 (unreleased) ##
+## Honeybadger 1.8.0 ##
 
 * Report memory and load stats
 
