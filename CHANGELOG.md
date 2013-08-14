@@ -1,5 +1,9 @@
 ## Honeybadger 1.8.0 (unreleased) ##
 
+* Report memory and load stats
+
+  *Benjamin Curtis*
+
 * Use HONEYBADGER_API_KEY as default value for api_key
 
   *Benjamin Curtis*

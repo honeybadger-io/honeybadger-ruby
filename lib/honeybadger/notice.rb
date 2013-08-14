@@ -79,6 +79,9 @@ module Honeybadger
     # The host name where this error occurred (if any)
     attr_reader :hostname
 
+    # System stats
+    attr_reader :stats
+
     def initialize(args)
       self.args         = args
       self.exception    = args[:exception]
@@ -112,6 +115,7 @@ module Honeybadger
       end
 
       self.hostname         = local_hostname
+      self.stats            = Stats.all
 
       self.source_extract_radius = args[:source_extract_radius] || 2
       self.source_extract        = extract_source_from_backtrace
@@ -164,7 +168,8 @@ module Honeybadger
         :server => {
           :project_root => project_root,
           :environment_name => environment_name,
-          :hostname => hostname
+          :hostname => hostname,
+          :stats => stats
         }
       }
     end
@@ -225,7 +230,7 @@ module Honeybadger
       :error_message, :backtrace_filters, :parameters, :params_filters,
       :environment_filters, :session_data, :project_root, :url, :ignore,
       :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
-      :component, :action, :cgi_data, :environment_name, :hostname, :context,
+      :component, :action, :cgi_data, :environment_name, :hostname, :stats, :context,
       :source_extract, :source_extract_radius, :send_request_session
 
     # Private: Arguments given in the initializer

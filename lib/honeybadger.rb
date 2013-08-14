@@ -9,6 +9,7 @@ require 'honeybadger/backtrace'
 require 'honeybadger/notice'
 require 'honeybadger/rack'
 require 'honeybadger/sender'
+require 'honeybadger/stats'
 
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
