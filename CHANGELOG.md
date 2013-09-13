@@ -8,6 +8,10 @@
 
   *Joshua Wood*
 
+* Allow API key to be overridden by notice.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.9.4 ##
 
 * Fix bug where Faraday was getting a duplicate adapter when building

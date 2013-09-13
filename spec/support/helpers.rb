@@ -43,7 +43,7 @@ module Helpers
   def build_notice_data(exception = nil)
     exception ||= build_exception
     {
-      :api_key       => 'abc123',
+      :api_key       => nil,
       :error_class   => exception.class.name,
       :error_message => "#{exception.class.name}: #{exception.message}",
       :backtrace     => exception.backtrace,

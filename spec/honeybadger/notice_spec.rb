@@ -95,6 +95,16 @@ describe Honeybadger::Notice do
     expect(notice.hostname).to eq 'asdf'
   end
 
+  it "defaults api key to configuration" do
+    notice = build_notice
+    expect(notice.api_key).to eq 'abc123def456'
+  end
+
+  it "sets the api key" do
+    notice = build_notice({ :api_key => 'asdf' })
+    expect(notice.api_key).to eq 'asdf'
+  end
+
   context "custom fingerprint" do
     it "includes nil fingerprint when no fingerprint is specified" do
       notice = build_notice

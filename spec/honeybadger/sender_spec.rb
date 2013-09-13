@@ -10,7 +10,7 @@ describe Honeybadger::Sender do
   end
 
   it "posts to Honeybadger when using an HTTP proxy" do
-    post = double()
+    post = double(:headers => {})
     http = stub_http
     http.stub(:post).and_yield(post).and_return(false)
 
@@ -127,7 +127,7 @@ describe Honeybadger::Sender do
       http = stub_http
       url = "http://api.honeybadger.io:80#{Honeybadger::Sender::NOTICES_URI}"
       uri = URI.parse(url)
-      post = double(:body= => nil)
+      post = double(:body= => nil, :headers => {})
       http.should_receive(:post).and_yield(post)
       post.should_receive(:url).with(uri.path)
       send_exception(:secure => false)
@@ -135,7 +135,7 @@ describe Honeybadger::Sender do
 
     it "post to the right path for ssl" do
       http = stub_http
-      post = double(:body= => nil)
+      post = double(:body= => nil, :headers => {})
       http.should_receive(:post).and_yield(post)
       post.should_receive(:url).with(Honeybadger::Sender::NOTICES_URI)
       send_exception(:secure => true)
