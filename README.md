@@ -219,8 +219,6 @@ directly:
 The fingerprint can be any Ruby object that responds to #to_s, and will
 be sent to Honeybadger as a SHA1 hash.
 
-*Please note that to make use of this option, you must have **strict**
-grouping disabled on your project settings page.*
 
 ## Tracking deploys
 
