@@ -193,16 +193,9 @@ slate.
 
 ## Custom error grouping
 
-By default, we group errors in two ways:
+By default, we group errors by error class, component (aka controller), and the application trace.
 
-1. "Strict" grouping generates a fingerprint using a hash of the error
-   class, component (if available), and the entire backtrace. When the
-   backtrace changes, a new error is created by Honeybadger.
-2. "Loose" grouping uses the error class, component (if available), and
-   the application trace.
-
-You can choose to use strict or loose grouping from your Honeybadger
-project settings page. If you want to use your own grouping strategy,
+If you want to use your own grouping strategy,
 you can, using the `fingerprint` configuration option. When configured,
 a custom fingerprint will be sent with each error notification, and
 we'll use that for grouping errors instead of the default:
