@@ -20,6 +20,13 @@ module Honeybadger
         end
       end
 
+      # Same as the notify_honeybadger method but taking into account the ignored exceptions.
+      def notify_honeybadger_or_ignore(hash_or_exception)
+        unless honeybadger_local_request?
+          Honeybadger.notify_or_ignore(hash_or_exception, honeybadger_request_data)
+        end
+      end
+
       def honeybadger_local_request?
         if defined?(::Rails.application.config)
           ::Rails.application.config.consider_all_requests_local || (request.local? && (!request.env["HTTP_X_FORWARDED_FOR"]))
