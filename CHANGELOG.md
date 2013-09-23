@@ -1,3 +1,9 @@
+## Honeybadger 1.8.1 ##
+
+* notify_honeybadger_or_ignore method for controllers
+
+  *Pierre Olivier Martel*
+
 ## Honeybadger 1.8.0 ##
 
 * Report memory and load stats
