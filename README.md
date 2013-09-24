@@ -130,7 +130,9 @@ end
 
 The `#notify_honeybadger` call will send the notice over to Honeybadger for later
 analysis. While in your controllers you use the `notify_honeybadger` method, anywhere
-else in your code, use `Honeybadger.notify`.
+else in your code, use `Honeybadger.notify`. If you do not want [exception filters](#filtering)
+to be skipped, use `notify_honeybadger_or_ignore` and `Honeybadger.notify_or_ignore` instead.
+
 
 To perform custom error processing after Honeybadger has been notified, define the
 instance method `#rescue_action_in_public_without_honeybadger(exception)` in your
