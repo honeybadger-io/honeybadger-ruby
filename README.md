@@ -107,8 +107,9 @@ end
 
 ## Additional integrations:
 
-* [Catch exceptions in Resque jobs](https://github.com/henrik/resque-honeybadger)
-* [Sidekiq - Simple, efficient message processing for Ruby](https://github.com/mperham/sidekiq) (supports Honeybadger natively)
+* [Catch exceptions in Resque jobs](/henrik/resque-honeybadger)
+* [Sidekiq - Simple, efficient message processing for Ruby](/mperham/sidekiq) (supports Honeybadger natively)
+* [DelayedJob](/honeybadger-io/delayed_job_honeybadger)
 
 ## Usage
 
