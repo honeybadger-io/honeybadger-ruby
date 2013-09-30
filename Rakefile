@@ -55,6 +55,7 @@ end
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 task :default => :spec
+task :test => :spec
 
 Cucumber::Rake::Task.new(:cucumber) do |t|
   t.fork = true
