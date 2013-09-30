@@ -5,9 +5,6 @@ module Honeybadger
                    Errno::EINVAL,
                    Errno::ECONNRESET,
                    EOFError,
-                   Net::HTTPBadResponse,
-                   Net::HTTPHeaderSyntaxError,
-                   Net::ProtocolError,
                    Errno::ECONNREFUSED].freeze
 
     def initialize(options = {})
@@ -34,35 +31,54 @@ module Honeybadger
     #
     # Returns error id from successful response
     def send_to_honeybadger(notice)
-      if api_key.nil?
-        log(:error, "API key not found.")
+      if !Honeybadger.configuration.features['notices']
+        log(:error, "Can't send error report -- the gem has been deactivated by the remote service.  Try restarting your app or contacting support@honeybadger.io.")
         return nil
       end
 
+      return nil unless api_key_ok?
+
       data = notice.is_a?(String) ? notice : notice.to_json
 
-      http     = setup_http_connection
-      headers  = HEADERS
-
-      headers.merge!({ 'X-API-Key' => api_key})
-
       response = begin
-                   http.post(url.path, data, headers)
+                   client.post do |p|
+                     p.url NOTICES_URI
+                     p.body = data
+                   end
                  rescue *HTTP_ERRORS => e
                    log(:error, "Unable to contact the Honeybadger server. HTTP Error=#{e}")
                    nil
                  end
 
-      case response
-      when Net::HTTPSuccess then
+      if response.success?
         log(Honeybadger.configuration.debug ? :info : :debug, "Success: #{response.class}", response, data)
-        JSON.parse(response.body)['id']
+        JSON.parse(response.body).fetch('id')
       else
         log(:error, "Failure: #{response.class}", response, data)
-        nil
       end
+
     rescue => e
       log(:error, "[Honeybadger::Sender#send_to_honeybadger] Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
+      nil
+    end
+
+    def ping(data = {})
+      return nil unless api_key_ok?
+
+      response = client.post do |p|
+        p.url "/v1/ping"
+        p.body = data.to_json
+      end
+
+      if response.success?
+        JSON.parse(response.body)
+      else
+        log(:error, "Ping Failure", response, data)
+        nil
+      end
+
+    rescue => e
+      log(:error, "[Honeybadger::Sender#ping] Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
       nil
     end
 
@@ -84,8 +100,34 @@ module Honeybadger
 
     private
 
-    def url
-      URI.parse("#{protocol}://#{host}:#{port}").merge(NOTICES_URI)
+    def api_key_ok?
+      if api_key.nil? || api_key == ''
+        log(:error, "API key not found.")
+        return nil
+      end
+      true
+    end
+
+    def client
+      request_options = { :timeout => http_read_timeout, :open_timeout => http_open_timeout }
+      request_options.merge!({ :proxy => { :uri => "#{protocol}://#{proxy_host}:#{proxy_port || port}", :user => proxy_user, :password => proxy_pass } }) if proxy_host
+
+      @client ||= Faraday.new(:request => request_options) do |conn|
+        conn.adapter Faraday.default_adapter
+        conn.url_prefix = "#{protocol}://#{host}:#{port}"
+        conn.headers['User-agent'] = "HB-Ruby #{Honeybadger::VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"
+        conn.headers['X-API-Key'] = api_key.to_s
+        conn.headers['Content-Type'] = 'application/json'
+        conn.headers['Accept'] = 'text/json, application/json'
+
+        if secure?
+          conn.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_PEER
+          conn.ssl[:ca_file] = Honeybadger.configuration.ca_bundle_path
+        end
+      end
+    rescue => e
+      log(:error, "[Honeybadger::Sender#client] Failure initializing the HTTP connection.\nError: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
+      raise e
     end
 
     def log(level, message, response = nil, data = nil)
@@ -94,31 +136,8 @@ module Honeybadger
 
       # Log debug information:
       Honeybadger.report_environment_info
-      Honeybadger.report_response_body(response.body) if response && response.respond_to?(:body)
+      Honeybadger.report_response_body(response.body) if response && response.body =~ /\S/
       Honeybadger.write_verbose_log("Notice: #{data}", :debug) if data && Honeybadger.configuration.debug
-    end
-
-    def setup_http_connection
-      http =
-        Net::HTTP::Proxy(proxy_host, proxy_port, proxy_user, proxy_pass).
-          new(url.host, url.port)
-
-      http.read_timeout = http_read_timeout
-      http.open_timeout = http_open_timeout
-
-      if secure?
-        http.use_ssl     = true
-
-        http.ca_file      = Honeybadger.configuration.ca_bundle_path
-        http.verify_mode  = OpenSSL::SSL::VERIFY_PEER
-      else
-        http.use_ssl     = false
-      end
-
-      http
-    rescue => e
-      log(:error, "[Honeybadger::Sender#setup_http_connection] Failure initializing the HTTP connection.\nError: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
-      raise e
     end
   end
 end

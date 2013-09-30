@@ -1,10 +1,10 @@
-require 'test_helper'
+require 'spec_helper'
 require 'honeybadger/rails'
 
-class RailsInitializerTest < Test::Unit::TestCase
+describe Honeybadger::Rails do
   include DefinesConstants
 
-  should "trigger use of Rails' logger if logger isn't set and Rails' logger exists" do
+  it "triggers use of Rails' logger if logger isn't set and Rails' logger exists" do
     rails = Module.new do
       def self.logger
         "RAILS LOGGER"
@@ -12,17 +12,17 @@ class RailsInitializerTest < Test::Unit::TestCase
     end
     define_constant("Rails", rails)
     Honeybadger::Rails.initialize
-    assert_equal "RAILS LOGGER", Honeybadger.logger
+    expect(Honeybadger.logger).to eq "RAILS LOGGER"
   end
 
-  should "trigger use of Rails' default logger if logger isn't set and Rails.logger doesn't exist" do
+  it "triggers use of Rails' default logger if logger isn't set and Rails.logger doesn't exist" do
     define_constant("RAILS_DEFAULT_LOGGER", "RAILS DEFAULT LOGGER")
 
     Honeybadger::Rails.initialize
-    assert_equal "RAILS DEFAULT LOGGER", Honeybadger.logger
+    expect(Honeybadger.logger).to eq "RAILS DEFAULT LOGGER"
   end
 
-  should "allow overriding of the logger if already assigned" do
+  it "allows overriding of the logger if already assigned" do
     define_constant("RAILS_DEFAULT_LOGGER", "RAILS DEFAULT LOGGER")
     Honeybadger::Rails.initialize
 
@@ -30,6 +30,6 @@ class RailsInitializerTest < Test::Unit::TestCase
       config.logger = "OVERRIDDEN LOGGER"
     end
 
-    assert_equal "OVERRIDDEN LOGGER", Honeybadger.logger
+    expect(Honeybadger.logger).to eq "OVERRIDDEN LOGGER"
   end
 end

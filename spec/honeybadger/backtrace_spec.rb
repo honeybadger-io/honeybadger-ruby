@@ -1,8 +1,8 @@
-require 'test_helper'
+require 'spec_helper'
 require 'stringio'
 
-class BacktraceTest < Test::Unit::TestCase
-  should "parse a backtrace into lines" do
+describe Honeybadger::Backtrace do
+  it "parses a backtrace into lines" do
     array = [
       "app/models/user.rb:13:in `magic'",
       "app/controllers/users_controller.rb:8:in `index'"
@@ -11,17 +11,17 @@ class BacktraceTest < Test::Unit::TestCase
     backtrace = Honeybadger::Backtrace.parse(array)
 
     line = backtrace.lines.first
-    assert_equal '13', line.number
-    assert_equal 'app/models/user.rb', line.file
-    assert_equal 'magic', line.method
+    expect(line.number).to eq '13'
+    expect(line.file).to eq 'app/models/user.rb'
+    expect(line.method).to eq 'magic'
 
     line = backtrace.lines.last
-    assert_equal '8', line.number
-    assert_equal 'app/controllers/users_controller.rb', line.file
-    assert_equal 'index', line.method
+    expect(line.number).to eq '8'
+    expect(line.file).to eq 'app/controllers/users_controller.rb'
+    expect(line.method).to eq 'index'
   end
 
-  should "parse a windows backtrace into lines" do
+  it "parses a windows backtrace into lines" do
     array = [
       "C:/Program Files/Server/app/models/user.rb:13:in `magic'",
       "C:/Program Files/Server/app/controllers/users_controller.rb:8:in `index'"
@@ -30,34 +30,34 @@ class BacktraceTest < Test::Unit::TestCase
     backtrace = Honeybadger::Backtrace.parse(array)
 
     line = backtrace.lines.first
-    assert_equal '13', line.number
-    assert_equal 'C:/Program Files/Server/app/models/user.rb', line.file
-    assert_equal 'magic', line.method
+    expect(line.number).to eq '13'
+    expect(line.file).to eq 'C:/Program Files/Server/app/models/user.rb'
+    expect(line.method).to eq 'magic'
 
     line = backtrace.lines.last
-    assert_equal '8', line.number
-    assert_equal 'C:/Program Files/Server/app/controllers/users_controller.rb', line.file
-    assert_equal 'index', line.method
+    expect(line.number).to eq '8'
+    expect(line.file).to eq 'C:/Program Files/Server/app/controllers/users_controller.rb'
+    expect(line.method).to eq 'index'
   end
 
-  should "be equal with equal lines" do
+  it "is equal with equal lines" do
     one = build_backtrace_array
     two = one.dup
 
-    assert_equal Honeybadger::Backtrace.parse(one), Honeybadger::Backtrace.parse(two)
+    expect(Honeybadger::Backtrace.parse(one)).to eq Honeybadger::Backtrace.parse(two)
   end
 
-  should "parse massive one-line exceptions into multiple lines" do
+  it "parses massive one-line exceptions into multiple lines" do
     original_backtrace = Honeybadger::Backtrace.
       parse(["one:1:in `one'\n   two:2:in `two'\n      three:3:in `three`"])
     expected_backtrace = Honeybadger::Backtrace.
       parse(["one:1:in `one'", "two:2:in `two'", "three:3:in `three`"])
 
-    assert_equal expected_backtrace, original_backtrace
+    expect(expected_backtrace).to eq original_backtrace
   end
 
   context "when source file exists" do
-    setup do
+    before(:each) do
       source = <<-RUBY
         $:<<'lib'
         require 'honeybadger'
@@ -76,35 +76,35 @@ class BacktraceTest < Test::Unit::TestCase
       ]
 
       ['app/models/user.rb', 'app/concerns/authenticated_controller.rb', 'app/controllers/users_controller.rb'].each do |file|
-        File.expects(:exists?).with(file).returns true
-        File.expects(:open).with(file).yields StringIO.new(source)
+        File.should_receive(:exists?).with(file).and_return true
+        File.should_receive(:open).with(file).and_yield StringIO.new(source)
       end
 
       @backtrace = Honeybadger::Backtrace.parse(array)
     end
 
-    should "include a snippet from the source file for each line of the backtrace" do
-      assert_equal 4, @backtrace.lines[0].source.keys.size
-      assert_match /\$:<</, @backtrace.lines[0].source[1]
-      assert_match /require/, @backtrace.lines[0].source[2]
-      assert_match /\n/, @backtrace.lines[0].source[3]
-      assert_match /begin/, @backtrace.lines[0].source[4]
+    it "includes a snippet from the source file for each line of the backtrace" do
+      expect(@backtrace.lines[0].source.keys.size).to eq(4)
+      expect(@backtrace.lines[0].source[1]).to match(/\$:<</)
+      expect(@backtrace.lines[0].source[2]).to match(/require/)
+      expect(@backtrace.lines[0].source[3]).to match(/\n/)
+      expect(@backtrace.lines[0].source[4]).to match(/begin/)
 
-      assert_equal 5, @backtrace.lines[1].source.keys.size
-      assert_match /require/, @backtrace.lines[1].source[2]
-      assert_match /\n/, @backtrace.lines[1].source[3]
-      assert_match /begin/, @backtrace.lines[1].source[4]
-      assert_match /StandardError/, @backtrace.lines[1].source[5]
-      assert_match /rescue/, @backtrace.lines[1].source[6]
+      expect(@backtrace.lines[1].source.keys.size).to eq(5)
+      expect(@backtrace.lines[1].source[2]).to match(/require/)
+      expect(@backtrace.lines[1].source[3]).to match(/\n/)
+      expect(@backtrace.lines[1].source[4]).to match(/begin/)
+      expect(@backtrace.lines[1].source[5]).to match(/StandardError/)
+      expect(@backtrace.lines[1].source[6]).to match(/rescue/)
 
-      assert_equal 3, @backtrace.lines[2].source.keys.size
-      assert_match /rescue/, @backtrace.lines[2].source[6]
-      assert_match /Honeybadger/, @backtrace.lines[2].source[7]
-      assert_match /end/, @backtrace.lines[2].source[8]
+      expect(@backtrace.lines[2].source.keys.size).to eq(3)
+      expect(@backtrace.lines[2].source[6]).to match(/rescue/)
+      expect(@backtrace.lines[2].source[7]).to match(/Honeybadger/)
+      expect(@backtrace.lines[2].source[8]).to match(/end/)
     end
   end
 
-  should "fail gracefully when looking up snippet and file doesn't exist" do
+  it "fails gracefully when looking up snippet and file doesn't exist" do
     array = [
       "app/models/user.rb:13:in `magic'",
       "app/controllers/users_controller.rb:8:in `index'"
@@ -112,17 +112,17 @@ class BacktraceTest < Test::Unit::TestCase
 
     backtrace = Honeybadger::Backtrace.parse(array)
 
-    assert_equal backtrace.lines[0].source, {}
-    assert_equal backtrace.lines[1].source, {}
+    expect(backtrace.lines[0].source).to be_empty
+    expect(backtrace.lines[1].source).to be_empty
   end
 
-  should "have an empty application trace by default" do
+  it "has an empty application trace by default" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
-    assert_equal backtrace.application_lines, []
+    expect(backtrace.application_lines).to be_empty
   end
 
   context "with a project root" do
-    setup do
+    before(:each) do
       @project_root = '/some/path'
       Honeybadger.configure {|config| config.project_root = @project_root }
 
@@ -139,27 +139,27 @@ class BacktraceTest < Test::Unit::TestCase
          "/lib/something.rb:41:in `open'"])
     end
 
-    should "filter out the project root" do
-      assert_equal @backtrace_without_root, @backtrace_with_root
+    it "filters out the project root" do
+      expect(@backtrace_without_root).to eq @backtrace_with_root
     end
 
-    should "have an application trace" do
-      assert_equal @backtrace_without_root.application_lines, @backtrace_without_root.lines[0..1]
+    it "has an application trace" do
+      expect(@backtrace_without_root.application_lines).to eq @backtrace_without_root.lines[0..1]
     end
 
-    should "filter ./vendor from application trace" do
-      assert_does_not_contain @backtrace_without_root.application_lines, @backtrace_without_root.lines[2]
+    it "filters ./vendor from application trace" do
+      expect(@backtrace_without_root.application_lines).not_to include(@backtrace_without_root.lines[2])
     end
   end
 
   context "with a project root equals to a part of file name" do
-    setup do
+    before(:each) do
       # Heroku-like
       @project_root = '/app'
       Honeybadger.configure {|config| config.project_root = @project_root }
     end
 
-    should "filter out the project root" do
+    it "filters out the project root" do
       backtrace_with_root = Honeybadger::Backtrace.parse(
         ["#{@project_root}/app/models/user.rb:7:in `latest'",
          "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
@@ -170,16 +170,16 @@ class BacktraceTest < Test::Unit::TestCase
             "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
             "/lib/something.rb:41:in `open'"])
 
-            assert_equal backtrace_without_root, backtrace_with_root
+         expect(backtrace_without_root).to eq backtrace_with_root
     end
   end
 
   context "with a blank project root" do
-    setup do
+    before(:each) do
       Honeybadger.configure {|config| config.project_root = '' }
     end
 
-    should "not filter line numbers with respect to any project root" do
+    it "does not filter line numbers with respect to any project root" do
       backtrace = ["/app/models/user.rb:7:in `latest'",
                    "/app/controllers/users_controller.rb:13:in `index'",
                    "/lib/something.rb:41:in `open'"]
@@ -190,11 +190,11 @@ class BacktraceTest < Test::Unit::TestCase
       backtrace_without_root =
         Honeybadger::Backtrace.parse(backtrace)
 
-      assert_equal backtrace_without_root, backtrace_with_root
+      expect(backtrace_without_root).to eq backtrace_with_root
     end
   end
 
-  should "remove notifier trace" do
+  it "removes notifier trace" do
     inside_notifier  = ['lib/honeybadger.rb:13:in `voodoo`']
     outside_notifier = ['users_controller:8:in `index`']
 
@@ -202,35 +202,33 @@ class BacktraceTest < Test::Unit::TestCase
     with_inside    = Honeybadger::Backtrace.parse(inside_notifier + outside_notifier,
                                                   :filters => default_filters)
 
-    assert_equal without_inside, with_inside
+    expect(without_inside).to eq with_inside
   end
 
-  should "run filters on the backtrace" do
+  it "runs filters on the backtrace" do
     filters = [lambda { |line| line.sub('foo', 'bar') }]
     input = Honeybadger::Backtrace.parse(["foo:13:in `one'", "baz:14:in `two'"],
                                          :filters => filters)
     expected = Honeybadger::Backtrace.parse(["bar:13:in `one'", "baz:14:in `two'"])
-    assert_equal expected, input
+    expect(expected).to eq input
   end
 
-  should "alias #to_ary as #to_a" do
+  it "aliases #to_ary as #to_a" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
 
-    assert_equal backtrace.to_a, backtrace.to_ary
+    expect(backtrace.to_a).to eq backtrace.to_ary
   end
 
-  should "generate json from to_array template" do
+  it "generates json from to_array template" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
     array = [{'foo' => 'bar'}]
-    backtrace.expects(:to_ary).once.returns(array)
+    backtrace.should_receive(:to_ary).once.and_return(array)
     json = backtrace.to_json
 
     payload = nil
-    assert_nothing_raised do
-      payload = JSON.parse(json)
-    end
+    expect { payload = JSON.parse(json) }.not_to raise_error
 
-    assert_equal payload, array
+    expect(payload).to eq array
   end
 
   def build_backtrace_array

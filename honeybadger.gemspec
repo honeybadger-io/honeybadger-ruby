@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.8.0'
-  s.date              = '2013-08-14'
+  s.version           = '1.9.0'
+  s.date              = '2013-09-13'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -19,19 +19,22 @@ Gem::Specification.new do |s|
   s.rdoc_options = ['--charset=UTF-8', '--markup tomdoc']
   s.extra_rdoc_files = %w[README.md MIT-LICENSE]
 
+  s.add_dependency('faraday')
   s.add_dependency('json')
 
   s.add_development_dependency('cucumber',          '~> 1.2.1')
-  s.add_development_dependency('rspec',             '~> 2.12.0')
+  s.add_development_dependency('rspec',             '~> 2.14.0')
   s.add_development_dependency('fakeweb',           '~> 1.3.0')
   s.add_development_dependency('sham_rack',         '~> 1.3.0')
-  s.add_development_dependency('bourne',            '>= 1.0')
-  s.add_development_dependency('shoulda',           '~> 2.11.3')
   s.add_development_dependency('capistrano')
   s.add_development_dependency('rake')
   s.add_development_dependency('sinatra')
   s.add_development_dependency('aruba')
   s.add_development_dependency('appraisal')
+  s.add_development_dependency('guard')
+  s.add_development_dependency('guard-rspec')
+  s.add_development_dependency('fuubar')
+  s.add_development_dependency('growl')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
@@ -84,9 +87,14 @@ Gem::Specification.new do |s|
     generators/honeybadger/templates/initializer.rb
     honeybadger.gemspec
     lib/honeybadger.rb
+    lib/honeybadger/array.rb
     lib/honeybadger/backtrace.rb
     lib/honeybadger/capistrano.rb
     lib/honeybadger/configuration.rb
+    lib/honeybadger/monitor.rb
+    lib/honeybadger/monitor/railtie.rb
+    lib/honeybadger/monitor/sender.rb
+    lib/honeybadger/monitor/worker.rb
     lib/honeybadger/notice.rb
     lib/honeybadger/rack.rb
     lib/honeybadger/rails.rb
@@ -106,18 +114,22 @@ Gem::Specification.new do |s|
     resources/README.md
     resources/ca-bundle.crt
     script/integration_test.rb
-    test/test_helper.rb
-    test/unit/backtrace_test.rb
-    test/unit/capistrano_test.rb
-    test/unit/configuration_test.rb
-    test/unit/honeybadger_tasks_test.rb
-    test/unit/logger_test.rb
-    test/unit/notice_test.rb
-    test/unit/notifier_test.rb
-    test/unit/rack_test.rb
-    test/unit/rails/action_controller_catcher_test.rb
-    test/unit/rails_test.rb
-    test/unit/sender_test.rb
+    spec/honeybadger/backtrace_spec.rb
+    spec/honeybadger/capistrano_spec.rb
+    spec/honeybadger/configuration_spec.rb
+    spec/honeybadger/logger_spec.rb
+    spec/honeybadger/notice_spec.rb
+    spec/honeybadger/notifier_spec.rb
+    spec/honeybadger/rack_spec.rb
+    spec/honeybadger/rails/action_controller_spec.rb
+    spec/honeybadger/rails_spec.rb
+    spec/honeybadger/sender_spec.rb
+    spec/honeybadger_tasks_spec.rb
+    spec/spec_helper.rb
+    spec/support/backtraced_exception.rb
+    spec/support/collected_sender.rb
+    spec/support/defines_constants.rb
+    spec/support/helpers.rb
   ]
   # = MANIFEST =
 

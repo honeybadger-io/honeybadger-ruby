@@ -1,11 +1,10 @@
-require 'test_helper'
+require 'spec_helper'
 
 require 'capistrano/configuration'
 require 'honeybadger/capistrano'
 
-class CapistranoTest < Test::Unit::TestCase
-  def setup
-    super
+describe Honeybadger::Capistrano do
+  before(:each) do
     reset_config
 
     @configuration = Capistrano::Configuration.new
@@ -13,11 +12,11 @@ class CapistranoTest < Test::Unit::TestCase
     @configuration.dry_run = true
   end
 
-  should "define honeybadger:deploy task" do
-    assert_not_nil @configuration.find_task('honeybadger:deploy')
+  it "defines honeybadger:deploy task" do
+    expect(@configuration.find_task('honeybadger:deploy')).not_to be_nil
   end
 
-  should "log when calling honeybadger:deploy task" do
+  it "logs when calling honeybadger:deploy task" do
     @configuration.set(:current_revision, '084505b1c0e0bcf1526e673bb6ac99fbcb18aecc')
     @configuration.set(:repository, 'repository')
     @configuration.set(:current_release, '/home/deploy/rails_app/honeybadger')
@@ -28,7 +27,7 @@ class CapistranoTest < Test::Unit::TestCase
     @configuration.logger = logger
     @configuration.find_and_execute_task('honeybadger:deploy')
 
-    assert io.string.include?('** Notifying Honeybadger of Deploy')
-    assert io.string.include?('** Honeybadger Notification Complete')
+    expect(io.string).to include '** Notifying Honeybadger of Deploy'
+    expect(io.string).to include '** Honeybadger Notification Complete'
   end
 end

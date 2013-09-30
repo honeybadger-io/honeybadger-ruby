@@ -1,7 +1,8 @@
-require 'test_helper'
+require 'spec_helper'
 require 'json'
+require 'rack'
 
-class NoticeTest < Test::Unit::TestCase
+describe Honeybadger::Notice do
   def configure
     Honeybadger::Configuration.new.tap do |config|
       config.api_key = 'abc123def456'
@@ -14,7 +15,7 @@ class NoticeTest < Test::Unit::TestCase
   end
 
   def stub_request(attrs = {})
-    stub('request', { :parameters  => { 'one' => 'two' },
+    double('request', { :parameters  => { 'one' => 'two' },
                       :protocol    => 'http',
                       :host        => 'some.host',
                       :request_uri => '/some/uri',
@@ -24,103 +25,100 @@ class NoticeTest < Test::Unit::TestCase
 
   context '#deliver' do
     context 'sender is configured' do
-      should "deliver to sender" do
+      it "delivers to sender" do
         sender = stub_sender!
         notice = build_notice
-        notice.stubs(:to_json => { :foo => 'bar' })
+        notice.stub(:to_json => { :foo => 'bar' })
 
+        sender.should_receive(:send_to_honeybadger).with(notice)
         notice.deliver
-
-        assert_received(sender, :send_to_honeybadger) { |expect| expect.with(notice) }
       end
     end
 
     context 'sender is not configured' do
-      should "return false" do
+      it "returns false" do
         notice = build_notice
         Honeybadger.sender = nil
-        assert_equal false, notice.deliver
+        expect(notice.deliver).to be_false
       end
     end
   end
 
-  should "generate json from as_json template" do
+  it "generates json from as_json template" do
     notice = build_notice
     hash = {'foo' => 'bar'}
-    notice.expects(:as_json).once.returns(hash)
+    notice.should_receive(:as_json).once.and_return(hash)
     json = notice.to_json
 
     payload = nil
-    assert_nothing_raised do
-      payload = JSON.parse(json)
-    end
+    expect { payload = JSON.parse(json) }.not_to raise_error
 
-    assert_equal payload, hash
+    expect(payload).to eq hash
   end
 
-  should "accept a project root" do
+  it "accepts a project root" do
     project_root = '/path/to/project'
     notice = build_notice(:project_root => project_root)
-    assert_equal project_root, notice.project_root
+    expect(notice.project_root).to eq project_root
   end
 
-  should "accept a component" do
-    assert_equal 'users_controller', build_notice(:component => 'users_controller').controller
+  it "accepts a component" do
+    expect(build_notice(:component => 'users_controller').controller).to eq 'users_controller'
   end
 
-  should "alias the component as controller" do
-    assert_equal 'users_controller', build_notice(:controller => 'users_controller').component
-    assert_equal 'users_controller', build_notice(:component => 'users_controller').controller
+  it "aliases the component as controller" do
+    expect(build_notice(:controller => 'users_controller').component).to eq 'users_controller'
+    expect(build_notice(:controller => 'users_controller').controller).to eq 'users_controller'
   end
 
-  should "accept a action" do
-    assert_equal 'index', build_notice(:action => 'index').action
+  it "accepts a action" do
+    expect(build_notice(:action => 'index').action).to eq 'index'
   end
 
-  should "accept source excerpt radius" do
-    assert_equal 3, build_notice(:source_extract_radius => 3).source_extract_radius
+  it "accepts source excerpt radius" do
+    expect(build_notice(:source_extract_radius => 3).source_extract_radius).to eq 3
   end
 
-  should "accept a url" do
+  it "accepts a url" do
     url = 'http://some.host/uri'
     notice = build_notice(:url => url)
-    assert_equal url, notice.url
+    expect(notice.url).to eq url
   end
 
-  should "set the host name" do
+  it "sets the host name" do
     notice = build_notice
-    assert_equal hostname, notice.hostname
+    expect(notice.hostname).to eq hostname
   end
 
-  should "override the host name" do
+  it "overrides the host name" do
     notice = build_notice({ :hostname => 'asdf' })
-    assert_equal 'asdf', notice.hostname
+    expect(notice.hostname).to eq 'asdf'
   end
 
   context "custom fingerprint" do
-    should "include nil fingerprint when no fingerprint is specified" do
+    it "includes nil fingerprint when no fingerprint is specified" do
       notice = build_notice
-      assert_equal nil, notice.fingerprint
+      expect(notice.fingerprint).to be_nil
     end
 
-    should "accept fingerprint as string" do
+    it "accepts fingerprint as string" do
       notice = build_notice({ :fingerprint => 'foo' })
-      assert_equal '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', notice.fingerprint
+      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
-    should "accept fingerprint responding to #call" do
-      notice = build_notice({ :fingerprint => mock(:call => 'foo') })
-      assert_equal '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', notice.fingerprint
+    it "accepts fingerprint responding to #call" do
+      notice = build_notice({ :fingerprint => double(:call => 'foo') })
+      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
-    should "accept fingerprint using #to_s" do
-      notice = build_notice({ :fingerprint => mock(:to_s => 'foo') })
-      assert_equal '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', notice.fingerprint
+    it "accepts fingerprint using #to_s" do
+      notice = build_notice({ :fingerprint => double(:to_s => 'foo') })
+      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
   end
 
   context "with a backtrace" do
-    setup do
+    before(:each) do
       @source = <<-RUBY
         $:<<'lib'
         require 'honeybadger'
@@ -141,73 +139,69 @@ class NoticeTest < Test::Unit::TestCase
       @exception.set_backtrace(@backtrace_array)
     end
 
-    should "pass its backtrace filters for parsing" do
-      Honeybadger::Backtrace.expects(:parse).with(@backtrace_array, {:filters => 'foo'}).returns(mock(:lines => []))
+    it "passes its backtrace filters for parsing" do
+      Honeybadger::Backtrace.should_receive(:parse).with(@backtrace_array, {:filters => 'foo'}).and_return(double(:lines => []))
 
-      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
+      Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
     end
 
-    should "pass its backtrace line filters for parsing" do
+    it "passes its backtrace line filters for parsing" do
       @backtrace_array.each do |line|
-        Honeybadger::Backtrace::Line.expects(:parse).with(line, {:filters => 'foo'})
+        Honeybadger::Backtrace::Line.should_receive(:parse).with(line, {:filters => 'foo'})
       end
 
-      notice = Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
+      Honeybadger::Notice.new({:exception => @exception, :backtrace_filters => 'foo'})
     end
 
-    should "accept a backtrace from an exception or hash" do
+    it "accepts a backtrace from an exception or hash" do
       backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
       notice_from_exception = build_notice(:exception => @exception)
 
-      assert_equal backtrace,
-        notice_from_exception.backtrace,
-        "backtrace was not correctly set from an exception"
+      expect(notice_from_exception.backtrace).to eq backtrace # backtrace was not correctly set from an exception
 
       notice_from_hash = build_notice(:backtrace => @backtrace_array)
-      assert_equal backtrace,
-        notice_from_hash.backtrace,
-        "backtrace was not correctly set from a hash"
+      expect(notice_from_hash.backtrace).to eq backtrace # backtrace was not correctly set from a hash
     end
 
     context "without application trace" do
-      setup do
+      before(:each) do
         Honeybadger.configuration.project_root = '/foo/bar'
         @string_io = StringIO.new(@source)
-        File.stubs(:exists?).with('my/file/backtrace').returns true
-        File.stubs(:open).with('my/file/backtrace').yields @string_io
+        File.stub(:exists?).with('my/file/backtrace').and_return true
+        File.stub(:open).with('my/file/backtrace').and_yield @string_io
       end
 
-      should "include source extract from backtrace" do
+      it "includes source extract from backtrace" do
         backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
         notice_from_exception = build_notice(:exception => @exception)
         @string_io.rewind
 
-        assert_not_equal notice_from_exception.source_extract, {}, 'Expected backtrace source extract to be found'
-        assert_equal backtrace.lines.first.source, notice_from_exception.source_extract
+        expect(notice_from_exception.source_extract).not_to be_empty # Expected backtrace source extract to be found
+        expect(notice_from_exception.source_extract).to eq backtrace.lines.first.source
       end
     end
 
     context 'with an application trace' do
-      setup do
+      before(:each) do
         Honeybadger.configuration.project_root = 'test/honeybadger/'
 
         @string_io = StringIO.new(@source)
-        File.stubs(:exists?).with('test/honeybadger/rack_test.rb').returns true
-        File.stubs(:open).with('test/honeybadger/rack_test.rb').yields @string_io
+        File.stub(:exists?).with('test/honeybadger/rack_test.rb').and_return true
+        File.stub(:open).with('test/honeybadger/rack_test.rb').and_yield @string_io
       end
 
-      should "include source extract from first line of application trace" do
+      it "includes source extract from first line of application trace" do
         backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
         notice_from_exception = build_notice(:exception => @exception)
         @string_io.rewind
 
-        assert_not_equal notice_from_exception.source_extract, {}, 'Expected backtrace source extract to be found'
-        assert_equal backtrace.lines[1].source, notice_from_exception.source_extract
+        expect(notice_from_exception.source_extract).not_to be_empty # Expected backtrace source extract to be found
+        expect(notice_from_exception.source_extract).to eq backtrace.lines[1].source
       end
     end
   end
 
-  should "Use source extract from view when reporting an ActionView::Template::Error" do
+  it "Uses source extract from view when reporting an ActionView::Template::Error" do
     # TODO: I would like to stub out a real ActionView::Template::Error, but we're
     # currently locked at actionpack 2.3.8. Perhaps if one day we upgrade...
     source = <<-ERB
@@ -217,73 +211,73 @@ class NoticeTest < Test::Unit::TestCase
       4: <div>
     ERB
     exception = build_exception
-    exception.stubs(:source_extract).returns(source)
+    exception.stub(:source_extract).and_return(source)
     notice = Honeybadger::Notice.new({:exception => exception})
 
-    assert_equal({ '1' => '  <%= current_user.name %>', '2' => '</div>', '3' => '', '4' => '<div>'}, notice.source_extract)
+    expect(notice.source_extract).to eq({ '1' => '  <%= current_user.name %>', '2' => '</div>', '3' => '', '4' => '<div>'})
   end
 
-  should "set the error class from an exception or hash" do
+  it "sets the error class from an exception or hash" do
     assert_accepts_exception_attribute :error_class do |exception|
       exception.class.name
     end
   end
 
-  should "set the error message from an exception or hash" do
+  it "sets the error message from an exception or hash" do
     assert_accepts_exception_attribute :error_message do |exception|
       "#{exception.class.name}: #{exception.message}"
     end
   end
 
-  should "accept parameters from a request or hash" do
+  it "accepts parameters from a request or hash" do
     parameters = { 'one' => 'two' }
     notice_from_hash = build_notice(:parameters => parameters)
-    assert_equal notice_from_hash.parameters, parameters
+    expect(notice_from_hash.parameters).to eq parameters
   end
 
-  should "accept session data from a session[:data] hash" do
+  it "accepts session data from a session[:data] hash" do
     data = { 'one' => 'two' }
     notice = build_notice(:session => { :data => data })
-    assert_equal data, notice.session_data
+    expect(notice.session_data).to eq data
   end
 
-  should "accept session data from a session_data hash" do
+  it "accepts session data from a session_data hash" do
     data = { 'one' => 'two' }
     notice = build_notice(:session_data => data)
-    assert_equal data, notice.session_data
+    expect(notice.session_data).to eq data
   end
 
-  should "accept an environment name" do
-    assert_equal 'development', build_notice(:environment_name => 'development').environment_name
+  it "accepts an environment name" do
+    expect(build_notice(:environment_name => 'development').environment_name).to eq 'development'
   end
 
-  should "accept CGI data from a hash" do
+  it "accepts CGI data from a hash" do
     data = { 'string' => 'value' }
     notice = build_notice(:cgi_data => data)
-    assert_equal data, notice.cgi_data, "should take CGI data from a hash"
+    expect(notice.cgi_data).to eq data
   end
 
-  should "accept notifier information" do
+  it "accepts notifier information" do
     params = { :notifier_name    => 'a name for a notifier',
                :notifier_version => '1.0.5',
                :notifier_url     => 'http://notifiers.r.us/download' }
     notice = build_notice(params)
-    assert_equal params[:notifier_name], notice.notifier_name
-    assert_equal params[:notifier_version], notice.notifier_version
-    assert_equal params[:notifier_url], notice.notifier_url
+    expect(notice.notifier_name).to eq params[:notifier_name]
+    expect(notice.notifier_version).to eq params[:notifier_version]
+    expect(notice.notifier_url).to eq params[:notifier_url]
   end
 
-  should "set sensible defaults without an exception" do
+  it "sets sensible defaults without an exception" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
     notice = build_notice(:backtrace => build_backtrace_array)
 
-    assert_equal 'Notification', notice.error_message
+    expect(notice.error_message).to eq 'Notification'
     assert_array_starts_with backtrace.lines, notice.backtrace.lines
-    assert_equal({}, notice.parameters)
-    assert_equal({}, notice.session_data)
+    expect(notice.parameters).to be_empty
+    expect(notice.session_data).to be_empty
   end
 
-  should "use the caller as the backtrace for an exception without a backtrace" do
+  it "uses the caller as the backtrace for an exception without a backtrace" do
     filters = Honeybadger::Configuration.new.backtrace_filters
     backtrace = Honeybadger::Backtrace.parse(caller, :filters => filters)
     notice = build_notice(:exception => StandardError.new('error'), :backtrace => nil)
@@ -291,110 +285,108 @@ class NoticeTest < Test::Unit::TestCase
     assert_array_starts_with backtrace.lines, notice.backtrace.lines
   end
 
-  should "convert unserializable objects to strings" do
+  it "converts unserializable objects to strings" do
     assert_serializes_hash(:parameters)
     assert_serializes_hash(:cgi_data)
     assert_serializes_hash(:session_data)
   end
 
-  should "filter parameters" do
+  it "filters parameters" do
     assert_filters_hash(:parameters)
   end
 
-  should "filter cgi data" do
+  it "filters cgi data" do
     assert_filters_hash(:cgi_data)
   end
 
-  should "filter session" do
+  it "filters session" do
     assert_filters_hash(:session_data)
   end
 
-  should "remove rack.request.form_vars" do
+  it "removes rack.request.form_vars" do
     original = {
       "rack.request.form_vars" => "story%5Btitle%5D=The+TODO+label",
       "abc" => "123"
     }
 
     notice = build_notice(:cgi_data => original)
-    assert_equal({"abc" => "123"}, notice.cgi_data)
+    expect(notice.cgi_data).to eq({"abc" => "123"})
   end
 
-  should "not send empty request data" do
+  it "does not send empty request data" do
     notice = build_notice
-    assert_nil notice.url
-    assert_nil notice.controller
-    assert_nil notice.action
+    notice.url.should be_nil
+    notice.controller.should be_nil
+    notice.action.should be_nil
 
     json = notice.to_json
     payload = JSON.parse(json)
-    assert_nil payload['request']['url']
-    assert_nil payload['request']['component']
-    assert_nil payload['request']['action']
-    assert_nil payload['request']['user']
+    payload['request']['url'].should be_nil
+    payload['request']['component'].should be_nil
+    payload['request']['action'].should be_nil
+    payload['request']['user'].should be_nil
   end
 
   %w(url controller action).each do |var|
-    should "send a request if #{var} is present" do
+    it "sends a request if #{var} is present" do
       notice = build_notice(var.to_sym => 'value')
       json = notice.to_json
       payload = JSON.parse(json)
-      assert_not_nil payload['request']
+      payload['request'].should_not be_nil
     end
   end
 
   %w(parameters cgi_data session_data context).each do |var|
-    should "send a request if #{var} is present" do
+    it "sends a request if #{var} is present" do
       notice = build_notice(var.to_sym => { 'key' => 'value' })
       json = notice.to_json
       payload = JSON.parse(json)
-      assert_not_nil payload['request']
+      payload['request'].should_not be_nil
     end
   end
 
-  should "not ignore an exception not matching ignore filters" do
+  it "does not ignore an exception not matching ignore filters" do
     notice = build_notice(:error_class       => 'ArgumentError',
                           :ignore            => ['Argument'],
-                          :ignore_by_filters => [lambda { |notice| false }])
-    assert !notice.ignore?
+                          :ignore_by_filters => [lambda { |n| false }])
+    expect(notice.ignore?).to be_false
   end
 
-  should "ignore an exception with a matching error class" do
+  it "ignores an exception with a matching error class" do
     notice = build_notice(:error_class => 'ArgumentError',
                           :ignore      => [ArgumentError])
-    assert notice.ignore?
+    expect(notice.ignore?).to be_true
   end
 
-  should "ignore an exception with an equal error class name" do
+  it "ignores an exception with an equal error class name" do
     notice = build_notice(:error_class => 'ArgumentError',
                           :ignore      => ['ArgumentError'])
-    assert notice.ignore?, "Expected ArgumentError to ignore ArgumentError"
+    expect(notice.ignore?).to be_true # Expected ArgumentError to ignore ArgumentError
   end
 
-  should "ignore an exception matching error class name" do
+  it "ignores an exception matching error class name" do
     notice = build_notice(:error_class => 'ArgumentError',
                           :ignore      => [/Error$/])
-    assert notice.ignore?, "Expected /Error$/ to ignore ArgumentError"
+    expect(notice.ignore?).to be_true # Expected /Error$/ to ignore ArgumentError
   end
 
-  should "ignore an exception that inherits from ignored error class" do
+  it "ignores an exception that inherits from ignored error class" do
     class ::FooError < ArgumentError ; end
     notice = build_notice(:exception => FooError.new('Oh noes!'),
                           :ignore      => [ArgumentError])
-    assert notice.ignore?, "Expected ArgumentError to ignore FooError"
+    expect(notice.ignore?).to be_true # Expected ArgumentError to ignore FooError
   end
 
-  should "ignore an exception with a matching filter" do
+  it "ignores an exception with a matching filter" do
     filter = lambda {|notice| notice.error_class == 'ArgumentError' }
     notice = build_notice(:error_class       => 'ArgumentError',
                           :ignore_by_filters => [filter])
-    assert notice.ignore?
+    expect(notice.ignore?).to be_true
   end
 
-  should "not raise without an ignore list" do
+  it "does not raise without an ignore list" do
     notice = build_notice(:ignore => nil, :ignore_by_filters => nil)
-    assert_nothing_raised do
-      notice.ignore?
-    end
+    expect { notice.ignore? }.not_to raise_error
   end
 
   ignored_error_classes = %w(
@@ -407,127 +399,123 @@ class NoticeTest < Test::Unit::TestCase
   )
 
   ignored_error_classes.each do |ignored_error_class|
-    should "ignore #{ignored_error_class} error by default" do
+    it "ignores #{ignored_error_class} error by default" do
       notice = build_notice(:error_class => ignored_error_class)
-      assert notice.ignore?
+      expect(notice.ignore?).to be_true
     end
   end
 
-  should "act like a hash" do
+  it "acts like a hash" do
     notice = build_notice(:error_message => 'some message')
-    assert_equal notice.error_message, notice[:error_message]
+    expect(notice[:error_message]).to eq notice.error_message
   end
 
-  should "return params on notice[:request][:params]" do
+  it "returns params on notice[:request][:params]" do
     params = { 'one' => 'two' }
     notice = build_notice(:parameters => params)
-    assert_equal params, notice[:request][:params]
+    expect(notice[:request][:params]).to eq params
   end
 
-  should "return context on notice[:request][:context]" do
+  it "returns context on notice[:request][:context]" do
     context = { 'one' => 'two' }
     notice = build_notice(:context => context)
-    assert_equal context, notice[:request][:context]
+    expect(notice[:request][:context]).to eq context
   end
 
-  should "merge context from args with context from Honeybadger#context" do
+  it "merges context from args with context from Honeybadger#context" do
     Honeybadger.context({ 'one' => 'two', 'foo' => 'bar' })
     notice = build_notice(:context => { 'three' => 'four', 'foo' => 'baz' })
-    assert_equal({ 'one' => 'two', 'three' => 'four', 'foo' => 'baz' }, notice[:request][:context])
+    expect(notice[:request][:context]).to eq({ 'one' => 'two', 'three' => 'four', 'foo' => 'baz' })
   end
 
-  should "return nil context when context is not set" do
+  it "returns nil context when context is not set" do
     notice = build_notice
-    assert_equal nil, notice[:request][:context]
+    notice[:request][:context].should be_nil
   end
 
-  should "ensure #to_hash is called on objects that support it" do
-    assert_nothing_raised do
-      build_notice(:session => { :object => stub(:to_hash => {}) })
-    end
+  it "ensures #to_hash is called on objects that support it" do
+    expect { build_notice(:session => { :object => double(:to_hash => {}) }) }.not_to raise_error
   end
 
-  should "ensure #to_ary is called on objects that support it" do
-    assert_nothing_raised do
-      build_notice(:session => { :object => stub(:to_ary => {}) })
-    end
+  it "ensures #to_ary is called on objects that support it" do
+    expect { build_notice(:session => { :object => double(:to_ary => {}) }) }.not_to raise_error
   end
 
-  should "extract data from a rack environment hash" do
+  it "extracts data from a rack environment hash" do
     url = "https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2"
     parameters = { 'var' => 'value', 'var2' => 'value2' }
     env = Rack::MockRequest.env_for(url)
 
     notice = build_notice(:rack_env => env)
 
-    assert_equal url, notice.url
-    assert_equal parameters, notice.parameters
-    assert_equal 'GET', notice.cgi_data['REQUEST_METHOD']
+    expect(notice.url).to eq url
+    expect(notice.parameters).to eq parameters
+    expect(notice.cgi_data['REQUEST_METHOD']).to eq 'GET'
   end
 
-  should "extract data from a rack environment hash with action_dispatch info" do
+  it "extracts data from a rack environment hash with action_dispatch info" do
     params = { 'controller' => 'users', 'action' => 'index', 'id' => '7' }
     env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
 
     notice = build_notice(:rack_env => env)
 
-    assert_equal params, notice.parameters
-    assert_equal params['controller'], notice.component
-    assert_equal params['action'], notice.action
+    expect(notice.parameters).to eq params
+    expect(notice.component).to eq params['controller']
+    expect(notice.action).to eq params['action']
   end
 
-  should "extract session data from a rack environment" do
+  it "extracts session data from a rack environment" do
     session_data = { 'something' => 'some value' }
     env = Rack::MockRequest.env_for('/', 'rack.session' => session_data)
 
     notice = build_notice(:rack_env => env)
 
-    assert_equal session_data, notice.session_data
+    expect(notice.session_data).to eq session_data
   end
 
-  should "prefer passed session data to rack session data" do
+  it "prefers passed session data to rack session data" do
     session_data = { 'something' => 'some value' }
     env = Rack::MockRequest.env_for('/')
 
     notice = build_notice(:rack_env => env, :session_data => session_data)
 
-    assert_equal session_data, notice.session_data
+    expect(notice.session_data).to eq session_data
   end
 
   unless Gem::Version.new(Rack.release) < Gem::Version.new('1.2')
-    should "fail gracefully when Rack params cannot be parsed" do
+    it "fails gracefully when Rack params cannot be parsed" do
       rack_env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
       notice = Honeybadger::Notice.new(:rack_env => rack_env)
-      assert_equal 1, notice.params.size
-      assert_match /Failed to call params on Rack::Request/, notice.params[:error]
+      expect(notice.params.size).to eq 1
+      expect(notice.params[:error]).to match(/Failed to call params on Rack::Request/)
     end
   end
 
-  should "not send session data when send_request_session is false" do
+  it "does not send session data when send_request_session is false" do
     notice = build_notice(:send_request_session => false, :session_data => { :foo => :bar })
-    assert_equal nil, notice.session_data
+    notice.session_data.should be_nil
   end
 
-  should "not allow infinite recursion" do
+  it "does not allow infinite recursion" do
     hash = {:a => :a}
     hash[:hash] = hash
     notice = Honeybadger::Notice.new(:parameters => hash)
-    assert_equal "[possible infinite recursion halted]", notice.parameters[:hash]
+    expect(notice.parameters[:hash]).to eq "[possible infinite recursion halted]"
   end
 
-  should "trim error message to 1k" do
+  it "trims error message to 1k" do
     message = 'asdfghjkl'*200
     e = StandardError.new(message)
     notice = Honeybadger::Notice.new(:exception => e)
-    assert_operator 1024, :<, message.bytesize
-    assert_equal 1024, notice.error_message.bytesize
+    message.bytesize.should > 1024
+    expect(notice.error_message.bytesize).to eq 1024
   end
 
-  should "prefer notice args to exception attributes" do
+  it "prefers notice args to exception attributes" do
     e = RuntimeError.new('Not very helpful')
     notice = Honeybadger::Notice.new(:exception => e, :error_class => 'MyClass', :error_message => 'Something very specific went wrong.')
-    assert_equal 'MyClass', notice.error_class
-    assert_equal 'Something very specific went wrong.', notice.error_message
+    expect(notice.error_class).to eq 'MyClass'
+    expect(notice.error_message).to eq 'Something very specific went wrong.'
   end
 
   def assert_accepts_exception_attribute(attribute, args = {}, &block)
@@ -537,14 +525,10 @@ class NoticeTest < Test::Unit::TestCase
 
     notice_from_exception = build_notice(args.merge(:exception => exception))
 
-    assert_equal notice_from_exception.send(attribute),
-                 value,
-                 "#{attribute} was not correctly set from an exception"
+    expect(notice_from_exception.send(attribute)).to eq value
 
     notice_from_hash = build_notice(args.merge(attribute => value))
-    assert_equal notice_from_hash.send(attribute),
-                 value,
-                 "#{attribute} was not correctly set from a hash"
+    expect(notice_from_hash.send(attribute)).to eq value
   end
 
   def assert_serializes_hash(attribute)
@@ -558,11 +542,12 @@ class NoticeTest < Test::Unit::TestCase
       }
       notice = build_notice(attribute => hash)
       hash = notice.send(attribute)
-      assert_equal object.to_s, hash[:strange_object], "objects should be serialized"
-      assert_kind_of Hash, hash[:sub_hash], "subhashes should be kept"
-      assert_equal object.to_s, hash[:sub_hash][:sub_object], "subhash members should be serialized"
-      assert_kind_of Array, hash[:array], "arrays should be kept"
-      assert_equal object.to_s, hash[:array].first, "array members should be serialized"
+      expect(object.to_s).to eq hash[:strange_object] # objects should be serialized
+
+      expect(hash[:sub_hash]).to be_a Hash # subhashes should be kept
+      expect(object.to_s).to eq hash[:sub_hash][:sub_object] # subhash members should be serialized
+      expect(hash[:array]).to be_a Array # arrays should be kept
+      expect(object.to_s).to eq hash[:array].first # array members should be serialized
     end
   end
 
@@ -578,8 +563,7 @@ class NoticeTest < Test::Unit::TestCase
 
     notice = build_notice(:params_filters => filters, attribute => original)
 
-    assert_equal(filtered,
-                 notice.send(attribute))
+    expect(notice.send(attribute)).to eq filtered
   end
 
   def build_backtrace_array

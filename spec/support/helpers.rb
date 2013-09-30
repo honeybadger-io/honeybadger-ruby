@@ -1,63 +1,10 @@
-require 'test/unit'
-
-require 'mocha'
-require 'shoulda'
-require 'bourne'
-require 'rack'
-
-require 'honeybadger'
-
-class BacktracedException < Exception
-  attr_accessor :backtrace
-  def initialize(opts)
-    @backtrace = opts[:backtrace]
-  end
-  def set_backtrace(bt)
-    @backtrace = bt
-  end
-end
-
-module DefinesConstants
-  def setup
-    @defined_constants = []
-  end
-
-  def teardown
-    @defined_constants.each do |constant|
-      Object.__send__(:remove_const, constant)
-    end
-  end
-
-  def define_constant(name, value)
-    Object.const_set(name, value)
-    @defined_constants << name
-  end
-end
-
-class CollectingSender
-  attr_reader :collected
-
-  def initialize
-    @collected = []
-  end
-
-  def send_to_honeybadger(notice)
-    data = notice.respond_to?(:to_json) ? notice.to_json : notice
-    @collected << data
-  end
-end
-
-class Test::Unit::TestCase
-  def teardown
-    Honeybadger.context.clear!
-  end
-
+module Helpers
   def assert_no_difference(expression, message = nil, &block)
     assert_difference expression, 0, message, &block
   end
 
   def stub_sender
-    stub('sender', :send_to_honeybadger => nil)
+    double('sender', :send_to_honeybadger => nil)
   end
 
   def stub_sender!
@@ -66,13 +13,13 @@ class Test::Unit::TestCase
 
   def stub_notice
     Honeybadger::Notice.new({}).tap do |notice|
-      notice.stubs(:ignored? => false, :to_json => '{"foo":"bar"}')
+      notice.stub(:ignored? => false, :to_json => '{"foo":"bar"}')
     end
   end
 
   def stub_notice!
      stub_notice.tap do |notice|
-       Honeybadger::Notice.stubs(:new => notice)
+       Honeybadger::Notice.stub(:new => notice)
     end
   end
 
@@ -112,10 +59,10 @@ class Test::Unit::TestCase
   end
 
   def assert_array_starts_with(expected, actual)
-    assert_respond_to actual, :to_ary
+    expect(actual).to respond_to :to_ary
     array = actual.to_ary.reverse
     expected.reverse.each_with_index do |value, i|
-      assert_equal value, array[i]
+      expect(array[i]).to eq value
     end
   end
 
@@ -132,10 +79,10 @@ class Test::Unit::TestCase
   end
 
   def assert_caught_and_sent
-    assert !Honeybadger.sender.collected.empty?
+    expect(Honeybadger.sender.collected).not_to be_empty
   end
 
   def assert_caught_and_not_sent
-    assert Honeybadger.sender.collected.empty?
+    expect(Honeybadger.sender.collected).to be_empty
   end
 end

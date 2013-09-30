@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'spec_helper'
 
 begin
   require 'active_support'
@@ -6,11 +6,10 @@ begin
   require 'action_controller/test_process'
   require 'honeybadger/rails'
 
-  class ActionControllerCatcherTest < Test::Unit::TestCase
+  describe Honeybadger::Rails::ActionControllerCatcher do
     include DefinesConstants
 
-    def setup
-      super
+    before(:each) do
       reset_config
       Honeybadger.sender = CollectingSender.new
       define_constant('RAILS_ROOT', '/path/to/rails/root')
@@ -45,7 +44,7 @@ begin
     end
 
     def assert_sent_element(value, &block)
-      assert_equal yield(last_sent_notice_payload), stringify_array_elements(value)
+      expect(yield(last_sent_notice_payload)).to eq stringify_array_elements(value)
     end
 
     def stringify_array_elements(data)
@@ -87,13 +86,11 @@ begin
     end
 
     def last_sent_notice_payload
-      assert_not_nil last_sent_notice_json, "No json was sent"
+      expect(last_sent_notice_json).to_not be_nil
       JSON.parse(last_sent_notice_json)
     end
 
-    def process_action(opts = {}, &action)
-      opts[:request]  ||= ActionController::TestRequest.new
-      opts[:response] ||= ActionController::TestResponse.new
+    def build_controller(opts = {}, &action)
       klass = build_controller_class do
         cattr_accessor :local
         define_method(:index, &action)
@@ -101,9 +98,24 @@ begin
           local
         end
       end
+
       if opts[:filters]
-        klass.filter_parameter_logging *opts[:filters]
+        klass.filter_parameter_logging(*opts[:filters])
       end
+
+      klass.consider_all_requests_local = opts[:all_local]
+      klass.local                       = opts[:local]
+      controller = klass.new
+      controller.stub(:rescue_action_in_public_without_honeybadger)
+      controller
+    end
+
+    def process_action(opts = {}, &action)
+      opts[:request]  ||= ActionController::TestRequest.new
+      opts[:response] ||= ActionController::TestResponse.new
+
+      controller = opts[:controller] || build_controller(opts, &action)
+
       if opts[:user_agent]
         if opts[:request].respond_to?(:user_agent=)
           opts[:request].user_agent = opts[:user_agent]
@@ -111,17 +123,16 @@ begin
           opts[:request].env["HTTP_USER_AGENT"] = opts[:user_agent]
         end
       end
+
       if opts[:port]
         opts[:request].port = opts[:port]
       end
-      klass.consider_all_requests_local = opts[:all_local]
-      klass.local                       = opts[:local]
-      controller = klass.new
-      controller.stubs(:rescue_action_in_public_without_honeybadger)
+
       opts[:request].query_parameters = opts[:request].query_parameters.merge(opts[:params] || {})
       opts[:request].session = ActionController::TestSession.new(opts[:session] || {})
       # Prevents request.fullpath from crashing Rails in tests
       opts[:request].env['REQUEST_URI'] = opts[:request].request_uri
+
       controller.process(opts[:request], opts[:response])
       controller
     end
@@ -138,120 +149,120 @@ begin
       process_action(args) { raise "Hello" }
     end
 
-    should "deliver notices from exceptions raised in public requests" do
+    it "delivers notices from exceptions raised in public requests" do
       process_action_with_automatic_notification
       assert_caught_and_sent
     end
 
-    should "not deliver notices from exceptions in local requests" do
+    it "not deliver notices from exceptions in local requests" do
       process_action_with_automatic_notification(:local => true)
       assert_caught_and_not_sent
     end
 
-    should "not deliver notices from exceptions when all requests are local" do
+    it "not deliver notices from exceptions when all requests are local" do
       process_action_with_automatic_notification(:all_local => true)
       assert_caught_and_not_sent
     end
 
-    should "not deliver notices from actions that don't raise" do
+    it "not deliver notices from actions that don't raise" do
       controller = process_action { render :text => 'Hello' }
       assert_caught_and_not_sent
-      assert_equal 'Hello', controller.response.body
+      expect(controller.response.body).to eq 'Hello'
     end
 
-    should "not deliver ignored exceptions raised by actions" do
+    it "not deliver ignored exceptions raised by actions" do
       ignore(RuntimeError)
       process_action_with_automatic_notification
       assert_caught_and_not_sent
     end
 
-    should "deliver ignored exception raised manually" do
+    it "deliver ignored exception raised manually" do
       ignore(RuntimeError)
       process_action_with_manual_notification
       assert_caught_and_sent
     end
 
-    should "deliver manually sent notices in public requests" do
+    it "deliver manually sent notices in public requests" do
       process_action_with_manual_notification
       assert_caught_and_sent
     end
 
-    should "not deliver manually sent notices in local requests" do
+    it "not deliver manually sent notices in local requests" do
       process_action_with_manual_notification(:local => true)
       assert_caught_and_not_sent
     end
 
-    should "not deliver manually sent notices when all requests are local" do
+    it "not deliver manually sent notices when all requests are local" do
       process_action_with_manual_notification(:all_local => true)
       assert_caught_and_not_sent
     end
 
-    should "continue with default behavior after delivering an exception" do
-      controller = process_action_with_automatic_notification(:public => true)
-      # TODO: can we test this without stubbing?
-      assert_received(controller, :rescue_action_in_public_without_honeybadger)
+    it "continue with default behavior after delivering an exception" do
+      controller = build_controller(:public => true) { raise 'cobras!' }
+      controller.should_receive(:rescue_action_in_public_without_honeybadger)
+      process_action(:controller => controller)
     end
 
-    should "not create actions from Honeybadger methods" do
-      controller = build_controller_class.new
-      assert_equal [], Honeybadger::Rails::ActionControllerCatcher.instance_methods
+    it "not create actions from Honeybadger methods" do
+      build_controller_class.new
+      expect(Honeybadger::Rails::ActionControllerCatcher.instance_methods).to be_empty
     end
 
-    should "ignore exceptions when user agent is being ignored by regular expression" do
+    it "ignore exceptions when user agent is being ignored by regular expression" do
       Honeybadger.configuration.ignore_user_agent_only = [/Ignored/]
       process_action_with_automatic_notification(:user_agent => 'ShouldBeIgnored')
       assert_caught_and_not_sent
     end
 
-    should "ignore exceptions when user agent is being ignored by string" do
+    it "ignore exceptions when user agent is being ignored by string" do
       Honeybadger.configuration.ignore_user_agent_only = ['IgnoredUserAgent']
       process_action_with_automatic_notification(:user_agent => 'IgnoredUserAgent')
       assert_caught_and_not_sent
     end
 
-    should "not ignore exceptions when user agent is not being ignored" do
+    it "not ignore exceptions when user agent is not being ignored" do
       Honeybadger.configuration.ignore_user_agent_only = ['IgnoredUserAgent']
       process_action_with_automatic_notification(:user_agent => 'NonIgnoredAgent')
       assert_caught_and_sent
     end
 
-    should "send session data for manual notifications" do
+    it "send session data for manual notifications" do
       data = { 'one' => 'two' }
       process_action_with_manual_notification(:session => data)
       assert_sent_hash(data) { |h| h['request']['session'] }
     end
 
-    should "send session data for automatic notification" do
+    it "send session data for automatic notification" do
       data = { 'one' => 'two' }
       process_action_with_automatic_notification(:session => data)
       assert_sent_hash(data) { |h| h['request']['session'] }
     end
 
-    should "send request data for manual notification" do
+    it "send request data for manual notification" do
       params = { 'controller' => "honeybadger_test", 'action' => "index" }
       controller = process_action_with_manual_notification(:params => params)
       assert_sent_request_info_for controller.request
     end
 
-    should "send request data for manual notification with non-standard port" do
+    it "send request data for manual notification with non-standard port" do
       params = { 'controller' => "honeybadger_test", 'action' => "index" }
       controller = process_action_with_manual_notification(:params => params, :port => 81)
       assert_sent_request_info_for controller.request
     end
 
-    should "send request data for automatic notification" do
+    it "send request data for automatic notification" do
       params = { 'controller' => "honeybadger_test", 'action' => "index" }
       controller = process_action_with_automatic_notification(:params => params)
       assert_sent_request_info_for controller.request
     end
 
-    should "send request data for automatic notification with non-standard port" do
+    it "send request data for automatic notification with non-standard port" do
       params = { 'controller' => "honeybadger_test", 'action' => "index" }
       controller = process_action_with_automatic_notification(:params => params, :port => 81)
       assert_sent_request_info_for controller.request
     end
 
-    should "use standard rails logging filters on params and session and env" do
+    it "use standard rails logging filters on params and session and env" do
       filtered_params = { "abc" => "123",
                           "def" => "456",
                           "ghi" => "[FILTERED]" }
@@ -272,38 +283,36 @@ begin
       assert_sent_hash(filtered_session) { |h| h['request']['session'] }
     end
 
-    should "call session.to_hash if available" do
+    it "call session.to_hash if available" do
       hash_data = {:key => :value}
 
       session = ActionController::TestSession.new
-      ActionController::TestSession.stubs(:new).returns(session)
-      session.stubs(:to_hash).returns(hash_data)
+      ActionController::TestSession.stub(:new).and_return(session)
+      session.stub(:to_hash).and_return(hash_data)
+
+      session.should_receive(:to_hash)
+      session.should_receive(:data).never
 
       process_action_with_automatic_notification
-      assert_received(session, :to_hash)
-      assert_received(session, :data) { |expect| expect.never }
       assert_caught_and_sent
     end
 
-    should "call session.data if session.to_hash is undefined" do
+    it "call session.data if session.to_hash is undefined" do
       hash_data = {:key => :value}
 
       session = ActionController::TestSession.new
-      ActionController::TestSession.stubs(:new).returns(session)
-      session.stubs(:data).returns(hash_data)
-      if session.respond_to?(:to_hash)
-        class << session
-          undef to_hash
-        end
-      end
+      ActionController::TestSession.stub(:new).and_return(session)
+      session.stub(:data).and_return(hash_data)
+      session.stub(:respond_to?).with(:to_hash).and_return(false)
+
+      session.should_receive(:to_hash).never
+      session.should_receive(:data).at_least(1).times
 
       process_action_with_automatic_notification
-      assert_received(session, :to_hash) { |expect| expect.never }
-      assert_received(session, :data) { |expect| expect.at_least_once }
       assert_caught_and_sent
     end
   end
 
 rescue LoadError
-  nil
+ nil
 end

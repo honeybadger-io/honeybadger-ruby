@@ -1,3 +1,5 @@
+require 'socket'
+
 module Honeybadger
   class Configuration
     OPTIONS = [:api_key, :backtrace_filters, :development_environments, :environment_name,
@@ -107,6 +109,12 @@ module Honeybadger
     # Override the hostname of the local server (optional)
     attr_accessor :hostname
 
+    # Send metrics?
+    attr_accessor :metrics
+
+    # Which features the API says we have
+    attr_accessor :features
+
     DEFAULT_PARAMS_FILTERS = %w(password password_confirmation).freeze
 
     DEFAULT_BACKTRACE_FILTERS = [
@@ -161,7 +169,10 @@ module Honeybadger
       @source_extract_radius     = 2
       @send_request_session      = true
       @debug                     = false
-      @hostname                  = nil
+      @hostname                  = Socket.gethostname
+      @metrics                   = true
+      @features                  = { 'notices' => true }
+      @limit                     = nil
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When
@@ -248,7 +259,13 @@ module Honeybadger
     #
     # Returns false if in a development environment, true otherwise.
     def public?
-      !development_environments.include?(environment_name)
+      !development_environments.include?(environment_name) && features['notices']
+    end
+
+    # Public: Determines whether to send metrics
+    #
+    def metrics?
+      public? && @metrics
     end
 
     # Public: Configure async delivery

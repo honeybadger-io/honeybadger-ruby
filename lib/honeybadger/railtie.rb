@@ -1,4 +1,5 @@
 require 'honeybadger'
+require 'honeybadger/monitor'
 require 'rails'
 
 module Honeybadger
@@ -39,6 +40,15 @@ module Honeybadger
         #
         require 'honeybadger/rails/middleware/exceptions_catcher'
         ::ActionDispatch::ShowExceptions.send(:include,Honeybadger::Rails::Middleware::ExceptionsCatcher)
+      end
+
+      if Honeybadger.configuration.public?
+        if result = Honeybadger.sender.ping({ :version => Honeybadger::VERSION, :framework => Honeybadger.configuration.framework, :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
+          Honeybadger.configure(true) do |config|
+            config.features = result['features'] if result['features']
+            config.limit = result['limit'] if result['limit']
+          end
+        end
       end
     end
   end
