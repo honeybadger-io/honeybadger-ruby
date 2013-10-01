@@ -14,6 +14,6 @@ RSpec.configure do |c|
   c.filter_run_excluding :rails2 => !(ENV['BUNDLE_GEMFILE'] =~ /rails2/)
   c.run_all_when_everything_filtered = true
 
-  include Helpers
+  c.include Helpers
   c.after(:each) { Honeybadger.context.clear! }
 end
