@@ -4,16 +4,11 @@ begin
   require 'active_support'
   require 'action_controller'
   require 'action_controller/test_process'
-rescue LoadError
-  nil
-end
+  require 'honeybadger/rails'
 
-require 'honeybadger/rails'
+  describe Honeybadger::Rails::ActionControllerCatcher do
+    include DefinesConstants
 
-describe 'Honeybadger::Rails::ActionControllerCatcher' do
-  include DefinesConstants
-
-  context 'Rails 2.3 is installed', :rails2 => true do
     before(:each) do
       reset_config
       Honeybadger.sender = CollectingSender.new
@@ -317,4 +312,6 @@ describe 'Honeybadger::Rails::ActionControllerCatcher' do
       assert_caught_and_sent
     end
   end
+rescue LoadError
+  nil
 end
