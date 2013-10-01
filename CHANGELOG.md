@@ -4,6 +4,14 @@
 
   *Joshua Wood*
 
+* Added metrics reporting
+
+  *Benjamin Curtis*
+
+* Added ping to Honeybadger on startup
+
+  *Benjamin Curtis*
+
 ## Honeybadger 1.8.1 ##
 
 * notify_honeybadger_or_ignore method for controllers
