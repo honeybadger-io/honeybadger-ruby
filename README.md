@@ -622,8 +622,8 @@ suite against multiple versions of Rails. To run the Cucumber features,
 use `rake appraisal cucumber`. Type `rake -T` for a complete list of
 available tasks.
 
-The unit tests are undergoing some changes, but for now can be run with
-`rake appraisal:rails2.3 test`.
+The RSpec test suite can be run with `rake`, or
+`rake appraisal:rails2.3` to include Rails-specific specs.
 
 ## Credits
 

@@ -11,8 +11,9 @@ RSpec.configure do |c|
 
   c.treat_symbols_as_metadata_keys_with_true_values = true
   c.filter_run :focus => true
+  c.filter_run_excluding :rails2 => !(ENV['BUNDLE_GEMFILE'] =~ /rails2/)
   c.run_all_when_everything_filtered = true
 
-  c.include Helpers
+  include Helpers
   c.after(:each) { Honeybadger.context.clear! }
 end
