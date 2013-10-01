@@ -109,6 +109,7 @@ end
 
 * [Catch exceptions in Resque jobs](https://github.com/henrik/resque-honeybadger)
 * [Sidekiq - Simple, efficient message processing for Ruby](https://github.com/mperham/sidekiq) (supports Honeybadger natively)
+* [DelayedJob](https://github.com/honeybadger-io/delayed_job_honeybadger)
 
 ## Usage
 
@@ -130,7 +131,9 @@ end
 
 The `#notify_honeybadger` call will send the notice over to Honeybadger for later
 analysis. While in your controllers you use the `notify_honeybadger` method, anywhere
-else in your code, use `Honeybadger.notify`.
+else in your code, use `Honeybadger.notify`. If you do not want [exception filters](#filtering)
+to be skipped, use `notify_honeybadger_or_ignore` and `Honeybadger.notify_or_ignore` instead.
+
 
 To perform custom error processing after Honeybadger has been notified, define the
 instance method `#rescue_action_in_public_without_honeybadger(exception)` in your
@@ -193,16 +196,9 @@ slate.
 
 ## Custom error grouping
 
-By default, we group errors in two ways:
+By default, we group errors by error class, component (aka controller), and the application trace.
 
-1. "Strict" grouping generates a fingerprint using a hash of the error
-   class, component (if available), and the entire backtrace. When the
-   backtrace changes, a new error is created by Honeybadger.
-2. "Loose" grouping uses the error class, component (if available), and
-   the application trace.
-
-You can choose to use strict or loose grouping from your Honeybadger
-project settings page. If you want to use your own grouping strategy,
+If you want to use your own grouping strategy,
 you can, using the `fingerprint` configuration option. When configured,
 a custom fingerprint will be sent with each error notification, and
 we'll use that for grouping errors instead of the default:
@@ -226,8 +222,6 @@ directly:
 The fingerprint can be any Ruby object that responds to #to_s, and will
 be sent to Honeybadger as a SHA1 hash.
 
-*Please note that to make use of this option, you must have **strict**
-grouping disabled on your project settings page.*
 
 ## Tracking deploys
 
