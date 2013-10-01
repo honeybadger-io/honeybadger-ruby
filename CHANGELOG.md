@@ -1,3 +1,9 @@
+## Honeybadger 1.9.0 (Unreleased) ##
+
+* Move from TestUnit/shoulda to RSpec.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.8.1 ##
 
 * notify_honeybadger_or_ignore method for controllers
