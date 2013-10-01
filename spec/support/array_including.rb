@@ -7,7 +7,13 @@ module RSpec
         end
 
         def ==(actual)
-          @expected.all? {|v| actual.include?(v) }
+          @expected.all? do |value|
+            if Regexp === value
+              actual.any? {|v| value =~ v }
+            else
+              actual.include?(value)
+            end
+          end
         rescue NoMethodError
           false
         end

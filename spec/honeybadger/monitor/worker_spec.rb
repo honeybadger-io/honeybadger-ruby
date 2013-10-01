@@ -130,7 +130,7 @@ describe Honeybadger::Monitor::Worker do
       end
 
       it 'includes the stddev value' do
-        instance.sender.should_receive(:send_metrics).with(hash_including(:metrics => array_including(['test:stddev 3.0276503540974917'])))
+        instance.sender.should_receive(:send_metrics).with(hash_including(:metrics => array_including(/test:stddev 3.027/)))
       end
 
       it 'includes a count of total metrics' do
