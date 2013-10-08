@@ -1,4 +1,4 @@
-## Honeybadger 1.9.0 (Unreleased) ##
+## Honeybadger 1.9.0 ##
 
 * Move from TestUnit/shoulda to RSpec.
 

@@ -113,7 +113,7 @@ Feature: Install the Gem in a Rails application
       """
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
-    Then the output should match /\[Honeybadger\] Notifier (?:[\d\.]+) ready to catch errors/
+    Then the output should match /\[Honeybadger\] Notifier (?:\S+) ready to catch errors/
     Then the output should not contain "[Honeybadger] Success"
     Then the output should not contain "[Honeybadger] Environment Info"
     Then the output should not contain "[Honeybadger] Response from Honeybadger"

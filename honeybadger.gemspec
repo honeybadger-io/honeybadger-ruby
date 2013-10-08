@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.9.0'
-  s.date              = '2013-09-13'
+  s.version           = '1.9.0.beta1'
+  s.date              = '2013-10-08'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -118,6 +118,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/capistrano_spec.rb
     spec/honeybadger/configuration_spec.rb
     spec/honeybadger/logger_spec.rb
+    spec/honeybadger/monitor/worker_spec.rb
     spec/honeybadger/notice_spec.rb
     spec/honeybadger/notifier_spec.rb
     spec/honeybadger/rack_spec.rb
@@ -126,6 +127,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/sender_spec.rb
     spec/honeybadger_tasks_spec.rb
     spec/spec_helper.rb
+    spec/support/array_including.rb
     spec/support/backtraced_exception.rb
     spec/support/collected_sender.rb
     spec/support/defines_constants.rb
