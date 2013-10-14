@@ -46,7 +46,6 @@ module Honeybadger
         if result = Honeybadger.sender.ping({ :version => Honeybadger::VERSION, :framework => Honeybadger.configuration.framework, :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
           Honeybadger.configure(true) do |config|
             config.features = result['features'] if result['features']
-            config.limit = result['limit'] if result['limit']
           end
         end
       end
