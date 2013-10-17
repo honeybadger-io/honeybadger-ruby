@@ -19,31 +19,6 @@ module Honeybadger
             end
           end
 
-          ActiveSupport::Notifications.subscribe(/render_(partial|template)\.action_view\Z/) do |*args|
-            event = ActiveSupport::Notifications::Event.new(*args)
-            if !event.name.start_with?('!')
-              metric = event.name.split('.').first
-              file = event.payload[:identifier].gsub(::Rails.root.to_s + File::SEPARATOR,'').gsub('.', '_')
-              Monitor.worker.timing("app.view.#{metric}.#{file}", event.duration)
-            end
-          end
-
-          ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
-            event = ActiveSupport::Notifications::Event.new(*args)
-            if event.name != 'SCHEMA' && !event.name == 'CACHE'
-              metric = event.payload[:sql].strip.split(' ', 2).first.downcase
-              Monitor.worker.timing("app.active_record.#{metric}", event.duration)
-            end
-          end
-
-          ActiveSupport::Notifications.subscribe(/(deliver|receive).action_mailer\Z/) do |*args|
-            event = ActiveSupport::Notifications::Event.new(*args)
-            if !event.name.start_with?('!')
-              metric = event.name.split('.').first
-              Monitor.worker.timing("app.mail.#{metric}", event.duration)
-            end
-          end
-
         end
       end
 
