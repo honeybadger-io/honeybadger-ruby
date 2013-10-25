@@ -5,7 +5,7 @@ module Honeybadger
         return unless Honeybadger.configuration.metrics?
 
         if !Honeybadger.configuration.features['metrics']
-          log(:error, "Can't send metrics -- the gem has been deactivated by the remote service.  Try restarting your app or contacting support@honeybadger.io.")
+          log(:info, "The optional metrics feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.")
           Honeybadger.configuration.metrics = false
           return nil
         end
