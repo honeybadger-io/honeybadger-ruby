@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    honeybadger (1.9.0)
+    honeybadger (1.9.1)
       faraday
       json
 
