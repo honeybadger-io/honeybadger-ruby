@@ -1,7 +1,7 @@
 PATH
   remote: /Users/josh/code/honeybadger-ruby
   specs:
-    honeybadger (1.9.0.beta1)
+    honeybadger (1.9.2)
       faraday
       json
 
