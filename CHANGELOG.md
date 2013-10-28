@@ -1,5 +1,9 @@
 ## Honeybadger 1.9.0 ##
 
+* Fix bug causing Honeybadger#Sender to omit proxy configuration.
+
+## Honeybadger 1.9.0 ##
+
 * Move from TestUnit/shoulda to RSpec.
 
   *Joshua Wood*
