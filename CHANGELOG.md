@@ -1,4 +1,4 @@
-## Honeybadger 1.9.0 ##
+## Honeybadger 1.9.2 ##
 
 * Fix bug causing Honeybadger#Sender to omit proxy configuration.
 
