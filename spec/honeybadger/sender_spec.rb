@@ -17,7 +17,7 @@ describe Honeybadger::Sender do
     post.should_receive(:body=).with('asdf')
 
     Faraday.should_receive(:new).
-      with(hash_including(:request => hash_including({ :proxy => { :uri => 'https://some.host:88', :user => 'login', :password => 'passwd' } }))).and_return(http)
+      with(hash_including(:proxy => { :uri => 'https://some.host:88', :user => 'login', :password => 'passwd' })).and_return(http)
 
     send_exception(:proxy_host => 'some.host',
                    :proxy_port => 88,

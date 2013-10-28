@@ -108,11 +108,18 @@ module Honeybadger
       true
     end
 
-    def client
-      request_options = { :timeout => http_read_timeout, :open_timeout => http_open_timeout }
-      request_options.merge!({ :proxy => { :uri => "#{protocol}://#{proxy_host}:#{proxy_port || port}", :user => proxy_user, :password => proxy_pass } }) if proxy_host
+    def proxy_options
+      if proxy_host
+        { :uri => "#{protocol}://#{proxy_host}:#{proxy_port || port}", :user => proxy_user, :password => proxy_pass }
+      end
+    end
 
-      @client ||= Faraday.new(:request => request_options) do |conn|
+    def request_options
+      { :timeout => http_read_timeout, :open_timeout => http_open_timeout }
+    end
+
+    def client
+      @client ||= Faraday.new(:request => request_options, :proxy => proxy_options) do |conn|
         conn.adapter Faraday.default_adapter
         conn.url_prefix = "#{protocol}://#{host}:#{port}"
         conn.headers['User-agent'] = "HB-Ruby #{Honeybadger::VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"
