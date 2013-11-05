@@ -14,7 +14,7 @@ require 'honeybadger/stats'
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
 module Honeybadger
-  VERSION = '1.9.2'
+  VERSION = '1.9.3'
   LOG_PREFIX = "** [Honeybadger] "
 
   HEADERS = {
