@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rspec',             '~> 2.14.0')
   s.add_development_dependency('fakeweb',           '~> 1.3.0')
   s.add_development_dependency('sham_rack',         '~> 1.3.0')
-  s.add_development_dependency('capistrano')
+  s.add_development_dependency('capistrano',        '~> 2.0')
   s.add_development_dependency('rake')
   s.add_development_dependency('sinatra')
   s.add_development_dependency('aruba')
