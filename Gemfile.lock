@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     honeybadger (1.9.2)
-      faraday
+      faraday (~> 0.7)
       json
 
 GEM

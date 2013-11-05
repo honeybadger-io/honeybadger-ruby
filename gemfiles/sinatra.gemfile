@@ -4,5 +4,6 @@ source "https://rubygems.org"
 
 gem "sinatra"
 gem "honeybadger", :path=>"../"
+gem "faraday", "~> 0.7.0"
 
 gemspec :path=>"../"

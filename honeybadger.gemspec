@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.9.2'
-  s.date              = '2013-10-28'
+  s.date              = '2013-11-05'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ['--charset=UTF-8', '--markup tomdoc']
   s.extra_rdoc_files = %w[README.md MIT-LICENSE]
 
-  s.add_dependency('faraday')
+  s.add_dependency('faraday', '~> 0.7')
   s.add_dependency('json')
 
   s.add_development_dependency('cucumber',          '~> 1.2.1')

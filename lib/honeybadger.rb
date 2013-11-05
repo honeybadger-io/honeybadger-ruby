@@ -1,4 +1,5 @@
 require 'faraday'
+require 'timeout'
 require 'json'
 require 'digest'
 require 'logger'

@@ -1,17 +1,6 @@
 require 'spec_helper'
 
 describe Honeybadger do
-  def stub_http(options = {})
-    response = options[:response] || Faraday::Response.new(:status => 200)
-    response.stub(:body => options.include?(:body) ? options[:body] : '{"id":"1234"}')
-    http = double(:post => response,
-                :adapter => nil,
-                :url_prefix= => nil,
-                :headers => nil)
-    Faraday.stub(:new => http)
-    http
-  end
-
   def send_notice
     Honeybadger.sender.send_to_honeybadger('data')
   end

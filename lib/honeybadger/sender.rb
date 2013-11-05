@@ -119,7 +119,7 @@ module Honeybadger
     end
 
     def client
-      @client ||= Faraday.new(:request => request_options, :proxy => proxy_options) do |conn|
+      @client ||= Faraday.new(:request => request_options, :proxy => proxy_options).tap do |conn|
         conn.adapter Faraday.default_adapter
         conn.url_prefix = "#{protocol}://#{host}:#{port}"
         conn.headers['User-agent'] = "HB-Ruby #{Honeybadger::VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"

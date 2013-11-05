@@ -5,9 +5,7 @@ describe Honeybadger::Sender do
 
   it "posts to Honeybadger when using an HTTP proxy" do
     post = double()
-    http = double(:adapter     => nil,
-                  :url_prefix= => nil,
-                  :headers     => nil)
+    http = stub_http
     http.stub(:post).and_yield(post).and_return(false)
 
     url = "http://api.honeybadger.io:80#{Honeybadger::Sender::NOTICES_URI}"
@@ -142,7 +140,7 @@ describe Honeybadger::Sender do
 
       real_http = Faraday.new(:url => url)
       real_http.stub(:post => nil)
-      Faraday.stub(:new).and_yield(real_http)
+      Faraday.stub(:new).and_return(real_http)
 
       File.stub(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(false)
 
@@ -234,16 +232,5 @@ describe Honeybadger::Sender do
     notice = args.delete(:notice) || build_notice_data
     sender = args.delete(:sender) || build_sender(args)
     sender.send_to_honeybadger(notice)
-  end
-
-  def stub_http(options = {})
-    response = options[:response] || Faraday::Response.new(:status => 200)
-    response.stub(:body => options[:body] || '{"id":"1234"}')
-    http = double(:post => response,
-                :adapter => nil,
-                :url_prefix= => nil,
-                :headers => nil)
-    Faraday.stub(:new => http)
-    http
   end
 end

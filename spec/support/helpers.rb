@@ -23,6 +23,16 @@ module Helpers
     end
   end
 
+  def stub_http(options = {})
+    response = options[:response] || Faraday::Response.new(:status => 200)
+    response.stub(:body => options[:body] || '{"id":"1234"}')
+
+    http = Faraday.new
+    http.stub(:post).and_return(response)
+    Faraday.stub(:new => http)
+    http
+  end
+
   def reset_config
     Honeybadger.configuration = nil
     Honeybadger.configure do |config|
