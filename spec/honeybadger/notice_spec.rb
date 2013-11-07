@@ -433,6 +433,13 @@ describe Honeybadger::Notice do
     notice[:request][:context].should be_nil
   end
 
+  it "allows falsey values in context" do
+    Honeybadger.context({ :debuga => true, :debugb => false })
+    notice = build_notice
+    hash = JSON.parse(notice.to_json)
+    expect(hash['request']['context']).to eq({ 'debuga' => true, 'debugb' => false })
+  end
+
   it "ensures #to_hash is called on objects that support it" do
     expect { build_notice(:session => { :object => double(:to_hash => {}) }) }.not_to raise_error
   end
