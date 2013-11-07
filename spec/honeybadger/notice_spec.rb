@@ -313,6 +313,56 @@ describe Honeybadger::Notice do
     assert_filters_hash(:session_data)
   end
 
+  describe 'url' do
+    let(:params_filters) { [] }
+    let(:notice) { build_notice(:params_filters => params_filters, :url => url) }
+
+    context 'filtered params in query' do
+      let(:params_filters) { [:bar] }
+      let(:url) { 'https://www.honeybadger.io/?foo=1&bar=2&baz=3' }
+
+      it 'filters query' do
+        expect(notice.url).to eq 'https://www.honeybadger.io/?foo=1&bar=[FILTERED]&baz=3'
+      end
+    end
+
+    context 'malformed query' do
+      let(:url) { 'https://www.honeybadger.io/?foobar12' }
+
+      it 'maintains query' do
+        expect(notice.url).to eq url
+      end
+    end
+
+    context 'no query' do
+      let(:url) { 'https://www.honeybadger.io' }
+
+      it 'keeps original URL' do
+        expect(notice.url).to eq url
+      end
+    end
+
+    context 'malformed url' do
+      let(:url) { 'http s ! honeybadger' }
+
+      before do
+        expect { URI.parse(url) }.to raise_error
+      end
+
+      it 'keeps original URL' do
+        expect(notice.url).to eq url
+      end
+    end
+
+    context 'complex url' do
+      let(:url) { 'https://foo:bar@www.honeybadger.io:123/asdf/?foo=1&bar=2&baz=3' }
+
+      it 'keeps original URL' do
+        expect(notice.url).to eq url
+      end
+    end
+  end
+
   it "removes rack.request.form_vars" do
     original = {
       "rack.request.form_vars" => "story%5Btitle%5D=The+TODO+label",

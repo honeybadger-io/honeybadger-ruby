@@ -130,6 +130,7 @@ module Honeybadger
       find_session_data
       clean_params
       clean_rack_request_data
+      clean_url
       set_context
     end
 
@@ -296,7 +297,21 @@ module Honeybadger
       end
     end
 
-    # Private: Replaces the contents of params that match params_filters.
+    # Internal: Filters query parameters from URL
+    #
+    # Returns nothing
+    def clean_url
+      uri = URI.parse(url)
+      return unless uri.query =~ /=/
+
+      filtered_hash = filter(Hash[uri.query.split('&').map { |e| e.split('=') }])
+      uri.query = filtered_hash.to_a.map { |e| e.join('=') }.join('&')
+      self.url = uri.to_s
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    # Internal: Replaces the contents of params that match params_filters.
     # TODO: extract this to a different class
     def clean_params
       clean_unserializable_data_from(:parameters)
