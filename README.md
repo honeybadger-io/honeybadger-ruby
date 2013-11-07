@@ -578,6 +578,37 @@ Honeybadger.configure do |config|
 end
 ```
 
+## User Informer
+
+When an error is sent to Honeybadger, our API returns a unique UUID for
+the occurrence within your project. This UUID can be automatically
+displayed for reference on Rails error pages (e.g. `public/500.html`) or
+any rack output by including the `Honeybadger::UserInformer` middleware.
+
+To include this output, you must reference a special tag within your
+document or response body:
+
+```html
+<!-- HONEYBADGER ERROR -->
+```
+
+By default, we will replace this tag with:
+
+```
+Honeybadger Error {{error_id}}
+```
+
+Where `{{error_id}}` is the UUID. You can customize this output by
+overriding the `user_information` option in your Honeybadger
+initializer:
+
+```ruby
+Honeybadger.configure do |config|
+  # ...
+  config.user_information = "Error ID: {{error_id}}"
+end
+```
+
 ## Troubleshooting
 
 By default, Honeybadger is quiet when your log level is set to INFO

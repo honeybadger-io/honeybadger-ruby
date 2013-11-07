@@ -1,3 +1,9 @@
+## Honeybadger 1.9.5 (unreleased) ##
+
+* Bring back the UserInformer
+
+  *Joshua Wood*
+
 ## Honeybadger 1.9.4 ##
 
 * Fix bug where Faraday was getting a duplicate adapter when building

@@ -119,6 +119,16 @@ When /^I perform a request to "([^\"]*)"$/ do |uri|
   perform_request(uri)
 end
 
+When /^I configure the user informer/ do
+  error_page = File.join(rails_root, 'public', '500.html')
+  File.open(error_page, "r+") do |file|
+    content = file.read
+    content.gsub!('</body>', '<!-- HONEYBADGER ERROR --></body>')
+    file.rewind
+    file.write(content)
+  end
+end
+
 When /^I route "([^\"]*)" to "([^\"]*)"$/ do |path, controller_action_pair|
   route = if rails2?
             controller, action = controller_action_pair.split('#')
