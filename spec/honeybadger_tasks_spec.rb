@@ -2,9 +2,6 @@ require 'spec_helper'
 require 'rubygems'
 
 require File.expand_path('../../lib/honeybadger_tasks', __FILE__)
-require 'fakeweb'
-
-FakeWeb.allow_net_connect = false
 
 describe HoneybadgerTasks do
   def successful_response(body = "")

@@ -3,6 +3,12 @@ require 'spec_helper'
 describe Honeybadger::Sender do
   before(:each) { reset_config }
 
+  it "it makes a single request when sending notices" do
+    stub_request(:post, /api\.honeybadger\.io/)
+    Honeybadger.notify(RuntimeError.new('oops!'))
+    assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1
+  end
+
   it "posts to Honeybadger when using an HTTP proxy" do
     post = double()
     http = stub_http

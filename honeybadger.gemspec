@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.9.3'
-  s.date              = '2013-11-05'
+  s.date              = '2013-11-12'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -24,7 +24,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('cucumber',          '~> 1.2.1')
   s.add_development_dependency('rspec',             '~> 2.14.0')
-  s.add_development_dependency('fakeweb',           '~> 1.3.0')
   s.add_development_dependency('sham_rack',         '~> 1.3.0')
   s.add_development_dependency('capistrano',        '~> 2.0')
   s.add_development_dependency('rake')
@@ -35,6 +34,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('guard-rspec')
   s.add_development_dependency('fuubar')
   s.add_development_dependency('growl')
+  s.add_development_dependency('webmock')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE

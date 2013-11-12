@@ -1,3 +1,10 @@
+## Honeybadger 1.9.4 ##
+
+* Fix bug where Faraday was getting a duplicate adapter when building
+  client.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.9.3 ##
 
 * Lock gemspec to faraday ~>0.7 to fix yield discrepancy between 0.7 and
