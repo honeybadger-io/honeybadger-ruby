@@ -360,7 +360,11 @@ module Honeybadger
 
     def filter_key?(key)
       params_filters.any? do |filter|
-        key.to_s.eql?(filter.to_s)
+        if filter.is_a?(Regexp)
+          key.to_s =~ filter
+        else
+          key.to_s.eql?(filter.to_s)
+        end
       end
     end
 
