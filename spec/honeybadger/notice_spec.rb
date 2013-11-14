@@ -559,14 +559,20 @@ describe Honeybadger::Notice do
   end
 
   def assert_filters_hash(attribute)
-    filters  = ["abc", :def]
+    filters  = ["abc", :def, /private/, /^foo_.*$/]
     original = { 'abc' => "123", 'def' => "456", 'ghi' => "789", 'nested' => { 'abc' => '100' },
-      'something_with_abc' => 'match the entire string'}
+      'something_with_abc' => 'match the entire string', 'private_param' => 'prra',
+      'foo_param' => 'bar', 'not_foo_param' => 'baz', 'nested_foo' => { 'foo_nested' => 'bla'} }
     filtered = { 'abc'    => "[FILTERED]",
                  'def'    => "[FILTERED]",
                  'something_with_abc' => "match the entire string",
                  'ghi'    => "789",
-                 'nested' => { 'abc' => '[FILTERED]' } }
+                 'nested' => { 'abc' => '[FILTERED]' },
+                 'private_param' => '[FILTERED]',
+                 'foo_param' => '[FILTERED]',
+                 'not_foo_param' => 'baz',
+                 'nested_foo' => { 'foo_nested' => '[FILTERED]'}
+    }
 
     notice = build_notice(:params_filters => filters, attribute => original)
 

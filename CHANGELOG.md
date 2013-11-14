@@ -1,5 +1,9 @@
 ## Honeybadger 1.9.5 (unreleased) ##
 
+* Added params filtering by regex
+
+  *Octavian Neamtu*
+
 * Bring back the UserInformer
 
   *Joshua Wood*
