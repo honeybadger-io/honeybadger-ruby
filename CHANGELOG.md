@@ -1,4 +1,4 @@
-## Honeybadger 1.9.5 (unreleased) ##
+## Honeybadger 1.10.0 (unreleased) ##
 
 * Added params filtering by regex
 
