@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.9.4'
-  s.date              = '2013-11-12'
+  s.date              = '2013-11-13'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -22,16 +22,16 @@ Gem::Specification.new do |s|
   s.add_dependency('faraday', '~> 0.7')
   s.add_dependency('json')
 
-  s.add_development_dependency('cucumber',          '~> 1.2.1')
-  s.add_development_dependency('rspec',             '~> 2.14.0')
-  s.add_development_dependency('sham_rack',         '~> 1.3.0')
-  s.add_development_dependency('capistrano',        '~> 2.0')
+  s.add_development_dependency('cucumber',   '~> 1.2.1')
+  s.add_development_dependency('rspec',      '~> 2.14.0')
+  s.add_development_dependency('sham_rack',  '~> 1.3.0')
+  s.add_development_dependency('capistrano', '~> 2.0')
+  s.add_development_dependency('guard',      '~> 1.8.3')
+  s.add_development_dependency('guard-rspec')
   s.add_development_dependency('rake')
   s.add_development_dependency('sinatra')
   s.add_development_dependency('aruba')
   s.add_development_dependency('appraisal')
-  s.add_development_dependency('guard')
-  s.add_development_dependency('guard-rspec')
   s.add_development_dependency('fuubar')
   s.add_development_dependency('growl')
   s.add_development_dependency('webmock')
@@ -75,8 +75,6 @@ Gem::Specification.new do |s|
     gemfiles/rails3.2.gemfile.lock
     gemfiles/rails4.gemfile
     gemfiles/rails4.gemfile.lock
-    gemfiles/rails_edge.gemfile
-    gemfiles/rails_edge.gemfile.lock
     gemfiles/rake.gemfile
     gemfiles/rake.gemfile.lock
     gemfiles/sinatra.gemfile
