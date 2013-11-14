@@ -6,9 +6,3 @@ rvm:
   - 2.0.0
   - jruby-18mode
   - jruby-19mode
-before_script:
-  - bundle install --gemfile='gemfiles/rails2.3.gemfile'
-  - bundle install --gemfile='gemfiles/rack.gemfile'
-script:
-  - rake appraisal:rack test
-  - rake appraisal:rails2.3 test
