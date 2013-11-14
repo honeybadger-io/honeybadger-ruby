@@ -523,6 +523,20 @@ Honeybadger.configure do |config|
 end
 ```
 
+You can also add a regex to filter out sensitive parameters:
+
+```ruby
+Honeybadger.configure do |config|
+  config.api_key      = '1234567890abcdef'
+  config.params_filters << /credit_card_number/
+end
+```
+
+This is especially useful when your request parameters sometimes include search keys like
+'credit_card_number_begins_with', 'credit_card_matches', etc. to exclude a whole class of parameters.
+
+The param values for 'password' and 'password_confirmation' are always filtered out by default.
+
 Note that, when rescuing exceptions within an ActionController method,
 honeybadger will reuse filters specified by #filter_parameter_logging.
 
