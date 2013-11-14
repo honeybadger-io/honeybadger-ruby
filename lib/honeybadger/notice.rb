@@ -89,7 +89,6 @@ module Honeybadger
       self.args         = args
       self.exception    = args[:exception]
       self.project_root = args[:project_root]
-      self.url          = args[:url] || rack_env(:url)
 
       self.notifier_name    = args[:notifier_name]
       self.notifier_version = args[:notifier_version]
@@ -117,6 +116,7 @@ module Honeybadger
         end
       end
 
+      self.url              = filter_url(args[:url] || rack_env(:url))
       self.hostname         = local_hostname
       self.stats            = Stats.all
       self.api_key          = args[:api_key]
@@ -130,7 +130,6 @@ module Honeybadger
       find_session_data
       clean_params
       clean_rack_request_data
-      clean_url
       set_context
     end
 
@@ -299,16 +298,19 @@ module Honeybadger
 
     # Internal: Filters query parameters from URL
     #
-    # Returns nothing
-    def clean_url
-      uri = URI.parse(url)
-      return unless uri.query =~ /=/
+    # url - String URL to filter
+    #
+    # Returns filtered String URL
+    def filter_url(url)
+      return nil unless url =~ /\S/
 
-      filtered_hash = filter(Hash[uri.query.split('&').map { |e| e.split('=') }])
-      uri.query = filtered_hash.to_a.map { |e| e.join('=') }.join('&')
-      self.url = uri.to_s
-    rescue URI::InvalidURIError
-      nil
+      url = url.dup
+      url.scan(/&([^=]+)=([^&]+)/).each do |m|
+        next unless filter_key?(m[0])
+        url.gsub!(/#{m[1]}/, '[FILTERED]')
+      end
+
+      url
     end
 
     # Internal: Replaces the contents of params that match params_filters.

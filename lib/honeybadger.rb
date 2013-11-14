@@ -3,7 +3,6 @@ require 'timeout'
 require 'json'
 require 'digest'
 require 'logger'
-require 'uri'
 
 require 'honeybadger/configuration'
 require 'honeybadger/backtrace'
