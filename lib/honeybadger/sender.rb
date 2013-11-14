@@ -105,7 +105,7 @@ module Honeybadger
       api_key ||= self.api_key
       unless api_key =~ /\S/
         log(:error, "API key not found.")
-        return false
+        return nil
       end
 
       api_key
