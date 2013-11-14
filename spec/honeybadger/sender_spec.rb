@@ -1,10 +1,12 @@
 require 'spec_helper'
 
 describe Honeybadger::Sender do
-  before(:each) { reset_config }
+  before { reset_config }
+  before do
+    stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:body => '{"id":"123"}')
+  end
 
   it "it makes a single request when sending notices" do
-    stub_request(:post, /api\.honeybadger\.io/)
     Honeybadger.notify(RuntimeError.new('oops!'))
     assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1
   end
@@ -40,10 +42,30 @@ describe Honeybadger::Sender do
     expect(send_exception(:secure => false)).to be_nil
   end
 
-  it "logs missing API key and return nil" do
-    sender = build_sender(:api_key => nil)
-    sender.should_receive(:log).with(:error, /API key/)
-    expect(send_exception(:sender => sender, :secure => false)).to be_nil
+  describe '#api_key' do
+    context 'api_key is missing' do
+      it "logs missing API key and return nil" do
+        sender = build_sender(:api_key => nil)
+        sender.should_receive(:log).with(:error, /API key/)
+        expect(send_exception(:sender => sender, :secure => false)).to be_nil
+      end
+    end
+
+    context 'notice is a hash' do
+      it 'uses api_key from hash when present' do
+        sender = build_sender(:api_key => 'asdf')
+        send_exception(:sender => sender, :notice => { 'api_key' => 'zxcv' })
+        assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1, :headers => { 'x-api-key' => 'zxcv' }
+      end
+    end
+
+    context 'notice is a Honeybadger::Notice' do
+      it 'uses api_key from notice when present' do
+        sender = build_sender(:api_key => 'asdf')
+        send_exception(:sender => sender, :notice => Honeybadger::Notice.new(:api_key => 'zxcv'))
+        assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1, :headers => { 'x-api-key' => 'zxcv' }
+      end
+    end
   end
 
   it "logs success" do

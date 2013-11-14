@@ -36,7 +36,7 @@ module Honeybadger
         return nil
       end
 
-      api_key = api_key_ok?(!notice.is_a?(String) && notice[:api_key]) or return nil
+      api_key = api_key_ok?(!notice.is_a?(String) && notice['api_key']) or return nil
 
       data = notice.is_a?(String) ? notice : notice.to_json
 
