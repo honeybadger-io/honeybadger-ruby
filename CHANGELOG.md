@@ -12,6 +12,10 @@
 
   *Joshua Wood*
 
+* Filter query strings.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.9.4 ##
 
 * Fix bug where Faraday was getting a duplicate adapter when building
@@ -20,10 +24,6 @@
   *Joshua Wood*
 
 ## Honeybadger 1.9.3 ##
-
-* Filter query strings.
-
-  *Joshua Wood*
 
 * Lock gemspec to faraday ~>0.7 to fix yield discrepancy between 0.7 and
   0.8.
