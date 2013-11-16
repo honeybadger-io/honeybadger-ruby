@@ -11,6 +11,7 @@ require 'honeybadger/rack'
 require 'honeybadger/sender'
 require 'honeybadger/stats'
 require 'honeybadger/user_informer'
+require 'honeybadger/user_feedback'
 
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 

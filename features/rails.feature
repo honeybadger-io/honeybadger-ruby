@@ -117,6 +117,24 @@ Feature: Install the Gem in a Rails application
     Then the output should contain "Honeybadger Error 123456789"
     And the output should not contain "<!-- HONEYBADGER ERROR -->"
 
+  Scenario: Output when user feedback is enabled
+    When I configure my application to require Honeybadger
+    And I configure Honeybadger with:
+      """
+      config.api_key = 'myapikey'
+      config.logger = Logger.new(STDOUT)
+      """
+    And I define a response for "TestController#index":
+      """
+      session[:value] = "test"
+      raise RuntimeError, "some message"
+      """
+    And I configure the user feedback form
+    And I route "/test/index" to "test#index"
+    And I perform a request to "http://example.com:123/test/index?param=value"
+    Then the output should contain "honeybadger_feedback_token"
+    And the output should not contain "<!-- HONEYBADGER FEEDBACK -->"
+
   Scenario: Log output in production environments
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:

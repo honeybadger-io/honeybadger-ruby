@@ -1,0 +1,25 @@
+<form action="https://api.honeybadger.dev/v1/feedback" method="POST" id="honeybadger_feedback">
+  <input type="hidden" name="token" id="honeybadger_feedback_token" value="<%= error_id %>">
+
+  <h2>Care to help us fix this?</h2>
+  <p>Any information you can provide will help our technical team get to the bottom of this issue.</p>
+
+  <p class="honeybadger-feedback-name">
+    <label for="honeybadger_feedback_name">Your name</label><br>
+    <input type="text" name="name" id="honeybadger_feedback_name">
+  </p>
+
+  <p class"honeybadger-feedback-email">
+    <label for="honeybadger_feedback_email">Your email address</label><br>
+    <input type="email" name="email" id="honeybadger_feedback_email">
+  </p>
+
+  <p class="honeybadger-feedback-comment">
+    <label for="honeybadger_feedback_comment">Comment (required)</label><br>
+    <textarea name="comment" id="honeybadger_feedback_comment" required></textarea>
+  </p>
+
+  <p class="honeybadger-feedback-submit">
+    <input type="submit" value="Send">
+  </p>
+</form>

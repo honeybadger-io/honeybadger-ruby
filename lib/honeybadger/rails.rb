@@ -21,6 +21,8 @@ module Honeybadger
                                                       Honeybadger::Rack
         ::Rails.configuration.middleware.insert_after 'Rack::Lock',
                                                       Honeybadger::UserInformer
+        ::Rails.configuration.middleware.insert_after 'Honeybadger::UserInformer',
+                                                      Honeybadger::UserFeedback
       end
 
       Honeybadger.configure(true) do |config|
