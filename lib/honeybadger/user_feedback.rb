@@ -1,4 +1,6 @@
 require 'erb'
+require 'uri'
+
 module Honeybadger
   class UserFeedback
     TEMPLATE = File.read(File.expand_path('../templates/feedback_form.html.erb', __FILE__)).freeze
@@ -7,15 +9,22 @@ module Honeybadger
       @app = app
     end
 
-    def feedback_form(error_id)
+    def action
+      config = Honeybadger.configuration
+      URI.parse("#{config.protocol}://#{config.host}:#{config.port}/v1/feedback/").to_s
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def feedback_form(error_id, action = action)
+      return unless action
       ERB.new(TEMPLATE).result(binding)
     end
 
     def call(env)
       status, headers, body = @app.call(env)
-      if env['honeybadger.error_id']
+      if env['honeybadger.error_id'] && form = feedback_form(env['honeybadger.error_id'])
         new_body = []
-        form     = feedback_form(env['honeybadger.error_id'])
         body.each do |chunk|
           new_body << chunk.gsub("<!-- HONEYBADGER FEEDBACK -->", form)
         end
