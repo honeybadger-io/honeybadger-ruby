@@ -10,7 +10,9 @@ module Honeybadger
           return nil
         end
 
-        response = http_connection.post('/v1/metrics', data.to_json, http_headers)
+        response = rescue_http_errors do
+          http_connection.post('/v1/metrics', data.to_json, http_headers)
+        end
 
         if Net::HTTPSuccess === response
           true

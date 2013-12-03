@@ -43,12 +43,9 @@ module Honeybadger
 
       data = notice.is_a?(String) ? notice : notice.to_json
 
-      response = begin
-                   http_connection.post(url.path, data, http_headers({'X-API-Key' => api_key}))
-                 rescue *HTTP_ERRORS => e
-                   log(:error, "Unable to contact the Honeybadger server. HTTP Error=#{e}")
-                   nil
-                 end
+      response = rescue_http_errors do
+        http_connection.post(url.path, data, http_headers({'X-API-Key' => api_key}))
+      end
 
       if Net::HTTPSuccess === response
         log(Honeybadger.configuration.debug ? :info : :debug, "Success: #{response.class}", response, data)
@@ -65,7 +62,9 @@ module Honeybadger
     def ping(data = {})
       return nil unless api_key_ok?
 
-      response = http_connection.post('/v1/ping', data.to_json, http_headers)
+      response = rescue_http_errors do
+        http_connection.post('/v1/ping', data.to_json, http_headers)
+      end
 
       if Net::HTTPSuccess === response
         JSON.parse(response.body)
@@ -119,6 +118,13 @@ module Honeybadger
       Honeybadger.report_environment_info
       Honeybadger.report_response_body(response.body) if response && response.body =~ /\S/
       Honeybadger.write_verbose_log("Notice: #{data}", :debug) if data && Honeybadger.configuration.debug
+    end
+
+    def rescue_http_errors(&block)
+      yield
+    rescue *HTTP_ERRORS => e
+      log(:error, "Unable to contact the Honeybadger server. HTTP Error=#{e}")
+      nil
     end
 
     def http_connection
