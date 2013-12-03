@@ -2,11 +2,12 @@ require 'spec_helper'
 
 describe Honeybadger::Sender do
   before { reset_config }
+
   before do
     stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:body => '{"id":"123"}')
   end
 
-  it "it makes a single request when sending notices" do
+  it "makes a single request when sending notices" do
     Honeybadger.notify(RuntimeError.new('oops!'))
     assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1
   end

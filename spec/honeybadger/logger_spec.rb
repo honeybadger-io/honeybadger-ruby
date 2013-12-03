@@ -51,4 +51,19 @@ describe Honeybadger do
     Honeybadger.should_receive(:write_verbose_log).with(/Response from Honeybadger:/)
     send_notice
   end
+
+  context "429 error response" do
+    before do
+      reset_config
+      stub_verbose_log
+      stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => 429, :body => '{"error":"something went wrong"}')
+    end
+
+    it "logs the response" do
+      Honeybadger.should_receive(:write_verbose_log).with(/Failure: Net::HTTPTooManyRequests/, :error)
+      Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
+      Honeybadger.should_receive(:write_verbose_log).with(/something went wrong/)
+      Honeybadger.notify(RuntimeError.new('oops!'))
+    end
+  end
 end
