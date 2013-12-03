@@ -72,7 +72,6 @@ module Honeybadger
         log(:error, "Ping Failure", response, data)
         nil
       end
-
     rescue => e
       log(:error, "[Honeybadger::Sender#ping] Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
       nil
