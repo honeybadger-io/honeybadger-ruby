@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     honeybadger (1.9.4)
-      faraday (~> 0.7)
       json
 
 GEM
@@ -34,8 +33,6 @@ GEM
       gherkin (~> 2.11.0)
       json (>= 1.4.6)
     diff-lcs (1.2.4)
-    faraday (0.8.8)
-      multipart-post (~> 1.2.0)
     ffi (1.9.3)
     ffi (1.9.3-java)
     formatador (0.2.4)
@@ -66,7 +63,6 @@ GEM
       rb-kqueue (>= 0.2)
     lumberjack (1.0.4)
     method_source (0.8.2)
-    multipart-post (1.2.0)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)

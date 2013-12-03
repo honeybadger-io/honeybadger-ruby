@@ -2,7 +2,6 @@ PATH
   remote: /Users/josh/code/honeybadger-ruby
   specs:
     honeybadger (1.9.4)
-      faraday (~> 0.7)
       json
 
 GEM
@@ -64,10 +63,6 @@ GEM
       multi_json (~> 1.3)
     diff-lcs (1.2.4)
     erubis (2.7.0)
-    faraday (0.7.6)
-      addressable (~> 2.2)
-      multipart-post (~> 1.1)
-      rack (~> 1.1)
     ffi (1.9.3)
     formatador (0.2.4)
     fuubar (1.2.1)
@@ -102,7 +97,6 @@ GEM
     mime-types (1.25)
     minitest (4.7.5)
     multi_json (1.8.2)
-    multipart-post (1.2.0)
     net-scp (1.1.2)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
@@ -187,7 +181,6 @@ DEPENDENCIES
   better_errors
   capistrano (~> 2.0)
   cucumber (~> 1.2.1)
-  faraday (~> 0.7.0)
   fuubar
   growl
   guard (~> 1.8.3)

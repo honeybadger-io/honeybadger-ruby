@@ -1,5 +1,5 @@
-require 'faraday'
-require 'timeout'
+require 'net/http'
+require 'net/https'
 require 'json'
 require 'digest'
 require 'logger'
@@ -19,8 +19,8 @@ module Honeybadger
   LOG_PREFIX = "** [Honeybadger] "
 
   HEADERS = {
-    'Content-type'             => 'application/json',
-    'Accept'                   => 'text/json, application/json'
+    'Content-type' => 'application/json',
+    'Accept'       => 'text/json, application/json'
   }
 
   class << self

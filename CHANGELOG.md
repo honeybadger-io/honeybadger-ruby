@@ -1,5 +1,9 @@
 ## Honeybadger 1.10.0 (unreleased) ##
 
+* Remove Faraday dependency (restore net/http code)
+
+  *Joshua Wood*
+
 * Added params filtering by regex
 
   *Octavian Neamtu*

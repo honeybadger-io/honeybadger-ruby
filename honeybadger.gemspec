@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.9.4'
-  s.date              = '2013-11-13'
+  s.date              = '2013-12-02'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.rdoc_options = ['--charset=UTF-8', '--markup tomdoc']
   s.extra_rdoc_files = %w[README.md MIT-LICENSE]
 
-  s.add_dependency('faraday', '~> 0.7')
   s.add_dependency('json')
 
   s.add_development_dependency('cucumber',   '~> 1.2.1')
@@ -108,6 +107,7 @@ Gem::Specification.new do |s|
     lib/honeybadger/shared_tasks.rb
     lib/honeybadger/stats.rb
     lib/honeybadger/tasks.rb
+    lib/honeybadger/user_informer.rb
     lib/honeybadger_tasks.rb
     lib/rails/generators/honeybadger/honeybadger_generator.rb
     rails/init.rb
@@ -125,6 +125,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/rails/action_controller_spec.rb
     spec/honeybadger/rails_spec.rb
     spec/honeybadger/sender_spec.rb
+    spec/honeybadger/user_informer_spec.rb
     spec/honeybadger_tasks_spec.rb
     spec/spec_helper.rb
     spec/support/array_including.rb
