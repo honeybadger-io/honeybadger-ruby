@@ -15,13 +15,13 @@ describe Honeybadger::UserFeedback do
     ShamRack.mount(informer_app, "example.com")
   end
 
-  context "feedback feature is disabled" do
+  context "feedback feature is disabled by ping" do
     it 'does not modify the output' do
       expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
     end
   end
 
-  context "feedback feature is enabled" do
+  context "feedback feature is enabled by ping" do
     before do
       Honeybadger.configuration.features['feedback'] = true
     end
@@ -30,9 +30,19 @@ describe Honeybadger::UserFeedback do
       let(:honeybadger_id) { 1 }
 
       it 'modifies output' do
-        rendered_length = informer_app.feedback_form(1).size
+        rendered_length = informer_app.render_form(1).size
         expect(response.body).to match(/honeybadger_feedback_token/)
         expect(response["Content-Length"].to_i).to eq rendered_length
+      end
+
+      context "feedback feature is disabled by customer" do
+        before do
+          Honeybadger.configuration.feedback = false
+        end
+
+        it 'does not modify the output' do
+          expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
+        end
       end
     end
 

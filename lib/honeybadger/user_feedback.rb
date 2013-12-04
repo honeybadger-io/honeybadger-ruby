@@ -16,14 +16,18 @@ module Honeybadger
       nil
     end
 
-    def feedback_form(error_id, action = action)
+    def render_form(error_id, action = action)
       return unless action
       ERB.new(TEMPLATE).result(binding)
     end
 
+    def enabled?
+      Honeybadger.configuration.feedback && Honeybadger.configuration.features['feedback']
+    end
+
     def call(env)
       status, headers, body = @app.call(env)
-      if Honeybadger.configuration.features['feedback'] && env['honeybadger.error_id'] && form = feedback_form(env['honeybadger.error_id'])
+      if enabled? && env['honeybadger.error_id'] && form = render_form(env['honeybadger.error_id'])
         new_body = []
         body.each do |chunk|
           new_body << chunk.gsub("<!-- HONEYBADGER FEEDBACK -->", form)
