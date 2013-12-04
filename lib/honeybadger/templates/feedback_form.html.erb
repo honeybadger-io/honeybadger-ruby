@@ -1,20 +1,20 @@
 <style>
-#honeybadger_feedback *, #honeybadger_feedback *:before, #honeybadger_feedback *:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
-#honeybadger_feedback h2 { font-size: 110%; line-height: 1.5em; }
-#honeybadger_feedback label { font-weight: bold; }
+#honeybadger_feedback_form *, #honeybadger_feedback_form *:before, #honeybadger_feedback_form *:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+#honeybadger_feedback_form h2 { font-size: 110%; line-height: 1.5em; }
+#honeybadger_feedback_form label { font-weight: bold; }
 #honeybadger_feedback_name, #honeybadger_feedback_email, #honeybadger_feedback_comment { width: 100%; padding: 0.5em; }
 #honeybadger_feedback_comment { height: 10em; }
 #honeybadger_feedback_submit { height: 1em; }
-#honeybadger_feedback .honeybadger-feedback-phone { display: none; }
+#honeybadger_feedback_form .honeybadger-feedback-phone { display: none; }
 </style>
 
 <script>
 function honeybadgerFeedbackResponse(data) {
   if (data['result'] == 'OK') {
-    var fields = document.getElementById('honeybadger_form_fields');
-    var success = document.getElementById('honeybadger_form_success');
+    var form = document.getElementById('honeybadger_feedback_form');
+    var success = document.getElementById('honeybadger_feedback_success');
 
-    fields.style.display = 'none';
+    form.style.display = 'none';
     success.style.display = 'block';
   } else {
     var message;
@@ -30,46 +30,53 @@ function honeybadgerFeedbackResponse(data) {
 }
 
 function sendHoneybadgerFeedback() {
-  var script = document.createElement('script');
-  var form = document.getElementById('honeybadger_feedback');
-  script.src = '<%= action %>?format=js&token=<%= error_id %>&name=' + encodeURIComponent(form.name.value) + '&email=' + encodeURIComponent(form.email.value) + '&comment=' + encodeURIComponent(form.comment.value);
-  form.appendChild(script);
+  try {
+    var script = document.createElement('script');
+    var form = document.getElementById('honeybadger_feedback_form');
+    script.src = '<%= action %>?format=js&token=<%= error_id %>&name=' + encodeURIComponent(form.name.value) + '&email=' + encodeURIComponent(form.email.value) + '&comment=' + encodeURIComponent(form.comment.value);
+    form.appendChild(script);
+    return false;
+  } catch(e) {
+    if (window.console) {
+      console.log('Error caught while processing Honeybadger feedback form: ' + e);
+      console.log('Submitting form normally...');
+    }
+    return true;
+  }
 }
 </script>
 
-<form action="<%= action %>" method="POST" id="honeybadger_feedback" onsubmit="sendHoneybadgerFeedback();return false;">
+<div id="honeybadger_feedback_success" style="display:none;">
+  <p><strong>Thanks for the feedback!</strong></p>
+</div>
+
+<form action="<%= action %>" method="POST" id="honeybadger_feedback_form" onsubmit="return sendHoneybadgerFeedback();">
   <input type="hidden" name="token" id="honeybadger_feedback_token" value="<%= error_id %>">
 
   <h2>Care to help us fix this?</h2>
   <p>Any information you can provide will help our technical team get to the bottom of this issue.</p>
 
-  <div id="honeybadger_form_success" style="display:none;">
-    <p><strong>Thanks for the feedback!</strong></p>
-  </div>
-
-  <div id="honeybadger_form_fields">
-    <p class="honeybadger-feedback-name">
+  <p class="honeybadger-feedback-name">
     <label for="honeybadger_feedback_name">Your name</label><br>
     <input type="text" name="name" id="honeybadger_feedback_name" size="60">
-    </p>
+  </p>
 
-    <p class="honeybadger-feedback-phone">
+  <p class="honeybadger-feedback-phone">
     <label for="honeybadger_feedback_phone">Your phone number</label><br>
     <input type="text" name="phone" id="honeybadger_feedback_phone" size="60">
-    </p>
+  </p>
 
-    <p class="honeybadger-feedback-email">
+  <p class="honeybadger-feedback-email">
     <label for="honeybadger_feedback_email">Your email address</label><br>
     <input type="email" name="email" id="honeybadger_feedback_email" size="60">
-    </p>
+  </p>
 
-    <p class="honeybadger-feedback-comment">
+  <p class="honeybadger-feedback-comment">
     <label for="honeybadger_feedback_comment">Comment (required)</label><br>
     <textarea name="comment" id="honeybadger_feedback_comment" cols="50" rows="6" required></textarea>
-    </p>
+  </p>
 
-    <p class="honeybadger-feedback-submit">
+  <p class="honeybadger-feedback-submit">
     <input type="submit" id="honeybadger_feedback_submit" value="Send">
-    </p>
-  </div>
+  </p>
 </form>
