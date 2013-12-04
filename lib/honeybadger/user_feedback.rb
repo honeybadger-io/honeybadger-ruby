@@ -23,7 +23,7 @@ module Honeybadger
 
     def call(env)
       status, headers, body = @app.call(env)
-      if env['honeybadger.error_id'] && form = feedback_form(env['honeybadger.error_id'])
+      if Honeybadger.configuration.features['feedback'] && env['honeybadger.error_id'] && form = feedback_form(env['honeybadger.error_id'])
         new_body = []
         body.each do |chunk|
           new_body << chunk.gsub("<!-- HONEYBADGER FEEDBACK -->", form)

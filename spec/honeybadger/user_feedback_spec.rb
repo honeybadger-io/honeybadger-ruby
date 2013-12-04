@@ -2,32 +2,44 @@ require 'spec_helper'
 require 'sham_rack'
 
 describe Honeybadger::UserFeedback do
-  it 'modifies output if there is a honeybadger id' do
-    main_app = lambda do |env|
-      env['honeybadger.error_id'] = 1
+  let(:main_app) do
+    lambda do |env|
+      env['honeybadger.error_id'] = honeybadger_id if defined?(honeybadger_id)
       [200, {}, ["<!-- HONEYBADGER FEEDBACK -->"]]
     end
+  end
+  let(:informer_app) { Honeybadger::UserFeedback.new(main_app) }
+  let(:response) { Net::HTTP.get_response(URI.parse("http://example.com/")) }
 
-    informer_app = Honeybadger::UserFeedback.new(main_app)
-
+  before do
     ShamRack.mount(informer_app, "example.com")
-
-    rendered_length = informer_app.feedback_form(1).size
-
-    response = Net::HTTP.get_response(URI.parse("http://example.com/"))
-    expect(response.body).to match(/honeybadger_feedback_token/)
-    expect(response["Content-Length"].to_i).to eq rendered_length
   end
 
-  it 'does not modify output if there is no honeybadger id' do
-    main_app = lambda do |env|
-      [200, {}, ["<!-- HONEYBADGER FEEDBACK -->"]]
+  context "feedback feature is disabled" do
+    it 'does not modify the output' do
+      expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
     end
-    informer_app = Honeybadger::UserFeedback.new(main_app)
+  end
 
-    ShamRack.mount(informer_app, "example.com")
+  context "feedback feature is enabled" do
+    before do
+      Honeybadger.configuration.features['feedback'] = true
+    end
 
-    response = Net::HTTP.get_response(URI.parse("http://example.com/"))
-    expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
+    context "there is a honeybadger id" do
+      let(:honeybadger_id) { 1 }
+
+      it 'modifies output' do
+        rendered_length = informer_app.feedback_form(1).size
+        expect(response.body).to match(/honeybadger_feedback_token/)
+        expect(response["Content-Length"].to_i).to eq rendered_length
+      end
+    end
+
+    context "there is no honeybadger id" do
+      it 'does not modify the output' do
+        expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
+      end
+    end
   end
 end
