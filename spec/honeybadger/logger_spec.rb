@@ -53,6 +53,14 @@ describe Honeybadger do
   end
 
   context "429 error response" do
+    let(:failure_class) do
+      if RUBY_VERSION !~ /^1/
+        'Net::HTTPTooManyRequests'
+      else
+        'Net::HTTPClientError'
+      end
+    end
+
     before do
       reset_config
       stub_verbose_log
@@ -60,7 +68,7 @@ describe Honeybadger do
     end
 
     it "logs the response" do
-      Honeybadger.should_receive(:write_verbose_log).with(/Failure: Net::HTTPTooManyRequests/, :error)
+      Honeybadger.should_receive(:write_verbose_log).with(/Failure: #{failure_class}/, :error)
       Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
       Honeybadger.should_receive(:write_verbose_log).with(/something went wrong/)
       Honeybadger.notify(RuntimeError.new('oops!'))
