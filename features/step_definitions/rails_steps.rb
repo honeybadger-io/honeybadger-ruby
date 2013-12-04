@@ -129,6 +129,16 @@ When /^I configure the user informer/ do
   end
 end
 
+When /^I configure the user feedback form/ do
+  error_page = File.join(rails_root, 'public', '500.html')
+  File.open(error_page, "r+") do |file|
+    content = file.read
+    content.gsub!('</body>', '<!-- HONEYBADGER FEEDBACK --></body>')
+    file.rewind
+    file.write(content)
+  end
+end
+
 When /^I route "([^\"]*)" to "([^\"]*)"$/ do |path, controller_action_pair|
   route = if rails2?
             controller, action = controller_action_pair.split('#')

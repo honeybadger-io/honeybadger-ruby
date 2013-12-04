@@ -1,3 +1,9 @@
+## Honeybadger 2.0 (unreleased) ##
+
+* Collect user feedback when an error occurs.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.10.0 (unreleased) ##
 
 * Remove Faraday dependency (restore net/http code)
