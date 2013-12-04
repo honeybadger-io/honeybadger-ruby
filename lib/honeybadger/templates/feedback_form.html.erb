@@ -1,3 +1,12 @@
+<style>
+  #honeybadger_feedback *, #honeybadger_feedback *:before, #honeybadger_feedback *:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+  #honeybadger_feedback h2 { font-size: 110%; line-height: 1.5em; }
+  #honeybadger_feedback label { font-weight: bold; }
+  #honeybadger_feedback_name, #honeybadger_feedback_email, #honeybadger_feedback_comment { width: 100%; padding: 10px; }
+  #honeybadger_feedback_comment { height: 100px; }
+  #honeybadger_feedback .honeybadger-feedback-nickname { display: none; }
+</style>
+
 <form action="<%= action %>" method="POST" id="honeybadger_feedback">
   <input type="hidden" name="token" id="honeybadger_feedback_token" value="<%= error_id %>">
 
@@ -6,17 +15,23 @@
 
   <p class="honeybadger-feedback-name">
     <label for="honeybadger_feedback_name">Your name</label><br>
-    <input type="text" name="name" id="honeybadger_feedback_name">
+    <input type="text" name="name" id="honeybadger_feedback_name" size="60">
+  </p>
+
+  <%- # Honeypot field -%>
+  <p class="honeybadger-feedback-phone">
+    <label for="honeybadger_feedback_phone">Your phone number</label><br>
+    <input type="text" name="phone" id="honeybadger_feedback_phone" size="60">
   </p>
 
   <p class="honeybadger-feedback-email">
     <label for="honeybadger_feedback_email">Your email address</label><br>
-    <input type="email" name="email" id="honeybadger_feedback_email">
+    <input type="email" name="email" id="honeybadger_feedback_email" size="60">
   </p>
 
   <p class="honeybadger-feedback-comment">
     <label for="honeybadger_feedback_comment">Comment (required)</label><br>
-    <textarea name="comment" id="honeybadger_feedback_comment" required></textarea>
+    <textarea name="comment" id="honeybadger_feedback_comment" cols="50" rows="6" required></textarea>
   </p>
 
   <p class="honeybadger-feedback-submit">
