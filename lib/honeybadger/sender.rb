@@ -63,7 +63,7 @@ module Honeybadger
       return nil unless api_key_ok?
 
       response = rescue_http_errors do
-        http_connection.post('/v1/ping', data.to_json, http_headers)
+        http_connection.post('/v1/ping/', data.to_json, http_headers)
       end
 
       if Net::HTTPSuccess === response
