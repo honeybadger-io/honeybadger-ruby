@@ -9,6 +9,7 @@ appraise 'rails3.0' do
   gem 'rails', '3.0.17'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
@@ -16,6 +17,7 @@ appraise 'rails3.1' do
   gem 'rails', '3.1.8'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
@@ -23,6 +25,7 @@ appraise 'rails3.2' do
   gem 'rails', '3.2.12'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
@@ -30,6 +33,7 @@ appraise 'rails4' do
   gem 'rails', '4.0.2'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 

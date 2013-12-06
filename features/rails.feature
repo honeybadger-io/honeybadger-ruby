@@ -68,6 +68,18 @@ Feature: Install the Gem in a Rails application
     Then the output should contain "Better Errors detected"
     And I should receive a Honeybadger notification
 
+  @rails_3
+  Scenario: Running the test task with rack-mini-profiler installed
+    When I configure Rails with:
+      """
+      require 'rack-mini-profiler'
+      """
+    And I configure the notifier to use "myapikey" as an API key
+    And I configure my application to require Honeybadger
+    And I run `rake honeybadger:test`
+    Then the output should not contain "rake aborted"
+    And I should receive a Honeybadger notification
+
   Scenario: Rescue an exception in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:

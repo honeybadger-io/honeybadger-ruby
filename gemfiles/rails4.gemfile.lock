@@ -110,6 +110,8 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     rack (1.5.2)
+    rack-mini-profiler (0.1.31)
+      rack (>= 1.1.3)
     rack-protection (1.5.1)
       rack
     rack-test (0.6.2)
@@ -186,6 +188,7 @@ DEPENDENCIES
   guard (~> 1.8.3)
   guard-rspec
   honeybadger!
+  rack-mini-profiler
   rails (= 4.0.2)
   rake
   rspec (~> 2.14.0)
