@@ -11,6 +11,7 @@ appraise 'rails3.0' do
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
   gem 'faraday', '~> 0.7.0'
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
@@ -19,6 +20,7 @@ appraise 'rails3.1' do
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
   gem 'faraday', '~> 0.7.0'
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
@@ -27,6 +29,7 @@ appraise 'rails3.2' do
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
   gem 'faraday', '~> 0.7.0'
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
@@ -35,6 +38,7 @@ appraise 'rails4' do
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
   gem 'faraday', '~> 0.7.0'
+  gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 2.0'
 end
 

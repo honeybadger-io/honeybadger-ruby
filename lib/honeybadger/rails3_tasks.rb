@@ -87,7 +87,7 @@ namespace :honeybadger do
     puts 'Processing request.'
 
     ssl = defined?(Rails.configuration.force_ssl) && Rails.configuration.force_ssl
-    env = Rack::MockRequest.env_for("http#{ ssl ? 's' : nil }://www.example.com/verify")
+    env = Rack::MockRequest.env_for("http#{ ssl ? 's' : nil }://www.example.com/verify", 'REMOTE_ADDR' => '127.0.0.1')
 
     Rails.application.call(env)
   end
