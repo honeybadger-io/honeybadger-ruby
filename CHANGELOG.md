@@ -1,3 +1,15 @@
+## Honeybadger 1.9.5 ##
+
+* Call through middleware stack when disabling better_errors in test
+  task (fixes incorrect error notification bug).
+
+  *Joshua Wood*
+
+* Fix test rake task/rack-mini-profiler bug where it requires an IP
+  address to identify users.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.9.4 ##
 
 * Fix bug where Faraday was getting a duplicate adapter when building
