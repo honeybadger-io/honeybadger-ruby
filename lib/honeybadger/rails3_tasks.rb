@@ -29,7 +29,7 @@ namespace :honeybadger do
     # Detect and disable the better_errors gem
     if defined? BetterErrors::Middleware
       puts 'Better Errors detected: temporarily disabling middleware.'
-      class BetterErrors::Middleware ; def call(env) ; end ; end
+      class BetterErrors::Middleware ; def call(env) @app.call(env); end ; end
     end
 
     begin
