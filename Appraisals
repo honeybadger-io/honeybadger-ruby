@@ -1,5 +1,5 @@
 appraise 'rails2.3' do
-  gem 'rails', '2.3.14'
+  gem 'rails', '2.3.18'
   gem 'rake', '0.9.5'
   gem 'honeybadger', :path => '../'
   gem 'capistrano', '~> 2.0'
@@ -27,7 +27,7 @@ appraise 'rails3.2' do
 end
 
 appraise 'rails4' do
-  gem 'rails', '4.0.1'
+  gem 'rails', '4.0.2'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
   gem 'capistrano', '~> 2.0'
