@@ -22,6 +22,8 @@
 
 * Filter query strings.
 
+  *Joshua Wood*
+
 ## Honeybadger 1.9.5 ##
 
 * Call through middleware stack when disabling better_errors in test
