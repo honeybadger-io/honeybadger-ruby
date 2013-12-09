@@ -18,7 +18,7 @@ module Honeybadger
           true
         else
           Honeybadger.configuration.features['metrics'] = false if Net::HTTPForbidden === response
-          log(:error, "Metrics Failure", response, data)
+          log(:error, "Metrics Failure: #{response.class}", response, data)
           false
         end
       rescue => e
