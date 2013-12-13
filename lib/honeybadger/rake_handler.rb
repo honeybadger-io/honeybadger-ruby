@@ -13,7 +13,7 @@ module Honeybadger::RakeHandler
       (Honeybadger.configuration.rescue_rake_exceptions || 
        (Honeybadger.configuration.rescue_rake_exceptions===nil && !self.tty_output?))
 
-      Honeybadger.notify_or_ignore(ex, :component => reconstruct_command_line, :cgi_data => ENV)
+      Honeybadger.notify_or_ignore(ex, :component => reconstruct_command_line)
       Honeybadger.context.clear!
     end
 
