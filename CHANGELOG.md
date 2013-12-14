@@ -1,4 +1,10 @@
-## Honeybadger 1.10.0 (unreleased) ##
+## Honeybadger 1.10.1 ##
+
+* Stop sending ENV with rake exceptions
+
+  *Joshua Wood*
+
+## Honeybadger 1.10.0 ##
 
 * Collect user feedback when an error occurs.
 
