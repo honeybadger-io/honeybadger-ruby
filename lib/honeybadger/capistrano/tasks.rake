@@ -1,13 +1,10 @@
 after 'deploy:finishing', 'honeybadger:deploy'
 
 namespace :honeybadger do
-  # Until release of >= Capistrano 3.0.1
-  alias :release_roles :roles
-
   desc 'Notify Honeybadger of the deployment.'
   # Run remotely so we use remote API keys, environment, etc.
   task :deploy => :env do
-    on release_roles(:all) do |host|
+    on roles(:all, { :exclude => :no_release }) do |host|
       executable = RUBY_PLATFORM.downcase.include?('mswin') ? fetch(:rake, :'rake.bat') : fetch(:rake, :rake)
       rake_task  = fetch(:honeybadger_deploy_task, 'honeybadger:deploy')
 
@@ -30,7 +27,7 @@ namespace :honeybadger do
 
   desc 'Setup ENV for Honeybadger deploy rake task.'
   task :env do
-    on release_roles(:all) do |host|
+    on roles(:all, { :exclude => :no_release }) do |host|
       rails_env       = fetch(:rails_env, "production")
       honeybadger_env = fetch(:honeybadger_env, rails_env)
       repository      = fetch(:repo_url)
