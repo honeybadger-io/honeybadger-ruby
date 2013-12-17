@@ -23,6 +23,11 @@ module RailsHelpers
     rails4? || rails3? || rails_version =~ /^2\.3/
   end
 
+  def capify?
+    require 'capistrano/version'
+    !(defined?(Capistrano::VERSION) && Gem::Version.new(Capistrano::VERSION) >= Gem::Version.new('3.0.0'))
+  end
+
   def rails_version
     @rails_version ||= `bundle exec rails -v`[/\d.+/]
   end

@@ -36,9 +36,8 @@ class HoneybadgerGenerator < Rails::Generators::Base
 
   def append_capistrano_hook
     if File.exists?('config/deploy.rb') && File.exists?('Capfile')
-      append_file('config/deploy.rb', <<-HOOK)
+      append_file('Capfile', <<-HOOK)
 
-        require './config/boot'
         require 'honeybadger/capistrano'
       HOOK
     end

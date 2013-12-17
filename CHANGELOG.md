@@ -1,3 +1,9 @@
+## Honeybadger 1.11.0 (unreleased) ##
+
+* Capistrano 3 support
+
+  *Joshua Wood*
+
 ## Honeybadger 1.10.1 ##
 
 * Stop sending ENV with rake exceptions

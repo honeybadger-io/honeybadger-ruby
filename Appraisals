@@ -37,6 +37,15 @@ appraise 'rails4' do
   gem 'capistrano', '~> 2.0'
 end
 
+appraise 'rails4-cap3' do
+  gem 'rails', '4.0.2'
+  gem 'honeybadger', :path => '../'
+  gem 'better_errors', :require => false
+  gem 'rack-mini-profiler', :require => false
+  gem 'capistrano', '~> 3.0'
+  gem 'capistrano-rails', '~> 1.1.0'
+end
+
 # appraise 'rails-edge' do
   # gem 'rails', :git => 'git@github.com:rails/rails.git'
   # gem 'honeybadger', :path => '../'

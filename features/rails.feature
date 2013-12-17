@@ -32,7 +32,7 @@ Feature: Install the Gem in a Rails application
     Then the output should contain "Must pass --api-key or --heroku or create config/initializers/honeybadger.rb"
 
   Scenario: Configure and deploy with Capistrano
-    When I successfully run `capify .`
+    When I install capistrano
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "-k myapikey"
     And I run `cap -T`

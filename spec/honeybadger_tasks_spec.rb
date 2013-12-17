@@ -17,14 +17,17 @@ describe HoneybadgerTasks do
   end
 
   context "being quiet" do
-    before(:each) { HoneybadgerTasks.stub(:puts) }
+    before do
+      HoneybadgerTasks.stub(:puts)
+      $stderr.stub(:puts)
+    end
 
     context "in a configured project" do
       before(:each) { Honeybadger.configure { |config| config.api_key = "1234123412341234" } }
 
       context "on deploy({})" do
         it "complains about missing rails env" do
-          HoneybadgerTasks.should_receive(:puts).with(/which environment/i)
+          $stderr.should_receive(:puts).with(/which environment/i)
           HoneybadgerTasks.deploy({})
         end
 
@@ -95,8 +98,14 @@ describe HoneybadgerTasks do
           end
 
           it "puts the response body on failure" do
-            HoneybadgerTasks.should_receive(:puts).with("body")
+            $stderr.should_receive(:puts).with(/body/)
             @http_proxy.should_receive(:request).with(anything).and_return(unsuccessful_response('body'))
+            HoneybadgerTasks.deploy(@options)
+          end
+
+          it "puts the response class on failure" do
+            $stderr.should_receive(:puts).with(/Net::HTTPClientError/)
+            @http_proxy.should_receive(:request).with(anything).and_return(unsuccessful_response)
             HoneybadgerTasks.deploy(@options)
           end
 
@@ -148,7 +157,7 @@ describe HoneybadgerTasks do
 
       context "on deploy(:environment => 'staging')" do
         it "complains about missing api key" do
-          HoneybadgerTasks.should_receive(:puts).with(/api key/i)
+          $stderr.should_receive(:puts).with(/api key/i)
           HoneybadgerTasks.deploy(:environment => "staging")
         end
 

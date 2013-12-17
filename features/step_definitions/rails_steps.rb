@@ -260,3 +260,11 @@ When /^I configure Rails with:$/ do |config|
     end
   end
 end
+
+When /^I install capistrano$/ do
+  if capify?
+    step %(I successfully run `capify .`)
+  else
+    step %(I successfully run `cap install`)
+  end
+end

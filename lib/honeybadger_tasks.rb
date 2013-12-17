@@ -17,12 +17,12 @@ module HoneybadgerTasks
   def self.deploy(opts = {})
     api_key = opts.delete(:api_key) || Honeybadger.configuration.api_key
     unless api_key =~ /\S/
-      puts "I don't seem to be configured with an API key.  Please check your configuration."
+      $stderr.puts "I don't seem to be configured with an API key.  Please check your configuration."
       return false
     end
 
     unless opts[:environment] =~ /\S/
-      puts "I don't know to which environment you are deploying (use the TO=production option)."
+      $stderr.puts "I don't know to which environment you are deploying (use the TO=production option)."
       return false
     end
 
@@ -60,7 +60,7 @@ module HoneybadgerTasks
         puts "Succesfully recorded deployment"
         return true
       else
-        puts response.body
+        $stderr.puts "Error recording deployment: #{response.class} -- #{response.body || 'no response'}"
         return false
       end
     end
