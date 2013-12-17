@@ -37,7 +37,7 @@ namespace :honeybadger do
       local_user      = fetch(:honeybadger_user, ENV['USER'] || ENV['USERNAME'])
       api_key         = fetch(:honeybadger_api_key, ENV['HONEYBADGER_API_KEY'] || ENV['API_KEY'])
       revision        = fetch(:current_revision) do
-        within(release_path) do
+        within(repo_path) do
           capture("cd #{repo_path} && git rev-parse --short HEAD")
         end
       end
