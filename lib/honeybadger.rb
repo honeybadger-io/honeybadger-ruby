@@ -3,6 +3,7 @@ require 'net/https'
 require 'json'
 require 'digest'
 require 'logger'
+require 'forwardable'
 
 require 'honeybadger/configuration'
 require 'honeybadger/backtrace'
@@ -25,6 +26,8 @@ module Honeybadger
   }
 
   class << self
+    extend Forwardable
+
     # The sender object is responsible for delivering formatted data to the
     # Honeybadger server. Must respond to #send_to_honeybadger. See Honeybadger::Sender.
     attr_accessor :sender
@@ -32,6 +35,9 @@ module Honeybadger
     # A Honeybadger configuration object. Must act like a hash and return sensible
     # values for all Honeybadger configuration options. See Honeybadger::Configuration.
     attr_writer :configuration
+
+    # Is this Honeybadger session attached to a terminal?
+    def_delegator :STDOUT, :tty?
 
     # Tell the log that the Notifier is good to go
     def report_ready
