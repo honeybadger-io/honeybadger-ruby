@@ -2,15 +2,11 @@ after 'deploy:finishing', 'honeybadger:deploy'
 
 namespace :honeybadger do
   desc 'Notify Honeybadger of the deployment.'
-  task :deploy do
-    run_locally do
-      info 'Notifying Honeybadger of deploy.'
-    end
-
-    invoke :'honeybadger:env'
-
+  task :deploy => :env do
     if server = fetch(:honeybadger_server)
       on server do |host|
+        info 'Notifying Honeybadger of deploy.'
+
         executable = RUBY_PLATFORM.downcase.include?('mswin') ? fetch(:rake, :'rake.bat') : fetch(:rake, :rake)
         rake_task  = fetch(:honeybadger_deploy_task, 'honeybadger:deploy')
 
@@ -26,10 +22,6 @@ namespace :honeybadger do
         end
 
         info 'Honeybadger notification complete.'
-      end
-    else
-      run_locally do
-        error 'Honeybadger notification failed: primary server not found.'
       end
     end
   end
