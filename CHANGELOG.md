@@ -1,9 +1,5 @@
 ## Honeybadger 1.11.0 (unreleased) ##
 
-* Disable ping when attached to console.
-
-  *Joshua Wood*
-
 * Capistrano 3 support
 
   *Joshua Wood*

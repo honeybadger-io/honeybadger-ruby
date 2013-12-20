@@ -80,13 +80,6 @@ Feature: Install the Gem in a Rails application
     Then the output should not contain "rake aborted"
     And I should receive a Honeybadger notification
 
-  Scenario: Rake task when attached to terminal
-    When I configure the notifier to use "myapikey" as an API key
-    And I configure my application to require Honeybadger
-    And I run `rake honeybadger:test`
-    Then I should not have a ping response from Honeybadger
-    And I should receive a Honeybadger notification
-
   Scenario: Rescue an exception in a controller
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
@@ -101,8 +94,7 @@ Feature: Install the Gem in a Rails application
       """
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
-    Then I should have a ping response from Honeybadger
-    And I should receive a Honeybadger notification
+    Then I should receive a Honeybadger notification
 
   Scenario: Rescue an exception in a metal controller
     When I configure my application to require Honeybadger

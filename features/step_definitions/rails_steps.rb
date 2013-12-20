@@ -86,13 +86,8 @@ Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
            when 'two' then 2
            else number end
 
-  all_output.scan(/\[Honeybadger\] Success:/).size.should == number
+  all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == number
   step %(the output should contain "123456789")
-end
-
-Then /^I should( not)? have a ping response from Honeybadger$/ do |negative|
-  step %(the output should#{negative ? " not" : nil} contain "Ping Success")
-  step %(the output should#{negative ? " not" : nil} contain "features")
 end
 
 Then /^the request\s?(url|component|action|params|session|cgi_data|context)? should( not)? contain "([^\"]*)"$/ do |key, negate, expected|
