@@ -140,12 +140,17 @@ describe Honeybadger::Sender do
         sender.should_receive(:log).with(:debug, /Success/, kind_of(Net::HTTPSuccess), kind_of(String))
         sender.send(:send_request, :notices, {})
       end
+
+      it "logs the success with API prefix" do
+        sender.should_receive(:log).with(:debug, /NOTICES/, kind_of(Net::HTTPSuccess), kind_of(String))
+        sender.send(:send_request, :notices, {})
+      end
     end
 
     context "unsuccessful response" do
-      it "logs the failure" do
+      it "logs the failure with API prefix" do
         stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => [429, 'Too Many Requests'])
-        sender.should_receive(:log).with(:error, /Too Many Requests/, kind_of(Net::HTTPResponse), kind_of(String))
+        sender.should_receive(:log).with(:error, /NOTICES/, kind_of(Net::HTTPResponse), kind_of(String))
         expect { sender.send(:send_request, :notices, {}) }.to raise_error
       end
 

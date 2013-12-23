@@ -157,7 +157,7 @@ module Honeybadger
       retry_errors do
         response = http_connection.post(uri.merge("#{path.to_s}/").path, json, http_headers(headers))
         if Net::HTTPSuccess === response
-          log(Honeybadger.configuration.debug ? :info : :debug, "[#{path}] Success: #{response.class}", response, json)
+          log(Honeybadger.configuration.debug ? :info : :debug, "[#{path.to_s.upcase}] Success: #{response.class}", response, json)
           JSON.parse(response.body)
         else
           message = response.message =~ /\S/ ? response.message : response.class
@@ -165,7 +165,7 @@ module Honeybadger
         end
       end
     rescue Error => e
-      log(:error, "[#{path}] Failure: #{e} (retried #{e.retries} time(s))", e.respond_to?(:response) && e.response, json)
+      log(:error, "[#{path.to_s.upcase}] Failure: #{e} (retried #{e.retries} time(s))", e.respond_to?(:response) && e.response, json)
       raise e
     end
 
