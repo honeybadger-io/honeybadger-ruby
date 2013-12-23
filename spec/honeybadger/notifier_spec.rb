@@ -7,10 +7,6 @@ describe 'Honeybadger' do
   class ContinuedException < Exception
   end
 
-  before(:each) do
-    reset_config
-  end
-
   def assert_sends(notice, notice_args)
     Honeybadger::Notice.should_receive(:new).with(hash_including(notice_args))
     Honeybadger.sender.should_receive(:send_to_honeybadger).with(notice)

@@ -17,6 +17,7 @@ describe Honeybadger::Configuration do
     assert_config_default :host,                'api.honeybadger.io'
     assert_config_default :http_open_timeout,   2
     assert_config_default :http_read_timeout,   5
+    assert_config_default :max_retries,         2
     assert_config_default :ignore_by_filters,   []
     assert_config_default :ignore_user_agent,   []
     assert_config_default :params_filters,
@@ -102,6 +103,7 @@ describe Honeybadger::Configuration do
     assert_config_overridable :port
     assert_config_overridable :http_open_timeout
     assert_config_overridable :http_read_timeout
+    assert_config_overridable :max_retries
     assert_config_overridable :project_root
     assert_config_overridable :notifier_version
     assert_config_overridable :notifier_name
@@ -131,7 +133,7 @@ describe Honeybadger::Configuration do
      :notifier_version, :params_filters, :project_root, :port, :protocol,
      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
      :source_extract_radius, :async, :send_request_session, :debug,
-     :fingerprint, :hostname, :metrics, :feedback].each do |option|
+     :fingerprint, :hostname, :metrics, :feedback, :max_retries].each do |option|
        expect(hash[option]).to eq config[option]
     end
   end

@@ -15,5 +15,6 @@ RSpec.configure do |c|
   c.run_all_when_everything_filtered = true
 
   c.include Helpers
+  c.before(:each) { reset_config }
   c.after(:each) { Honeybadger.context.clear! }
 end

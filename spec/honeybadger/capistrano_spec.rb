@@ -6,8 +6,6 @@ if defined?(Capistrano::Configuration.instance)
     require 'capistrano/configuration'
     require 'honeybadger/capistrano'
 
-    before { reset_config }
-
     before(:each) do
       @configuration = Capistrano::Configuration.new
       Honeybadger::Capistrano.load_into(@configuration)

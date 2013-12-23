@@ -10,7 +10,6 @@ begin
     include DefinesConstants
 
     before(:each) do
-      reset_config
       Honeybadger.sender = CollectingSender.new
       define_constant('RAILS_ROOT', '/path/to/rails/root')
     end

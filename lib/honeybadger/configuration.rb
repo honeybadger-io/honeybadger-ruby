@@ -8,7 +8,7 @@ module Honeybadger
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :feedback, :rescue_rake_exceptions, :source_extract_radius,
-               :send_request_session, :debug, :fingerprint, :hostname, :metrics].freeze
+               :send_request_session, :debug, :fingerprint, :hostname, :metrics, :max_retries].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -31,6 +31,9 @@ module Honeybadger
 
     # The HTTP read timeout in seconds (defaults to 5).
     attr_accessor :http_read_timeout
+
+    # The number of times to retry failed requests
+    attr_accessor :max_retries
 
     # The hostname of your proxy server (if using a proxy)
     attr_accessor :proxy_host
@@ -157,6 +160,7 @@ module Honeybadger
       @host                      = 'api.honeybadger.io'
       @http_open_timeout         = 2
       @http_read_timeout         = 5
+      @max_retries               = 2
       @params_filters            = DEFAULT_PARAMS_FILTERS.dup
       @backtrace_filters         = DEFAULT_BACKTRACE_FILTERS.dup
       @ignore_by_filters         = []
