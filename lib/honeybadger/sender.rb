@@ -1,7 +1,5 @@
 module Honeybadger
   class Sender
-    NOTICES_URI = '/v1/notices/'.freeze
-
     HTTP_ERRORS = [Timeout::Error,
                    Errno::EINVAL,
                    Errno::ECONNRESET,

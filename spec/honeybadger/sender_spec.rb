@@ -106,7 +106,7 @@ describe Honeybadger::Sender do
     it "posts to the right url for non-ssl" do
       sender = build_sender(:secure => false)
       http = stub_http
-      url = "http://api.honeybadger.io:80#{Honeybadger::Sender::NOTICES_URI}"
+      url = "http://api.honeybadger.io:80/v1/notices/"
       uri = URI.parse(url)
       http.should_receive(:post).with(uri.path, anything, Honeybadger::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
       sender.send(:send_request, :notices, {})
@@ -115,7 +115,7 @@ describe Honeybadger::Sender do
     it "post to the right path for ssl" do
       sender = build_sender(:secure => true)
       http = stub_http
-      http.should_receive(:post).with(Honeybadger::Sender::NOTICES_URI, anything, Honeybadger::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
+      http.should_receive(:post).with('/v1/notices/', anything, Honeybadger::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
       sender.send(:send_request, :notices, {})
     end
 
@@ -124,7 +124,7 @@ describe Honeybadger::Sender do
       proxy = double(:new => http)
       Net::HTTP.stub(:Proxy).and_return(proxy)
 
-      http.should_receive(:post).with(Honeybadger::Sender::NOTICES_URI, kind_of(String), Honeybadger::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
+      http.should_receive(:post).with('/v1/notices/', kind_of(String), Honeybadger::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
       Net::HTTP.should_receive(:Proxy).with('some.host', 88, 'login', 'passwd')
 
       sender = build_sender(:proxy_host => 'some.host',
@@ -252,7 +252,7 @@ describe Honeybadger::Sender do
 
     context "SSL" do
       it "verifies the SSL peer when the use_ssl option is set to true" do
-        url = "https://api.honeybadger.io#{Honeybadger::Sender::NOTICES_URI}"
+        url = "https://api.honeybadger.io/v1/notices/"
         uri = URI.parse(url)
 
         real_http = Net::HTTP.new(uri.host, uri.port)
