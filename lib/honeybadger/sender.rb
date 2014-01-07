@@ -1,58 +1,5 @@
 module Honeybadger
   class Sender
-    HTTP_ERRORS = [Timeout::Error,
-                   Errno::EINVAL,
-                   Errno::ECONNRESET,
-                   EOFError,
-                   Net::HTTPBadResponse,
-                   Net::HTTPHeaderSyntaxError,
-                   Net::ProtocolError,
-                   Errno::ECONNREFUSED].freeze
-
-    class Error < StandardError
-      attr_accessor :retries
-
-      def initialize(message)
-        @retries = 0
-        super
-      end
-
-      def retry?; false; end
-    end
-
-    class HTTPError < Error
-      attr_reader :original_error
-
-      def initialize(message, original_error = self)
-        @original_error = original_error
-        super(message)
-      end
-
-      def retry?
-        HTTP_ERRORS.any? { |e| e === original_error }
-      end
-    end
-
-    class InvalidResponseError < Error
-      attr_reader :response
-
-      def initialize(default_message, response)
-        @response = response
-        super(message_from(response) || default_message)
-      end
-
-      def retry?
-        Net::HTTPInternalServerError === response
-      end
-
-      private
-
-        def message_from(response)
-          return unless response.body =~ /\S/
-          JSON.parse(response.body)['error'] rescue nil
-        end
-    end
-
     def initialize(options = {})
       [ :api_key,
         :proxy_host,
@@ -152,41 +99,21 @@ module Honeybadger
 
     def send_request(path, data, headers={})
       json = data.to_json
-      retry_errors do
-        response = http_connection.post(uri.merge("#{path.to_s}/").path, json, http_headers(headers))
-        if Net::HTTPSuccess === response
-          log(Honeybadger.configuration.debug ? :info : :debug, "[#{path.to_s.upcase}] Success: #{response.class}", response, json)
-          JSON.parse(response.body)
-        else
-          message = response.message =~ /\S/ ? response.message : response.class
-          fail InvalidResponseError.new("Invalid HTTP response: #{message}", response)
+      Error.retry(max_retries) do
+        Error.wrap_http_errors do
+          response = http_connection.post(uri.merge("#{path.to_s}/").path, json, http_headers(headers))
+          if Net::HTTPSuccess === response
+            log(Honeybadger.configuration.debug ? :info : :debug, "[#{path.to_s.upcase}] Success: #{response.class}", response, json)
+            JSON.parse(response.body)
+          else
+            message = response.message =~ /\S/ ? response.message : response.class
+            fail InvalidResponseError.new("Invalid HTTP response: #{message}", response)
+          end
         end
       end
     rescue Error => e
       log(:error, "[#{path.to_s.upcase}] Failure: #{e} (retried #{e.retries} time(s))", e.respond_to?(:response) && e.response, json)
       raise e
-    end
-
-    def retry_errors(&block)
-      retries = 0
-      begin
-        wrap_errors(&block)
-      rescue Error => e
-        e.retries = retries
-        if e.retry? && (retries += 1) <= max_retries
-          retry
-        else
-          raise e
-        end
-      end
-    end
-
-    def wrap_errors(&block)
-      yield
-    rescue Error => e
-      raise e
-    rescue *HTTP_ERRORS => e
-      raise HTTPError.new("Unable to contact the Honeybadger server. HTTP Error=#{e.class}", e)
     end
 
     def http_connection

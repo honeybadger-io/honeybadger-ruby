@@ -95,7 +95,7 @@ describe Honeybadger::Sender do
 
     it "doesn't fail when posting any http exception occurs" do
       http = stub_http
-      Honeybadger::Sender::HTTP_ERRORS.each do |error|
+      Honeybadger::HTTP_ERRORS.each do |error|
         http.stub(:post).and_raise(error)
         expect { send_exception(:secure => false) }.not_to raise_error
       end
@@ -174,13 +174,13 @@ describe Honeybadger::Sender do
     end
 
     context "HTTP failures" do
-      Honeybadger::Sender::HTTP_ERRORS.each do |error_class|
+      Honeybadger::HTTP_ERRORS.each do |error_class|
         context "#{error_class}" do
           let(:error_class) { error_class }
 
           it "retries connection up to configured limit" do
             sender.should_receive(:setup_http_connection).exactly(3).times.and_raise(error_class)
-            expect { sender.send(:send_request, :notices, :data, :headers) }.to raise_error(Honeybadger::Sender::HTTPError)
+            expect { sender.send(:send_request, :notices, :data, :headers) }.to raise_error(Honeybadger::HTTPError)
           end
         end
       end
@@ -189,14 +189,14 @@ describe Honeybadger::Sender do
         context "Net::HTTPInternalServerError" do
           it "retries connection up to configured limit" do
             stub_http(:response => Net::HTTPInternalServerError.new('1.2', '500', 'Internal Error')).should_receive(:post).exactly(3).times
-            expect { sender.send(:send_request, :notices, {}, {}) }.to raise_error(Honeybadger::Sender::InvalidResponseError)
+            expect { sender.send(:send_request, :notices, {}, {}) }.to raise_error(Honeybadger::InvalidResponseError)
           end
         end
 
         context "other errors" do
           it "does not retry connection" do
             stub_http(:response => Net::HTTPClientError.new('1.2', '429', 'Too Many Requests')).should_receive(:post).exactly(1).times
-            expect { sender.send(:send_request, :notices, {}, {}) }.to raise_error(Honeybadger::Sender::InvalidResponseError)
+            expect { sender.send(:send_request, :notices, {}, {}) }.to raise_error(Honeybadger::InvalidResponseError)
           end
         end
       end
