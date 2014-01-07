@@ -18,6 +18,7 @@ describe Honeybadger do
   it "reports that notifier is ready when configured" do
     stub_verbose_log
     Honeybadger.should_receive(:write_verbose_log).with(/Notifier (.*) ready/, anything)
+    Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
     configure
   end
 
@@ -27,27 +28,38 @@ describe Honeybadger do
     Honeybadger.configure(true) { |config| }
   end
 
-  it "prints environment info on a failed notification without a body" do
+  it "prints response on a failed notification without a body" do
     stub_verbose_log
     stub_http(:response => error_response, :body => nil)
-    Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
-    Honeybadger.should_not_receive(:write_verbose_log).with(/Response from Honeybadger:/, anything)
+    Honeybadger.should_receive(:write_verbose_log).with(/Response from Honeybadger:/, :debug)
     send_notice
   end
 
-  it "prints environment info and response on a success with a body" do
+  it "prints response on a success with a body" do
     stub_verbose_log
     stub_http
-    Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
-    Honeybadger.should_receive(:write_verbose_log).with(/Response from Honeybadger:/)
+    Honeybadger.should_receive(:write_verbose_log).with(/Response from Honeybadger:/, :debug)
     send_notice
   end
 
-  it "prints environment info and response on a failure with a body" do
+  it "prints response body on a success with a body" do
     stub_verbose_log
-    stub_http(:response => error_response)
-    Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
-    Honeybadger.should_receive(:write_verbose_log).with(/Response from Honeybadger:/)
+    stub_http(:body => 'this is a failure message')
+    Honeybadger.should_receive(:write_verbose_log).with(/this is a failure message/, :debug)
+    send_notice
+  end
+
+  it "prints response on a failure with a body" do
+    stub_verbose_log
+    stub_http(:response => error_response, :body => 'this is a failure message')
+    Honeybadger.should_receive(:write_verbose_log).with(/Response from Honeybadger:/, :debug)
+    send_notice
+  end
+
+  it "prints response body on a failure with a body" do
+    stub_verbose_log
+    stub_http(:response => error_response, :body => 'this is a failure message')
+    Honeybadger.should_receive(:write_verbose_log).with(/this is a failure message/, :debug)
     send_notice
   end
 end

@@ -87,23 +87,23 @@ module Honeybadger
       api_key
     end
 
-    def log(level, message, response = nil, data = nil)
-      # Log result:
+    def log(level, message)
       Honeybadger.write_verbose_log(message, level)
-
-      # Log debug information:
-      Honeybadger.report_environment_info
-      Honeybadger.write_verbose_log("Data: #{data}", :debug) if data && Honeybadger.configuration.debug
-      Honeybadger.report_response_body(response.body) if response && response.body =~ /\S/
     end
 
     def send_request(path, data, headers={})
+      log_prefix = path.to_s.upcase
       json = data.to_json
+
+      log(:debug, "[#{log_prefix}] Data: #{json}") if Honeybadger.configuration.debug
+
       Error.retry(max_retries) do
         Error.wrap_http_errors do
           response = http_connection.post(uri.merge("#{path.to_s}/").path, json, http_headers(headers))
+
+          log(Honeybadger.configuration.debug ? :info : :debug, "[#{log_prefix}] Response from Honeybadger: #{response.class}" + (response.body =~ /\S/ ? "\n#{response.body}" : ""))
+
           if Net::HTTPSuccess === response
-            log(Honeybadger.configuration.debug ? :info : :debug, "[#{path.to_s.upcase}] Success: #{response.class}", response, json)
             JSON.parse(response.body)
           else
             message = response.message =~ /\S/ ? response.message : response.class
@@ -112,7 +112,7 @@ module Honeybadger
         end
       end
     rescue Error => e
-      log(:error, "[#{path.to_s.upcase}] Failure: #{e} (retried #{e.retries} time(s))", e.respond_to?(:response) && e.response, json)
+      log(:error, "[#{log_prefix}] Failure: #{e} (retried #{e.retries} time(s))")
       raise e
     end
 

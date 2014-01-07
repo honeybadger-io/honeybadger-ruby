@@ -136,39 +136,49 @@ describe Honeybadger::Sender do
     end
 
     context "successful response" do
-      it "logs the success" do
-        sender.should_receive(:log).with(:debug, /Success/, kind_of(Net::HTTPSuccess), kind_of(String))
+      before { sender.stub(:log) }
+
+      it "logs the response" do
+        sender.should_receive(:log).with(:debug, /Response from Honeybadger: Net::HTTPOK/)
         sender.send(:send_request, :notices, {})
       end
 
       it "logs the success with API prefix" do
-        sender.should_receive(:log).with(:debug, /NOTICES/, kind_of(Net::HTTPSuccess), kind_of(String))
+        sender.should_receive(:log).with(:debug, /NOTICES/)
         sender.send(:send_request, :notices, {})
       end
     end
 
     context "unsuccessful response" do
+      before { sender.stub(:log) }
+
+      it "logs the response" do
+        stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => 403)
+        sender.should_receive(:log).with(:debug, /Response from Honeybadger: Net::HTTPForbidden/)
+        expect { sender.send(:send_request, :notices, {}) }.to raise_error
+      end
+
       it "logs the failure with API prefix" do
         stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => [429, 'Too Many Requests'])
-        sender.should_receive(:log).with(:error, /NOTICES/, kind_of(Net::HTTPResponse), kind_of(String))
+        sender.should_receive(:log).with(:error, /NOTICES/)
         expect { sender.send(:send_request, :notices, {}) }.to raise_error
       end
 
       it "logs response message on a failure with an invalid body" do
         stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => [429, 'Too Many Requests'], :body => 'ror":"oh no{s!"}')
-        sender.should_receive(:log).with(:error, /Too Many Requests/, kind_of(Net::HTTPResponse), kind_of(String))
+        sender.should_receive(:log).with(:error, /Too Many Requests/)
         expect { sender.send(:send_request, :notices, {}) }.to raise_error
       end
 
       it "logs response message on a failure with a body" do
         stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => [429, 'Too Many Requests'], :body => '{"error":"oh noes!"}')
-        sender.should_receive(:log).with(:error, /oh noes!/, kind_of(Net::HTTPResponse), kind_of(String))
+        sender.should_receive(:log).with(:error, /oh noes!/)
         expect { sender.send(:send_request, :notices, {}) }.to raise_error
       end
 
       it "logs response class on a failure without a body or message" do
         stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => 429)
-        sender.should_receive(:log).with(:error, /#{RUBY_VERSION !~ /^1/ ? 'Net::HTTPTooManyRequests' : 'Net::HTTPClientError'}/, kind_of(Net::HTTPResponse), kind_of(String))
+        sender.should_receive(:log).with(:error, /#{RUBY_VERSION !~ /^1/ ? 'Net::HTTPTooManyRequests' : 'Net::HTTPClientError'}/)
         expect { sender.send(:send_request, :notices, {}) }.to raise_error
       end
     end

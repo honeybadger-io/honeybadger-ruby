@@ -36,17 +36,13 @@ module Honeybadger
 
     # Tell the log that the Notifier is good to go
     def report_ready
+      report_environment_info
       write_verbose_log("Notifier #{VERSION} ready to catch errors", :info)
     end
 
     # Prints out the environment info to the log for debugging help
     def report_environment_info
       write_verbose_log("Environment Info: #{environment_info}")
-    end
-
-    # Prints out the response body from Honeybadger for debugging help
-    def report_response_body(response)
-      write_verbose_log("Response from Honeybadger: \n#{response}")
     end
 
     # Returns the Ruby version, Rails version, and current Rails environment
