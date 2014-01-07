@@ -7,7 +7,6 @@ Feature: Install the Gem in a Rails application
   Scenario: Use the gem without vendoring the gem in a Rails application
     When I run the honeybadger generator with "-k myapikey"
     Then I should receive a Honeybadger notification
-    And I should see the Rails version
 
   Scenario: Configure the notifier by hand
     When I configure my application to require Honeybadger
@@ -164,9 +163,8 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then the output should match /\[Honeybadger\] Notifier (?:\S+) ready to catch errors/
     And the output should not contain "[Honeybadger] [NOTICES]"
-    And the output should not contain "[Honeybadger] Environment Info"
-    And the output should not contain "[Honeybadger] Response from Honeybadger"
-    And the output should not contain "[Honeybadger] Notice"
+    And the output should not contain "Response from Honeybadger"
+    And the output should not contain "[Honeybadger] Data"
 
   Scenario: Failure to notify Honeybadger in production environments
     When I configure the Honeybadger failure shim
@@ -198,7 +196,6 @@ Feature: Install the Gem in a Rails application
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "--heroku"
     Then I should receive a Honeybadger notification
-    And I should see the Rails version
     And my Honeybadger configuration should contain the following line:
       """
       config.api_key = ENV['HONEYBADGER_API_KEY']
@@ -209,7 +206,6 @@ Feature: Install the Gem in a Rails application
     And I configure my application to require Honeybadger
     And I run the honeybadger generator with "--heroku -a myapp"
     Then I should receive a Honeybadger notification
-    And I should see the Rails version
     And my Honeybadger configuration should contain the following line:
       """
       config.api_key = ENV['HONEYBADGER_API_KEY']

@@ -17,8 +17,8 @@ describe Honeybadger do
 
   it "reports that notifier is ready when configured" do
     stub_verbose_log
-    Honeybadger.should_receive(:write_verbose_log).with(/Notifier (.*) ready/, anything)
-    Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
+    Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/, :info)
+    Honeybadger.should_receive(:write_verbose_log).with(/Notifier (.*) ready/, :info)
     configure
   end
 

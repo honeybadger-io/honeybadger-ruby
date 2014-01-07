@@ -96,10 +96,6 @@ Then /^the request\s?(url|component|action|params|session|cgi_data|context)? sho
   hash.to_s.send(negate ? :should_not : :should, match(/#{Regexp.escape(expected)}/))
 end
 
-Then /^I should see the Rails version$/ do
-  step %(the output should contain "[Rails: #{rails_version}]")
-end
-
 When /^I define a( metal)? response for "([^\"]*)":$/ do |metal, controller_and_action, definition|
   controller_class_name, action = controller_and_action.split('#')
   controller_name = controller_class_name.split(/(?=[A-Z][a-z]*)/).join('_').downcase
