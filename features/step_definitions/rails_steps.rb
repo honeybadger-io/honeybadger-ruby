@@ -86,12 +86,12 @@ Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
            when 'two' then 2
            else number end
 
-  all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == number
+  all_output.scan(/\[Honeybadger\] \[NOTICES\] Success:/).size.should == number
   step %(the output should contain "123456789")
 end
 
 Then /^the request\s?(url|component|action|params|session|cgi_data|context)? should( not)? contain "([^\"]*)"$/ do |key, negate, expected|
-  notice = all_output.match(/Notice: (\{.+\})/) ? JSON.parse(Regexp.last_match(1)) : {}
+  notice = all_output.scan(/Data: (\{.+\})/).empty? ? {} : JSON.parse(Regexp.last_match(1))
   hash = key ? notice['request'][key.strip] : notice['request']
   hash.to_s.send(negate ? :should_not : :should, match(/#{Regexp.escape(expected)}/))
 end

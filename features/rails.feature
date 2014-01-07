@@ -163,10 +163,10 @@ Feature: Install the Gem in a Rails application
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
     Then the output should match /\[Honeybadger\] Notifier (?:\S+) ready to catch errors/
-    Then the output should not contain "[Honeybadger] Success"
-    Then the output should not contain "[Honeybadger] Environment Info"
-    Then the output should not contain "[Honeybadger] Response from Honeybadger"
-    Then the output should not contain "[Honeybadger] Notice"
+    And the output should not contain "[Honeybadger] [NOTICES]"
+    And the output should not contain "[Honeybadger] Environment Info"
+    And the output should not contain "[Honeybadger] Response from Honeybadger"
+    And the output should not contain "[Honeybadger] Notice"
 
   Scenario: Failure to notify Honeybadger in production environments
     When I configure the Honeybadger failure shim
@@ -183,8 +183,8 @@ Feature: Install the Gem in a Rails application
       """
     And I route "/test/index" to "test#index"
     And I perform a request to "http://example.com:123/test/index?param=value"
-    Then the output should contain "[Honeybadger] Failure"
-    Then the output should not contain "Honeybadger::Sender#send_to_honeybadger"
+    Then the output should contain "[Honeybadger] [NOTICES] Failure"
+    And the output should not contain "Honeybadger::Sender#send_to_honeybadger"
 
   Scenario: The app uses Vlad instead of Capistrano
     When I configure my application to require Honeybadger

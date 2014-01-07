@@ -146,8 +146,8 @@ module Honeybadger
 
       # Log debug information:
       Honeybadger.report_environment_info
+      Honeybadger.write_verbose_log("Data: #{data}", :debug) if data && Honeybadger.configuration.debug
       Honeybadger.report_response_body(response.body) if response && response.body =~ /\S/
-      Honeybadger.write_verbose_log("Notice: #{data}", :debug) if data && Honeybadger.configuration.debug
     end
 
     def send_request(path, data, headers={})
