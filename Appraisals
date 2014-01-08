@@ -44,6 +44,7 @@ appraise 'rails4-cap3' do
   gem 'rack-mini-profiler', :require => false
   gem 'capistrano', '~> 3.0'
   gem 'capistrano-rails', '~> 1.1.0'
+  gem 'sshkit', '~> 1.2.0'
 end
 
 # appraise 'rails-edge' do
