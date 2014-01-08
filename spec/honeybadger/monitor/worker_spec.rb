@@ -6,7 +6,6 @@ describe Honeybadger::Monitor::Worker do
   subject { instance }
 
   before(:each) do
-    Thread.stub(:new)
     # Create an attr_reader for @metrics and @sender
     instance.stub(:metrics) { instance.instance_variable_get(:@metrics) }
     instance.stub(:sender) { instance.instance_variable_get(:@sender) }
@@ -86,6 +85,11 @@ describe Honeybadger::Monitor::Worker do
   describe '#send_metrics' do
     subject { instance.send(:send_metrics) }
 
+    before do
+      # Don't want the thread here, since it calls subject
+      Thread.kill(instance.instance_variable_get(:@thread))
+    end
+
     it 're-inits metrics' do
       instance.increment(:test, 60)
       expect { subject }.to change(instance, :metrics).to({ :timing => {}, :counter => {} })
@@ -107,7 +111,6 @@ describe Honeybadger::Monitor::Worker do
 
     context 'when constructingtiming metrics' do
       before(:each) { 10.times { |i| instance.timing(:test, i) } }
-      after(:each) { subject }
 
       it 'includes the mean value' do
         instance.sender.should_receive(:send_metrics).with(hash_including(:metrics => array_including(['test:mean 4.5'])))
@@ -136,6 +139,8 @@ describe Honeybadger::Monitor::Worker do
       it 'includes a count of total metrics' do
         instance.sender.should_receive(:send_metrics).with(hash_including(:metrics => array_including(['test 10'])))
       end
+
+      after(:each) { subject }
     end
 
     context 'when constructing counter metrics' do
@@ -148,7 +153,6 @@ describe Honeybadger::Monitor::Worker do
 
     context 'when sending metrics' do
       before(:each) { instance.increment(:test, 1) }
-      after(:each) { subject }
 
       it 'executes batches of 100' do
         199.times { |i| instance.increment(:"test_#{i}", 1) }
@@ -168,6 +172,8 @@ describe Honeybadger::Monitor::Worker do
         end
         instance.sender.should_receive(:send_metrics).with(hash_including(:hostname => 'zxcv'))
       end
+
+      after(:each) { subject }
     end
 
     context 'when an exception occurrs' do
