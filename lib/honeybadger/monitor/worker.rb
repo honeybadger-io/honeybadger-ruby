@@ -5,17 +5,23 @@ module Honeybadger
     class Worker
       include Singleton
 
+      # Sub-class thread so we have a named thread (useful for debugging in Thread.list).
+      class MetricsThread < Thread
+      end
+
       def initialize
         init_metrics
         @delay = 60
         @per_request = 100
         @sender = Monitor::Sender.new(Honeybadger.configuration)
-        @thread = Thread.new do
-          while true do
+        @thread = MetricsThread.new do
+          until Thread.current[:should_exit] do
             send_metrics
             sleep @delay
           end
         end
+
+        at_exit { @thread[:should_exit] = true }
       end
 
       def timing(name, value)
