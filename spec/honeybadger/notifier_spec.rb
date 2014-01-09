@@ -35,7 +35,6 @@ describe 'Honeybadger' do
       config.hostname = 'twix'
       stub_const('Honeybadger::VERSION', '1.11.0')
 
-      Honeybadger.unstub(:ping)
       Honeybadger.stub(:sender).and_return(sender)
     end
 
