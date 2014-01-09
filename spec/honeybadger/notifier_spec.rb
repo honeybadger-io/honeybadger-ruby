@@ -7,10 +7,6 @@ describe 'Honeybadger' do
   class ContinuedException < Exception
   end
 
-  before(:each) do
-    reset_config
-  end
-
   def assert_sends(notice, notice_args)
     Honeybadger::Notice.should_receive(:new).with(hash_including(notice_args))
     Honeybadger.sender.should_receive(:send_to_honeybadger).with(notice)
@@ -22,6 +18,67 @@ describe 'Honeybadger' do
 
   def set_development_env
     Honeybadger.configure { |config| config.environment_name = 'development' }
+  end
+
+  before(:each) { reset_config }
+
+  describe "#ping" do
+    let(:config) { Honeybadger::Configuration.new }
+    let(:sender) { double() }
+
+    let(:invoke_subject) { Honeybadger.ping(config) }
+    subject { invoke_subject }
+
+    before do
+      config.framework = 'Rails 4.1.0'
+      config.environment_name = 'production'
+      config.hostname = 'twix'
+      stub_const('Honeybadger::VERSION', '1.11.0')
+
+      Honeybadger.unstub(:ping)
+      Honeybadger.stub(:sender).and_return(sender)
+    end
+
+    context "configuration is public" do
+      before { config.stub(:public?).and_return(true) }
+
+      it "pings the sender" do
+        sender.should_receive(:ping).with(hash_including(:version => '1.11.0', :framework => 'Rails 4.1.0', :environment => 'production', :hostname => 'twix'))
+        invoke_subject
+      end
+
+      context "result is truthy" do
+        before { sender.should_receive(:ping).and_return(result) }
+
+        context "result does not contain features" do
+          let(:result) { {} }
+          it { should be_nil }
+          specify { expect { subject }.not_to change(config, :features) }
+        end
+
+        context "result contains features" do
+          let(:result) { {'features' => {'notices' => true, 'metrics' => true}} }
+          it { should eq result['features'] }
+          specify { expect { subject }.to change(config, :features).to(result['features']) }
+        end
+      end
+
+      context "result is falsey" do
+        before { sender.should_receive(:ping) }
+        it { should be_nil }
+        specify { expect { invoke_subject }.not_to change(config, :features) }
+      end
+    end
+
+    context "configuration is not public" do
+      before { config.stub(:public?).and_return(false) }
+      it { should be_nil }
+
+      it "doesn't attempt to ping sender" do
+        sender.should_not_receive(:ping)
+        invoke_subject
+      end
+    end
   end
 
   it "yields and save a configuration when configuring" do

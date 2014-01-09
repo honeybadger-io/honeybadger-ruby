@@ -14,15 +14,6 @@ describe Honeybadger::Notice do
     Honeybadger::Notice.new(configuration.merge(args))
   end
 
-  def stub_request(attrs = {})
-    double('request', { :parameters  => { 'one' => 'two' },
-                      :protocol    => 'http',
-                      :host        => 'some.host',
-                      :request_uri => '/some/uri',
-                      :session     => { :to_hash => { 'a' => 'b' } },
-                      :env         => { 'three' => 'four' } }.update(attrs))
-  end
-
   context '#deliver' do
     context 'sender is configured' do
       it "delivers to sender" do

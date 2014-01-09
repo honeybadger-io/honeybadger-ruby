@@ -90,6 +90,19 @@ module Honeybadger
       @configuration ||= Configuration.new
     end
 
+    # Internal: Contacts the Honeybadger service and configures features
+    #
+    # configuration - the Configuration object to use
+    #
+    # Returns Hash features on success, NilClass on failure
+    def ping(configuration)
+      if configuration.public?
+        if result = sender.ping({ :version => Honeybadger::VERSION, :framework => configuration.framework, :environment => configuration.environment_name, :hostname => configuration.hostname })
+          configuration.features = result['features'] if result['features']
+        end
+      end
+    end
+
     # Public: Sends an exception manually using this method, even when you are not in a controller.
     #
     # exception - The exception you want to notify Honeybadger about.

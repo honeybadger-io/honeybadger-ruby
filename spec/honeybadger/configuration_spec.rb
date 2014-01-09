@@ -3,6 +3,7 @@ require 'socket'
 
 describe Honeybadger::Configuration do
   it "provides default values" do
+    assert_config_default :api_key,             nil
     assert_config_default :proxy_host,          nil
     assert_config_default :proxy_port,          nil
     assert_config_default :proxy_user,          nil
@@ -189,6 +190,7 @@ describe Honeybadger::Configuration do
 
   it "is public in a public environment" do
     config = Honeybadger::Configuration.new
+    config.api_key = 'asdf'
     config.development_environments = %w(development)
     config.environment_name = 'production'
     expect(config.public?).to be_true
@@ -196,6 +198,7 @@ describe Honeybadger::Configuration do
 
   it "is not public in a development environment" do
     config = Honeybadger::Configuration.new
+    config.api_key = 'asdf'
     config.development_environments = %w(staging)
     config.environment_name = 'staging'
     expect(config.public?).to be_false
@@ -203,32 +206,36 @@ describe Honeybadger::Configuration do
 
   it "is public without an environment name" do
     config = Honeybadger::Configuration.new
+    config.api_key = 'asdf'
     expect(config.public?).to be_true
   end
 
-  it "is not be public if the notices feature is missing" do
-    config = Honeybadger::Configuration.new
-    config.features = {}
-    expect(config.public?).to be_false
-  end
+  describe "#metrics?" do
+    let(:config) { Honeybadger::Configuration.new }
 
-  it "sends metrics by default in a public environment" do
-    config = Honeybadger::Configuration.new
-    config.environment_name = 'production'
-    expect(config.metrics?).to be_true
-  end
+    context "when public" do
+      before { config.stub(:public?).and_return(true) }
 
-  it "sends not send metrics when disabled" do
-    config = Honeybadger::Configuration.new
-    config.environment_name = 'production'
-    config.metrics = false
-    expect(config.metrics?).to be_false
-  end
+      it "sends metrics by default" do
+        expect(config.metrics?).to be_true
+      end
 
-  it "sends not send metrics in a development environment" do
-    config = Honeybadger::Configuration.new
-    config.environment_name = 'development'
-    expect(config.metrics?).to be_false
+      context "when disabled" do
+        before { config.metrics = false }
+
+        it "does not send metrics" do
+          expect(config.metrics?).to be_false
+        end
+      end
+    end
+
+    context "when not public" do
+      before { config.stub(:public?).and_return(false) }
+
+      it "does not send metrics" do
+        expect(config.metrics?).to be_false
+      end
+    end
   end
 
   it "uses the assigned logger if set" do
@@ -237,7 +244,7 @@ describe Honeybadger::Configuration do
     expect(config.logger).to eq "CUSTOM LOGGER"
   end
 
-  it 'gives a new instance if non defined' do
+  it "gives a new instance if non defined" do
     Honeybadger.configuration = nil
     expect(Honeybadger.configuration).to be_a Honeybadger::Configuration
   end

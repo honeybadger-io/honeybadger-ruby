@@ -44,13 +44,7 @@ module Honeybadger
         ::ActionDispatch::ShowExceptions.send(:include,Honeybadger::Rails::Middleware::ExceptionsCatcher)
       end
 
-      if Honeybadger.configuration.public?
-        if result = Honeybadger.sender.ping({ :version => Honeybadger::VERSION, :framework => Honeybadger.configuration.framework, :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
-          Honeybadger.configure(true) do |config|
-            config.features = result['features'] if result['features']
-          end
-        end
-      end
+      Honeybadger.ping(Honeybadger.configuration)
     end
   end
 end

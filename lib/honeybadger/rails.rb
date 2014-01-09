@@ -21,6 +21,8 @@ module Honeybadger
                                                       Honeybadger::Rack
         ::Rails.configuration.middleware.insert_after 'Rack::Lock',
                                                       Honeybadger::UserInformer
+        ::Rails.configuration.middleware.insert_after Honeybadger::UserInformer,
+                                                      Honeybadger::UserFeedback
       end
 
       Honeybadger.configure(true) do |config|
@@ -28,6 +30,12 @@ module Honeybadger
         config.environment_name = defined?(::Rails.env) && ::Rails.env || defined?(RAILS_ENV) && RAILS_ENV
         config.project_root     = defined?(::Rails.root) && ::Rails.root || defined?(RAILS_ROOT) && RAILS_ROOT
         config.framework        = defined?(::Rails.version) && "Rails: #{::Rails.version}" || defined?(::Rails::VERSION::STRING) && "Rails: #{::Rails::VERSION::STRING}"
+      end
+
+      if defined?(::Rails.configuration) && ::Rails.configuration.respond_to?(:after_initialize)
+        ::Rails.configuration.after_initialize do
+          Honeybadger.ping(Honeybadger.configuration)
+        end
       end
     end
   end

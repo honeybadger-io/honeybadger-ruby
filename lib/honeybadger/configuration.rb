@@ -261,9 +261,9 @@ module Honeybadger
 
     # Public: Determines if the notifier will send notices.
     #
-    # Returns false if in a development environment, true otherwise.
+    # Returns true if allowed to talk to API, false otherwise.
     def public?
-      !development_environments.include?(environment_name) && features['notices']
+      !development_environments.include?(environment_name) && api_key =~ /\S/
     end
 
     # Public: Determines whether to send metrics
