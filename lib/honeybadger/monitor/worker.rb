@@ -14,14 +14,21 @@ module Honeybadger
         @delay = 60
         @per_request = 100
         @sender = Monitor::Sender.new(Honeybadger.configuration)
+        start
+        at_exit { stop }
+      end
+
+      def start
         @thread = MetricsThread.new do
           until Thread.current[:should_exit] do
             send_metrics
             sleep @delay
           end
         end
+      end
 
-        at_exit { @thread[:should_exit] = true }
+      def stop
+        @thread[:should_exit] = true if @thread
       end
 
       def timing(name, value)
