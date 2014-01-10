@@ -190,7 +190,6 @@ describe Honeybadger::Configuration do
 
   it "is public in a public environment" do
     config = Honeybadger::Configuration.new
-    config.api_key = 'asdf'
     config.development_environments = %w(development)
     config.environment_name = 'production'
     expect(config.public?).to be_true
@@ -198,7 +197,6 @@ describe Honeybadger::Configuration do
 
   it "is not public in a development environment" do
     config = Honeybadger::Configuration.new
-    config.api_key = 'asdf'
     config.development_environments = %w(staging)
     config.environment_name = 'staging'
     expect(config.public?).to be_false
@@ -206,7 +204,6 @@ describe Honeybadger::Configuration do
 
   it "is public without an environment name" do
     config = Honeybadger::Configuration.new
-    config.api_key = 'asdf'
     expect(config.public?).to be_true
   end
 
