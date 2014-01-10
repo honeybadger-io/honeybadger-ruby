@@ -129,7 +129,6 @@ Feature: Install the Gem in a Rails application
     Then the output should contain "Honeybadger Error 123456789"
     And the output should not contain "<!-- HONEYBADGER ERROR -->"
 
-  @rails_3
   Scenario: Output when user feedback is enabled
     When I configure my application to require Honeybadger
     And I configure Honeybadger with:
