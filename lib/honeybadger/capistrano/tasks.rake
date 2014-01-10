@@ -1,8 +1,13 @@
 after 'deploy:finishing', 'honeybadger:deploy'
 
 namespace :honeybadger do
+  def sshkit_outdated?
+    !::SSHKit.config.command_map.respond_to?(:prefix)
+  end
+
   desc 'Notify Honeybadger of the deployment.'
   task :deploy => :env do
+    next if sshkit_outdated?
     if server = fetch(:honeybadger_server)
       on server do |host|
         info 'Notifying Honeybadger of deploy.'
@@ -28,6 +33,13 @@ namespace :honeybadger do
 
   desc 'Setup ENV for Honeybadger deploy rake task.'
   task :env do
+    if sshkit_outdated?
+      run_locally do
+        warn 'Unable to notify Honeybadger: you are using an outdated version of SSHKIT. Please upgrade to >= 1.2.0.'
+      end
+      next
+    end
+
     server = fetch(:honeybadger_server) do
       s = primary(:app)
       set(:honeybadger_server, s.select?({ :exclude => :no_release }) ? s : nil)
