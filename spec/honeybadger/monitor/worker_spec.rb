@@ -6,6 +6,8 @@ describe Honeybadger::Monitor::Worker do
   subject { instance }
 
   before(:each) do
+    Thread.stub(:new)
+
     # Create an attr_reader for @metrics and @sender
     instance.stub(:metrics) { instance.instance_variable_get(:@metrics) }
     instance.stub(:sender) { instance.instance_variable_get(:@sender) }
@@ -84,11 +86,6 @@ describe Honeybadger::Monitor::Worker do
 
   describe '#send_metrics' do
     subject { instance.send(:send_metrics) }
-
-    before do
-      # Don't want the thread here, since it calls subject
-      Thread.kill(instance.instance_variable_get(:@thread))
-    end
 
     it 're-inits metrics' do
       instance.increment(:test, 60)
