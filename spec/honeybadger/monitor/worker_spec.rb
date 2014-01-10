@@ -13,7 +13,7 @@ describe Honeybadger::Monitor::Worker do
     instance.stub(:sender) { instance.instance_variable_get(:@sender) }
   end
 
-  context 'initializing' do
+  describe '#initialize' do
     describe '@metrics' do
       subject { instance.instance_variable_get(:@metrics) }
 
@@ -50,6 +50,16 @@ describe Honeybadger::Monitor::Worker do
         Honeybadger::Monitor::Worker.send(:new)
       end
     end
+
+    it 'starts the worker loop'
+  end
+
+  describe '#start' do
+    it 'creates a new Thread'
+  end
+
+  describe '#stop' do
+    it 'asks current thread to exit gracefully'
   end
 
   describe '#timing' do
