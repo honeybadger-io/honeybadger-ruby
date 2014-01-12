@@ -1,6 +1,18 @@
 require 'erb'
 require 'uri'
 
+begin
+  require 'i18n'
+rescue LoadError
+  module Honeybadger
+    module I18n
+      def self.t(key, options={})
+        options[:default]
+      end
+    end
+  end
+end
+
 module Honeybadger
   class UserFeedback
     def initialize(app)

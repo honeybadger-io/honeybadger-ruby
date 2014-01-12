@@ -1,5 +1,9 @@
 ## Honeybadger 1.11.0 (unreleased) ##
 
+* Add I18n support to feedback form
+
+  *Joshua Wood*
+
 * Allow feedback template to be overridden.
 
   *Joshua Wood*
