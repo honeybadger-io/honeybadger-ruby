@@ -1,5 +1,9 @@
 ## Honeybadger 1.11.0 (unreleased) ##
 
+* Allow feedback template to be overridden.
+
+  *Joshua Wood*
+
 * Capistrano 3 support
 
   *Joshua Wood*

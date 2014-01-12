@@ -3,26 +3,8 @@ require 'uri'
 
 module Honeybadger
   class UserFeedback
-    TEMPLATE = File.read(File.expand_path('../templates/feedback_form.html.erb', __FILE__)).freeze
-
     def initialize(app)
       @app = app
-    end
-
-    def action
-      config = Honeybadger.configuration
-      URI.parse("#{config.protocol}://#{config.host}:#{config.port}/v1/feedback/").to_s
-    rescue URI::InvalidURIError
-      nil
-    end
-
-    def render_form(error_id, action = action)
-      return unless action
-      ERB.new(TEMPLATE).result(binding)
-    end
-
-    def enabled?
-      Honeybadger.configuration.feedback && Honeybadger.configuration.features['feedback']
     end
 
     def call(env)
@@ -37,6 +19,42 @@ module Honeybadger
         body = new_body
       end
       [status, headers, body]
+    end
+
+    def config
+      Honeybadger.configuration
+    end
+
+    def enabled?
+      config.feedback && config.features['feedback']
+    end
+
+    def action
+      URI.parse("#{config.protocol}://#{config.host}:#{config.port}/v1/feedback/").to_s
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def render_form(error_id, action = action)
+      return unless action
+      ERB.new(@template ||= File.read(template_file)).result(binding)
+    end
+
+    def custom_template_file
+      @custom_template_file ||= config.project_root &&
+        File.join(config.project_root, 'lib', 'honeybadger', 'templates', 'feedback_form.erb')
+    end
+
+    def custom_template_file?
+      custom_template_file && File.exists?(custom_template_file)
+    end
+
+    def template_file
+      if custom_template_file?
+        custom_template_file
+      else
+        File.expand_path('../templates/feedback_form.erb', __FILE__)
+      end
     end
   end
 end
