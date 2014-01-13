@@ -8,6 +8,14 @@
 
   *Joshua Wood*
 
+* Add feedback to Rails 2.3.x (also adds ping for Rails 2)
+
+  *Joshua Wood*
+
+* Fix a JRuby memory leak
+
+  *Kevin Menard*
+
 * Capistrano 3 support
 
   *Joshua Wood*
