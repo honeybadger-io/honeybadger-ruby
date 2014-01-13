@@ -99,7 +99,9 @@ describe Honeybadger::Monitor::Worker do
 
     it 're-inits metrics' do
       instance.increment(:test, 60)
+      previous_metrics = instance.metrics
       expect { subject }.to change(instance, :metrics).to({ :timing => {}, :counter => {} })
+      expect(instance.metrics).not_to be(previous_metrics)
     end
 
     it 'returns nil when there are no metrics to send' do
@@ -116,7 +118,7 @@ describe Honeybadger::Monitor::Worker do
       expect(subject).to be_nil
     end
 
-    context 'when constructingtiming metrics' do
+    context 'when constructing timing metrics' do
       before(:each) { 10.times { |i| instance.timing(:test, i) } }
 
       it 'includes the mean value' do

@@ -1,5 +1,9 @@
 ## Honeybadger 1.11.0 (unreleased) ##
 
+* Fix concurrency race condition when modifying metrics hash
+
+  *Joshua Wood*
+
 * Add I18n support to feedback form
 
   *Joshua Wood*

@@ -14,6 +14,7 @@ module Honeybadger
         @delay = 60
         @per_request = 100
         @sender = Monitor::Sender.new(Honeybadger.configuration)
+        @lock = Mutex.new
         start
         at_exit { stop }
       end
@@ -45,10 +46,17 @@ module Honeybadger
           @metrics = { :timing => {}, :counter => {} }
         end
 
+        def collect_metrics
+          @lock.synchronize do
+            metrics = @metrics
+            init_metrics
+            metrics
+          end
+        end
+
         def send_metrics
-          metrics = @metrics.dup
+          metrics = collect_metrics
           return unless metrics[:timing].any? || metrics[:counter].any?
-          init_metrics
           [].tap do |m|
             metrics[:counter].each do |metric, values|
               m << "#{metric} #{values.sum}"
@@ -72,7 +80,9 @@ module Honeybadger
         end
 
         def add_metric(name, value, kind)
-          (@metrics[kind][name] ||= Honeybadger::Array.new) << value
+          @lock.synchronize do
+            (@metrics[kind][name] ||= Honeybadger::Array.new) << value
+          end
         end
 
         def log(level, message)
