@@ -6,6 +6,7 @@
 #honeybadger_feedback_comment { height: 10em; }
 #honeybadger_feedback_submit { height: 1em; }
 #honeybadger_feedback_form .honeybadger-feedback-phone { display: none; }
+#honeybadger_feedback_link { font-size: 90%; }
 </style>
 
 <script>
@@ -80,3 +81,5 @@ function sendHoneybadgerFeedback() {
     <input type="submit" id="honeybadger_feedback_submit" value="<%= I18n.t('honeybadger.feedback.submit', :default => 'Send') %>">
   </p>
 </form>
+
+<p><a id="honeybadger_feedback_link" href="https://www.honeybadger.io/" target="_blank" title="Exception, uptime, and performance monitoring for Ruby.">Powered by Honeybadger</a></p>
