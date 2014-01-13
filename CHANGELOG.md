@@ -1,3 +1,13 @@
+## Honeybadger 1.10.2 ##
+
+* Fix concurrency race condition when modifying metrics hash
+
+  *Joshua Wood*
+
+* Fix a JRuby memory leak
+
+  *Kevin Menard*
+
 ## Honeybadger 1.10.1 ##
 
 * Stop sending ENV with rake exceptions
