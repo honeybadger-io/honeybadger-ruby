@@ -1,5 +1,9 @@
 ## Honeybadger 1.11.0 (unreleased) ##
 
+* Filter params from query strings in rack env.
+
+  *Joshua Wood*
+
 * Fix concurrency race condition when modifying metrics hash
 
   *Joshua Wood*

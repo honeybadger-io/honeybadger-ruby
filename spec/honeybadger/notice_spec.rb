@@ -304,53 +304,55 @@ describe Honeybadger::Notice do
     assert_filters_hash(:session_data)
   end
 
-  describe 'url' do
-    let(:params_filters) { [] }
-    let(:notice) { build_notice(:params_filters => params_filters, :url => url) }
+  context 'filtered parameters in query string' do
+    let(:params_filters) { [:foo, :bar] }
 
-    context 'filtered params in query' do
-      let(:params_filters) { [:bar] }
-      let(:url) { 'https://www.honeybadger.io/?foo=1&bar=2&baz=3' }
-
+    describe '#url' do
+      let(:notice) { build_notice(:params_filters => params_filters, :url => 'https://www.honeybadger.io/?foo=1&bar=2&baz=3') }
       it 'filters query' do
-        expect(notice.url).to eq 'https://www.honeybadger.io/?foo=1&bar=[FILTERED]&baz=3'
+        expect(notice.url).to eq 'https://www.honeybadger.io/?foo=[FILTERED]&bar=[FILTERED]&baz=3'
       end
     end
 
+    describe '#cgi_data' do
+      let(:cgi_data) { { 'QUERY_STRING' => 'foo=1&bar=2&baz=3', 'ORIGINAL_FULLPATH' => '/?foo=1&bar=2&baz=3' } }
+      let(:notice) { build_notice(:params_filters => params_filters, :cgi_data => cgi_data) }
+
+      subject { notice.cgi_data }
+
+      it 'filters QUERY_STRING key' do
+        expect(subject['QUERY_STRING']).to eq 'foo=[FILTERED]&bar=[FILTERED]&baz=3'
+      end
+
+      it 'filters ORIGINAL_FULLPATH key' do
+        expect(subject['ORIGINAL_FULLPATH']).to eq '/?foo=[FILTERED]&bar=[FILTERED]&baz=3'
+      end
+    end
+  end
+
+  describe '#filter_url' do
+    let(:notice) { build_notice(:params_filters => [], :url => url) }
+    subject { notice.send(:filter_url, url) }
+
     context 'malformed query' do
       let(:url) { 'https://www.honeybadger.io/?foobar12' }
-
-      it 'maintains query' do
-        expect(notice.url).to eq url
-      end
+      it { should eq url }
     end
 
     context 'no query' do
       let(:url) { 'https://www.honeybadger.io' }
-
-      it 'keeps original URL' do
-        expect(notice.url).to eq url
-      end
+      it { should eq url }
     end
 
     context 'malformed url' do
       let(:url) { 'http s ! honeybadger' }
-
-      before do
-        expect { URI.parse(url) }.to raise_error
-      end
-
-      it 'keeps original URL' do
-        expect(notice.url).to eq url
-      end
+      before { expect { URI.parse(url) }.to raise_error }
+      it { should eq url }
     end
 
     context 'complex url' do
       let(:url) { 'https://foo:bar@www.honeybadger.io:123/asdf/?foo=1&bar=2&baz=3' }
-
-      it 'keeps original URL' do
-        expect(notice.url).to eq url
-      end
+      it { should eq url }
     end
   end
 
