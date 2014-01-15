@@ -339,6 +339,7 @@ module Honeybadger
     def clean_rack_request_data
       if cgi_data
         cgi_data.delete("rack.request.form_vars")
+        cgi_data.delete("rack.request.query_string")
       end
     end
 

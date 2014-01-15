@@ -221,6 +221,7 @@ Feature: Install the Gem in a Rails application
       config.api_key = "myapikey"
       config.logger = Logger.new(STDOUT)
       config.params_filters << "credit_card_number"
+      config.params_filters << "secret"
       config.debug = true
       """
     And I define a response for "TestController#index":
@@ -229,10 +230,12 @@ Feature: Install the Gem in a Rails application
       raise RuntimeError, "some message"
       """
     And I route "/test/index" to "test#index"
-    And I perform a request to "http://example.com:123/test/index?param=value"
+    And I perform a request to "http://example.com:123/test/index?param=value&secret=blue42"
     Then I should receive a Honeybadger notification
-    And the request should not contain "blue42"
+    And the request should not contain "red23"
     And the request params should contain "FILTERED"
+    And the request should not contain "blue42"
+    And the request cgi_data should contain "FILTERED"
 
   Scenario: Filtering session in a controller
     When I configure my application to require Honeybadger
