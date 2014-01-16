@@ -331,7 +331,7 @@ module Honeybadger
 
     def filter_cgi_data_params(cgi_data)
       cgi_data.each_pair do |key, value|
-        next unless value.kind_of?(String) && key.match(/\A[A-Z_]+\Z/)
+        next unless value.kind_of?(String) && key =~ /\A[A-Z_]+\Z/
         cgi_data[key] = filter_url(value)
       end
     end
