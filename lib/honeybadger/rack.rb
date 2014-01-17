@@ -22,6 +22,7 @@ module Honeybadger
   class Rack
     def initialize(app)
       @app = app
+      Honeybadger.configuration.framework = "Rack: #{::Rack.release}"
     end
 
     def ignored_user_agent?(env)

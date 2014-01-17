@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rack'
 
 describe Honeybadger::Rack do
   it "calls the upstream app with the environment" do
