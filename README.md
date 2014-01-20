@@ -18,7 +18,7 @@ Honeybadger supports Ruby 1.8.7 through 2.0.
 
 ## Supported Rails versions
 
-Honeybadger supports Rails 2.3.18 through Rails 4.0.2.
+Honeybadger supports Rails 2.3.18 through Rails 4.1.0.
 
 ## Contributing
 

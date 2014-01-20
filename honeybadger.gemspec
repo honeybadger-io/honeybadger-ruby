@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'honeybadger'
   s.version           = '1.11.0.beta1'
-  s.date              = '2014-01-17'
+  s.date              = '2014-01-20'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('json')
 
-  s.add_development_dependency('cucumber',   '~> 1.2.1')
+  s.add_development_dependency('cucumber',   '~> 1.3.10')
   s.add_development_dependency('rspec',      '~> 2.14.0')
   s.add_development_dependency('sham_rack',  '~> 1.3.0')
   s.add_development_dependency('capistrano', '~> 2.0')
@@ -72,10 +72,10 @@ Gem::Specification.new do |s|
     gemfiles/rails3.1.gemfile.lock
     gemfiles/rails3.2.gemfile
     gemfiles/rails3.2.gemfile.lock
-    gemfiles/rails4.gemfile
-    gemfiles/rails4.gemfile.lock
-    gemfiles/rails4_cap3.gemfile
-    gemfiles/rails4_cap3.gemfile.lock
+    gemfiles/rails4.0.gemfile
+    gemfiles/rails4.0.gemfile.lock
+    gemfiles/rails4.1.gemfile
+    gemfiles/rails4.1.gemfile.lock
     gemfiles/rake.gemfile
     gemfiles/rake.gemfile.lock
     gemfiles/sinatra.gemfile
