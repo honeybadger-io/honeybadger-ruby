@@ -11,7 +11,7 @@ describe Honeybadger::Stats do
 
     describe '.keys' do
       subject { Honeybadger::Stats.memory.keys }
-      it { should eq [:total, :free, :buffers, :cached, :free_total] }
+      its(:length) { should eq 5 }
     end
 
     it 'converts KB to MB' do
@@ -47,7 +47,7 @@ describe Honeybadger::Stats do
 
     describe '.keys' do
       subject { Honeybadger::Stats.load.keys }
-      it { should eq [:one, :five, :fifteen] }
+      its(:length) { should eq 3 }
     end
 
     specify { expect(subject[:one]).to eq 22.58 }
