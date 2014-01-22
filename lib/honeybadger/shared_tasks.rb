@@ -47,7 +47,7 @@ namespace :honeybadger do
         exit
       end
 
-      command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{heroku_rails_env}&api_key=#{heroku_api_key}"#{ENV['APP'] ? " --app #{ENV['APP']}" : ''})
+      command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{heroku_rails_env}&deploy[local_username]={{user}}&deploy[revision]={{head}}&api_key=#{heroku_api_key}"#{ENV['APP'] ? " --app #{ENV['APP']}" : ''})
 
       puts "\nRunning:\n#{command}\n"
       puts `#{command}`
