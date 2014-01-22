@@ -12,7 +12,7 @@ module Honeybadger
       def memory
         out = {}
         if HAS_MEM
-          out[:total], out[:free], out[:buffers], out[:cached] = IO.readlines("/proc/meminfo")[0..4].map { |l| l =~ /^.*?\: +(.*?) kB$/; $1.to_i / 1024.0 }
+          out[:total], out[:free], out[:buffers], out[:cached] = IO.readlines("/proc/meminfo")[0..4].map { |l| l =~ /^.*?\: +(.*?) kB$/; ($1.to_i / 1024.0).to_f }
           out[:free_total] = out[:free] + out[:buffers] + out[:cached]
         end
         out
