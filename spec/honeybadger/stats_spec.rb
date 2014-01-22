@@ -25,7 +25,7 @@ describe Honeybadger::Stats do
       expect(Honeybadger::Stats.memory[:free_total]).to eq 15337.73828125
     end
 
-    context 'mathn' do
+    context 'when mathn is required' do
       before(:all) { require 'mathn' }
 
       it 'converts Rational to Float' do
@@ -35,5 +35,23 @@ describe Honeybadger::Stats do
         expect(Honeybadger::Stats.memory[:cached]).to be_a Float
       end
     end
+  end
+
+  describe '.load' do
+    subject { Honeybadger::Stats.load }
+
+    before do
+      stub_const('Honeybadger::Stats::HAS_LOAD', true)
+      IO.stub(:read).with('/proc/loadavg').and_return('22.58 19.66 15.96 20/2019 2')
+    end
+
+    describe '.keys' do
+      subject { Honeybadger::Stats.load.keys }
+      it { should eq [:one, :five, :fifteen] }
+    end
+
+    specify { expect(subject[:one]).to eq 22.58 }
+    specify { expect(subject[:five]).to eq 19.66 }
+    specify { expect(subject[:fifteen]).to eq 15.96 }
   end
 end
