@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.11.0.beta1'
-  s.date              = '2014-01-20'
+  s.version           = '1.11.0.beta2'
+  s.date              = '2014-01-22'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -131,6 +131,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/rails/action_controller_spec.rb
     spec/honeybadger/rails_spec.rb
     spec/honeybadger/sender_spec.rb
+    spec/honeybadger/stats_spec.rb
     spec/honeybadger/user_feedback_spec.rb
     spec/honeybadger/user_informer_spec.rb
     spec/honeybadger_tasks_spec.rb

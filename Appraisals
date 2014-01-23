@@ -9,7 +9,7 @@ appraise 'rails3.0' do
   gem 'rails', '~> 3.0.17'
   gem 'honeybadger', :path => '../'
   gem 'better_errors', :require => false
-  gem 'rack-mini-profiler', :require => false
+  gem 'rack-mini-profiler', '~>0.1.31 ', :require => false
   gem 'capistrano', '~> 2.0'
 end
 
