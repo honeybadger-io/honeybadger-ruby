@@ -1,5 +1,3 @@
-after 'deploy:finishing', 'honeybadger:deploy'
-
 namespace :honeybadger do
   def sshkit_outdated?
     !::SSHKit.config.command_map.respond_to?(:prefix)
@@ -65,3 +63,5 @@ namespace :honeybadger do
     end
   end
 end
+
+after 'deploy:finishing', 'honeybadger:deploy'
