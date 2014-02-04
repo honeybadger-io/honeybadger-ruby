@@ -72,7 +72,7 @@ module Honeybadger
             end
           end.each_slice(@per_request) do |mm|
             begin
-              @sender.send_metrics({ :metrics => mm, :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
+              @sender.send_metrics({ :metrics => mm.compact, :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
             rescue Exception => e
               log(:error, "[Honeybadger::Monitor::Worker#send_metrics] Failed to send #{mm.count} metrics: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
             end
