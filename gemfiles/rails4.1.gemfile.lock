@@ -1,7 +1,7 @@
 PATH
   remote: /Users/josh/code/honeybadger-ruby
   specs:
-    honeybadger (1.11.0.beta3)
+    honeybadger (1.11.0.beta4)
       json
 
 GEM
