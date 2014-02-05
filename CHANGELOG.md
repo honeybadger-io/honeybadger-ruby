@@ -1,4 +1,4 @@
-## Honeybadger 1.10.2 ##
+## Honeybadger 1.10.3 ##
 
 * Fix concurrency race condition when modifying metrics hash
 
@@ -7,6 +7,15 @@
 * Fix a JRuby memory leak
 
   *Kevin Menard*
+
+## Honeybadger 1.10.2 ##
+
+* Explictly cast division to float.
+
+  If you include mathn, a Rational is returned from #/, so we need
+  to explictly cast to a float.
+
+  *Austen Ito*
 
 ## Honeybadger 1.10.1 ##
 
