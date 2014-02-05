@@ -4,10 +4,6 @@
 
   *Joshua Wood*
 
-* Fix concurrency race condition when modifying metrics hash
-
-  *Joshua Wood*
-
 * Add I18n support to feedback form
 
   *Joshua Wood*
@@ -20,13 +16,32 @@
 
   *Joshua Wood*
 
+* Capistrano 3 support
+
+  *Joshua Wood*
+
+## Honeybadger 1.10.3 ##
+
+* Fixed bug with missing stddev stats
+
+  *Ben Curtis*
+
+* Fix concurrency race condition when modifying metrics hash
+
+  *Joshua Wood*
+
 * Fix a JRuby memory leak
 
   *Kevin Menard*
 
-* Capistrano 3 support
+## Honeybadger 1.10.2 ##
 
-  *Joshua Wood*
+* Explictly cast division to float.
+
+  If you include mathn, a Rational is returned from #/, so we need
+  to explictly cast to a float.
+
+  *Austen Ito*
 
 ## Honeybadger 1.10.1 ##
 
