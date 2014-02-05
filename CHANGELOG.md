@@ -1,5 +1,9 @@
 ## Honeybadger 1.10.3 ##
 
+* Fixed bug with missing stddev stats
+
+  *Ben Curtis*
+
 * Fix concurrency race condition when modifying metrics hash
 
   *Joshua Wood*
