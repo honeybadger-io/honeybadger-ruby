@@ -1,4 +1,4 @@
-## Honeybadger 1.11.0 (unreleased) ##
+## Honeybadger 1.11.0 ##
 
 * Filter params from query strings in rack env.
 
