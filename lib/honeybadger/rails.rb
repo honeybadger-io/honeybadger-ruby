@@ -34,6 +34,7 @@ module Honeybadger
 
       if defined?(::Rails.configuration) && ::Rails.configuration.respond_to?(:after_initialize)
         ::Rails.configuration.after_initialize do
+          Honeybadger::Dependency.inject!
           Honeybadger.ping(Honeybadger.configuration)
         end
       end

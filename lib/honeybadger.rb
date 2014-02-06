@@ -4,6 +4,7 @@ require 'json'
 require 'digest'
 require 'logger'
 
+require 'honeybadger/dependency'
 require 'honeybadger/configuration'
 require 'honeybadger/backtrace'
 require 'honeybadger/notice'

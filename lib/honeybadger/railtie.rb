@@ -44,6 +44,7 @@ module Honeybadger
         ::ActionDispatch::ShowExceptions.send(:include,Honeybadger::Rails::Middleware::ExceptionsCatcher)
       end
 
+      Honeybadger::Dependency.inject!
       Honeybadger.ping(Honeybadger.configuration)
     end
   end
