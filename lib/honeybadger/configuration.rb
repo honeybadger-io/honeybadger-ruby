@@ -145,7 +145,8 @@ module Honeybadger
                       'CGI::Session::CookieStore::TamperedWithCookie',
                       'ActionController::UnknownAction',
                       'AbstractController::ActionNotFound',
-                      'Mongoid::Errors::DocumentNotFound']
+                      'Mongoid::Errors::DocumentNotFound',
+                      'Sinatra::NotFound']
 
     alias_method :secure?, :secure
     alias_method :use_system_ssl_cert_chain?, :use_system_ssl_cert_chain
