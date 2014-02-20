@@ -108,6 +108,39 @@ describe Honeybadger::Sender do
         sender.send_to_honeybadger("stuff")
       end
 
+      it "should log the exception on any error" do
+        Honeybadger.configuration.log_exception_on_send_failure = true
+        notice = Honeybadger::Notice.new(:exception => Exception.new("bad things"))
+        sender = build_sender
+        sender.should_receive(:setup_http_connection).and_raise(RuntimeError)
+        sender.stub(:log)
+
+        Honeybadger.should_receive(:write_verbose_log).with(/Original Exception:.*bad things/, :error)
+        sender.send_to_honeybadger(notice)
+      end
+
+      it "should not log the exception on any error by default" do
+        notice = Honeybadger::Notice.new(:exception => Exception.new("bad things"))
+        sender = build_sender
+        sender.should_receive(:setup_http_connection).and_raise(RuntimeError)
+        sender.stub(:log)
+
+        Honeybadger.should_not_receive(:write_verbose_log).with(/Original Exception:.*bad things/, :error)
+        sender.send_to_honeybadger(notice)
+      end
+
+      it "should log the exception on a non-successful HTTP response" do
+        Honeybadger.configuration.log_exception_on_send_failure = true
+        stub_http(:response => Net::HTTPError)
+        notice = Honeybadger::Notice.new(:exception => Exception.new("bad things"))
+        sender = build_sender
+        sender.stub(:log)
+
+        Honeybadger.should_receive(:write_verbose_log).with(/Original Exception:.*bad things/, :error)
+        sender.send_to_honeybadger(notice)
+      end
+
+
       it "returns nil no matter what" do
         sender  = build_sender
         sender.should_receive(:setup_http_connection).and_raise(LocalJumpError)

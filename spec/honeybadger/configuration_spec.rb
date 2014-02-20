@@ -31,6 +31,7 @@ describe Honeybadger::Configuration do
     assert_config_default :async, nil
     assert_config_default :send_request_session, true
     assert_config_default :debug, false
+    assert_config_default :log_exception_on_send_failure, false
     assert_config_default :fingerprint, nil
     assert_config_default :hostname, Socket.gethostname
     assert_config_default :feedback, true
@@ -117,6 +118,7 @@ describe Honeybadger::Configuration do
     assert_config_overridable :hostname
     assert_config_overridable :metrics
     assert_config_overridable :feedback
+    assert_config_overridable :log_exception_on_send_failure
   end
 
   it "has an api key" do
@@ -132,7 +134,7 @@ describe Honeybadger::Configuration do
      :notifier_version, :params_filters, :project_root, :port, :protocol,
      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
      :source_extract_radius, :async, :send_request_session, :debug,
-     :fingerprint, :hostname, :metrics, :feedback].each do |option|
+     :fingerprint, :hostname, :metrics, :feedback, :log_exception_on_send_failure].each do |option|
        expect(hash[option]).to eq config[option]
     end
   end

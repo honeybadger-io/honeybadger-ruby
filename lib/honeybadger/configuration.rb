@@ -8,7 +8,7 @@ module Honeybadger
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :feedback, :rescue_rake_exceptions, :source_extract_radius,
-               :send_request_session, :debug, :fingerprint, :hostname, :metrics].freeze
+               :send_request_session, :debug, :fingerprint, :hostname, :metrics, :log_exception_on_send_failure].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -103,6 +103,9 @@ module Honeybadger
     # +true+ to log extra debug info, +false+ to suppress
     attr_accessor :debug
 
+    # +true+ to log the original exception on send failure, +false+ to suppress
+    attr_accessor :log_exception_on_send_failure
+
     # A Proc object used to send notices asynchronously
     attr_writer :async
 
@@ -152,32 +155,33 @@ module Honeybadger
     alias_method :use_system_ssl_cert_chain?, :use_system_ssl_cert_chain
 
     def initialize
-      @api_key                   = ENV['HONEYBADGER_API_KEY']
-      @secure                    = true
-      @use_system_ssl_cert_chain = false
-      @host                      = 'api.honeybadger.io'
-      @http_open_timeout         = 2
-      @http_read_timeout         = 5
-      @params_filters            = DEFAULT_PARAMS_FILTERS.dup
-      @backtrace_filters         = DEFAULT_BACKTRACE_FILTERS.dup
-      @ignore_by_filters         = []
-      @ignore                    = IGNORE_DEFAULT.dup
-      @ignore_user_agent         = []
-      @development_environments  = %w(development test cucumber)
-      @notifier_name             = 'Honeybadger Notifier'
-      @notifier_version          = VERSION
-      @notifier_url              = 'https://github.com/honeybadger-io/honeybadger-ruby'
-      @framework                 = 'Standalone'
-      @user_information          = 'Honeybadger Error {{error_id}}'
-      @rescue_rake_exceptions    = nil
-      @source_extract_radius     = 2
-      @send_request_session      = true
-      @debug                     = false
-      @hostname                  = Socket.gethostname
-      @metrics                   = true
-      @features                  = { 'notices' => true }
-      @limit                     = nil
-      @feedback                  = true
+      @api_key                       = ENV['HONEYBADGER_API_KEY']
+      @secure                        = true
+      @use_system_ssl_cert_chain     = false
+      @host                          = 'api.honeybadger.io'
+      @http_open_timeout             = 2
+      @http_read_timeout             = 5
+      @params_filters                = DEFAULT_PARAMS_FILTERS.dup
+      @backtrace_filters             = DEFAULT_BACKTRACE_FILTERS.dup
+      @ignore_by_filters             = []
+      @ignore                        = IGNORE_DEFAULT.dup
+      @ignore_user_agent             = []
+      @development_environments      = %w(development test cucumber)
+      @notifier_name                 = 'Honeybadger Notifier'
+      @notifier_version              = VERSION
+      @notifier_url                  = 'https://github.com/honeybadger-io/honeybadger-ruby'
+      @framework                     = 'Standalone'
+      @user_information              = 'Honeybadger Error {{error_id}}'
+      @rescue_rake_exceptions        = nil
+      @source_extract_radius         = 2
+      @send_request_session          = true
+      @debug                         = false
+      @log_exception_on_send_failure = false
+      @hostname                      = Socket.gethostname
+      @metrics                       = true
+      @features                      = { 'notices' => true }
+      @limit                         = nil
+      @feedback                      = true
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When
