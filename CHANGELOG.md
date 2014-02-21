@@ -1,3 +1,10 @@
+## Honeybadger 1.11.1 ##
+
+* Add option to log the exception locally when the API cannot be
+  reached.
+
+  *Justin Mazzi*
+
 ## Honeybadger 1.11.0 ##
 
 * Filter params from query strings in rack env.
