@@ -52,10 +52,12 @@ module Honeybadger
         JSON.parse(response.body).fetch('id')
       else
         log(:error, "Failure: #{response.class}", response, data)
+        log_original_exception(notice)
         nil
       end
     rescue => e
       log(:error, "[Honeybadger::Sender#send_to_honeybadger] Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
+      log_original_exception(notice)
       nil
     end
 
@@ -158,6 +160,18 @@ module Honeybadger
     rescue => e
       log(:error, "[Honeybadger::Sender#setup_http_connection] Failure initializing the HTTP connection.\nError: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
       raise e
+    end
+
+    def log_original_exception(notice)
+      if Honeybadger.configuration.log_exception_on_send_failure
+        if notice.respond_to?(:exception) && notice.respond_to?(:backtrace)
+          message = "#{notice.error_message}\n#{notice.backtrace}"
+        else
+          message = "#{notice}"
+        end
+
+        Honeybadger.write_verbose_log("Original Exception: #{message}", :error)
+      end
     end
   end
 end
