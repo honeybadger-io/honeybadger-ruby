@@ -182,6 +182,8 @@ module Honeybadger
         exception.original_exception
       elsif exception.respond_to?(:continued_exception)
         exception.continued_exception
+      elsif exception.respond_to?(:cause)
+        exception.cause
       else
         exception
       end
