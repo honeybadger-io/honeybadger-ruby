@@ -1,8 +1,12 @@
-## Honeybadger 1.12.0 ##
+## Honeybadger 1.12.0 (unreleased) ##
 
 * Support ruby 2.1 with Exception#cause
 
   *Ravil Bayramgalin*
+
+* Clean action_dispatch.request.parameters from payload.
+
+  *Joshua Wood*
 
 ## Honeybadger 1.11.1 ##
 
