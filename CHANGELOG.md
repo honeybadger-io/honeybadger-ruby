@@ -1,3 +1,9 @@
+## Honeybadger 1.12.0 ##
+
+* Support ruby 2.1 with Exception#cause
+
+  *Ravil Bayramgalin*
+
 ## Honeybadger 1.11.1 ##
 
 * Add option to log the exception locally when the API cannot be
