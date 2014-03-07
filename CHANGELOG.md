@@ -4,6 +4,10 @@
 
   *Joshua Wood*
 
+* Clean action_dispatch.request.parameters from payload.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.12.0 (skipped) ##
 
 ## Honeybadger 1.11.2 ##

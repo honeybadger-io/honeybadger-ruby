@@ -501,53 +501,69 @@ describe Honeybadger::Notice do
     expect { build_notice(:session => { :object => double(:to_ary => {}) }) }.not_to raise_error
   end
 
-  it "extracts data from a rack environment hash" do
-    url = "https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2"
-    parameters = { 'var' => 'value', 'var2' => 'value2' }
-    env = Rack::MockRequest.env_for(url)
+  context "with a rack environment hash" do
+    it "extracts data from a rack environment hash" do
+      url = "https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2"
+      parameters = { 'var' => 'value', 'var2' => 'value2' }
+      env = Rack::MockRequest.env_for(url)
 
-    notice = build_notice(:rack_env => env)
+      notice = build_notice(:rack_env => env)
 
-    expect(notice.url).to eq url
-    expect(notice.parameters).to eq parameters
-    expect(notice.cgi_data['REQUEST_METHOD']).to eq 'GET'
-  end
+      expect(notice.url).to eq url
+      expect(notice.parameters).to eq parameters
+      expect(notice.cgi_data['REQUEST_METHOD']).to eq 'GET'
+    end
 
-  it "extracts data from a rack environment hash with action_dispatch info" do
-    params = { 'controller' => 'users', 'action' => 'index', 'id' => '7' }
-    env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
+    context "with action_dispatch info" do
+      let(:params) { {'controller' => 'users', 'action' => 'index', 'id' => '7'} }
 
-    notice = build_notice(:rack_env => env)
+      it "extracts data from a rack environment hash " do
+        env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
+        notice = build_notice(:rack_env => env)
 
-    expect(notice.parameters).to eq params
-    expect(notice.component).to eq params['controller']
-    expect(notice.action).to eq params['action']
-  end
+        expect(notice.parameters).to eq params
+        expect(notice.component).to eq params['controller']
+        expect(notice.action).to eq params['action']
+      end
 
-  it "extracts session data from a rack environment" do
-    session_data = { 'something' => 'some value' }
-    env = Rack::MockRequest.env_for('/', 'rack.session' => session_data)
+      it "removes action_dispatch.request.parameters from cgi_data" do
+        env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
+        notice = build_notice(:rack_env => env)
+        expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.parameters'
+      end
 
-    notice = build_notice(:rack_env => env)
+      it "removes action_dispatch.request.request_parameters from cgi_data" do
+        env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.request_parameters' => params })
+        notice = build_notice(:rack_env => env)
+        expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.request_parameters'
+      end
+    end
 
-    expect(notice.session_data).to eq session_data
-  end
+    it "extracts session data from a rack environment" do
+      session_data = { 'something' => 'some value' }
+      env = Rack::MockRequest.env_for('/', 'rack.session' => session_data)
 
-  it "prefers passed session data to rack session data" do
-    session_data = { 'something' => 'some value' }
-    env = Rack::MockRequest.env_for('/')
+      notice = build_notice(:rack_env => env)
 
-    notice = build_notice(:rack_env => env, :session_data => session_data)
+      expect(notice.session_data).to eq session_data
+    end
 
-    expect(notice.session_data).to eq session_data
-  end
+    it "prefers passed session data to rack session data" do
+      session_data = { 'something' => 'some value' }
+      env = Rack::MockRequest.env_for('/')
 
-  unless Gem::Version.new(Rack.release) < Gem::Version.new('1.2')
-    it "fails gracefully when Rack params cannot be parsed" do
-      rack_env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
-      notice = Honeybadger::Notice.new(:rack_env => rack_env)
-      expect(notice.params.size).to eq 1
-      expect(notice.params[:error]).to match(/Failed to call params on Rack::Request/)
+      notice = build_notice(:rack_env => env, :session_data => session_data)
+
+      expect(notice.session_data).to eq session_data
+    end
+
+    unless Gem::Version.new(Rack.release) < Gem::Version.new('1.2')
+      it "fails gracefully when Rack params cannot be parsed" do
+        rack_env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
+        notice = Honeybadger::Notice.new(:rack_env => rack_env)
+        expect(notice.params.size).to eq 1
+        expect(notice.params[:error]).to match(/Failed to call params on Rack::Request/)
+      end
     end
   end
 

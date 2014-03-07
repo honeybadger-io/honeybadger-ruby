@@ -340,6 +340,8 @@ module Honeybadger
       if cgi_data
         cgi_data.delete("rack.request.form_vars")
         cgi_data.delete("rack.request.query_string")
+        cgi_data.delete("action_dispatch.request.parameters")
+        cgi_data.delete("action_dispatch.request.request_parameters")
       end
     end
 
