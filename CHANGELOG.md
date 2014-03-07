@@ -8,6 +8,14 @@
 
   *Joshua Wood*
 
+* Add support for 3rd-party integrations via dependency injection.
+
+  *Joshua Wood*
+
+* Delayed Job support
+
+  *Joshua Wood*
+
 ## Honeybadger 1.11.1 ##
 
 * Add option to log the exception locally when the API cannot be
