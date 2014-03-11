@@ -16,6 +16,10 @@
 
   *Joshua Wood*
 
+* Add native support for Sidekiq
+
+  *Joshua Wood*
+
 ## Honeybadger 1.11.1 ##
 
 * Add option to log the exception locally when the API cannot be
