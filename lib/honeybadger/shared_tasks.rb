@@ -33,7 +33,7 @@ namespace :honeybadger do
     task :add_deploy_notification => [:environment] do
       def heroku_var(var, app_name, default = nil)
         app = app_name ? "--app #{app_name}" : ''
-        result = `heroku config:get #{var} #{app} 2> /dev/null`.strip
+        result = Bundler.with_clean_env { `heroku config:get #{var} #{app} 2> /dev/null`.strip }
         result.split.find(lambda { default }) {|x| x =~ /\S/ }
       end
 
