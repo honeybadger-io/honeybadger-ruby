@@ -20,6 +20,13 @@
 
   *Joshua Wood*
 
+## Honeybadger 1.11.2 ##
+
+* Fix Bundler::RubyVersionMismatch error when invoking heroku command
+  from within Bundler.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.11.1 ##
 
 * Add option to log the exception locally when the API cannot be

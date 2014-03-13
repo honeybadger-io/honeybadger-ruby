@@ -63,7 +63,7 @@ class HoneybadgerGenerator < Rails::Generator::Base
 
   def heroku_var(var, app_name = nil)
     app = app_name ? "--app #{app_name}" : ''
-    `heroku config:get #{var} #{app}`
+    Bundler.with_clean_env { `heroku config:get #{var} #{app}` }
   end
 
   def heroku_api_key
