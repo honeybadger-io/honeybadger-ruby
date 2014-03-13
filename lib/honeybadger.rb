@@ -16,7 +16,7 @@ require 'honeybadger/user_feedback'
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
 module Honeybadger
-  VERSION = '1.11.1'
+  VERSION = '1.11.2'
   LOG_PREFIX = "** [Honeybadger] "
 
   HEADERS = {
