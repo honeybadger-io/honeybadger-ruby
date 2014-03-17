@@ -56,6 +56,10 @@ module Honeybadger
       @injected = false
     end
 
+    def injected?
+      @injected
+    end
+
     attr_reader :requirements, :injections
   end
 end

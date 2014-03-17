@@ -81,12 +81,46 @@ describe Honeybadger::Dependency do
 
       it { should be_false }
     end
+
+    context "some requirements error" do
+      before do
+        dependency.requirement { true }
+        dependency.requirement { fail 'oops!' }
+      end
+
+      it { should be_false }
+
+      it "logs the failure" do
+        Honeybadger.should_receive(:write_verbose_log).with(/oops!/, :error).once
+        dependency.ok?
+      end
+    end
   end
 
   describe "#inject!" do
     it "calls injections" do
       dependency.injections.replace([mock_injection, mock_injection])
       dependency.inject!
+    end
+
+    context "some injections fail" do
+      before do
+        failing_injection = Proc.new { fail 'oh noes!' }
+        dependency.injections.replace([mock_injection, failing_injection, mock_injection(false)])
+      end
+
+      it "halts injection silently" do
+        expect { dependency.inject! }.not_to raise_error
+      end
+
+      it "logs the failure" do
+        Honeybadger.should_receive(:write_verbose_log).with(/oh noes!/, :error).once
+        dependency.inject!
+      end
+
+      it "marks the dependency as injected" do
+        expect { dependency.inject!}.to change(dependency, :injected?).from(false).to(true)
+      end
     end
   end
 
