@@ -4,7 +4,7 @@ module Honeybadger
   class Configuration
     OPTIONS = [:api_key, :backtrace_filters, :development_environments, :environment_name,
                :host, :http_open_timeout, :http_read_timeout, :ignore, :ignore_by_filters,
-               :ignore_user_agent, :notifier_name, :notifier_url, :notifier_version,
+               :ignore_user_agent, :notice_post_build, :notifier_name, :notifier_url, :notifier_version,
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :feedback, :rescue_rake_exceptions, :source_extract_radius,
@@ -63,6 +63,9 @@ module Honeybadger
 
     # Traces must have a duration greater than this (in ms) to be recorded
     attr_reader :trace_threshold
+
+    # A proc that will be applied to the notice after build. Useful for really custom updates.
+    attr_accessor :notice_post_build
 
     # A list of environments in which notifications should not be sent.
     attr_accessor :development_environments
@@ -161,6 +164,8 @@ module Honeybadger
                       'Mongoid::Errors::DocumentNotFound',
                       'Sinatra::NotFound']
 
+    NULL_PROC = Proc.new {}
+
     alias_method :secure?, :secure
     alias_method :use_system_ssl_cert_chain?, :use_system_ssl_cert_chain
 
@@ -176,6 +181,7 @@ module Honeybadger
       @ignore_by_filters             = []
       @ignore                        = IGNORE_DEFAULT.dup
       @ignore_user_agent             = []
+      @notice_post_build             = NULL_PROC
       @development_environments      = %w(development test cucumber)
       @notifier_name                 = 'Honeybadger Notifier'
       @notifier_version              = VERSION

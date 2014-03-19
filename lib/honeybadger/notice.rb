@@ -68,6 +68,9 @@ module Honeybadger
     # See Configuration#ignore_by_filters
     attr_reader :ignore_by_filters
 
+    # See Configuration#notice_post_build
+    attr_reader :notice_post_build
+
     # The name of the notifier library sending this notice, such as "Honeybadger Notifier"
     attr_reader :notifier_name
 
@@ -104,6 +107,7 @@ module Honeybadger
 
       self.ignore              = args[:ignore]              || []
       self.ignore_by_filters   = args[:ignore_by_filters]   || []
+      self.notice_post_build    = args[:notice_post_build] || Proc.new {}
       self.backtrace_filters   = args[:backtrace_filters]   || []
       self.params_filters      = args[:params_filters]      || []
       self.parameters          = args[:parameters] ||
@@ -140,6 +144,7 @@ module Honeybadger
       also_use_rack_params_filters
       set_context
       clean_rack_request_data
+      notice_post_build.call(self)
     end
 
     # Deprecated. Remove in 2.0.
@@ -241,7 +246,7 @@ module Honeybadger
     attr_writer :exception, :backtrace, :fingerprint, :error_class,
       :error_message, :backtrace_filters, :parameters, :params_filters,
       :environment_filters, :session_data, :project_root, :url, :ignore,
-      :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
+      :ignore_by_filters, :notice_post_build, :notifier_name, :notifier_url, :notifier_version,
       :component, :action, :cgi_data, :environment_name, :hostname, :stats,
       :context, :source_extract, :source_extract_radius, :send_request_session,
       :api_key, :features, :local_variables

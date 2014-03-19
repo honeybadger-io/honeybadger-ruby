@@ -20,6 +20,7 @@ describe Honeybadger::Configuration do
     assert_config_default :http_read_timeout,   5
     assert_config_default :ignore_by_filters,   []
     assert_config_default :ignore_user_agent,   []
+    assert_config_default :notice_post_build, Honeybadger::Configuration::NULL_PROC
     assert_config_default :params_filters,
                           Honeybadger::Configuration::DEFAULT_PARAMS_FILTERS
     assert_config_default :backtrace_filters,

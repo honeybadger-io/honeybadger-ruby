@@ -1,5 +1,9 @@
 ## Honeybadger 1.16.0 ##
 
+* Added notice_post_build for advanced message filtering.
+
+  *Octavian Neamtu*
+
 * Compress requests using deflate.
 
   *Joshua Wood*
@@ -282,7 +286,7 @@ Unicorn users)
 
   *Joshua Wood*
 
-* Added option to run capistrano deploy notification asynchronously 
+* Added option to run capistrano deploy notification asynchronously
 
  *Sergey Efremov*
 
