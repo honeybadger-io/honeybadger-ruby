@@ -17,10 +17,6 @@ require 'honeybadger/integrations'
 
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
-unless defined?(Rails)
-  Honeybadger::Dependency.inject!
-end
-
 module Honeybadger
   VERSION = '1.11.1'
   LOG_PREFIX = "** [Honeybadger] "
@@ -190,4 +186,8 @@ module Honeybadger
       exception
     end
   end
+end
+
+unless defined?(Rails)
+  Honeybadger::Dependency.inject!
 end

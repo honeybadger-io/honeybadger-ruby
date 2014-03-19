@@ -65,3 +65,7 @@ appraise 'sinatra' do
   gem 'sinatra'
   gem 'honeybadger', :path => '../'
 end
+
+appraise 'standalone' do
+  gem 'honeybadger', :path => '../'
+end

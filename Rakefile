@@ -74,6 +74,8 @@ Cucumber::Rake::Task.new(:cucumber) do |t|
     t.cucumber_opts << 'features/rake.feature'
   when /sinatra/
     t.cucumber_opts << 'features/sinatra.feature'
+  when /standalone/
+    t.cucumber_opts << 'features/standalone.feature'
   end unless ENV['FEATURE']
 end
 
