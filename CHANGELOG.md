@@ -1,5 +1,10 @@
 ## Honeybadger 1.12.0 (unreleased) ##
 
+* Create Honeybadger::Rack namespace and add deprecation warnings for
+  old middleware.
+
+  *Joshua Wood*
+
 * Support ruby 2.1 with Exception#cause
 
   *Ravil Bayramgalin*

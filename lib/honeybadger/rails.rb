@@ -18,11 +18,11 @@ module Honeybadger
 
       if defined?(::Rails.configuration) && ::Rails.configuration.respond_to?(:middleware)
         ::Rails.configuration.middleware.insert_after 'ActionController::Failsafe',
-                                                      Honeybadger::Rack
+                                                      Honeybadger::Rack::ErrorNotifier
         ::Rails.configuration.middleware.insert_after 'Rack::Lock',
-                                                      Honeybadger::UserInformer
-        ::Rails.configuration.middleware.insert_after Honeybadger::UserInformer,
-                                                      Honeybadger::UserFeedback
+                                                      Honeybadger::Rack::UserInformer
+        ::Rails.configuration.middleware.insert_after Honeybadger::Rack::UserInformer,
+                                                      Honeybadger::Rack::UserFeedback
       end
 
       Honeybadger.configure(true) do |config|

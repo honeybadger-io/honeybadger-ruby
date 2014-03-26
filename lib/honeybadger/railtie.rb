@@ -10,9 +10,9 @@ module Honeybadger
     end
 
     initializer "honeybadger.use_rack_middleware" do |app|
-      app.config.middleware.insert 0, "Honeybadger::UserInformer"
-      app.config.middleware.insert_after "Honeybadger::UserInformer","Honeybadger::UserFeedback"
-      app.config.middleware.insert_after "Honeybadger::UserFeedback","Honeybadger::Rack"
+      app.config.middleware.insert 0, "Honeybadger::Rack::UserInformer"
+      app.config.middleware.insert_after "Honeybadger::Rack::UserInformer","Honeybadger::Rack::UserFeedback"
+      app.config.middleware.insert_after "Honeybadger::Rack::UserFeedback","Honeybadger::Rack::ErrorNotifier"
     end
 
     config.after_initialize do
