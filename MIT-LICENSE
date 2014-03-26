@@ -1,7 +1,8 @@
-Portions Copyright (c) 2012-2013, Honeybadger Industries LLC
+Copyright (c) 2012-2013, Honeybadger Industries LLC
 Portions Copyright (c) 2012 Noah Lorang
 Portions Copyright (c) 2007-2012, Exceptional DBA Airbrake.io
 Portions Copyright (c) 2009 Brenton Fletcher (http://i.bloople.net i@bloople.net)
+Portions Copyright (c) 2014 Charlie Somerville
 
 The original version of the Honeybadger gem was based on the
 MIT-licensed Airbrake gem. All code contained herein that is 

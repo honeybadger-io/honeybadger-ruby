@@ -29,12 +29,14 @@ appraise 'rails3.2' do
   gem 'capistrano', '~> 2.0'
 end
 
-appraise 'rails4.0' do
-  gem 'rails', '~> 4.0.2'
+# The latest officially supported Rails release
+appraise 'rails' do
+  gem 'rails', '~> 4.0.3'
   gem 'honeybadger', :path => '../'
+  gem 'capistrano', '~> 3.0'
   gem 'better_errors', :require => false
   gem 'rack-mini-profiler', :require => false
-  gem 'capistrano', '~> 2.0'
+  gem 'binding_of_caller'
 end
 
 appraise 'rails4.1' do
@@ -44,12 +46,6 @@ appraise 'rails4.1' do
   gem 'better_errors', :require => false
   gem 'rack-mini-profiler', :require => false
 end
-
-# appraise 'rails-edge' do
-  # gem 'rails', :git => 'git@github.com:rails/rails.git'
-  # gem 'honeybadger', :path => '../'
-  # gem 'capistrano', '~> 2.0'
-# end
 
 appraise 'rake' do
   gem 'sinatra'

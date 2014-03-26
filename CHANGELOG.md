@@ -1,5 +1,11 @@
 ## Honeybadger 1.12.0 (unreleased) ##
 
+* Add option to send local_variables when binding_of_caller is
+  installed. In order to enable it, the gem must be present in the
+  project, and `config.send_local_variables` must be `true`.
+
+  *Joshua Wood*
+
 * Create Honeybadger::Rack namespace and add deprecation warnings for
   old middleware.
 

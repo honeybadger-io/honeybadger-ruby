@@ -1,7 +1,9 @@
 require 'spec_helper'
-require 'honeybadger/rails'
 
-describe Honeybadger::Rails do
+# This test should be run only when Rails is not bundled
+require 'honeybadger/rails' unless defined?(ActionController::Base)
+
+describe 'Honeybadger::Rails', :unless => defined?(ActionController::Base) do
   include DefinesConstants
 
   it "triggers use of Rails' logger if logger isn't set and Rails' logger exists" do

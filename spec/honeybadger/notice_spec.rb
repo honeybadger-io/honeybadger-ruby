@@ -76,6 +76,17 @@ describe Honeybadger::Notice do
     expect(notice.url).to eq url
   end
 
+  it "initializes default features" do
+    notice = build_notice(:features => nil)
+    expect(notice.features).to eq({})
+  end
+
+  it "accepts features" do
+    features = {'foo' => 'bar'}
+    notice = build_notice(:features => features)
+    expect(notice.features).to eq features
+  end
+
   it "sets the host name" do
     notice = build_notice
     expect(notice.hostname).to eq hostname
@@ -592,6 +603,115 @@ describe Honeybadger::Notice do
     notice = Honeybadger::Notice.new(:exception => e, :error_class => 'MyClass', :error_message => 'Something very specific went wrong.')
     expect(notice.error_class).to eq 'MyClass'
     expect(notice.error_message).to eq 'Something very specific went wrong.'
+  end
+
+  describe "#to_json" do
+    context "when local variables are not found" do
+      it "sends local_variables in request payload" do
+        notice = build_notice
+        hash = {'foo' => 'bar'}
+        notice.stub(:local_variables).and_return(hash)
+        expect(JSON.parse(notice.to_json)['request']['local_variables']).to eq(hash)
+      end
+    end
+
+    context "when local variables are found" do
+      it "sends local_variables in request payload" do
+        notice = build_notice
+        expect(JSON.parse(notice.to_json)['request']['local_variables']).to eq({})
+      end
+    end
+  end
+
+  describe "#local_variables" do
+    let(:notice) { build_notice(:exception => @exception, :configuration => configuration) }
+    let(:configuration) { configure }
+
+    before do
+      foo = 'bar'
+      begin
+        fail 'oops'
+      rescue
+        @exception = $!
+      end
+    end
+
+    context "when binding_of_caller is not installed", :unless => defined?(BindingOfCaller) do
+      context "when local variables aren't enabled" do
+        it "does not attempt to find them" do
+          expect(notice.local_variables).to eq({})
+        end
+      end
+
+      context "when local variables are enabled" do
+        before do
+          configuration.send_local_variables = true
+        end
+
+        it "does not attempt to find them" do
+          expect(notice.local_variables).to eq({})
+        end
+      end
+    end
+
+    context "when binding_of_caller is installed", :if => defined?(BindingOfCaller) do
+      context "when local variables aren't enabled" do
+        it "does not attempt to find them" do
+          expect(notice.local_variables).to eq({})
+        end
+      end
+
+      context "when local variables are enabled" do
+        before do
+          configuration.send_local_variables = true
+        end
+
+        it "finds the local variables from first frame of trace" do
+          expect(notice.local_variables[:foo]).to eq 'bar'
+        end
+
+        context "when the feature is disabled" do
+          before do
+            configuration.features['local_variables'] = false
+          end
+
+          it "assigns empty Hash" do
+            expect(notice.local_variables).to eq({})
+          end
+        end
+
+        context "with an application trace" do
+          before do
+            @exception.__honeybadger_bindings_stack.unshift(double('Binding', :eval => nil))
+            configuration.project_root = File.dirname(__FILE__)
+          end
+
+          it "finds the local variables from first frame of application trace" do
+            expect(notice.local_variables[:foo]).to eq 'bar'
+          end
+
+          context "and project_root is a Pathname" do
+            before do
+              configuration.project_root = Pathname.new(File.dirname(__FILE__))
+            end
+
+            specify { expect { notice }.not_to raise_error }
+          end
+        end
+
+        context "without an exception" do
+          it "assigns empty Hash" do
+            expect(build_notice(:exception => nil).local_variables).to eq({})
+          end
+        end
+
+        context "without bindings" do
+          it "assigns empty Hash" do
+            expect(build_notice(:exception => RuntimeError.new).local_variables).to eq({})
+          end
+        end
+      end
+    end
   end
 
   def assert_accepts_exception_attribute(attribute, args = {}, &block)

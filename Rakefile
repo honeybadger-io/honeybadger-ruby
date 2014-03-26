@@ -61,7 +61,7 @@ Cucumber::Rake::Task.new(:cucumber) do |t|
   t.fork = true
   t.cucumber_opts = ['--format', 'progress', '--tags', '~@pending']
 
-  unless ENV['BUNDLE_GEMFILE'] =~ /rails(3|4)/
+  unless ENV['BUNDLE_GEMFILE'] =~ /rails[^2]/
     t.cucumber_opts << '--tags ~@rails_3'
   end
 

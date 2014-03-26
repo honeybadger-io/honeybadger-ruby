@@ -85,8 +85,15 @@ module Honeybadger
     # The api_key to use when sending notice (optional)
     attr_reader :api_key
 
+    # Local variables are extracted from first frame of backtrace
+    attr_reader :local_variables
+
+    # Additional features to enable/disable
+    attr_reader :features
+
     def initialize(args)
       self.args         = args
+      self.features     = args[:features] || {}
       self.exception    = args[:exception]
       self.project_root = args[:project_root]
 
@@ -124,7 +131,9 @@ module Honeybadger
       self.source_extract_radius = args[:source_extract_radius] || 2
       self.source_extract        = extract_source_from_backtrace
 
-      self.send_request_session     = args[:send_request_session].nil? ? true : args[:send_request_session]
+      self.local_variables = send_local_variables? ? local_variables_from_exception(exception) : {}
+
+      self.send_request_session = args[:send_request_session].nil? ? true : args[:send_request_session]
 
       also_use_rack_params_filters
       find_session_data
@@ -165,7 +174,8 @@ module Honeybadger
           :params => parameters,
           :session => session_data,
           :cgi_data => cgi_data,
-          :context => context
+          :context => context,
+          :local_variables => local_variables
         },
         :server => {
           :project_root => project_root,
@@ -232,8 +242,9 @@ module Honeybadger
       :error_message, :backtrace_filters, :parameters, :params_filters,
       :environment_filters, :session_data, :project_root, :url, :ignore,
       :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
-      :component, :action, :cgi_data, :environment_name, :hostname, :stats, :context,
-      :source_extract, :source_extract_radius, :send_request_session, :api_key
+      :component, :action, :cgi_data, :environment_name, :hostname, :stats,
+      :context, :source_extract, :source_extract_radius, :send_request_session,
+      :api_key, :features, :local_variables
 
     # Private: Arguments given in the initializer
     attr_accessor :args
@@ -466,6 +477,32 @@ module Honeybadger
       input = input.dup
       input = input[0...bytes] if input.respond_to?(:size) && input.size > bytes
       input
+    end
+
+    # Internal: Fetch local variables from first frame of backtrace.
+    #
+    # exception - The Exception containing the bindings stack.
+    #
+    # Returns a Hash of local variables
+    def local_variables_from_exception(exception)
+      return {} unless Exception === exception
+      return {} if exception.__honeybadger_bindings_stack.empty?
+
+      if project_root
+        binding = exception.__honeybadger_bindings_stack.find { |b| b.eval('__FILE__') =~ /^#{Regexp.escape(project_root.to_s)}/ }
+      end
+
+      binding ||= exception.__honeybadger_bindings_stack[0]
+
+      vars = binding.eval('local_variables')
+      Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
+    end
+
+    # Internal: Should local variables be sent?
+    #
+    # Returns true to send local_variables
+    def send_local_variables?
+      args[:send_local_variables] && features['local_variables']
     end
   end
 end

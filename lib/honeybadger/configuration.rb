@@ -8,7 +8,8 @@ module Honeybadger
                :params_filters, :project_root, :port, :protocol, :proxy_host, :proxy_pass,
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :feedback, :rescue_rake_exceptions, :source_extract_radius,
-               :send_request_session, :debug, :fingerprint, :hostname, :metrics, :log_exception_on_send_failure].freeze
+               :send_request_session, :debug, :fingerprint, :hostname, :features, :metrics,
+               :log_exception_on_send_failure, :send_local_variables].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -100,6 +101,9 @@ module Honeybadger
     # +true+ to send session data, +false+ to exclude
     attr_accessor :send_request_session
 
+    # +true+ to send local variables, +false+ to exclude
+    attr_accessor :send_local_variables
+
     # +true+ to log extra debug info, +false+ to suppress
     attr_accessor :debug
 
@@ -175,11 +179,12 @@ module Honeybadger
       @rescue_rake_exceptions        = nil
       @source_extract_radius         = 2
       @send_request_session          = true
+      @send_local_variables          = false
       @debug                         = false
       @log_exception_on_send_failure = false
       @hostname                      = Socket.gethostname
       @metrics                       = true
-      @features                      = { 'notices' => true }
+      @features                      = {'notices' => true, 'local_variables' => true}
       @limit                         = nil
       @feedback                      = true
     end
