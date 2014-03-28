@@ -283,10 +283,10 @@ module Honeybadger
     #
     # Examples
     #
-    #   config.async = Proc.new { |notice| Thread.new { notice.deliver } }
+    #   config.async = Proc.new { |notice| Thread.new { Honeybadger.sender.send_to_honeybadger(notice) } }
     #
     #   config.async do |notice|
-    #     Thread.new { notice.deliver }
+    #     Thread.new { Honeybadger.sender.send_to_honeybadger(notice) }
     #   end
     #
     # Returns configured async handler (should respond to #call(notice))

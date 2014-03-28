@@ -133,10 +133,7 @@ module Honeybadger
       set_context
     end
 
-    # Public: Send the notice to Honeybadger using the configured sender
-    #
-    # Returns a reference to the error in Honeybadger, false if sender isn't
-    # configured
+    # Deprecated. Remove in 2.0.
     def deliver
       return false unless Honeybadger.sender
       Honeybadger.sender.send_to_honeybadger(self)

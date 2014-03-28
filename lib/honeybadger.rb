@@ -163,11 +163,13 @@ module Honeybadger
     private
 
     def send_notice(notice)
+      return false unless sender
+
       if configuration.public?
         if configuration.async?
           configuration.async.call(notice)
         else
-          notice.deliver
+          Honeybadger.sender.send_to_honeybadger(notice)
         end
       end
     end
