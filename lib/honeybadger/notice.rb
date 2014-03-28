@@ -1,3 +1,4 @@
+require 'honeybadger/payload'
 require 'socket'
 
 module Honeybadger
@@ -152,7 +153,7 @@ module Honeybadger
     #
     # Returns JSON representation of notice
     def as_json(options = {})
-      {
+      Payload.new({
         :api_key => api_key,
         :notifier => {
           :name => notifier_name,
@@ -183,7 +184,7 @@ module Honeybadger
           :hostname => hostname,
           :stats => stats
         }
-      }
+      })
     end
 
     # Public: Creates JSON
