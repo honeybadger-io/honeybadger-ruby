@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.11.1'
-  s.date              = '2014-02-21'
+  s.version           = '1.12.0.beta1'
+  s.date              = '2014-03-29'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -53,10 +53,12 @@ Gem::Specification.new do |s|
     features/rails.feature
     features/rake.feature
     features/sinatra.feature
+    features/standalone.feature
     features/step_definitions/metal_steps.rb
     features/step_definitions/rack_steps.rb
     features/step_definitions/rails_steps.rb
     features/step_definitions/rake_steps.rb
+    features/step_definitions/standalone_steps.rb
     features/support/env.rb
     features/support/honeybadger_failure_shim.rb.template
     features/support/honeybadger_shim.rb.template
@@ -64,6 +66,8 @@ Gem::Specification.new do |s|
     features/support/rake/Rakefile
     gemfiles/rack.gemfile
     gemfiles/rack.gemfile.lock
+    gemfiles/rails.gemfile
+    gemfiles/rails.gemfile.lock
     gemfiles/rails2.3.gemfile
     gemfiles/rails2.3.gemfile.lock
     gemfiles/rails3.0.gemfile
@@ -80,6 +84,8 @@ Gem::Specification.new do |s|
     gemfiles/rake.gemfile.lock
     gemfiles/sinatra.gemfile
     gemfiles/sinatra.gemfile.lock
+    gemfiles/standalone.gemfile
+    gemfiles/standalone.gemfile.lock
     generators/honeybadger/honeybadger_generator.rb
     generators/honeybadger/lib/insert_commands.rb
     generators/honeybadger/lib/rake_commands.rb
@@ -94,12 +100,22 @@ Gem::Specification.new do |s|
     lib/honeybadger/capistrano/legacy.rb
     lib/honeybadger/capistrano/tasks.rake
     lib/honeybadger/configuration.rb
+    lib/honeybadger/dependency.rb
+    lib/honeybadger/exception_extensions.rb
+    lib/honeybadger/integrations.rb
+    lib/honeybadger/integrations/delayed_job.rb
+    lib/honeybadger/integrations/delayed_job/plugin.rb
+    lib/honeybadger/integrations/sidekiq.rb
     lib/honeybadger/monitor.rb
     lib/honeybadger/monitor/railtie.rb
     lib/honeybadger/monitor/sender.rb
     lib/honeybadger/monitor/worker.rb
     lib/honeybadger/notice.rb
+    lib/honeybadger/payload.rb
     lib/honeybadger/rack.rb
+    lib/honeybadger/rack/error_notifier.rb
+    lib/honeybadger/rack/user_feedback.rb
+    lib/honeybadger/rack/user_informer.rb
     lib/honeybadger/rails.rb
     lib/honeybadger/rails/action_controller_catcher.rb
     lib/honeybadger/rails/controller_methods.rb
@@ -123,10 +139,14 @@ Gem::Specification.new do |s|
     spec/honeybadger/backtrace_spec.rb
     spec/honeybadger/capistrano_spec.rb
     spec/honeybadger/configuration_spec.rb
+    spec/honeybadger/dependency_spec.rb
+    spec/honeybadger/integrations/delayed_job_spec.rb
+    spec/honeybadger/integrations/sidekiq_spec.rb
     spec/honeybadger/logger_spec.rb
     spec/honeybadger/monitor/worker_spec.rb
     spec/honeybadger/notice_spec.rb
     spec/honeybadger/notifier_spec.rb
+    spec/honeybadger/payload_spec.rb
     spec/honeybadger/rack_spec.rb
     spec/honeybadger/rails/action_controller_spec.rb
     spec/honeybadger/rails_spec.rb
