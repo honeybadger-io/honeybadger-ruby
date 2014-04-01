@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.12.0.beta1'
-  s.date              = '2014-03-29'
+  s.version           = '1.12.0.beta2'
+  s.date              = '2014-04-01'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -64,6 +64,8 @@ Gem::Specification.new do |s|
     features/support/honeybadger_shim.rb.template
     features/support/rails.rb
     features/support/rake/Rakefile
+    gemfiles/binding_of_caller.gemfile
+    gemfiles/binding_of_caller.gemfile.lock
     gemfiles/rack.gemfile
     gemfiles/rack.gemfile.lock
     gemfiles/rails.gemfile
@@ -140,6 +142,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/capistrano_spec.rb
     spec/honeybadger/configuration_spec.rb
     spec/honeybadger/dependency_spec.rb
+    spec/honeybadger/exception_extensions_spec.rb
     spec/honeybadger/integrations/delayed_job_spec.rb
     spec/honeybadger/integrations/sidekiq_spec.rb
     spec/honeybadger/logger_spec.rb

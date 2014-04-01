@@ -19,7 +19,7 @@ require 'honeybadger/exception_extensions'
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
 
 module Honeybadger
-  VERSION = '1.12.0.beta1'
+  VERSION = '1.12.0.beta2'
   LOG_PREFIX = "** [Honeybadger] "
 
   HEADERS = {
