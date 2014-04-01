@@ -7,6 +7,5 @@ gem "honeybadger", :path=>"../"
 gem "capistrano", "~> 3.0"
 gem "better_errors", :require=>false
 gem "rack-mini-profiler", :require=>false
-gem "binding_of_caller"
 
 gemspec :path=>"../"

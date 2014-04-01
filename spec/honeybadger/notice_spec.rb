@@ -568,7 +568,12 @@ describe Honeybadger::Notice do
       expect(notice.session_data).to eq session_data
     end
 
-    unless Gem::Version.new(Rack.release) < Gem::Version.new('1.2')
+    if Gem::Version.new(Rack.release) < Gem::Version.new('1.3')
+      it "parses params which are malformed in Rack >= 1.3" do
+        rack_env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
+        expect { Honeybadger::Notice.new(:rack_env => rack_env) }.not_to raise_error
+      end
+    else
       it "fails gracefully when Rack params cannot be parsed" do
         rack_env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
         notice = Honeybadger::Notice.new(:rack_env => rack_env)

@@ -36,7 +36,6 @@ appraise 'rails' do
   gem 'capistrano', '~> 3.0'
   gem 'better_errors', :require => false
   gem 'rack-mini-profiler', :require => false
-  gem 'binding_of_caller'
 end
 
 appraise 'rails4.1' do
@@ -63,5 +62,10 @@ appraise 'sinatra' do
 end
 
 appraise 'standalone' do
+  gem 'honeybadger', :path => '../'
+end
+
+appraise 'binding_of_caller' do
+  gem 'binding_of_caller'
   gem 'honeybadger', :path => '../'
 end
