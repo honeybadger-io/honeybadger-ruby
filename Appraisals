@@ -1,8 +1,12 @@
-appraise 'rails2.3' do
-  gem 'rails', '~> 2.3.18'
-  gem 'rake', '0.9.5'
+appraise 'standalone' do
   gem 'honeybadger', :path => '../'
-  gem 'capistrano', '~> 2.0'
+end
+
+if RUBY_VERSION > '1.9'
+  appraise 'binding_of_caller' do
+    gem 'binding_of_caller'
+    gem 'honeybadger', :path => '../'
+  end
 end
 
 appraise 'rake' do
@@ -20,8 +24,11 @@ appraise 'sinatra' do
   gem 'honeybadger', :path => '../'
 end
 
-appraise 'standalone' do
+appraise 'rails2.3' do
+  gem 'rails', '~> 2.3.18'
+  gem 'rake', '0.9.5'
   gem 'honeybadger', :path => '../'
+  gem 'capistrano', '~> 2.0'
 end
 
 if RUBY_VERSION > '1.9'
@@ -64,10 +71,5 @@ if RUBY_VERSION > '1.9'
     gem 'capistrano', '~> 3.0'
     gem 'better_errors', :require => false
     gem 'rack-mini-profiler', :require => false
-  end
-
-  appraise 'binding_of_caller' do
-    gem 'binding_of_caller'
-    gem 'honeybadger', :path => '../'
   end
 end
