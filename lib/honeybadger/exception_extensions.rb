@@ -7,7 +7,7 @@ module Honeybadger
       end
 
       def set_backtrace_with_honeybadger(*args, &block)
-        if caller.none? { |loc| loc.match(Honeybadger::Backtrace::Line::INPUT_FORMAT)[1] == __FILE__ }
+        if caller.none? { |loc| loc.match(Honeybadger::Backtrace::Line::INPUT_FORMAT) && Regexp.last_match(1) == __FILE__ }
           @__honeybadger_bindings_stack = binding.callers.drop(1)
         end
 
