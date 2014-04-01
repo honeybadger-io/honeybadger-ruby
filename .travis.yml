@@ -10,5 +10,5 @@ rvm:
   - 2.1.0
   - jruby-18mode
   - jruby-19mode
-before_script: rake appraisal:install
-script: rake appraisal
+before_script: bundle exec rake appraisal:install
+script: bundle exec rake appraisal
