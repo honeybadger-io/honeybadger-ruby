@@ -30,14 +30,20 @@ describe "Sidekiq Dependency" do
 
     after { Object.send(:remove_const, :Sidekiq) }
 
-    it "adds the server middleware" do
-      chain.should_receive(:add).with(Honeybadger::Integrations::Sidekiq::Middleware)
-      Honeybadger::Dependency.inject!
-    end
+    context "when version is less than 3" do
+      before do
+        ::Sidekiq.const_set(:VERSION, '2.17.7')
+      end
 
-    it "doesn't add the error handler" do
-      Honeybadger::Dependency.inject!
-      expect(config.error_handlers).to be_empty
+      it "adds the server middleware" do
+        chain.should_receive(:add).with(Honeybadger::Integrations::Sidekiq::Middleware)
+        Honeybadger::Dependency.inject!
+      end
+
+      it "doesn't add the error handler" do
+        Honeybadger::Dependency.inject!
+        expect(config.error_handlers).to be_empty
+      end
     end
 
     context "when version is 3 or greater" do
