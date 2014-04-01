@@ -10,5 +10,16 @@ rvm:
   - 2.1.0
   - jruby-18mode
   - jruby-19mode
-before_script: bundle exec rake appraisal:install
+gemfile:
+  - gemfiles/standalone.gemfile
+  - gemfiles/binding_of_caller.gemfile
+  - gemfiles/rake.gemfile
+  - gemfiles/rack.gemfile
+  - gemfiles/sinatra.gemfile
+  - gemfiles/rails2.3.gemfile
+  - gemfiles/rails.gemfile
+  - gemfiles/rails3.0.gemfile
+  - gemfiles/rails3.1.gemfile
+  - gemfiles/rails3.2.gemfile
+  - gemfiles/rails4.1.gemfile
 script: bundle exec rake appraisal
