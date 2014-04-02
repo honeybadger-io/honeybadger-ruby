@@ -14,3 +14,9 @@ rvm:
   - jruby-18mode
   - jruby-19mode
 script: bundle exec rake appraisal
+matrix:
+  fast_finish: true
+  allow_failures:
+    - rvm: jruby-18mode
+    - rvm: jruby-19mode
+    - rvm: 1.9.2
