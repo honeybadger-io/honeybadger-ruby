@@ -65,29 +65,17 @@ Gem::Specification.new do |s|
     features/support/rails.rb
     features/support/rake/Rakefile
     gemfiles/binding_of_caller.gemfile
-    gemfiles/binding_of_caller.gemfile.lock
     gemfiles/rack.gemfile
-    gemfiles/rack.gemfile.lock
     gemfiles/rails.gemfile
-    gemfiles/rails.gemfile.lock
     gemfiles/rails2.3.gemfile
-    gemfiles/rails2.3.gemfile.lock
     gemfiles/rails3.0.gemfile
-    gemfiles/rails3.0.gemfile.lock
     gemfiles/rails3.1.gemfile
-    gemfiles/rails3.1.gemfile.lock
     gemfiles/rails3.2.gemfile
-    gemfiles/rails3.2.gemfile.lock
     gemfiles/rails4.0.gemfile
-    gemfiles/rails4.0.gemfile.lock
     gemfiles/rails4.1.gemfile
-    gemfiles/rails4.1.gemfile.lock
     gemfiles/rake.gemfile
-    gemfiles/rake.gemfile.lock
     gemfiles/sinatra.gemfile
-    gemfiles/sinatra.gemfile.lock
     gemfiles/standalone.gemfile
-    gemfiles/standalone.gemfile.lock
     generators/honeybadger/honeybadger_generator.rb
     generators/honeybadger/lib/insert_commands.rb
     generators/honeybadger/lib/rake_commands.rb

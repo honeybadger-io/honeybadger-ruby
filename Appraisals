@@ -2,7 +2,7 @@ appraise 'standalone' do
   gem 'honeybadger', :path => '../'
 end
 
-if RUBY_VERSION > '1.9'
+if RUBY_VERSION > '1.9' && RUBY_PLATFORM !~ /java/
   appraise 'binding_of_caller' do
     gem 'binding_of_caller'
     gem 'honeybadger', :path => '../'
