@@ -17,3 +17,5 @@ bin
 .yardoc
 _yardoc
 doc/
+
+gemfiles/*.lock
