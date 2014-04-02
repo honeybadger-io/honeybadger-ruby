@@ -3,6 +3,7 @@ before_install:
   - gem update --system 2.1.11
   - gem --version
 install:
+  - bundle install
   - rake appraisal:install
 rvm:
   - 1.8.7
