@@ -1,3 +1,9 @@
+## Honeybadger 1.15.0 ##
+
+* Send traces for slow requests.
+
+  *Benjamin Curtis*
+
 ## Honeybadger 1.14.0 ##
 
 * Catch exceptions in Thor tasks.
