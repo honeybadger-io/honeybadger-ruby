@@ -26,6 +26,31 @@ module Honeybadger
         true
       end
 
+      def send_traces(data)
+        return unless Honeybadger.configuration.traces?
+
+        if !Honeybadger.configuration.features['traces']
+          log(:info, "The optional traces feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.")
+          Honeybadger.configuration.traces = false
+          return nil
+        end
+
+        response = rescue_http_errors do
+          http_connection.post('/v1/traces', data.to_json, http_headers)
+        end
+
+        if Net::HTTPSuccess === response
+          true
+        else
+          Honeybadger.configuration.features['traces'] = false if Net::HTTPForbidden === response
+          log(:error, "Traces Failure: #{response.class}", response, data)
+          false
+        end
+      rescue => e
+        log(:error, "[Honeybadger::Monitor::Sender#send_traces] Error: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
+        true
+      end
+
     end
   end
 end
