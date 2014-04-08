@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.12.0.beta2'
-  s.date              = '2014-04-01'
+  s.version           = '1.12.0.beta3'
+  s.date              = '2014-04-08'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -59,11 +59,14 @@ Gem::Specification.new do |s|
     features/step_definitions/rails_steps.rb
     features/step_definitions/rake_steps.rb
     features/step_definitions/standalone_steps.rb
+    features/step_definitions/thor_steps.rb
     features/support/env.rb
     features/support/honeybadger_failure_shim.rb.template
     features/support/honeybadger_shim.rb.template
     features/support/rails.rb
     features/support/rake/Rakefile
+    features/support/test.thor
+    features/thor.feature
     gemfiles/binding_of_caller.gemfile
     gemfiles/rack.gemfile
     gemfiles/rails.gemfile
@@ -76,6 +79,7 @@ Gem::Specification.new do |s|
     gemfiles/rake.gemfile
     gemfiles/sinatra.gemfile
     gemfiles/standalone.gemfile
+    gemfiles/thor.gemfile
     generators/honeybadger/honeybadger_generator.rb
     generators/honeybadger/lib/insert_commands.rb
     generators/honeybadger/lib/rake_commands.rb
@@ -96,6 +100,7 @@ Gem::Specification.new do |s|
     lib/honeybadger/integrations/delayed_job.rb
     lib/honeybadger/integrations/delayed_job/plugin.rb
     lib/honeybadger/integrations/sidekiq.rb
+    lib/honeybadger/integrations/thor.rb
     lib/honeybadger/monitor.rb
     lib/honeybadger/monitor/railtie.rb
     lib/honeybadger/monitor/sender.rb
@@ -133,6 +138,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/exception_extensions_spec.rb
     spec/honeybadger/integrations/delayed_job_spec.rb
     spec/honeybadger/integrations/sidekiq_spec.rb
+    spec/honeybadger/integrations/thor_spec.rb
     spec/honeybadger/logger_spec.rb
     spec/honeybadger/monitor/worker_spec.rb
     spec/honeybadger/notice_spec.rb

@@ -1,5 +1,9 @@
 ## Honeybadger 1.12.0 (unreleased) ##
 
+* Catch exceptions in Thor tasks.
+
+  *Ryan Sonnek*
+
 * Add option to send local_variables when binding_of_caller is
   installed. In order to enable it, the gem must be present in the
   project, and `config.send_local_variables` must be `true`.

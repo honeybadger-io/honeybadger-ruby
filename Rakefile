@@ -72,6 +72,8 @@ Cucumber::Rake::Task.new(:cucumber) do |t|
     t.cucumber_opts << 'features/rack.feature'
   when /rake/
     t.cucumber_opts << 'features/rake.feature'
+  when /thor/
+    t.cucumber_opts << 'features/thor.feature'
   when /sinatra/
     t.cucumber_opts << 'features/sinatra.feature'
   else
