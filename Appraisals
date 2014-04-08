@@ -10,7 +10,12 @@ if RUBY_VERSION > '1.9' && RUBY_PLATFORM !~ /java/
 end
 
 appraise 'rake' do
-  gem 'sinatra'
+  gem 'rake'
+  gem 'honeybadger', :path => '../'
+end
+
+appraise 'thor' do
+  gem 'thor'
   gem 'honeybadger', :path => '../'
 end
 
