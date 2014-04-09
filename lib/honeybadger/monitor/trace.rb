@@ -85,7 +85,7 @@ module Honeybadger
         Newline = /\n/.freeze
         Replacement = "?".freeze
         EmptyReplacement = "".freeze
-        DoubleQuoters = /(postgres|sqlite)/.freeze
+        DoubleQuoters = /(postgres|sqlite|postgis)/.freeze
 
         def render?
           event.payload[:name] != Schema && !event.payload[:sql].match(SchemaMigrations)
