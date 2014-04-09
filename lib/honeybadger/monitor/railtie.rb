@@ -14,7 +14,7 @@ module Honeybadger
             Monitor.worker.trace.add(event) if Monitor.worker.trace and event.name != 'SCHEMA'
           end
 
-          ActiveSupport::Notifications.subscribe(/^render_(template|action)\.action_view/) do |*args|
+          ActiveSupport::Notifications.subscribe(/^render_(template|action|collection)\.action_view/) do |*args|
             event = ActiveSupport::Notifications::Event.new(*args)
             Monitor.worker.trace.add(event) if Monitor.worker.trace
           end
