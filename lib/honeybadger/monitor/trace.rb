@@ -75,6 +75,17 @@ module Honeybadger
 
       end
 
+      class NetHttpRequest < Base
+        Replacement = "..."
+        def to_s
+          uri = payload[:uri]
+          uri.user = Replacement if uri.user
+          uri.password = Replacement if uri.password
+          uri.query = Replacement if uri.query
+          "#{payload[:method]} #{uri}"
+        end
+      end
+
       class ActiveRecord < Base
         Schema = "SCHEMA".freeze
         SchemaMigrations = /schema_migrations/.freeze
@@ -127,7 +138,8 @@ module Honeybadger
         'render_template.action_view' => ActionView,
         'render_partial.action_view' => ActionView,
         'render_collection.action_view' => ActionView,
-        'process_action.action_controller' => ActionController
+        'process_action.action_controller' => ActionController,
+        'net_http.request' => NetHttpRequest
       })
     end
   end

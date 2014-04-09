@@ -19,6 +19,11 @@ module Honeybadger
             Monitor.worker.trace.add(event) if Monitor.worker.trace
           end
 
+          ActiveSupport::Notifications.subscribe('net_http.request') do |*args|
+            event = ActiveSupport::Notifications::Event.new(*args)
+            Monitor.worker.trace.add(event) if Monitor.worker.trace
+          end
+
           ActiveSupport::Notifications.subscribe('process_action.action_controller') do |*args|
             event = ActiveSupport::Notifications::Event.new(*args)
             status = event.payload[:exception] ? 500 : event.payload[:status]
