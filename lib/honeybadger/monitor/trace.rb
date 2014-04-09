@@ -126,6 +126,7 @@ module Honeybadger
         'sql.active_record' => ActiveRecord,
         'render_template.action_view' => ActionView,
         'render_partial.action_view' => ActionView,
+        'render_collection.action_view' => ActionView,
         'process_action.action_controller' => ActionController
       })
     end
