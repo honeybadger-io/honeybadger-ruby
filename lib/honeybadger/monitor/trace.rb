@@ -1,12 +1,19 @@
+require 'securerandom'
+
 module Honeybadger
   module Monitor
     class Trace
+      UUIDS_ENABLED = SecureRandom.respond_to?(:uuid).freeze
 
       attr_reader :id, :duration, :key
 
       def self.create(id)
         Thread.current[:hb_trace_id] = id
         Monitor.worker.pending_traces[id] = new(id)
+      end
+
+      def self.instrument(key, payload = {}, &block)
+        create(generate_secure_id).instrument(key, payload, &block)
       end
 
       def initialize(id)
@@ -28,6 +35,19 @@ module Honeybadger
         Monitor.worker.queue_trace
       end
 
+      def instrument(key, payload)
+        @key = key
+        @meta = payload
+        started = Time.now
+        yield
+      rescue Exception => e
+        @meta[:exception] = [e.class.name, e.message]
+        raise e
+      ensure
+        @meta.merge!(:duration => @duration = 1000.0 * (Time.now - started))
+        Monitor.worker.queue_trace
+      end
+
       def to_h
         @meta.merge({ events: @events })
       end
@@ -36,6 +56,10 @@ module Honeybadger
 
         def clean_event(event)
           TraceCleaner.create(event)
+        end
+
+        def generate_secure_id
+          UUIDS_ENABLED ? SecureRandom.uuid : SecureRandom.hex
         end
 
     end
