@@ -1,3 +1,5 @@
+require 'securerandom'
+
 module Honeybadger
   module Monitor
     class Trace
@@ -7,6 +9,10 @@ module Honeybadger
       def self.create(id)
         Thread.current[:hb_trace_id] = id
         Monitor.worker.pending_traces[id] = new(id)
+      end
+
+      def self.instrument(key, payload = {}, &block)
+        create(SecureRandom.uuid).instrument(key, payload, &block)
       end
 
       def initialize(id)
@@ -25,6 +31,19 @@ module Honeybadger
         @meta = clean_event(event).to_h
         @duration = event.duration
         @key = "#{event.payload[:controller]}##{event.payload[:action]}"
+        Monitor.worker.queue_trace
+      end
+
+      def instrument(key, payload)
+        @key = key
+        @meta = payload
+        started = Time.now
+        yield
+      rescue Exception => e
+        @meta[:exception] = [e.class.name, e.message]
+        raise e
+      ensure
+        @meta.merge!(:duration => @duration = 1000.0 * (Time.now - started))
         Monitor.worker.queue_trace
       end
 
