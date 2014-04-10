@@ -4,7 +4,9 @@ module Honeybadger
       class Middleware
         def call(worker, msg, queue)
           Honeybadger.context.clear!
-          yield
+          Honeybadger::Monitor::Trace.instrument("#{msg['class']}#perform", { :source => 'sidekiq', :jid => msg['jid'], :class => msg['class'] }) do
+            yield
+          end
         end
       end
     end

@@ -1,6 +1,6 @@
 module Honeybadger
   Dependency.register do
-    requirement { defined?(::Delayed::Plugins::Plugin) }
+    requirement { defined?(::Delayed::Plugin) }
     requirement { defined?(::Delayed::Worker.plugins) }
     requirement do
       if delayed_job_honeybadger = defined?(::Delayed::Plugins::Honeybadger)

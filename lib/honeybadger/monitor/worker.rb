@@ -11,7 +11,8 @@ module Honeybadger
 
       def initialize
         init_metrics
-        @delay = 60
+        init_traces
+        @delay = defined?(::Rails) && ::Rails.env.development? ? 10 : 60
         @per_request = 100
         @sender = Monitor::Sender.new(Honeybadger.configuration)
         @lock = Mutex.new
@@ -23,6 +24,7 @@ module Honeybadger
         @thread = MetricsThread.new do
           until Thread.current[:should_exit] do
             send_metrics
+            send_traces
             sleep @delay
           end
         end
@@ -40,10 +42,32 @@ module Honeybadger
         add_metric(name, value, :counter)
       end
 
+      def pending_traces
+        @pending_traces ||= {}
+      end
+
+      def trace
+        Thread.current[:hb_trace_id] ? @pending_traces[Thread.current[:hb_trace_id]] : nil
+      end
+
+      def queue_trace
+        @lock.synchronize do
+          if trace.duration > Honeybadger.configuration.trace_threshold && (!@traces[trace.key] || @traces[trace.key].duration < trace.duration)
+            @traces[trace.key] = trace
+          end
+          @pending_traces[Thread.current[:hb_trace_id]] = nil
+          Thread.current[:hb_trace_id] = nil
+        end
+      end
+
       protected
 
         def init_metrics
           @metrics = { :timing => {}, :counter => {} }
+        end
+
+        def init_traces
+          @traces = {}
         end
 
         def collect_metrics
@@ -51,6 +75,14 @@ module Honeybadger
             metrics = @metrics
             init_metrics
             metrics
+          end
+        end
+
+        def collect_traces
+          @lock.synchronize do
+            traces = @traces.values
+            init_traces
+            traces
           end
         end
 
@@ -75,6 +107,16 @@ module Honeybadger
               @sender.send_metrics({ :metrics => mm.compact, :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
             rescue Exception => e
               log(:error, "[Honeybadger::Monitor::Worker#send_metrics] Failed to send #{mm.count} metrics: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
+            end
+          end
+        end
+
+        def send_traces
+          collect_traces.each_slice(@per_request) do |t|
+            begin
+              @sender.send_traces({ :traces => t.compact.map(&:to_h), :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
+            rescue Exception => e
+              log(:error, "[Honeybadger::Monitor::Worker#send_traces] Failed to send #{t.count} metrics: #{e.class} - #{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}")
             end
           end
         end

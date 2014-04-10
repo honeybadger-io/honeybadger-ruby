@@ -1,6 +1,7 @@
 require "honeybadger/array"
 require "honeybadger/monitor/sender"
 require "honeybadger/monitor/worker"
+require "honeybadger/monitor/trace"
 require "honeybadger/monitor/railtie" if defined?(Rails)
 
 module Honeybadger
