@@ -22,8 +22,7 @@ describe "DelayedJob Dependency" do
 
     before do
       Object.const_set(:Delayed, Module.new)
-      ::Delayed.const_set(:Plugins, Module.new)
-      ::Delayed::Plugins.const_set(:Plugin, plugin_class)
+      ::Delayed.const_set(:Plugin, plugin_class)
       ::Delayed.const_set(:Worker, double(:plugins => plugins_array))
     end
 
@@ -36,6 +35,7 @@ describe "DelayedJob Dependency" do
 
     context "and delayed_job_honeybadger is installed" do
       before do
+        ::Delayed.const_set(:Plugins, Module.new)
         ::Delayed::Plugins.const_set(:Honeybadger, Class.new(plugin_class))
       end
 

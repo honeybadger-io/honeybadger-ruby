@@ -1,11 +1,11 @@
 module Honeybadger
   module Integrations
     module DelayedJob
-      class Plugin < ::Delayed::Plugins::Plugin
+      class Plugin < ::Delayed::Plugin
         callbacks do |lifecycle|
-          lifecycle.around(:invoke_job) do |job, *args, &block|
+          lifecycle.around(:invoke_job) do |job, &block|
             begin
-              block.call(job, *args)
+              block.call(job)
             rescue Exception => error
               ::Honeybadger.notify_or_ignore(
                 :error_class   => error.class.name,
