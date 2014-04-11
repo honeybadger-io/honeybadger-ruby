@@ -21,3 +21,18 @@ matrix:
     - rvm: jruby-18mode
     - rvm: jruby-19mode
     - rvm: 1.9.2
+  exclude:
+    - rvm: jruby-18mode
+      - gemfile:
+        - gemfiles/binding_of_caller.gemfile
+        - gemfiles/rails.gemfile
+    - rvm: jruby-19mode
+      - gemfile:
+        - gemfiles/binding_of_caller.gemfile
+    - rvm: 1.8.7
+      - gemfile:
+        - gemfiles/binding_of_caller.gemfile
+        - gemfiles/rails.gemfile
+    - rvm: 1.9.2
+      - gemfile:
+        - gemfiles/rails.gemfile
