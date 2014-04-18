@@ -70,9 +70,6 @@ Gem::Specification.new do |s|
     gemfiles/binding_of_caller.gemfile
     gemfiles/rack.gemfile
     gemfiles/rails.gemfile
-    gemfiles/rails2.3.gemfile
-    gemfiles/rails3.0.gemfile
-    gemfiles/rails3.1.gemfile
     gemfiles/rails3.2.gemfile
     gemfiles/rails4.0.gemfile
     gemfiles/rails4.1.gemfile
