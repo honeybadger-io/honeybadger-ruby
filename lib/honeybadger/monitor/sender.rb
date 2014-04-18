@@ -36,7 +36,7 @@ module Honeybadger
         end
 
         response = rescue_http_errors do
-          http_connection.post('/v1/traces', data.to_json, http_headers)
+          http_connection.post('/v1/traces', JSON.generate(data), http_headers)
         end
 
         if Net::HTTPSuccess === response
