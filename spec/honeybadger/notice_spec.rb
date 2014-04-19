@@ -297,76 +297,6 @@ describe Honeybadger::Notice do
     assert_array_starts_with backtrace.lines, notice.backtrace.lines
   end
 
-  it "converts unserializable objects to strings" do
-    assert_serializes_hash(:parameters)
-    assert_serializes_hash(:cgi_data)
-    assert_serializes_hash(:session_data)
-  end
-
-  it "filters parameters" do
-    assert_filters_hash(:parameters)
-  end
-
-  it "filters cgi data" do
-    assert_filters_hash(:cgi_data)
-  end
-
-  it "filters session" do
-    assert_filters_hash(:session_data)
-  end
-
-  context 'filtered parameters in query string' do
-    let(:params_filters) { [:foo, :bar] }
-
-    describe '#url' do
-      let(:notice) { build_notice(:params_filters => params_filters, :url => 'https://www.honeybadger.io/?foo=1&bar=2&baz=3') }
-      it 'filters query' do
-        expect(notice.url).to eq 'https://www.honeybadger.io/?foo=[FILTERED]&bar=[FILTERED]&baz=3'
-      end
-    end
-
-    describe '#cgi_data' do
-      let(:cgi_data) { { 'QUERY_STRING' => 'foo=1&bar=2&baz=3', 'ORIGINAL_FULLPATH' => '/?foo=1&bar=2&baz=3' } }
-      let(:notice) { build_notice(:params_filters => params_filters, :cgi_data => cgi_data) }
-
-      subject { notice.cgi_data }
-
-      it 'filters QUERY_STRING key' do
-        expect(subject['QUERY_STRING']).to eq 'foo=[FILTERED]&bar=[FILTERED]&baz=3'
-      end
-
-      it 'filters ORIGINAL_FULLPATH key' do
-        expect(subject['ORIGINAL_FULLPATH']).to eq '/?foo=[FILTERED]&bar=[FILTERED]&baz=3'
-      end
-    end
-  end
-
-  describe '#filter_url' do
-    let(:notice) { build_notice(:params_filters => [], :url => url) }
-    subject { notice.send(:filter_url, url) }
-
-    context 'malformed query' do
-      let(:url) { 'https://www.honeybadger.io/?foobar12' }
-      it { should eq url }
-    end
-
-    context 'no query' do
-      let(:url) { 'https://www.honeybadger.io' }
-      it { should eq url }
-    end
-
-    context 'malformed url' do
-      let(:url) { 'http s ! honeybadger' }
-      before { expect { URI.parse(url) }.to raise_error }
-      it { should eq url }
-    end
-
-    context 'complex url' do
-      let(:url) { 'https://foo:bar@www.honeybadger.io:123/asdf/?foo=1&bar=2&baz=3' }
-      it { should eq url }
-    end
-  end
-
   it "removes rack.request.form_vars" do
     original = {
       "rack.request.form_vars" => "story%5Btitle%5D=The+TODO+label",
@@ -504,14 +434,6 @@ describe Honeybadger::Notice do
     expect(hash['request']['context']).to eq({ 'debuga' => true, 'debugb' => false })
   end
 
-  it "ensures #to_hash is called on objects that support it" do
-    expect { build_notice(:session => { :object => double(:to_hash => {}) }) }.not_to raise_error
-  end
-
-  it "ensures #to_ary is called on objects that support it" do
-    expect { build_notice(:session => { :object => double(:to_ary => {}) }) }.not_to raise_error
-  end
-
   context "with a rack environment hash" do
     it "extracts data from a rack environment hash" do
       url = "https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2"
@@ -586,13 +508,6 @@ describe Honeybadger::Notice do
   it "does not send session data when send_request_session is false" do
     notice = build_notice(:send_request_session => false, :session_data => { :foo => :bar })
     notice.session_data.should be_nil
-  end
-
-  it "does not allow infinite recursion" do
-    hash = {:a => :a}
-    hash[:hash] = hash
-    notice = Honeybadger::Notice.new(:parameters => hash)
-    expect(notice.parameters[:hash]).to eq "[possible infinite recursion halted]"
   end
 
   it "trims error message to 1k" do
@@ -730,47 +645,6 @@ describe Honeybadger::Notice do
 
     notice_from_hash = build_notice(args.merge(attribute => value))
     expect(notice_from_hash.send(attribute)).to eq value
-  end
-
-  def assert_serializes_hash(attribute)
-    [File.open(__FILE__), Proc.new { puts "boo!" }, Module.new].each do |object|
-      hash = {
-        :strange_object => object,
-        :sub_hash => {
-          :sub_object => object
-        },
-        :array => [object]
-      }
-      notice = build_notice(attribute => hash)
-      hash = notice.send(attribute)
-      expect(object.to_s).to eq hash[:strange_object] # objects should be serialized
-
-      expect(hash[:sub_hash]).to be_a Hash # subhashes should be kept
-      expect(object.to_s).to eq hash[:sub_hash][:sub_object] # subhash members should be serialized
-      expect(hash[:array]).to be_a Array # arrays should be kept
-      expect(object.to_s).to eq hash[:array].first # array members should be serialized
-    end
-  end
-
-  def assert_filters_hash(attribute)
-    filters  = ["abc", :def, /private/, /^foo_.*$/]
-    original = { 'abc' => "123", 'def' => "456", 'ghi' => "789", 'nested' => { 'abc' => '100' },
-      'something_with_abc' => 'match the entire string', 'private_param' => 'prra',
-      'foo_param' => 'bar', 'not_foo_param' => 'baz', 'nested_foo' => { 'foo_nested' => 'bla'} }
-    filtered = { 'abc'    => "[FILTERED]",
-                 'def'    => "[FILTERED]",
-                 'something_with_abc' => "match the entire string",
-                 'ghi'    => "789",
-                 'nested' => { 'abc' => '[FILTERED]' },
-                 'private_param' => '[FILTERED]',
-                 'foo_param' => '[FILTERED]',
-                 'not_foo_param' => 'baz',
-                 'nested_foo' => { 'foo_nested' => '[FILTERED]'}
-    }
-
-    notice = build_notice(:params_filters => filters, attribute => original)
-
-    expect(notice.send(attribute)).to eq filtered
   end
 
   def build_backtrace_array
