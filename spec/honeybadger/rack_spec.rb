@@ -1,11 +1,11 @@
 require 'spec_helper'
 require 'rack'
 
-describe Honeybadger::Rack do
+describe Honeybadger::Rack::ErrorNotifier do
   it "calls the upstream app with the environment" do
     environment = { 'key' => 'value' }
     app = lambda { |env| ['response', {}, env] }
-    stack = Honeybadger::Rack.new(app)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app)
 
     response = stack.call(environment)
 
@@ -24,7 +24,7 @@ describe Honeybadger::Rack do
     Honeybadger.should_receive(:notify_or_ignore).with(exception, :rack_env => environment)
 
     begin
-      stack = Honeybadger::Rack.new(app)
+      stack = Honeybadger::Rack::ErrorNotifier.new(app)
       stack.call(environment)
     rescue Exception => raised
       expect(raised).to eq exception
@@ -43,7 +43,7 @@ describe Honeybadger::Rack do
       env['rack.exception'] = exception
       response
     end
-    stack = Honeybadger::Rack.new(app)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app)
 
     Honeybadger.should_receive(:notify_or_ignore).with(exception, :rack_env => environment)
 
@@ -62,7 +62,7 @@ describe Honeybadger::Rack do
       env['sinatra.error'] = exception
       response
     end
-    stack = Honeybadger::Rack.new(app)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app)
 
     Honeybadger.should_receive(:notify_or_ignore).with(exception, :rack_env => environment)
 
@@ -76,7 +76,7 @@ describe Honeybadger::Rack do
     expect(Thread.current[:honeybadger_context]).to eq({ :foo => :bar })
 
     app = lambda { |env| ['response', {}, env] }
-    stack = Honeybadger::Rack.new(app)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app)
 
     stack.call({})
 

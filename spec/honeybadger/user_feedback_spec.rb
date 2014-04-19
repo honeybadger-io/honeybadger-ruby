@@ -1,14 +1,14 @@
 require 'spec_helper'
 require 'sham_rack'
 
-describe Honeybadger::UserFeedback do
+describe Honeybadger::Rack::UserFeedback do
   let(:main_app) do
     lambda do |env|
       env['honeybadger.error_id'] = honeybadger_id if defined?(honeybadger_id)
       [200, {}, ["<!-- HONEYBADGER FEEDBACK -->"]]
     end
   end
-  let(:informer_app) { Honeybadger::UserFeedback.new(main_app) }
+  let(:informer_app) { Honeybadger::Rack::UserFeedback.new(main_app) }
   let(:response) { Net::HTTP.get_response(URI.parse("http://example.com/")) }
 
   before do
