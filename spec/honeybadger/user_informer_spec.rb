@@ -1,13 +1,13 @@
 require 'spec_helper'
 require 'sham_rack'
 
-describe Honeybadger::UserInformer do
+describe Honeybadger::Rack::UserInformer do
   it 'modifies output if there is a honeybadger id' do
     main_app = lambda do |env|
       env['honeybadger.error_id'] = 1
       [200, {}, ["<!-- HONEYBADGER ERROR -->"]]
     end
-    informer_app = Honeybadger::UserInformer.new(main_app)
+    informer_app = Honeybadger::Rack::UserInformer.new(main_app)
 
     ShamRack.mount(informer_app, "example.com")
 
@@ -20,7 +20,7 @@ describe Honeybadger::UserInformer do
     main_app = lambda do |env|
       [200, {}, ["<!-- HONEYBADGER ERROR -->"]]
     end
-    informer_app = Honeybadger::UserInformer.new(main_app)
+    informer_app = Honeybadger::Rack::UserInformer.new(main_app)
 
     ShamRack.mount(informer_app, "example.com")
 
