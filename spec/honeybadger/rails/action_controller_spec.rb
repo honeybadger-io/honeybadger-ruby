@@ -52,6 +52,8 @@ begin
         data.collect do |value|
           stringify_array_elements(value)
         end
+      elsif Honeybadger::Payload::OBJECT_WHITELIST.any? {|c| data.kind_of?(c) }
+        data
       else
         data.to_s
       end
