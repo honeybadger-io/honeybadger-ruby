@@ -35,6 +35,7 @@ describe Honeybadger::Payload do
       assert_serializes(:request, :parameters)
       assert_serializes(:request, :cgi_data)
       assert_serializes(:request, :session_data)
+      assert_serializes(:request, :local_variables)
     end
 
     it "ensures #to_hash is called on objects that support it" do
@@ -56,6 +57,10 @@ describe Honeybadger::Payload do
 
   it "filters session" do
     assert_filters_request(:session)
+  end
+
+  it "filters local_variables" do
+    assert_filters_request(:local_variables)
   end
 
   context 'filtered parameters in query string' do

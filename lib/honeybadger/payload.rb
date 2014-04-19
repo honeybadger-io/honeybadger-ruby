@@ -28,6 +28,7 @@ module Honeybadger
       filter(request[:params]) if request[:params]
       filter(request[:session]) if request[:session]
       filter(request[:cgi_data]) if request[:cgi_data]
+      filter(request[:local_variables]) if request[:local_variables]
     end
 
     protected
