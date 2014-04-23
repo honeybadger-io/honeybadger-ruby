@@ -90,13 +90,13 @@ end
 
 desc "Create tag v#{version} and build and push #{gem_file} to Rubygems"
 task :release => :build do
-  unless `git branch` =~ /^\* master$/
-    puts "You must be on the master branch to release!"
+  unless `git branch` =~ /^\* 1.x/
+    puts "You must be on the 1.x branch to release!"
     exit!
   end
   sh "git commit --allow-empty -a -m 'Release #{version}'"
   sh "git tag v#{version}"
-  sh "git push origin master"
+  sh "git push origin 1.x"
   sh "git push origin v#{version}"
   sh "gem push pkg/#{name}-#{version}.gem"
 end
