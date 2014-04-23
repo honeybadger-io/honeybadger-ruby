@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.11.2'
-  s.date              = '2014-03-13'
+  s.version           = '1.13.0'
+  s.date              = '2014-04-23'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -94,6 +94,7 @@ Gem::Specification.new do |s|
     lib/honeybadger/capistrano/legacy.rb
     lib/honeybadger/capistrano/tasks.rake
     lib/honeybadger/configuration.rb
+    lib/honeybadger/integrations/sidekiq.rb
     lib/honeybadger/monitor.rb
     lib/honeybadger/monitor/railtie.rb
     lib/honeybadger/monitor/sender.rb

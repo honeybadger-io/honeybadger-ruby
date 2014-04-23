@@ -1,8 +1,10 @@
-## Honeybadger 1.11.3 ##
+## Honeybadger 1.13.0 ##
 
 * Add native support for Sidekiq 3.0
 
   *Joshua Wood*
+
+## Honeybadger 1.12.0 (skipped) ##
 
 ## Honeybadger 1.11.2 ##
 
