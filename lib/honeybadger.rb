@@ -14,6 +14,7 @@ require 'honeybadger/user_informer'
 require 'honeybadger/user_feedback'
 
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
+require 'honeybadger/integrations/sidekiq'
 
 module Honeybadger
   VERSION = '1.11.2'

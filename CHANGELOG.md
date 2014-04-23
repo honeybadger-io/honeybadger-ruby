@@ -1,3 +1,9 @@
+## Honeybadger 1.11.3 ##
+
+* Add native support for Sidekiq 3.0
+
+  *Joshua Wood*
+
 ## Honeybadger 1.11.2 ##
 
 * Fix Bundler::RubyVersionMismatch error when invoking heroku command
