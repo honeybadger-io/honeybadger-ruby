@@ -55,13 +55,13 @@ describe Honeybadger do
   context "429 error response" do
     let(:failure_class) do
       if RUBY_VERSION !~ /^1/
-        'Net::HTTPTooManyRequests'
+        Net::HTTPTooManyRequests
       else
-        'Net::HTTPClientError'
+        Net::HTTPClientError
       end
     end
 
-    let(:http) { stub_http(response: Object.const_get(failure_class).new('1.2', '429', 'Peace out'), body: '{"error":"something went wrong"}') }
+    let(:http) { stub_http(response: failure_class.new('1.2', '429', 'Peace out'), body: '{"error":"something went wrong"}') }
 
     before do
       reset_config
