@@ -33,7 +33,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('appraisal')
   s.add_development_dependency('fuubar')
   s.add_development_dependency('growl')
-  s.add_development_dependency('webmock')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
