@@ -61,13 +61,15 @@ describe Honeybadger do
       end
     end
 
+    let(:http) { stub_http(response: Object.const_get(failure_class).new('1.2', '429', 'Peace out'), body: '{"error":"something went wrong"}') }
+
     before do
       reset_config
       stub_verbose_log
-      stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:status => 429, :body => '{"error":"something went wrong"}')
     end
 
     it "logs the response" do
+      http.should_receive(:post).with(Honeybadger::Sender::NOTICES_URI, kind_of(String), kind_of(Hash))
       Honeybadger.should_receive(:write_verbose_log).with(/Failure: #{failure_class}/, :error)
       Honeybadger.should_receive(:write_verbose_log).with(/Environment Info:/)
       Honeybadger.should_receive(:write_verbose_log).with(/something went wrong/)
