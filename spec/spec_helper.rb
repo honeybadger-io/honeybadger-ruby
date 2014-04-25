@@ -1,6 +1,5 @@
 require 'rspec'
 require 'honeybadger'
-require 'webmock/rspec'
 
 # Require files in spec/support/ and its subdirectories.
 Dir[File.expand_path('../../spec/support/**/*.rb', __FILE__)].each {|f| require f}

@@ -2,14 +2,11 @@ require 'spec_helper'
 
 describe Honeybadger::Sender do
   before { reset_config }
-
-  before do
-    stub_request(:post, /api\.honeybadger\.io\/v1\/notices/).to_return(:body => '{"id":"123"}')
-  end
+  let(:http) { stub_http }
 
   it "makes a single request when sending notices" do
+    http.should_receive(:post).with(Honeybadger::Sender::NOTICES_URI, kind_of(String), kind_of(Hash))
     Honeybadger.notify(RuntimeError.new('oops!'))
-    assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1
   end
 
   it "posts to Honeybadger when using an HTTP proxy" do
@@ -49,16 +46,16 @@ describe Honeybadger::Sender do
     context 'notice is a hash' do
       it 'uses api_key from hash when present' do
         sender = build_sender(:api_key => 'asdf')
+        http.should_receive(:post).with(Honeybadger::Sender::NOTICES_URI, kind_of(String), hash_including('X-API-Key' => 'zxcv'))
         send_exception(:sender => sender, :notice => { 'api_key' => 'zxcv' })
-        assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1, :headers => { 'x-api-key' => 'zxcv' }
       end
     end
 
     context 'notice is a Honeybadger::Notice' do
       it 'uses api_key from notice when present' do
         sender = build_sender(:api_key => 'asdf')
+        http.should_receive(:post).with(Honeybadger::Sender::NOTICES_URI, kind_of(String), hash_including('X-API-Key' => 'zxcv'))
         send_exception(:sender => sender, :notice => Honeybadger::Notice.new(:api_key => 'zxcv'))
-        assert_requested :post, 'https://api.honeybadger.io/v1/notices/', :times => 1, :headers => { 'x-api-key' => 'zxcv' }
       end
     end
   end
