@@ -17,7 +17,7 @@ module Honeybadger
             local_user = ENV['USER'] || ENV['USERNAME']
             executable = RUBY_PLATFORM.downcase.include?('mswin') ? fetch(:rake, 'rake.bat') : fetch(:rake, 'rake')
             async_notify = fetch(:honeybadger_async_notify, false)
-            directory = configuration.current_release
+            directory = fetch(:honeybadger_deploy_dir, configuration.current_release)
             notify_options = "cd #{directory};"
             notify_options << " nohup" if async_notify
             notify_options << " #{executable} RAILS_ENV=#{rails_env} #{rake_task} TO=#{honeybadger_env} REVISION=#{current_revision} REPO=#{repository} USER=#{local_user}"
