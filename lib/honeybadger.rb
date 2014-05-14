@@ -101,7 +101,16 @@ module Honeybadger
     def ping(configuration)
       if configuration.public?
         if result = sender.ping({ :version => Honeybadger::VERSION, :framework => configuration.framework, :environment => configuration.environment_name, :hostname => configuration.hostname })
-          configuration.features = result['features'] if result['features']
+          if features = result['features']
+            configuration.features = features
+
+            unless features['metrics']
+              write_verbose_log("The optional metrics feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.", :error)
+              configuration.metrics = false
+            end
+
+            features
+          end
         end
       end
     end

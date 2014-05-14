@@ -3,12 +3,7 @@ module Honeybadger
     class Sender < Honeybadger::Sender
       def send_metrics(data)
         return unless Honeybadger.configuration.metrics?
-
-        if !Honeybadger.configuration.features['metrics']
-          log(:info, "The optional metrics feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.")
-          Honeybadger.configuration.metrics = false
-          return nil
-        end
+        return unless Honeybadger.configuration.features['metrics']
 
         response = rescue_http_errors do
           http_connection.post('/v1/metrics', data.to_json, http_headers)
