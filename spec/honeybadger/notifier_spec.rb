@@ -60,6 +60,16 @@ describe 'Honeybadger' do
           it { should eq result['features'] }
           specify { expect { subject }.to change(config, :features).to(result['features']) }
         end
+
+        context "metrics are disabled by service" do
+          let(:result) { {'features' => {'metrics' => false}} }
+          specify { expect { invoke_subject }.to change(config, :metrics).to(false) }
+
+          it "logs that metrics are disabled" do
+            Honeybadger.should_receive(:write_verbose_log).with(/metrics feature is not enabled/, :error)
+            invoke_subject
+          end
+        end
       end
 
       context "result is falsey" do
