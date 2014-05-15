@@ -17,7 +17,7 @@ require 'honeybadger/railtie' if defined?(Rails::Railtie)
 require 'honeybadger/integrations/sidekiq'
 
 module Honeybadger
-  VERSION = '1.13.0'
+  VERSION = '1.13.1'
   LOG_PREFIX = "** [Honeybadger] "
 
   HEADERS = {
