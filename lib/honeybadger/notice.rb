@@ -329,8 +329,10 @@ module Honeybadger
         self.session_data = args[:session_data] || args[:session] || rack_session || {}
         self.session_data = session_data[:data] if session_data[:data]
       end
-    rescue ArgumentError => e
-      # Rails raises an ArgumentError when `config.secret_token` is missing.
+    rescue => e
+      # Rails raises ArgumentError when `config.secret_token` is missing, and
+      # ActionDispatch::Session::SessionRestoreError when the session can't be
+      # restored.
       self.session_data = { :error => "Failed to access session data -- #{e.message}" }
     end
 
