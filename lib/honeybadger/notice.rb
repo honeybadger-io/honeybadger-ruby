@@ -136,9 +136,9 @@ module Honeybadger
 
       self.send_request_session = args[:send_request_session].nil? ? true : args[:send_request_session]
 
-      also_use_rack_params_filters
       find_session_data
       clean_rack_request_data
+      also_use_rack_params_filters
       set_context
     end
 
@@ -281,8 +281,10 @@ module Honeybadger
 
     def clean_rack_request_data
       if cgi_data
+        self.cgi_data = cgi_data.dup
         cgi_data.delete("rack.request.form_vars")
         cgi_data.delete("rack.request.query_string")
+        cgi_data.delete("rack.session")
         cgi_data.delete("action_dispatch.request.parameters")
         cgi_data.delete("action_dispatch.request.request_parameters")
       end
@@ -327,6 +329,9 @@ module Honeybadger
         self.session_data = args[:session_data] || args[:session] || rack_session || {}
         self.session_data = session_data[:data] if session_data[:data]
       end
+    rescue ArgumentError => e
+      # Rails raises an ArgumentError when `config.secret_token` is missing.
+      self.session_data = { :error => "Failed to access session data -- #{e.message}" }
     end
 
     def set_context
@@ -352,7 +357,7 @@ module Honeybadger
     end
 
     def rack_session
-      args[:rack_env]['rack.session'] if args[:rack_env]
+      rack_env(:session).to_hash if args[:rack_env]
     end
 
     # Private: (Rails 3+) Adds params filters to filter list
