@@ -65,6 +65,10 @@ Cucumber::Rake::Task.new(:cucumber) do |t|
     t.cucumber_opts << '--tags ~@rails_3'
   end
 
+  if ENV['BUNDLE_GEMFILE'] =~ /rails3/
+    t.cucumber_opts << 'features/rails3.x.feature'
+  end
+
   case ENV['BUNDLE_GEMFILE']
   when /rails/
     t.cucumber_opts << 'features/rails.feature features/metal.feature'
