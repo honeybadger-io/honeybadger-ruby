@@ -337,7 +337,8 @@ module Honeybadger
     end
 
     def set_context
-      self.context = Thread.current[:honeybadger_context] || {}
+      self.context = {}
+      self.context.merge!(Thread.current[:honeybadger_context]) if Thread.current[:honeybadger_context]
       self.context.merge!(args[:context]) if args[:context]
       self.context = nil if context.empty?
     end

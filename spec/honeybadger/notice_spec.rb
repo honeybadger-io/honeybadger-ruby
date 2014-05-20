@@ -422,6 +422,17 @@ describe Honeybadger::Notice do
     expect(notice[:request][:context]).to eq({ 'one' => 'two', 'three' => 'four', 'foo' => 'baz' })
   end
 
+  it "doesn't mutate global context" do
+    Honeybadger.context({ 'one' => 'two' })
+    expect { build_notice(:context => { 'foo' => 'bar' }) }.not_to change { Thread.current[:honeybadger_context] }
+  end
+
+  it "doesn't mutate local context" do
+    Honeybadger.context({ 'one' => 'two' })
+    hash = { 'foo' => 'bar' }
+    expect { build_notice(:context => hash) }.not_to change { hash }
+  end
+
   it "returns nil context when context is not set" do
     notice = build_notice
     notice[:request][:context].should be_nil
