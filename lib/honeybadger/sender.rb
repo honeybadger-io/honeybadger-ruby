@@ -35,7 +35,9 @@ module Honeybadger
     # Returns error id from successful response
     def send_to_honeybadger(notice)
       if !Honeybadger.configuration.features['notices']
-        log(:error, "Can't send error report -- the gem has been deactivated by the remote service.  Try restarting your app or contacting support@honeybadger.io.")
+        log(:error, "Can't send error report -- the gem has been deactivated by the remote service.\n\t" \
+            "This is usually a result of an expired plan. Please check your payment info and restart your app.\n\t" \
+            "If you continue to receive this message, contact support@honeybadger.io.")
         return nil
       end
 
@@ -51,6 +53,7 @@ module Honeybadger
         log(Honeybadger.configuration.debug ? :info : :debug, "Success: #{response.class}", response, data)
         JSON.parse(response.body).fetch('id')
       else
+        Honeybadger.configuration.features['notices'] = false if Net::HTTPForbidden === response
         log(:error, "Failure: #{response.class}", response, data)
         log_original_exception(notice)
         nil
