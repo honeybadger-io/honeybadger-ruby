@@ -63,11 +63,27 @@ describe Honeybadger::Sender do
     end
   end
 
-  it "logs success" do
-    stub_http
-    sender = build_sender
-    sender.should_receive(:log).with(:debug, /Success/, kind_of(Net::HTTPSuccess), kind_of(String))
-    send_exception(:sender => sender, :secure => false)
+  context "success response from server" do
+    let(:sender) { build_sender }
+
+    before { stub_http }
+
+    it "logs success" do
+      sender.should_receive(:log).with(:debug, /Success/, kind_of(Net::HTTPSuccess), kind_of(String))
+      send_exception(:sender => sender, :secure => false)
+    end
+
+    it "doesn't change features" do
+      expect { send_exception(:sender => sender, :secure => false) }.not_to change { Honeybadger.configuration.features }
+    end
+  end
+
+  context "403 response from server" do
+    it "deactivates notices on 403" do
+      stub_http(:response => Net::HTTPForbidden.new('1.2', '403', 'Forbidden'))
+      sender = build_sender
+      expect { send_exception(:sender => sender, :secure => false) }.to change { Honeybadger.configuration.features['notices'] }.to false
+    end
   end
 
   it "logs failure" do
