@@ -1,4 +1,4 @@
-## Honeybadger 1.12.0 (unreleased) ##
+## Honeybadger 1.14.0 (unreleased) ##
 
 * Catch exceptions in Thor tasks.
 
@@ -34,6 +34,33 @@
 * Add native support for Sidekiq
 
   *Joshua Wood*
+
+## Honeybadger 1.13.2 (unreleased) ##
+
+* Fix 2 bugs where the Rails raises exceptions when accessing session
+  information. (ActionDispatch::Session::SessionRestoreError) and
+  ArgumentError when `config.secret_token` is missing.
+
+  *Joshua Wood*
+
+## Honeybadger 1.13.1 ##
+
+* Be less verbose when logging that metrics are disabled. (primarily for
+Unicorn users)
+
+  *Joshua Wood*
+
+## Honeybadger 1.13.0 ##
+
+* Add native support for Sidekiq 3.0
+
+  *Joshua Wood*
+
+* Clean action_dispatch.request.parameters from payload.
+
+  *Joshua Wood*
+
+## Honeybadger 1.12.0 (skipped) ##
 
 ## Honeybadger 1.11.2 ##
 
