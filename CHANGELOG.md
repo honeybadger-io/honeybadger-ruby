@@ -1,3 +1,11 @@
+## Honeybadger 1.13.2 (unreleased) ##
+
+* Fix 2 bugs where the Rails raises exceptions when accessing session
+  information. (ActionDispatch::Session::SessionRestoreError) and
+  ArgumentError when `config.secret_token` is missing.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.13.1 ##
 
 * Be less verbose when logging that metrics are disabled. (primarily for
