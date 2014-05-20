@@ -6,6 +6,10 @@
 
   *Joshua Wood*
 
+* Disable notices via API when unauthorized.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.13.1 ##
 
 * Be less verbose when logging that metrics are disabled. (primarily for
