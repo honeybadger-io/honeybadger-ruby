@@ -19,19 +19,11 @@
 
   *Ravil Bayramgalin*
 
-* Clean action_dispatch.request.parameters from payload.
-
-  *Joshua Wood*
-
 * Add support for 3rd-party integrations via dependency injection.
 
   *Joshua Wood*
 
 * Delayed Job support
-
-  *Joshua Wood*
-
-* Add native support for Sidekiq
 
   *Joshua Wood*
 
