@@ -89,8 +89,8 @@ describe Honeybadger::Payload do
     end
   end
 
-  describe '#filter_url' do
-    subject { described_class.new.send(:filter_url, url) }
+  describe '#filter_url!' do
+    subject { described_class.new.send(:filter_url!, url) }
 
     context 'malformed query' do
       let(:url) { 'https://www.honeybadger.io/?foobar12' }

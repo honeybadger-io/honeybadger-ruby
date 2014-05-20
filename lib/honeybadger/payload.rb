@@ -22,13 +22,13 @@ module Honeybadger
 
       TOP_LEVEL_KEYS.each {|k| self[k] ||= {} }
 
-      filter_url(request[:url]) if request[:url]
-      filter_urls(request[:cgi_data]) if request[:cgi_data]
+      filter_url!(request[:url]) if request[:url]
+      filter_urls!(request[:cgi_data]) if request[:cgi_data]
 
-      filter(request[:params]) if request[:params]
-      filter(request[:session]) if request[:session]
-      filter(request[:cgi_data]) if request[:cgi_data]
-      filter(request[:local_variables]) if request[:local_variables]
+      filter!(request[:params]) if request[:params]
+      filter!(request[:session]) if request[:session]
+      filter!(request[:cgi_data]) if request[:cgi_data]
+      filter!(request[:local_variables]) if request[:local_variables]
     end
 
     protected
@@ -56,13 +56,13 @@ module Honeybadger
       end
     end
 
-    def filter(hash)
+    def filter!(hash)
       if filters
         hash.each do |key, value|
           if filter_key?(key)
             hash[key] = "[FILTERED]"
           elsif value.respond_to?(:to_hash)
-            filter(hash[key])
+            filter!(hash[key])
           end
         end
       end
@@ -85,7 +85,7 @@ module Honeybadger
     # url - String URL to filter
     #
     # Returns filtered String URL
-    def filter_url(url)
+    def filter_url!(url)
       return nil unless url =~ /\S/
 
       url.scan(/(?:^|&|\?)([^=?&]+)=([^&]+)/).each do |m|
@@ -96,10 +96,10 @@ module Honeybadger
       url
     end
 
-    def filter_urls(hash)
+    def filter_urls!(hash)
       hash.each_pair do |key, value|
         next unless value.kind_of?(String) && key =~ /\A[A-Z_]+\Z/ && value =~ /\S/
-        filter_url(value)
+        filter_url!(value)
       end
     end
   end
