@@ -1,3 +1,10 @@
+## Honeybadger 1.13.1 ##
+
+* Be less verbose when logging that metrics are disabled. (primarily for
+Unicorn users)
+
+  *Joshua Wood*
+
 ## Honeybadger 1.13.0 ##
 
 * Add native support for Sidekiq 3.0
