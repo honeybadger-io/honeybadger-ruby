@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.13.1'
-  s.date              = '2014-05-14'
+  s.version           = '1.13.2'
+  s.date              = '2014-05-22'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -51,6 +51,7 @@ Gem::Specification.new do |s|
     features/metal.feature
     features/rack.feature
     features/rails.feature
+    features/rails3.x.feature
     features/rake.feature
     features/sinatra.feature
     features/step_definitions/metal_steps.rb
