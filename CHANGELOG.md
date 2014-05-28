@@ -1,4 +1,4 @@
-## Honeybadger 1.14.0 (unreleased) ##
+## Honeybadger 1.14.0 ##
 
 * Catch exceptions in Thor tasks.
 
