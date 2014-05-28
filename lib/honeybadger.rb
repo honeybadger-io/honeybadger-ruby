@@ -105,8 +105,13 @@ module Honeybadger
             configuration.features = features
 
             unless features['metrics']
-              write_verbose_log("The optional metrics feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.", :error)
+              write_verbose_log("The optional metrics feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.", :warn)
               configuration.metrics = false
+            end
+
+            unless features['traces']
+              write_verbose_log("The optional traces feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.", :warn)
+              configuration.traces = false
             end
 
             features

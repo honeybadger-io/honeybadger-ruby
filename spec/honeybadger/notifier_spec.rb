@@ -48,6 +48,7 @@ describe 'Honeybadger' do
 
       context "result is truthy" do
         before { sender.should_receive(:ping).and_return(result) }
+        before { Honeybadger.stub(:write_verbose_log) }
 
         context "result does not contain features" do
           let(:result) { {} }
@@ -66,7 +67,17 @@ describe 'Honeybadger' do
           specify { expect { invoke_subject }.to change(config, :metrics).to(false) }
 
           it "logs that metrics are disabled" do
-            Honeybadger.should_receive(:write_verbose_log).with(/metrics feature is not enabled/, :error)
+            Honeybadger.should_receive(:write_verbose_log).with(/metrics feature is not enabled/, :warn)
+            invoke_subject
+          end
+        end
+
+        context "traces are disabled by service" do
+          let(:result) { {'features' => {'traces' => false}} }
+          specify { expect { invoke_subject }.to change(config, :traces).to(false) }
+
+          it "logs that traces are disabled" do
+            Honeybadger.should_receive(:write_verbose_log).with(/traces feature is not enabled/, :warn)
             invoke_subject
           end
         end

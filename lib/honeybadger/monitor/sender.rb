@@ -23,12 +23,7 @@ module Honeybadger
 
       def send_traces(data)
         return unless Honeybadger.configuration.traces?
-
-        if !Honeybadger.configuration.features['traces']
-          log(:info, "The optional traces feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.")
-          Honeybadger.configuration.traces = false
-          return nil
-        end
+        return unless Honeybadger.configuration.features['traces']
 
         response = rescue_http_errors do
           http_connection.post('/v1/traces', data.to_json, http_headers)
