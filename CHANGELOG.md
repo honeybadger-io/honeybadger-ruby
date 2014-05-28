@@ -27,7 +27,7 @@
 
   *Joshua Wood*
 
-## Honeybadger 1.13.2 (unreleased) ##
+## Honeybadger 1.13.2 ##
 
 * Fix 2 bugs where the Rails raises exceptions when accessing session
   information. (ActionDispatch::Session::SessionRestoreError) and
