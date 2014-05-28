@@ -80,11 +80,6 @@ module Honeybadger
       end
     end
 
-    # Internal: Filters query parameters from URL
-    #
-    # url - String URL to filter
-    #
-    # Returns filtered String URL
     def filter_url!(url)
       return nil unless url =~ /\S/
 
