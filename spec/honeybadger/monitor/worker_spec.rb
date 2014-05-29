@@ -8,8 +8,9 @@ describe Honeybadger::Monitor::Worker do
   before(:each) do
     Thread.stub(:new)
 
-    # Create an attr_reader for @metrics and @sender
+    # Create attr_readers for testing values
     instance.stub(:metrics) { instance.instance_variable_get(:@metrics) }
+    instance.stub(:traces) { instance.instance_variable_get(:@traces) }
     instance.stub(:sender) { instance.instance_variable_get(:@sender) }
   end
 
@@ -27,6 +28,12 @@ describe Honeybadger::Monitor::Worker do
       it 'is initialized counter with empty hash' do
         expect(subject[:counter]).to eq({})
       end
+    end
+
+    describe '@traces' do
+      subject { instance.traces }
+
+      it { should be_empty }
     end
 
     describe '@delay' do
