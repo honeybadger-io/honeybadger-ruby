@@ -26,6 +26,7 @@ module Honeybadger
   Dependency.register do
     requirement { defined?(::ActiveSupport::Notifications) }
     requirement { defined?(::Net::HTTP) }
+    requirement { Honeybadger.configuration.traces? }
 
     injection { ::Net::HTTP.send(:include, Integrations::NetHttp::Instrumentation) }
   end
