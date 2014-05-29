@@ -1,5 +1,4 @@
 require 'honeybadger'
-require 'honeybadger/monitor'
 require 'rails'
 
 module Honeybadger
@@ -44,8 +43,12 @@ module Honeybadger
         ::ActionDispatch::ShowExceptions.send(:include,Honeybadger::Rails::Middleware::ExceptionsCatcher)
       end
 
-      Honeybadger::Dependency.inject!
       Honeybadger.ping(Honeybadger.configuration)
+
+      # Inject last, in case we're depending on configuration from ping.
+      Honeybadger::Dependency.inject!
     end
   end
 end
+
+require 'honeybadger/monitor'
