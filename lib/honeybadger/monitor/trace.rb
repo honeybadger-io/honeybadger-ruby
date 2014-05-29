@@ -49,7 +49,7 @@ module Honeybadger
       end
 
       def to_h
-        @meta.merge({ events: @events })
+        @meta.merge({ :events => @events })
       end
 
       protected
@@ -90,7 +90,7 @@ module Honeybadger
         end
 
         def to_h
-          { name: event.name, desc: to_s, duration: event.duration }
+          { :name => event.name, :desc => to_s, :duration => event.duration }
         end
 
         def to_a
@@ -153,7 +153,7 @@ module Honeybadger
         end
 
         def to_h
-          payload.merge({ duration: event.duration })
+          payload.merge({ :duration => event.duration })
         end
       end
 

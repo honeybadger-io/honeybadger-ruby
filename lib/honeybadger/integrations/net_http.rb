@@ -15,7 +15,7 @@ module Honeybadger
             return request_without_honeybadger(*args, &block)
           end
 
-          ActiveSupport::Notifications.instrument("net_http.request", { uri: uri, method: request.method }) do
+          ActiveSupport::Notifications.instrument("net_http.request", { :uri => uri, :method => request.method }) do
             request_without_honeybadger(*args, &block)
           end
         end
