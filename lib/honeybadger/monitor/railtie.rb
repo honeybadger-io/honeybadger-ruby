@@ -5,8 +5,6 @@ module Honeybadger
       config.after_initialize do
         if Honeybadger.configuration.metrics?
 
-          require 'honeybadger/integrations/net_http'
-
           ActiveSupport::Notifications.subscribe('start_processing.action_controller') do |name, started, finished, id, data|
             Trace.create(id)
           end
