@@ -24,6 +24,7 @@ module Honeybadger
           end
 
           ActiveSupport::Notifications.subscribe('process_action.action_controller') do |*args|
+            event = ActiveSupport::Notifications::Event.new(*args)
             if event.payload[:controller] && event.payload[:action] && Monitor.worker.trace
               Monitor.worker.trace.complete(event)
             end
