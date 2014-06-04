@@ -10,6 +10,7 @@ module Honeybadger
         end
 
         if Net::HTTPSuccess === response
+          log(:info, "Metrics Success: #{response.class}", response, data) if Honeybadger.configuration.debug
           true
         else
           Honeybadger.configuration.features['metrics'] = false if Net::HTTPForbidden === response
@@ -30,6 +31,7 @@ module Honeybadger
         end
 
         if Net::HTTPSuccess === response
+          log(:info, "Traces Success: #{response.class}", response, data) if Honeybadger.configuration.debug
           true
         else
           Honeybadger.configuration.features['traces'] = false if Net::HTTPForbidden === response
