@@ -16,6 +16,10 @@ module Honeybadger
         create(generate_secure_id).instrument(key, payload, &block)
       end
 
+      def self.generate_secure_id
+        UUIDS_ENABLED ? SecureRandom.uuid : SecureRandom.hex
+      end
+
       def initialize(id)
         @id = id
         @events = []
@@ -56,10 +60,6 @@ module Honeybadger
 
         def clean_event(event)
           TraceCleaner.create(event)
-        end
-
-        def generate_secure_id
-          UUIDS_ENABLED ? SecureRandom.uuid : SecureRandom.hex
         end
 
     end
