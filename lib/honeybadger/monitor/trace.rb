@@ -53,7 +53,7 @@ module Honeybadger
       end
 
       def to_h
-        @meta.merge({ :events => @events })
+        @meta.merge({ :events => @events, :key => @key })
       end
 
       protected
