@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.14.0'
-  s.date              = '2014-05-28'
+  s.version           = '1.15.0'
+  s.date              = '2014-06-11'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -99,11 +99,13 @@ Gem::Specification.new do |s|
     lib/honeybadger/integrations.rb
     lib/honeybadger/integrations/delayed_job.rb
     lib/honeybadger/integrations/delayed_job/plugin.rb
+    lib/honeybadger/integrations/net_http.rb
     lib/honeybadger/integrations/sidekiq.rb
     lib/honeybadger/integrations/thor.rb
     lib/honeybadger/monitor.rb
     lib/honeybadger/monitor/railtie.rb
     lib/honeybadger/monitor/sender.rb
+    lib/honeybadger/monitor/trace.rb
     lib/honeybadger/monitor/worker.rb
     lib/honeybadger/notice.rb
     lib/honeybadger/payload.rb
@@ -137,9 +139,11 @@ Gem::Specification.new do |s|
     spec/honeybadger/dependency_spec.rb
     spec/honeybadger/exception_extensions_spec.rb
     spec/honeybadger/integrations/delayed_job_spec.rb
+    spec/honeybadger/integrations/net_http_spec.rb
     spec/honeybadger/integrations/sidekiq_spec.rb
     spec/honeybadger/integrations/thor_spec.rb
     spec/honeybadger/logger_spec.rb
+    spec/honeybadger/monitor/trace_spec.rb
     spec/honeybadger/monitor/worker_spec.rb
     spec/honeybadger/notice_spec.rb
     spec/honeybadger/notifier_spec.rb
