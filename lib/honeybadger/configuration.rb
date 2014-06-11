@@ -250,6 +250,10 @@ module Honeybadger
       @ignore_user_agent = [names].flatten
     end
 
+    def trace_threshold=(threshold)
+      @trace_threshold = [threshold, 1000].max
+    end
+
     # Public: Allows config options to be read like a hash
     #
     # option - Key for a given attribute

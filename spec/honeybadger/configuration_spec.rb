@@ -252,6 +252,24 @@ describe Honeybadger::Configuration do
     expect(Honeybadger.configuration).to be_a Honeybadger::Configuration
   end
 
+  describe '#trace_threshold=' do
+    let(:config) { Honeybadger::Configuration.new }
+
+    subject { config.trace_threshold = value; config.trace_threshold }
+
+    context "value is above 1000" do
+      let(:value) { 2000 }
+
+      it { should eq 2000 }
+    end
+
+    context "value is below 1000" do
+      let(:value) { 100 }
+
+      it { should eq 1000 }
+    end
+  end
+
   def assert_config_default(option, default_value, config = nil)
     config ||= Honeybadger::Configuration.new
     expect(config.send(option)).to eq default_value
