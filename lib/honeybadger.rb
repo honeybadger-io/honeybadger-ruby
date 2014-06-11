@@ -25,6 +25,7 @@ module Honeybadger
 
   HEADERS = {
     'Content-type' => 'application/json',
+    'Content-Encoding' => 'gzip',
     'Accept'       => 'text/json, application/json',
     'User-Agent'   => "HB-Ruby #{VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"
   }.freeze

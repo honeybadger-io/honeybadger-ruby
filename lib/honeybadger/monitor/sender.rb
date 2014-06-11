@@ -5,9 +5,7 @@ module Honeybadger
         return unless Honeybadger.configuration.metrics?
         return unless Honeybadger.configuration.features['metrics']
 
-        response = rescue_http_errors do
-          http_connection.post('/v1/metrics', data.to_json, http_headers)
-        end
+        response = send_request('/v1/metrics', data.to_json)
 
         if Net::HTTPSuccess === response
           log(:info, "Metrics Success: #{response.class}", response, data) if Honeybadger.configuration.debug
@@ -26,9 +24,7 @@ module Honeybadger
         return unless Honeybadger.configuration.traces?
         return unless Honeybadger.configuration.features['traces']
 
-        response = rescue_http_errors do
-          http_connection.post('/v1/traces', data.to_json, http_headers)
-        end
+        response = send_request('/v1/traces', data.to_json)
 
         if Net::HTTPSuccess === response
           log(:info, "Traces Success: #{response.class}", response, data) if Honeybadger.configuration.debug

@@ -1,3 +1,6 @@
+require 'zlib'
+require 'stringio'
+
 module Honeybadger
   class Sender
     NOTICES_URI = '/v1/notices/'.freeze
@@ -45,9 +48,7 @@ module Honeybadger
 
       data = notice.is_a?(String) ? notice : notice.to_json
 
-      response = rescue_http_errors do
-        http_connection.post(url.path, data, http_headers({'X-API-Key' => api_key}))
-      end
+      response = send_request(url.path, data, {'X-API-Key' => api_key})
 
       if Net::HTTPSuccess === response
         log(Honeybadger.configuration.debug ? :info : :debug, "Success: #{response.class}", response, data)
@@ -67,9 +68,7 @@ module Honeybadger
     def ping(data = {})
       return nil unless api_key_ok?
 
-      response = rescue_http_errors do
-        http_connection.post('/v1/ping/', data.to_json, http_headers)
-      end
+      response = send_request('/v1/ping/', data.to_json)
 
       if Net::HTTPSuccess === response
         JSON.parse(response.body)
@@ -124,8 +123,8 @@ module Honeybadger
       Honeybadger.write_verbose_log("Notice: #{data}", :debug) if data && Honeybadger.configuration.debug
     end
 
-    def rescue_http_errors(&block)
-      yield
+    def send_request(path, data, headers = {})
+      http_connection.post(path, compress(data), http_headers(headers))
     rescue *HTTP_ERRORS => e
       log(:error, "Unable to contact the Honeybadger server. HTTP Error=#{e}")
       nil
@@ -175,6 +174,15 @@ module Honeybadger
 
         Honeybadger.write_verbose_log("Original Exception: #{message}", :error)
       end
+    end
+
+    def compress(string, level = Zlib::DEFAULT_COMPRESSION, strategy = Zlib::DEFAULT_STRATEGY)
+      output = StringIO.new
+      output.set_encoding 'BINARY'
+      gz = Zlib::GzipWriter.new(output, level, strategy)
+      gz.write(string)
+      gz.close
+      output.string
     end
   end
 end
