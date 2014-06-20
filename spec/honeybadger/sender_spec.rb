@@ -11,7 +11,7 @@ describe Honeybadger::Sender do
 
   it "sends a user agent with version number" do
     http  = stub_http
-    http.should_receive(:post).with(kind_of(String), kind_of(String), hash_including({'User-Agent' => "honeybadger-ruby version #{Honeybadger::VERSION}"}))
+    http.should_receive(:post).with(kind_of(String), kind_of(String), hash_including({'User-Agent' => "HB-Ruby #{Honeybadger::VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"}))
     send_exception
   end
 

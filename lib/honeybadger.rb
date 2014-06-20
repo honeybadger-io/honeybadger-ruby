@@ -26,8 +26,8 @@ module Honeybadger
   HEADERS = {
     'Content-type' => 'application/json',
     'Accept'       => 'text/json, application/json',
-    'User-Agent'   => "honeybadger-ruby version #{VERSION}"
-  }
+    'User-Agent'   => "HB-Ruby #{VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"
+  }.freeze
 
   class << self
     # The sender object is responsible for delivering formatted data to the
