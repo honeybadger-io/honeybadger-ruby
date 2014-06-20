@@ -1,4 +1,10 @@
-## Honeybadger 1.15.1 ##
+## Honeybadger 1.15.3 ##
+
+* Send User-Agent header
+
+  *Joshua Wood*
+
+## Honeybadger 1.15.2 ##
 
 * Fix bug where honeybadger/monitor wasn't included in non-Rails apps, even
   though certain other integrations depend on it.

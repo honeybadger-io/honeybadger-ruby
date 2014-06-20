@@ -9,6 +9,12 @@ describe Honeybadger::Sender do
     Honeybadger.notify(RuntimeError.new('oops!'))
   end
 
+  it "sends a user agent with version number" do
+    http  = stub_http
+    http.should_receive(:post).with(kind_of(String), kind_of(String), hash_including({'User-Agent' => "honeybadger-ruby version #{Honeybadger::VERSION}"}))
+    send_exception
+  end
+
   it "posts to Honeybadger when using an HTTP proxy" do
     http  = stub_http
     proxy = double(:new => http)

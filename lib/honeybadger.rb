@@ -25,7 +25,8 @@ module Honeybadger
 
   HEADERS = {
     'Content-type' => 'application/json',
-    'Accept'       => 'text/json, application/json'
+    'Accept'       => 'text/json, application/json',
+    'User-Agent'   => "honeybadger-ruby version #{VERSION}"
   }
 
   class << self
