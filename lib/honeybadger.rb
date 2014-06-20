@@ -17,6 +17,7 @@ require 'honeybadger/integrations'
 require 'honeybadger/exception_extensions'
 
 require 'honeybadger/railtie' if defined?(Rails::Railtie)
+require 'honeybadger/monitor'
 
 module Honeybadger
   VERSION = '1.15.1'

@@ -50,5 +50,3 @@ module Honeybadger
     end
   end
 end
-
-require 'honeybadger/monitor'
