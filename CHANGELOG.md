@@ -1,5 +1,12 @@
 ## Honeybadger 1.15.1 ##
 
+* Fix bug where honeybadger/monitor wasn't included in non-Rails apps, even
+  though certain other integrations depend on it.
+
+  *Joshua Wood*
+
+## Honeybadger 1.15.1 ##
+
 * Fix bug in Thor integration (Issue #74)
 
   *Joshua Wood*
