@@ -1,3 +1,9 @@
+## Honeybadger 1.15.1 ##
+
+* Fix bug in Thor integration (Issue #74)
+
+  *Joshua Wood*
+
 ## Honeybadger 1.15.0 ##
 
 * Send traces for slow requests.
