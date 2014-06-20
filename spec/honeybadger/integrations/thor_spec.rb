@@ -13,7 +13,10 @@ describe "Thor Dependency" do
 
   context "when thor is installed" do
     let(:shim) do
-      double('fake thor')
+      Class.new do
+        def self.no_commands
+        end
+      end
     end
 
     before do

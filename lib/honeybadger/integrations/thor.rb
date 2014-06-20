@@ -20,10 +20,12 @@ module Honeybadger
   end
 
   Dependency.register do
-    requirement { defined?(::Thor) }
+    requirement { defined?(::Thor.no_commands) }
+
+    injection { Honeybadger.write_verbose_log('Installing Thor integration') }
 
     injection do
-      Thor.send(:include, Integrations::Thor)
+      ::Thor.send(:include, Integrations::Thor)
     end
   end
 end
