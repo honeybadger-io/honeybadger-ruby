@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    honeybadger (1.15.0)
+    honeybadger (1.15.1)
       json
 
 GEM
