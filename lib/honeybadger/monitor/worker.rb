@@ -21,6 +21,8 @@ module Honeybadger
       end
 
       def start
+        Honeybadger.write_verbose_log('Starting worker')
+
         @thread = MetricsThread.new do
           begin
             until Thread.current[:should_exit] do
@@ -36,7 +38,21 @@ module Honeybadger
       end
 
       def stop
+        Honeybadger.write_verbose_log('Stopping worker')
         @thread[:should_exit] = true if @thread
+      end
+
+      def fork
+        Honeybadger.write_verbose_log('Forking worker')
+
+        stop
+
+        @lock.synchronize do
+          init_metrics
+          init_traces
+        end
+
+        start
       end
 
       def timing(name, value)
@@ -92,6 +108,8 @@ module Honeybadger
         end
 
         def send_metrics
+          Honeybadger.write_verbose_log('Sending metrics')
+
           metrics = collect_metrics
           return unless metrics[:timing].any? || metrics[:counter].any?
           [].tap do |m|
@@ -117,6 +135,8 @@ module Honeybadger
         end
 
         def send_traces
+          Honeybadger.write_verbose_log('Sending traces')
+
           collect_traces.each_slice(@per_request) do |t|
             begin
               @sender.send_traces({ :traces => t.compact.map(&:to_h), :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
