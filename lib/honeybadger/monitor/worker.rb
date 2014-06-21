@@ -47,6 +47,7 @@ module Honeybadger
 
         stop
 
+        @lock.unlock if @lock.locked?
         @lock.synchronize do
           init_metrics
           init_traces
