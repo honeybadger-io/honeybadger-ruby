@@ -108,10 +108,11 @@ module Honeybadger
         end
 
         def send_metrics
-          Honeybadger.write_verbose_log('Sending metrics')
-
           metrics = collect_metrics
           return unless metrics[:timing].any? || metrics[:counter].any?
+
+          Honeybadger.write_verbose_log('Sending metrics')
+
           [].tap do |m|
             metrics[:counter].each do |metric, values|
               m << "#{metric} #{values.sum}"
@@ -135,9 +136,12 @@ module Honeybadger
         end
 
         def send_traces
+          traces = collect_traces
+          return unless traces.any?
+
           Honeybadger.write_verbose_log('Sending traces')
 
-          collect_traces.each_slice(@per_request) do |t|
+          traces.each_slice(@per_request) do |t|
             begin
               @sender.send_traces({ :traces => t.compact.map(&:to_h), :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
             rescue Exception => e
