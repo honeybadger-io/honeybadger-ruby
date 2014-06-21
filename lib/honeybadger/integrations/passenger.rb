@@ -6,7 +6,7 @@ module Honeybadger
     injection do
       ::PhusionPassenger.on_event(:starting_worker_process) do |forked|
         Honeybadger.write_verbose_log('Starting passenger worker process')
-        Honeybadger::Monitor.worker.fork
+        Honeybadger::Monitor.worker.fork if forked
       end
 
       ::PhusionPassenger.on_event(:stopping_worker_process) do
