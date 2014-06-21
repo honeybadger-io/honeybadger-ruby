@@ -5,7 +5,11 @@ module Honeybadger
         callbacks do |lifecycle|
           lifecycle.around(:invoke_job) do |job, &block|
             begin
-              Honeybadger::Monitor::Trace.instrument("#{job.payload_object.class}#perform", { :source => 'delayed_job', :jid => job.id, :class => job.payload_object.class.name }) do
+              if defined?(::Honeybadger::Monitor)
+                ::Honeybadger::Monitor::Trace.instrument("#{job.payload_object.class}#perform", { :source => 'delayed_job', :jid => job.id, :class => job.payload_object.class.name }) do
+                  block.call(job)
+                end
+              else
                 block.call(job)
               end
             rescue Exception => error

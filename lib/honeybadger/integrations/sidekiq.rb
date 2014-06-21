@@ -14,6 +14,7 @@ module Honeybadger
 
   Dependency.register do
     requirement { defined?(::Sidekiq) }
+    requirement { defined?(::Honeybadger::Monitor) }
 
     injection do
       ::Sidekiq.configure_server do |config|
