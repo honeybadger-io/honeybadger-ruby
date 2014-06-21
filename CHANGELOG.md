@@ -4,6 +4,10 @@
 
   *Joshua Wood*
 
+* Fix a bug where metrics were not reported for Passenger processes.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.15.2 ##
 
 * Fix bug where honeybadger/monitor wasn't included in non-Rails apps, even
