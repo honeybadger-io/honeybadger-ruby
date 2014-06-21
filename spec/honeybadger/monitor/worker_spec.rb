@@ -12,6 +12,31 @@ describe Honeybadger::Monitor::Worker do
     instance.stub(:metrics) { instance.instance_variable_get(:@metrics) }
     instance.stub(:traces) { instance.instance_variable_get(:@traces) }
     instance.stub(:sender) { instance.instance_variable_get(:@sender) }
+    instance.stub(:thread) { instance.instance_variable_get(:@thread) }
+    instance.stub(:lock) { instance.instance_variable_get(:@lock) }
+  end
+
+  describe "#fork" do
+    before { Thread.unstub(:new) }
+    before { Honeybadger.stub(:write_verbose_log) }
+    before { subject.start }
+    after { subject.stop }
+
+    it "logs debug information" do
+      Honeybadger.should_receive(:write_verbose_log).with(/forking/i)
+      subject.fork
+    end
+
+    it "restarts the worker thread" do
+      old_thread = instance.thread
+      subject.fork
+      expect(instance.thread).not_to be old_thread
+    end
+
+    it "unlocks the mutex first" do
+      instance.lock.lock
+      expect { subject.fork }.not_to raise_error
+    end
   end
 
   describe '#initialize' do
