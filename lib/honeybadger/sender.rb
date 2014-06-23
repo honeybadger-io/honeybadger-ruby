@@ -176,13 +176,8 @@ module Honeybadger
       end
     end
 
-    def compress(string, level = Zlib::DEFAULT_COMPRESSION, strategy = Zlib::DEFAULT_STRATEGY)
-      output = StringIO.new
-      output.set_encoding 'BINARY'
-      gz = Zlib::GzipWriter.new(output, level, strategy)
-      gz.write(string)
-      gz.close
-      output.string
+    def compress(string, level = Zlib::DEFAULT_COMPRESSION)
+      Zlib::Deflate.deflate(string, level)
     end
   end
 end
