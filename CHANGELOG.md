@@ -1,3 +1,9 @@
+## Honeybadger 1.16.0 ##
+
+* Compress requests using deflate.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header
