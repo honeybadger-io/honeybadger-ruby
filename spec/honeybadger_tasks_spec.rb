@@ -92,7 +92,7 @@ describe HoneybadgerTasks do
           end
 
           it "puts the response body on success" do
-            HoneybadgerTasks.should_receive(:puts).with("Succesfully recorded deployment")
+            HoneybadgerTasks.should_receive(:puts).with("Successfully recorded deployment")
             @http_proxy.should_receive(:request).with(anything).and_return(successful_response('body'))
             HoneybadgerTasks.deploy(@options)
           end
