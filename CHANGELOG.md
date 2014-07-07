@@ -8,6 +8,11 @@
 
   *Gavin Stark*
 
+* Fix a bug which affected Rails 3.0 apps
+  (`ActiveRecord::Base.connection_config` missing).
+
+  *Joshua Wood*
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header

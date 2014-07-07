@@ -130,7 +130,7 @@ module Honeybadger
           return "Super long query" if event.payload[:sql].length > 1024
           sql = event.payload[:sql]
           sql = sql.gsub(EscapedQuotes, EmptyReplacement).gsub(SQuotedData, Replacement)
-          sql = sql.gsub(DQuotedData, Replacement) unless ::ActiveRecord::Base.connection_config[:adapter] =~ DoubleQuoters
+          sql = sql.gsub(DQuotedData, Replacement) unless ::ActiveRecord::Base.connection_pool.spec.config[:adapter] =~ DoubleQuoters
           sql.gsub(NumericData, Replacement).gsub(Newline, EmptyReplacement).squeeze(' ')
         end
       end
