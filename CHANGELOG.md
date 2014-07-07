@@ -4,6 +4,10 @@
 
   *Joshua Wood*
 
+* Fix a bug where context wasn't reported from Sinatra applications
+
+  *Gavin Stark*
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header
