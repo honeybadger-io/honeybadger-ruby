@@ -24,12 +24,29 @@ module Honeybadger
         @id = id
         @events = []
         @meta = {}
+        @short_queries = {}
         @duration = 0
       end
 
       def add(event)
         ce = clean_event(event)
         @events << ce.to_a if ce.render?
+      end
+
+      def add_query(event)
+        if event.duration < 6
+          ce = clean_event(event)
+          return unless ce.render?
+          query = ce.to_s
+          if @short_queries[query]
+            @short_queries[query][:duration] += ce.event.duration
+            @short_queries[query][:count] += 1
+          else
+            @short_queries[query] = { duration: ce.event.duration, count: 1 }
+          end
+        else
+          add(event)
+        end
       end
 
       def complete(event)
@@ -53,7 +70,7 @@ module Honeybadger
       end
 
       def to_h
-        @meta.merge({ :events => @events, :key => @key })
+        @meta.merge({ :events => @events, :key => @key, :short_queries => @short_queries.map {|k,v| [ k, v[:duration], v[:count] ] } })
       end
 
       protected
