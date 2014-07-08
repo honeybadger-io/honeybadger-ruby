@@ -17,6 +17,11 @@
 
   *Joshua Wood*
 
+* Automatically fork worker when Unicorn forks (removes the need to call
+  `Honeybadger::Monitor.worker.fork` in Unicorn's `after_fork` block.)
+
+  *Joshua Wood*
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header
