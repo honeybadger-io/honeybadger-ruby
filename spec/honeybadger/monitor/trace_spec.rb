@@ -3,9 +3,29 @@ require 'honeybadger/monitor'
 
 describe Honeybadger::Monitor::Trace do
   describe "::instrument" do
+    before do
+      Honeybadger::Monitor::Trace.stub(:generate_secure_id).and_return(:foo)
+    end
+
     it "creates a new trace" do
       Honeybadger::Monitor::Trace.should_receive(:new).and_call_original
       described_class.instrument('testing', {}){}
+    end
+
+    it "temporarily stores trace id in thread local" do
+      described_class.instrument('testing', {}) do
+        expect(Thread.current[:hb_trace_id]).to eq :foo
+      end
+
+      expect(Thread.current[:hb_trace_id]).to be_nil
+    end
+
+    it "stores the trace on the worker's pending traces" do
+      described_class.instrument('testing', {}) do
+        expect(Honeybadger::Monitor.worker.pending_traces[:foo]).to be_a Honeybadger::Monitor::Trace
+      end
+
+      expect(Honeybadger::Monitor.worker.pending_traces[:foo]).to be_nil
     end
   end
 end
