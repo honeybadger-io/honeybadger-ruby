@@ -13,6 +13,10 @@
 
   *Joshua Wood*
 
+* Stop sending non-server env.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header
