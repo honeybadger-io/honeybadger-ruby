@@ -42,10 +42,10 @@ begin
         now+0.2,             # ending
         '1',                 # transaction_id
         {                    # payload
-          name: nil,
-          sql: '',
-          binds: [],
-          connection_id: 123
+          :name => nil,
+          :sql => '',
+          :binds => [],
+          :connection_id => 123
         }
       )
     end

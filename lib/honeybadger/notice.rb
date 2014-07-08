@@ -281,7 +281,7 @@ module Honeybadger
 
     def clean_rack_request_data
       if cgi_data
-        self.cgi_data = cgi_data.dup.select {|k, v| k.match(/\A[A-Z_]+\Z/) && k != 'QUERY_STRING' }
+        self.cgi_data = Hash[cgi_data.dup.select {|k, v| k.match(/\A[A-Z_]+\Z/) && k != 'QUERY_STRING' }]
       end
     end
 
