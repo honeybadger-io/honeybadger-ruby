@@ -194,23 +194,46 @@ describe Honeybadger::Configuration do
     expect(config.development_environments).to eq %w(development test cucumber)
   end
 
-  it "is public in a public environment" do
-    config = Honeybadger::Configuration.new
-    config.development_environments = %w(development)
-    config.environment_name = 'production'
-    expect(config.public?).to be_true
-  end
+  describe "#public?" do
+    let(:config) { Honeybadger::Configuration.new }
 
-  it "is not public in a development environment" do
-    config = Honeybadger::Configuration.new
-    config.development_environments = %w(staging)
-    config.environment_name = 'staging'
-    expect(config.public?).to be_false
-  end
+    subject { config.public? }
 
-  it "is public without an environment name" do
-    config = Honeybadger::Configuration.new
-    expect(config.public?).to be_true
+    before do
+      config.api_key = 'asdf'
+    end
+
+    context "when api_key is not configured" do
+      before { config.api_key = nil }
+
+      it { should be_false }
+    end
+
+    context "when api_key is configured" do
+      it { should be_true }
+    end
+
+    context "without an environment name" do
+      it { should be_true }
+    end
+
+    context "when environment is public" do
+      before do
+        config.development_environments = %w(development)
+        config.environment_name = 'production'
+      end
+
+      it { should be_true }
+    end
+
+    context "when environment is development" do
+      before do
+        config.development_environments = %w(development)
+        config.environment_name = 'development'
+      end
+
+      it { should be_false }
+    end
   end
 
   describe "#metrics?" do
