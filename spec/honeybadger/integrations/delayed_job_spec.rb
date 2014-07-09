@@ -17,6 +17,9 @@ if DELAYED_JOB_INSTALLED
   Delayed::Worker.backend = :test
 
   class ExceptionTester
+    def null_method
+    end
+
     def will_raise
       raise "raised from will_raise"
     end
@@ -28,14 +31,33 @@ if DELAYED_JOB_INSTALLED
     before { Honeybadger::Dependency.inject! }
     after { Delayed::Job.delete_all }
 
-    context "when an exception occurs in a delayed method" do
-      before { ExceptionTester.new.delay.will_raise }
-      after  { worker.work_off }
+    context "when a method is delayed" do
+      let(:method_name) { :null_method }
+
+      before { ExceptionTester.new.delay.send(method_name) }
 
       specify { expect(Delayed::Job.count).to eq 1 }
 
-      it "notifies Honeybadger" do
-        Honeybadger.should_receive(:notify_or_ignore).once
+      it "queues a new trace" do
+        trace_id = nil
+        Honeybadger::Monitor.worker.should_receive(:queue_trace).once.and_return do
+          # This ensures that Honeybadger::Monitor.worker.trace is not nil when
+          # it's queued from the worker. There may still be an edge case where
+          # that's possible. (see #84)
+          trace_id = Thread.current[:hb_trace_id]
+        end
+        worker.work_off
+        expect(trace_id).not_to be_nil
+      end
+
+      context "and an exception occurs" do
+        let(:method_name) { :will_raise }
+
+        after  { worker.work_off }
+
+        it "notifies Honeybadger" do
+          Honeybadger.should_receive(:notify_or_ignore).once
+        end
       end
     end
   end
