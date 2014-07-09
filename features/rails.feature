@@ -233,9 +233,8 @@ Feature: Install the Gem in a Rails application
     And I perform a request to "http://example.com:123/test/index?param=value&secret=blue42"
     Then I should receive a Honeybadger notification
     And the request should not contain "red23"
-    And the request params should contain "FILTERED"
     And the request should not contain "blue42"
-    And the request cgi_data should contain "FILTERED"
+    And the request params should contain "FILTERED"
 
   Scenario: Filtering session in a controller
     When I configure my application to require Honeybadger
