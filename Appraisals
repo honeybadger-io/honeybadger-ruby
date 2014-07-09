@@ -36,6 +36,11 @@ appraise 'rails2.3' do
   gem 'capistrano', '~> 2.0'
 end
 
+appraise 'delayed_job' do
+  gem 'delayed_job'
+  gem 'honeybadger', :path => '../'
+end
+
 if RUBY_VERSION > '1.9'
   appraise 'rails3.0' do
     gem 'rails', '~> 3.0.17'

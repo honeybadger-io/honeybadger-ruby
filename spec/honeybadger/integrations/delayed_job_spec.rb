@@ -1,48 +1,42 @@
 require 'spec_helper'
+require 'honeybadger/monitor'
 
-describe "DelayedJob Dependency" do
-  before do
-    Honeybadger::Dependency.reset!
-  end
+begin
+  require 'delayed_job'
+  DELAYED_JOB_INSTALLED = true
+rescue LoadError
+  DELAYED_JOB_INSTALLED = false
+  nil
+end
 
-  context "when delayed_job is not installed" do
-    it "fails quietly" do
-      expect { Honeybadger::Dependency.inject! }.not_to raise_error
+if DELAYED_JOB_INSTALLED
+  # Prepend the load path with delayed_job's spec directory so that we can take
+  # advantage of their test backend:
+  # https://github.com/collectiveidea/delayed_job/blob/master/spec/delayed/backend/test.rb
+  $:.unshift(File.join(Gem::Specification.find_by_name('delayed_job').full_gem_path, 'spec'))
+  Delayed::Worker.backend = :test
+
+  class ExceptionTester
+    def will_raise
+      raise "raised from will_raise"
     end
   end
 
-  context "when delayed_job is installed" do
-    let(:plugins_array) { [] }
-    let(:plugin_class) do
-      Class.new do
-        def self.callbacks(&block)
-        end
-      end
-    end
+  describe "DelayedJob integration" do
+    let(:worker) { Delayed::Worker.new }
 
     before do
-      Object.const_set(:Delayed, Module.new)
-      ::Delayed.const_set(:Plugin, plugin_class)
-      ::Delayed.const_set(:Worker, double(:plugins => plugins_array))
-    end
-
-    after { Object.send(:remove_const, :Delayed) }
-
-    it "adds the plugin to DelayedJob" do
       Honeybadger::Dependency.inject!
-      expect(plugins_array).to include(Honeybadger::Integrations::DelayedJob::Plugin)
+      ExceptionTester.new.delay.will_raise
     end
 
-    context "and delayed_job_honeybadger is installed" do
-      before do
-        ::Delayed.const_set(:Plugins, Module.new)
-        ::Delayed::Plugins.const_set(:Honeybadger, Class.new(plugin_class))
-      end
+    after { Delayed::Job.delete_all }
 
-      it "warns the user of the conflict" do
-        Honeybadger.should_receive(:write_verbose_log).with(/Support for Delayed Job has been moved/, :warn).once
-        Honeybadger::Dependency.inject!
-      end
+    specify { expect(Delayed::Job.count).to eq 1 }
+
+    it "is notified when an exception occurs in a delayed job" do
+      Honeybadger.should_receive(:notify_or_ignore).once
+      worker.work_off
     end
   end
 end
