@@ -42,7 +42,7 @@ module Honeybadger
             @fast_queries[query][:duration] += ce.event.duration
             @fast_queries[query][:count] += 1
           else
-            @fast_queries[query] = { duration: ce.event.duration, count: 1 }
+            @fast_queries[query] = { :duration => ce.event.duration, :count => 1 }
           end
         else
           add(event)
