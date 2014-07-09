@@ -25,18 +25,18 @@ if DELAYED_JOB_INSTALLED
   describe "DelayedJob integration" do
     let(:worker) { Delayed::Worker.new }
 
-    before do
-      Honeybadger::Dependency.inject!
-      ExceptionTester.new.delay.will_raise
-    end
-
+    before { Honeybadger::Dependency.inject! }
     after { Delayed::Job.delete_all }
 
-    specify { expect(Delayed::Job.count).to eq 1 }
+    context "when an exception occurs in a delayed method" do
+      before { ExceptionTester.new.delay.will_raise }
+      after  { worker.work_off }
 
-    it "is notified when an exception occurs in a delayed job" do
-      Honeybadger.should_receive(:notify_or_ignore).once
-      worker.work_off
+      specify { expect(Delayed::Job.count).to eq 1 }
+
+      it "notifies Honeybadger" do
+        Honeybadger.should_receive(:notify_or_ignore).once
+      end
     end
   end
 end
