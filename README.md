@@ -14,11 +14,11 @@ to the Honeybadger server specified in your environment.
 
 ## Supported Ruby versions
 
-Honeybadger supports Ruby 1.8.7 through 2.1.
+Honeybadger supports Ruby 1.9.3 through 2.1.
 
 ## Supported Rails versions
 
-Honeybadger supports Rails 2.3.18 through Rails 4.1.0.
+Honeybadger supports Rails 2.3 through Rails 4.1 (latest releases).
 
 ## Contributing
 

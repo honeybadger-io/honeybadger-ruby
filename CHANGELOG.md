@@ -22,6 +22,8 @@
 
   *Joshua Wood*
 
+* Ruby 1.8.7 and 1.9.2 are no longer supported.
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header
