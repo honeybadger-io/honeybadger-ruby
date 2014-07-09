@@ -14,6 +14,7 @@ module Honeybadger
         init_traces
         @delay = defined?(::Rails) && ::Rails.env.development? ? 10 : 60
         @per_request = 100
+        @traces_per_request = 20
         @sender = Monitor::Sender.new(Honeybadger.configuration)
         @lock = Mutex.new
         start
@@ -142,7 +143,7 @@ module Honeybadger
 
           Honeybadger.write_verbose_log('Sending traces')
 
-          traces.each_slice(@per_request) do |t|
+          traces.each_slice(@traces_per_request) do |t|
             begin
               @sender.send_traces({ :traces => t.compact.map(&:to_h), :environment => Honeybadger.configuration.environment_name, :hostname => Honeybadger.configuration.hostname })
             rescue Exception => e
