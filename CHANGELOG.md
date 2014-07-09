@@ -4,6 +4,26 @@
 
   *Joshua Wood*
 
+* Fix a bug where context wasn't reported from Sinatra applications
+
+  *Gavin Stark*
+
+* Fix a bug which affected Rails 3.0 apps
+  (`ActiveRecord::Base.connection_config` missing).
+
+  *Joshua Wood*
+
+* Stop sending non-server env.
+
+  *Joshua Wood*
+
+* Automatically fork worker when Unicorn forks (removes the need to call
+  `Honeybadger::Monitor.worker.fork` in Unicorn's `after_fork` block.)
+
+  *Joshua Wood*
+
+* Ruby 1.8.7 and 1.9.2 are no longer supported.
+
 ## Honeybadger 1.15.3 ##
 
 * Send User-Agent header

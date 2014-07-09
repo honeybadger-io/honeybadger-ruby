@@ -65,7 +65,7 @@ begin
       assert_sent_element(params['controller']) { |h| h['request']['component'] }
       assert_sent_element(params['action']) { |h| h['request']['action'] }
       assert_sent_element(url_from_request(request)) { |h| h['request']['url'] }
-      assert_sent_hash(request.env) { |h| h['request']['cgi_data'] }
+      assert_sent_hash(request.env.reject {|k,_| k == 'QUERY_STRING' || !k.match(/\A[A-Z_]+\Z/) }) { |h| h['request']['cgi_data'] }
     end
 
     def url_from_request(request)

@@ -8,17 +8,19 @@ This is the notifier gem for integrating apps with the :zap: [Honeybadger Except
 When an uncaught exception occurs, Honeybadger will POST the relevant data
 to the Honeybadger server specified in your environment.
 
-## Documentation
-
-[View the Documentation](http://docs.honeybadger.io/article/50-honeybadger-gem-documentation)
-
 ## Supported Ruby versions
 
-Honeybadger supports Ruby 1.8.7 through 2.1.
+#### IMPORTANT: As of version 1.16.0, Ruby 1.8.7 and 1.9.2 are unsupported. Please ensure you are running Ruby 1.9.3 or greater before upgrading.
+
+Honeybadger supports Ruby 1.9.3 through 2.1.
 
 ## Supported Rails versions
 
-Honeybadger supports Rails 2.3.18 through Rails 4.1.0.
+Honeybadger supports Rails 2.3 through Rails 4.1 (latest releases).
+
+## Documentation
+
+[View the Documentation](http://docs.honeybadger.io/article/50-honeybadger-gem-documentation)
 
 ## Contributing
 

@@ -137,9 +137,9 @@ module Honeybadger
       self.send_request_session = args[:send_request_session].nil? ? true : args[:send_request_session]
 
       find_session_data
-      clean_rack_request_data
       also_use_rack_params_filters
       set_context
+      clean_rack_request_data
     end
 
     # Deprecated. Remove in 2.0.
@@ -281,12 +281,7 @@ module Honeybadger
 
     def clean_rack_request_data
       if cgi_data
-        self.cgi_data = cgi_data.dup
-        cgi_data.delete("rack.request.form_vars")
-        cgi_data.delete("rack.request.query_string")
-        cgi_data.delete("rack.session")
-        cgi_data.delete("action_dispatch.request.parameters")
-        cgi_data.delete("action_dispatch.request.request_parameters")
+        self.cgi_data = cgi_data.reject {|k,_| k == 'QUERY_STRING' || !k.match(/\A[A-Z_]+\Z/) }
       end
     end
 

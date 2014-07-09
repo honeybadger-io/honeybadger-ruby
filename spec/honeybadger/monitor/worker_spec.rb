@@ -16,6 +16,44 @@ describe Honeybadger::Monitor::Worker do
     instance.stub(:lock) { instance.instance_variable_get(:@lock) }
   end
 
+  describe "#queue_trace" do
+    let(:trace) { Honeybadger::Monitor::Trace.new(:foo) }
+
+    context "when a trace exists" do
+      before do
+        trace.stub(:key).and_return(:bar)
+        subject.pending_traces[:foo] = trace
+        Thread.current[:hb_trace_id] = :foo
+      end
+
+      context "and the same trace key exists" do
+        let(:old_trace) { Honeybadger::Monitor::Trace.new(:foo) }
+
+        before do
+          old_trace.stub(:duration).and_return(2000)
+          old_trace.stub(:key).and_return(:bar)
+          subject.traces[:bar] = old_trace
+        end
+
+        context "and the new duration is not greater" do
+          before { trace.stub(:duration).and_return(2000) }
+
+          it "replaces the existing trace" do
+            expect { subject.queue_trace }.not_to change { subject.traces[:bar] }.from(old_trace)
+          end
+        end
+
+        context "and the new duration is greater" do
+          before { trace.stub(:duration).and_return(3000) }
+
+          it "replaces the existing trace" do
+            expect { subject.queue_trace }.to change { subject.traces[:bar] }.from(old_trace).to(trace)
+          end
+        end
+      end
+    end
+  end
+
   describe "#fork" do
     before { Thread.unstub(:new) }
     before { Honeybadger.stub(:write_verbose_log) }

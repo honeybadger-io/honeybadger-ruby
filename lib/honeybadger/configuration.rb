@@ -285,7 +285,7 @@ module Honeybadger
     #
     # Returns true if allowed to talk to API, false otherwise.
     def public?
-      !development_environments.include?(environment_name)
+      api_key =~ /\S/ && !development_environments.include?(environment_name)
     end
 
     # Public: Determines whether to send metrics

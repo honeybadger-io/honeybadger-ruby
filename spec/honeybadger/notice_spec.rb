@@ -264,7 +264,7 @@ describe Honeybadger::Notice do
   end
 
   it "accepts CGI data from a hash" do
-    data = { 'string' => 'value' }
+    data = { 'STRING' => 'value' }
     notice = build_notice(:cgi_data => data)
     expect(notice.cgi_data).to eq data
   end
@@ -297,14 +297,14 @@ describe Honeybadger::Notice do
     assert_array_starts_with backtrace.lines, notice.backtrace.lines
   end
 
-  it "removes rack.request.form_vars" do
+  it "removes non-uppercase keys" do
     original = {
-      "rack.request.form_vars" => "story%5Btitle%5D=The+TODO+label",
-      "abc" => "123"
+      'rack.request.form_vars' => 'story%5Btitle%5D=The+TODO+label',
+      'ABC' => "123"
     }
 
     notice = build_notice(:cgi_data => original)
-    expect(notice.cgi_data).to eq({"abc" => "123"})
+    expect(notice.cgi_data).to eq({'ABC' => '123'})
   end
 
   it "does not send empty request data" do
