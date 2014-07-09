@@ -74,6 +74,8 @@ module Honeybadger
       end
 
       def queue_trace
+        return unless trace
+
         @lock.synchronize do
           if trace.duration > Honeybadger.configuration.trace_threshold && (!@traces[trace.key] || @traces[trace.key].duration < trace.duration)
             @traces[trace.key] = trace
