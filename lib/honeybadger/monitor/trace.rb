@@ -24,7 +24,7 @@ module Honeybadger
         @id = id
         @events = []
         @meta = {}
-        @short_queries = {}
+        @fast_queries = {}
         @duration = 0
       end
 
@@ -38,11 +38,11 @@ module Honeybadger
           ce = clean_event(event)
           return unless ce.render?
           query = ce.to_s
-          if @short_queries[query]
-            @short_queries[query][:duration] += ce.event.duration
-            @short_queries[query][:count] += 1
+          if @fast_queries[query]
+            @fast_queries[query][:duration] += ce.event.duration
+            @fast_queries[query][:count] += 1
           else
-            @short_queries[query] = { duration: ce.event.duration, count: 1 }
+            @fast_queries[query] = { duration: ce.event.duration, count: 1 }
           end
         else
           add(event)
@@ -70,7 +70,7 @@ module Honeybadger
       end
 
       def to_h
-        @meta.merge({ :events => @events, :key => @key, :short_queries => @short_queries.map {|k,v| [ k, v[:duration], v[:count] ] } })
+        @meta.merge({ :events => @events, :key => @key, :fast_queries => @fast_queries.map {|k,v| [ k, v[:duration], v[:count] ] } })
       end
 
       protected
