@@ -24,6 +24,8 @@ matrix:
     - rvm: jruby-18mode
       gemfile: gemfiles/binding_of_caller.gemfile
     - rvm: jruby-18mode
+      gemfile: gemfiles/delayed_job.gemfile
+    - rvm: jruby-18mode
       gemfile: gemfiles/rails.gemfile
     - rvm: jruby-19mode
       gemfile: gemfiles/binding_of_caller.gemfile
@@ -31,5 +33,9 @@ matrix:
       gemfile: gemfiles/binding_of_caller.gemfile
     - rvm: 1.8.7
       gemfile: gemfiles/rails.gemfile
+    - rvm: 1.8.7
+      gemfile: gemfiles/delayed_job.gemfile
     - rvm: 1.9.2
       gemfile: gemfiles/rails.gemfile
+    - rvm: 1.9.2
+      gemfile: gemfiles/delayed_job.gemfile
