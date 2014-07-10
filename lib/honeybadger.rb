@@ -20,7 +20,7 @@ require 'honeybadger/railtie' if defined?(Rails::Railtie)
 require 'honeybadger/monitor'
 
 module Honeybadger
-  VERSION = '1.15.3'.freeze
+  VERSION = '1.16.0'.freeze
   LOG_PREFIX = "** [Honeybadger] ".freeze
 
   HEADERS = {

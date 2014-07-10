@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.15.3'
-  s.date              = '2014-06-21'
+  s.version           = '1.16.0'
+  s.date              = '2014-07-09'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -68,6 +68,7 @@ Gem::Specification.new do |s|
     features/support/test.thor
     features/thor.feature
     gemfiles/binding_of_caller.gemfile
+    gemfiles/delayed_job.gemfile
     gemfiles/rack.gemfile
     gemfiles/rails.gemfile
     gemfiles/rails2.3.gemfile
@@ -103,6 +104,7 @@ Gem::Specification.new do |s|
     lib/honeybadger/integrations/passenger.rb
     lib/honeybadger/integrations/sidekiq.rb
     lib/honeybadger/integrations/thor.rb
+    lib/honeybadger/integrations/unicorn.rb
     lib/honeybadger/monitor.rb
     lib/honeybadger/monitor/railtie.rb
     lib/honeybadger/monitor/sender.rb
@@ -144,6 +146,7 @@ Gem::Specification.new do |s|
     spec/honeybadger/integrations/passenger_spec.rb
     spec/honeybadger/integrations/sidekiq_spec.rb
     spec/honeybadger/integrations/thor_spec.rb
+    spec/honeybadger/integrations/unicorn_spec.rb
     spec/honeybadger/logger_spec.rb
     spec/honeybadger/monitor/trace_spec.rb
     spec/honeybadger/monitor/worker_spec.rb
