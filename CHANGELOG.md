@@ -1,3 +1,9 @@
+## Honeybadger 1.16.1 ##
+
+* Don't log when metrics/traces are disabled by service.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.16.0 ##
 
 * Compress requests using deflate.
@@ -23,6 +29,8 @@
   *Joshua Wood*
 
 * Ruby 1.8.7 and 1.9.2 are no longer supported.
+
+  *Joshua Wood*
 
 ## Honeybadger 1.15.3 ##
 

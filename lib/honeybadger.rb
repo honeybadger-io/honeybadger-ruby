@@ -106,17 +106,8 @@ module Honeybadger
         if result = sender.ping({ :version => Honeybadger::VERSION, :framework => configuration.framework, :environment => configuration.environment_name, :hostname => configuration.hostname })
           if features = result['features']
             configuration.features = features
-
-            unless features['metrics']
-              write_verbose_log("The optional metrics feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.", :warn)
-              configuration.metrics = false
-            end
-
-            unless features['traces']
-              write_verbose_log("The optional traces feature is not enabled for your account.  Try restarting your app or contacting support@honeybadger.io if your subscription includes this feature.", :warn)
-              configuration.traces = false
-            end
-
+            configuration.metrics = false unless features['metrics']
+            configuration.traces = false unless features['traces']
             features
           end
         end
