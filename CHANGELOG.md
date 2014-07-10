@@ -1,5 +1,9 @@
 ## Honeybadger 1.16.1 ##
 
+* Add debug logging of successful ping responses.
+
+  *Joshua Wood*
+
 * Don't log when metrics/traces are disabled by service.
 
   *Joshua Wood*

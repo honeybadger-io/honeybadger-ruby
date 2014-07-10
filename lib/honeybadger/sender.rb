@@ -71,6 +71,7 @@ module Honeybadger
       response = send_request('/v1/ping/', data.to_json)
 
       if Net::HTTPSuccess === response
+        log(Honeybadger.configuration.debug ? :info : :debug, "Ping Success: #{response.class}", response, data)
         JSON.parse(response.body)
       else
         log(:error, "Ping Failure: #{response.class}", response, data)
