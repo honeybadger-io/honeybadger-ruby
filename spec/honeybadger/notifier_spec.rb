@@ -61,6 +61,16 @@ describe 'Honeybadger' do
           it { should eq result['features'] }
           specify { expect { subject }.to change(config, :features).to(result['features']) }
         end
+
+        context "metrics are disabled by service" do
+          let(:result) { {'features' => {'metrics' => false}} }
+          specify { expect { invoke_subject }.to change(config, :metrics).to(false) }
+        end
+
+        context "traces are disabled by service" do
+          let(:result) { {'features' => {'traces' => false}} }
+          specify { expect { invoke_subject }.to change(config, :traces).to(false) }
+        end
       end
 
       context "result is falsey" do
