@@ -9,9 +9,9 @@ module Honeybadger
 
         def request_with_honeybadger(*args, &block)
           request = args[0]
-          uri = request.path.match(%r{https?://}) ? URI(request.path) : URI("http#{use_ssl? ? 's' : ''}://#{address}:#{port}#{request.path}")
+          uri = request.path.to_s.match(%r{https?://}) ? URI(request.path) : URI("http#{use_ssl? ? 's' : ''}://#{address}:#{port}#{request.path}")
 
-          if uri.host.match("honeybadger.io")
+          if uri.host.to_s.match("honeybadger.io")
             return request_without_honeybadger(*args, &block)
           end
 
