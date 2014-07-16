@@ -1,3 +1,10 @@
+## Honeybadger 1.16.2 ##
+
+* Fix a bug where #match was called on nil when instrumenting Net::HTTP
+  requests.
+
+  *Benjamin Curtis*
+
 ## Honeybadger 1.16.1 ##
 
 * Add debug logging of successful ping responses.
