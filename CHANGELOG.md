@@ -1,3 +1,10 @@
+## Honeybadger 1.16.3 ##
+
+* Prevent `binding_of_caller` from being loaded automatically (requires
+  `send_local_variables == true`).
+
+  *Joshua Wood*
+
 ## Honeybadger 1.16.2 ##
 
 * Fix a bug where #match was called on nil when instrumenting Net::HTTP
