@@ -402,6 +402,7 @@ module Honeybadger
     # Returns a Hash of local variables
     def local_variables_from_exception(exception)
       return {} unless Exception === exception
+      return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
       return {} if exception.__honeybadger_bindings_stack.empty?
 
       if project_root

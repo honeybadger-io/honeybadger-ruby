@@ -1,6 +1,12 @@
 require 'rspec'
 require 'honeybadger'
 
+begin
+  require 'binding_of_caller'
+rescue LoadError
+  nil
+end
+
 # Require files in spec/support/ and its subdirectories.
 Dir[File.expand_path('../../spec/support/**/*.rb', __FILE__)].each {|f| require f}
 
