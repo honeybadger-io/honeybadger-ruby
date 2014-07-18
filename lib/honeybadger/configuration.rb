@@ -9,7 +9,8 @@ module Honeybadger
                :proxy_port, :proxy_user, :secure, :use_system_ssl_cert_chain, :framework,
                :user_information, :feedback, :rescue_rake_exceptions, :source_extract_radius,
                :send_request_session, :debug, :fingerprint, :hostname, :features, :metrics,
-               :log_exception_on_send_failure, :send_local_variables, :traces, :trace_threshold].freeze
+               :log_exception_on_send_failure, :send_local_variables, :traces,
+               :trace_threshold, :unwrap_exceptions].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -107,6 +108,9 @@ module Honeybadger
     # +true+ to send local variables, +false+ to exclude
     attr_accessor :send_local_variables
 
+    # +true+ to unwrap exceptions
+    attr_accessor :unwrap_exceptions
+
     # +true+ to log extra debug info, +false+ to suppress
     attr_accessor :debug
 
@@ -195,6 +199,7 @@ module Honeybadger
       @limit                         = nil
       @feedback                      = true
       @trace_threshold               = 2000
+      @unwrap_exceptions             = true
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

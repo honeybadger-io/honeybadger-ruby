@@ -31,6 +31,7 @@ describe Honeybadger::Configuration do
     assert_config_default :async, nil
     assert_config_default :send_request_session, true
     assert_config_default :send_local_variables, false
+    assert_config_default :unwrap_exceptions, true
     assert_config_default :debug, false
     assert_config_default :log_exception_on_send_failure, false
     assert_config_default :fingerprint, nil
@@ -138,7 +139,7 @@ describe Honeybadger::Configuration do
      :proxy_host, :proxy_pass, :proxy_port, :proxy_user, :secure,
      :source_extract_radius, :async, :send_request_session, :debug,
      :fingerprint, :hostname, :features, :metrics, :feedback,
-     :log_exception_on_send_failure].each do |option|
+     :log_exception_on_send_failure, :unwrap_exceptions].each do |option|
        expect(hash[option]).to eq config[option]
     end
   end

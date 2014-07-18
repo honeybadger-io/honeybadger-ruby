@@ -190,6 +190,7 @@ module Honeybadger
     end
 
     def unwrap_exception(exception)
+      return exception unless configuration.unwrap_exceptions
       exception.respond_to?(:original_exception) && exception.original_exception ||
       exception.respond_to?(:continued_exception) && exception.continued_exception ||
       exception.respond_to?(:cause) && exception.cause ||

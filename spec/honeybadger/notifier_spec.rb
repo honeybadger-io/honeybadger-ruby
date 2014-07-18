@@ -233,7 +233,7 @@ describe 'Honeybadger' do
     config_opts = { 'one' => 'two', 'three' => 'four' }
     stub_notice!
     stub_sender!
-    Honeybadger.configuration = double('config', :merge => config_opts, :public? => true, :async? => false)
+    Honeybadger.configuration = double('config', :merge => config_opts, :public? => true, :async? => false, :unwrap_exceptions => false)
 
     Honeybadger::Notice.should_receive(:new).with(hash_including(config_opts))
     Honeybadger.notify(exception)
@@ -298,6 +298,15 @@ describe 'Honeybadger' do
       it "unwraps exceptions that provide #original_exception" do
         @hash = Honeybadger.build_lookup_hash_for(@exception)
         expect(@hash[:error_class]).to eq "OriginalException"
+      end
+
+      context "but unwrapping exceptions is disabled" do
+        before { Honeybadger.configuration.unwrap_exceptions = false }
+
+        it "doesn't unwrap the exception" do
+          @hash = Honeybadger.build_lookup_hash_for(@exception)
+          expect(@hash[:error_class]).not_to eq "OriginalException"
+        end
       end
     end
 

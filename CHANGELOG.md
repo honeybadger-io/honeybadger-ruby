@@ -1,5 +1,10 @@
 ## Honeybadger 1.16.3 ##
 
+* Add `unwrap_exceptions` configuration option; when `false`, exceptions will
+  not be unwrapped (default: `true`).
+
+  *Joshua Wood*
+
 * Prevent `binding_of_caller` from being loaded automatically (requires
   `send_local_variables == true`).
 
