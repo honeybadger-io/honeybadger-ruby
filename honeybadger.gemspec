@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.16.2'
-  s.date              = '2014-07-16'
+  s.version           = '1.16.3'
+  s.date              = '2014-07-21'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -96,10 +96,10 @@ Gem::Specification.new do |s|
     lib/honeybadger/capistrano/tasks.rake
     lib/honeybadger/configuration.rb
     lib/honeybadger/dependency.rb
-    lib/honeybadger/exception_extensions.rb
     lib/honeybadger/integrations.rb
     lib/honeybadger/integrations/delayed_job.rb
     lib/honeybadger/integrations/delayed_job/plugin.rb
+    lib/honeybadger/integrations/local_variables.rb
     lib/honeybadger/integrations/net_http.rb
     lib/honeybadger/integrations/passenger.rb
     lib/honeybadger/integrations/sidekiq.rb
@@ -140,8 +140,8 @@ Gem::Specification.new do |s|
     spec/honeybadger/capistrano_spec.rb
     spec/honeybadger/configuration_spec.rb
     spec/honeybadger/dependency_spec.rb
-    spec/honeybadger/exception_extensions_spec.rb
     spec/honeybadger/integrations/delayed_job_spec.rb
+    spec/honeybadger/integrations/local_variables_spec.rb
     spec/honeybadger/integrations/net_http_spec.rb
     spec/honeybadger/integrations/passenger_spec.rb
     spec/honeybadger/integrations/sidekiq_spec.rb
