@@ -1,3 +1,9 @@
+## Honeybadger 1.16.4 ##
+
+* Aggregate short queries when sending traces.
+
+  *Benjamin Curtis*
+
 ## Honeybadger 1.16.3 ##
 
 * Handle `nil` session in Rails controllers (i.e., when the `session_off` gem is
