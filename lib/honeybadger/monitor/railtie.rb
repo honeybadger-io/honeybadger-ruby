@@ -10,7 +10,7 @@ module Honeybadger
 
           ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
             event = ActiveSupport::Notifications::Event.new(*args)
-            Monitor.worker.trace.add(event) if Monitor.worker.trace and event.name != 'SCHEMA'
+            Monitor.worker.trace.add_query(event) if Monitor.worker.trace and event.name != 'SCHEMA'
           end
 
           ActiveSupport::Notifications.subscribe(/^render_(template|action|collection)\.action_view/) do |*args|
