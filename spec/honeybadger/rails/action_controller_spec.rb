@@ -131,7 +131,11 @@ begin
       end
 
       opts[:request].query_parameters = opts[:request].query_parameters.merge(opts[:params] || {})
-      opts[:request].session = ActionController::TestSession.new(opts[:session] || {})
+      opts[:request].session = if opts.include?(:session) && opts[:session].nil?
+                                 nil
+                               else
+                                 ActionController::TestSession.new(opts[:session] || {})
+                               end
       # Prevents request.fullpath from crashing Rails in tests
       opts[:request].env['REQUEST_URI'] = opts[:request].request_uri
 
@@ -238,6 +242,11 @@ begin
       data = { 'one' => 'two' }
       process_action_with_automatic_notification(:session => data)
       assert_sent_hash(data) { |h| h['request']['session'] }
+    end
+
+    it "fails gracefully when session isn nil" do
+      process_action_with_automatic_notification(:session => nil)
+      assert_sent_hash({}) { |h| h['request']['session'] }
     end
 
     it "send request data for manual notification" do

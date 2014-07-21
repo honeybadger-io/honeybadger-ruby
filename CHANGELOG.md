@@ -1,5 +1,10 @@
 ## Honeybadger 1.16.3 ##
 
+* Handle `nil` session in Rails controllers (i.e., when the `session_off` gem is
+  enabled).
+
+  *Joshua Wood*
+
 * Add `unwrap_exceptions` configuration option; when `false`, exceptions will
   not be unwrapped (default: `true`).
 

@@ -55,6 +55,7 @@ module Honeybadger
       end
 
       def honeybadger_session_data
+        return {} unless session
         if session.respond_to?(:to_hash)
           session.to_hash
         else
