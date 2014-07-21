@@ -8,7 +8,7 @@ module Honeybadger
         response = send_request('/v1/metrics', data.to_json)
 
         if Net::HTTPSuccess === response
-          log(:info, "Metrics Success: #{response.class}", response, data) if Honeybadger.configuration.debug
+          log(:info, "Metrics Success: #{response.class}", response) if Honeybadger.configuration.debug
           true
         else
           Honeybadger.configuration.features['metrics'] = false if Net::HTTPForbidden === response
@@ -27,7 +27,7 @@ module Honeybadger
         response = send_request('/v1/traces', data.to_json)
 
         if Net::HTTPSuccess === response
-          log(:info, "Traces Success: #{response.class}", response, data) if Honeybadger.configuration.debug
+          log(:info, "Traces Success: #{response.class}", response) if Honeybadger.configuration.debug
           true
         else
           Honeybadger.configuration.features['traces'] = false if Net::HTTPForbidden === response

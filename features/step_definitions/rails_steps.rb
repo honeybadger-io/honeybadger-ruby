@@ -86,7 +86,7 @@ Then /^I should receive (.+) Honeybadger notifications?$/ do |number|
            when 'two' then 2
            else number end
 
-  all_output.scan(/\[Honeybadger\] Response from Honeybadger:/).size.should == number
+  all_output.scan(/\[Honeybadger\] Success: Net::HTTPOK/).size.should == number
   step %(the output should contain "123456789")
 end
 
