@@ -645,6 +645,29 @@ describe Honeybadger::Notice do
     end
   end
 
+  context "notice_post_build" do
+
+    it "does not change the notice if a notice_post_build Proc is not given" do
+      e = StandardError.new('error')
+      notice = Honeybadger::Notice.new(:exception => e)
+
+      expect(notice.to_json).to eq notice.to_json
+    end
+
+    it "transforms the notice if a notice_post_build Proc is given" do
+      configuration = Honeybadger::Configuration.new.tap do |config|
+        config.notice_post_build = Proc.new do |notice|
+          if notice.error_class == 'StandardError'
+            notice.send(:error_message=, '')
+          end
+        end
+      end
+      e = StandardError.new('error')
+      notice = Honeybadger::Notice.new(configuration.merge(:exception => e))
+      expect(notice.error_message).to eq ''
+    end
+  end
+
   def assert_accepts_exception_attribute(attribute, args = {}, &block)
     exception = build_exception
     block ||= lambda { exception.send(attribute) }
