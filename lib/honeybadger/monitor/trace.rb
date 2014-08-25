@@ -148,7 +148,7 @@ module Honeybadger
           sql = sql.gsub(EscapedQuotes, EmptyReplacement).gsub(SQuotedData, Replacement)
           sql = sql.gsub(DQuotedData, Replacement) unless ::ActiveRecord::Base.connection_pool.spec.config[:adapter] =~ DoubleQuoters
           sql.gsub(NumericData, Replacement).gsub(Newline, EmptyReplacement).squeeze(' ')
-          sql.length < 1024 ? sql : sql[0..1023] + '...'
+          sql.bytesize < 1024 ? sql : sql[0..1023] + '...'
         end
       end
 
