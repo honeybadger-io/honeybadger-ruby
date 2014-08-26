@@ -7,6 +7,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    allocation_stats (0.1.5)
     appraisal (0.5.1)
       bundler
       rake
@@ -109,6 +110,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  allocation_stats
   appraisal
   aruba
   capistrano (~> 2.0)
