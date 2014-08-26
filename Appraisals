@@ -45,7 +45,7 @@ if RUBY_VERSION > '1.9'
   appraise 'rails3.0' do
     gem 'rails', '~> 3.0.17'
     gem 'honeybadger', :path => '../'
-    gem 'better_errors', :require => false
+    gem 'better_errors', '~> 1.0', :require => false
     gem 'rack-mini-profiler', '~>0.1.31 ', :require => false
     gem 'capistrano', '~> 2.0'
   end
@@ -53,7 +53,7 @@ if RUBY_VERSION > '1.9'
   appraise 'rails3.1' do
     gem 'rails', '~> 3.1.12'
     gem 'honeybadger', :path => '../'
-    gem 'better_errors', :require => false
+    gem 'better_errors', '~> 1.0', :require => false
     gem 'rack-mini-profiler', :require => false
     gem 'capistrano', '~> 2.0'
   end
@@ -61,7 +61,7 @@ if RUBY_VERSION > '1.9'
   appraise 'rails3.2' do
     gem 'rails', '~> 3.2.12'
     gem 'honeybadger', :path => '../'
-    gem 'better_errors', :require => false
+    gem 'better_errors', '~> 1.0', :require => false
     gem 'rack-mini-profiler', :require => false
     gem 'capistrano', '~> 2.0'
   end
@@ -72,7 +72,7 @@ if RUBY_VERSION > '1.9'
       gem 'rails', '~> 4.0.3'
       gem 'honeybadger', :path => '../'
       gem 'capistrano', '~> 3.0'
-      gem 'better_errors', :require => false
+    gem 'better_errors', '~> 1.0', :require => false
       gem 'rack-mini-profiler', :require => false
     end
 
@@ -80,7 +80,7 @@ if RUBY_VERSION > '1.9'
       gem 'rails', '~> 4.1.0.beta1'
       gem 'honeybadger', :path => '../'
       gem 'capistrano', '~> 3.0'
-      gem 'better_errors', :require => false
+      gem 'better_errors', '~> 1.0', :require => false
       gem 'rack-mini-profiler', :require => false
     end
   end
