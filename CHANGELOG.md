@@ -1,5 +1,9 @@
 ## Honeybadger 1.16.4 ##
 
+* Include a portion of longer queries with traces.
+
+  *Benjamin Curtis*
+
 * Aggregate short queries when sending traces.
 
   *Benjamin Curtis*
