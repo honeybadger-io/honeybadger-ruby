@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
+gem "allocation_stats"
 gem "rack"
 gem "honeybadger", :path=>"../"
 

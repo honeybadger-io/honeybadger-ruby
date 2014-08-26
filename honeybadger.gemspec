@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.16.3'
-  s.date              = '2014-07-21'
+  s.version           = '1.16.4'
+  s.date              = '2014-08-26'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -136,6 +136,7 @@ Gem::Specification.new do |s|
     resources/README.md
     resources/ca-bundle.crt
     script/integration_test.rb
+    spec/allocation_stats.rb
     spec/honeybadger/backtrace_spec.rb
     spec/honeybadger/capistrano_spec.rb
     spec/honeybadger/configuration_spec.rb

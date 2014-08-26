@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
+gem "allocation_stats"
 gem "rails", "~> 4.0.3"
 gem "honeybadger", :path=>"../"
 gem "capistrano", "~> 3.0"
