@@ -4,38 +4,16 @@ gemfile:
   - gemfiles/standalone.gemfile
   - gemfiles/binding_of_caller.gemfile
   - gemfiles/delayed_job.gemfile
-  - gemfiles/rails2.3.gemfile
   - gemfiles/rails.gemfile
 rvm:
-  - 1.8.7
-  - 1.9.2
   - 1.9.3
   - 2.0.0
   - 2.1.2
-  - jruby-18mode
   - jruby-19mode
 matrix:
   fast_finish: true
   allow_failures:
-    - rvm: jruby-18mode
     - rvm: jruby-19mode
-    - rvm: 1.9.2
   exclude:
-    - rvm: jruby-18mode
-      gemfile: gemfiles/binding_of_caller.gemfile
-    - rvm: jruby-18mode
-      gemfile: gemfiles/delayed_job.gemfile
-    - rvm: jruby-18mode
-      gemfile: gemfiles/rails.gemfile
     - rvm: jruby-19mode
       gemfile: gemfiles/binding_of_caller.gemfile
-    - rvm: 1.8.7
-      gemfile: gemfiles/binding_of_caller.gemfile
-    - rvm: 1.8.7
-      gemfile: gemfiles/rails.gemfile
-    - rvm: 1.8.7
-      gemfile: gemfiles/delayed_job.gemfile
-    - rvm: 1.9.2
-      gemfile: gemfiles/rails.gemfile
-    - rvm: 1.9.2
-      gemfile: gemfiles/delayed_job.gemfile

@@ -1,204 +1,180 @@
-require 'net/http'
-require 'net/https'
-require 'json'
-require 'digest'
-require 'logger'
-
-require 'honeybadger/dependency'
-require 'honeybadger/configuration'
-require 'honeybadger/backtrace'
-require 'honeybadger/notice'
-require 'honeybadger/rack'
-require 'honeybadger/sender'
-require 'honeybadger/stats'
-require 'honeybadger/user_informer'
-require 'honeybadger/user_feedback'
-require 'honeybadger/integrations'
-
-require 'honeybadger/railtie' if defined?(Rails::Railtie)
-require 'honeybadger/monitor'
+require 'forwardable'
+require 'honeybadger/const'
 
 module Honeybadger
-  VERSION = '1.16.4'.freeze
-  LOG_PREFIX = "** [Honeybadger] ".freeze
+  include Forwardable
 
-  HEADERS = {
-    'Content-type' => 'application/json',
-    'Content-Encoding' => 'deflate',
-    'Accept'       => 'text/json, application/json',
-    'User-Agent'   => "HB-Ruby #{VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"
-  }.freeze
+  extend self
 
-  class << self
-    # The sender object is responsible for delivering formatted data to the
-    # Honeybadger server. Must respond to #send_to_honeybadger. See Honeybadger::Sender.
-    attr_accessor :sender
+  # Public: Starts the Honeybadger service.
+  #
+  # opts - The Hash options used to initialize Honeybadger. Accepts config
+  #        keys in addition to the listed options. Order of precedence for
+  #        config is: 1) ENV, 2) config on disk, 3) opts. (default: {})
+  #        :logger - An alternate Logger to use. (optional)
+  #
+  # Examples:
+  #
+  #   ENV['HONEYBADGER_API_KEY'] # => 'asdf'
+  #
+  #   Honeybadger.start # => true
+  #
+  #   Honeybadger.start({
+  #     :root          => ::Rails.root,
+  #     :'config.path' => 'config/',
+  #     :logger        => Honeybadger::Logging::FormattedLogger.new(::Rails.logger)
+  #   }) # => true
+  #
+  # Returns true if started, otherwise false.
+  def start(config = {})
+    Agent.start(config)
+  end
 
-    # A Honeybadger configuration object. Must act like a hash and return sensible
-    # values for all Honeybadger configuration options. See Honeybadger::Configuration.
-    attr_writer :configuration
+  # Public: Stops the Honeybadger service.
+  #
+  # Examples:
+  #
+  #   Honeybadger.stop # => nil
+  #
+  # Returns nothing
+  def stop
+    Agent.stop
+  end
 
-    # Tell the log that the Notifier is good to go
-    def report_ready
-      write_verbose_log("Notifier #{VERSION} ready to catch errors", :info)
+  # Public: Send an exception to Honeybadger.
+  #
+  # exception_or_opts - An Exception object, or a Hash of options which is used
+  #                     to build the notice.
+  # opts              - The options Hash when the first argument is an
+  #                     Exception. (default: {}):
+  #                     :error_class   - The String class name of the error.
+  #                     :error_message - The String error message.
+  #
+  # Examples:
+  #
+  #   # With an exception:
+  #   begin
+  #     fail 'oops'
+  #   rescue => exception
+  #     Honeybadger.notify(exception, context: {
+  #       my_data: 'value'
+  #     }) # => '0dfb92ae-9b01-42e9-9c13-31205b70744a'
+  #   end
+  #
+  #   # Custom notification:
+  #   Honeybadger.notify({
+  #     error_class: 'MyClass',
+  #     error_message: 'Something went wrong.',
+  #     context: {my_data: 'value'}
+  #   }) # => '06221c5a-b471-41e5-baeb-de247da45a56'
+  #
+  # Returns a String UUID reference to the notice within Honeybadger.
+  def notify(exception_or_opts, opts = {})
+    opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
+    opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
+    Agent.instance ? Agent.instance.notice(opts) : false
+  end
+
+  # Deprecated: Legacy support.
+  alias_method :notify_or_ignore, :notify
+
+  # Public: Callback to ignore exceptions.
+  #
+  # See public API documentation for Honeybadger::Notice for available attributes.
+  #
+  # block - A block returning TrueClass true (to ignore) or FalseClass false
+  #         (to send).
+  #
+  # Examples:
+  #
+  #   # Ignoring based on error message:
+  #   Honeybadger.exception_filter do |notice|
+  #     notice[:error_message] =~ /sensitive data/
+  #   end
+  #
+  #   # Ignore an entire class of exceptions:
+  #   Honeybadger.exception_filter do |notice|
+  #     notice[:exception].class < MyError
+  #   end
+  #
+  # Returns nothing.
+  def exception_filter(&block)
+    Agent.exception_filter(&block)
+  end
+
+  # Public: Callback to add a custom grouping strategy for exceptions. The
+  # return value is hashed and sent to Honeybadger. Errors with the same
+  # fingerprint will be grouped.
+  #
+  # See public API documentation for Honeybadger::Notice for available attributes.
+  #
+  # block - A block returning any Object responding to #to_s.
+  #
+  # Examples:
+  #
+  #   Honeybadger.exception_fingerprint do |notice|
+  #     [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
+  #   end
+  #
+  # Returns nothing.
+  def exception_fingerprint(&block)
+    Agent.exception_fingerprint(&block)
+  end
+
+  # Public: Callback to filter backtrace lines. One use for this is to make
+  # additional [PROJECT_ROOT] or [GEM_ROOT] substitutions, which are used by
+  # Honeybadger when grouping errors and displaying application traces.
+  #
+  # block - A block which can be used to modify the Backtrace lines sent to
+  #         Honeybadger. The block expects one argument (line) which is the String line
+  #         from the Backtrace, and must return the String new line.
+  #
+  # Examples:
+  #
+  #    Honeybadger.backtrace_filter do |line|
+  #      line.gsub(/^\/my\/unknown\/bundle\/path/, "[GEM_ROOT]")
+  #    end
+  #
+  # Returns nothing.
+  def backtrace_filter(&block)
+    Agent.backtrace_filter(&block)
+  end
+
+  # Public: Save global context for the current request.
+  #
+  # hash - A Hash of data which will be sent to Honeybadger when an error
+  #        occurs. (default: nil)
+  #
+  # Examples:
+  #
+  #   Honeybadger.context({my_data: 'my value'})
+  #
+  #   # Inside a Rails controller:
+  #   before_action do
+  #     Honeybadger.context({user_id: current_user.id})
+  #   end
+  #
+  #   # Clearing global context:
+  #   Honeybadger.context.clear!
+  #
+  # Returns self so that method calls can be chained.
+  def context(hash = nil)
+    unless hash.nil?
+      Thread.current[:__honeybadger_context] ||= {}
+      Thread.current[:__honeybadger_context].merge!(hash)
     end
 
-    # Prints out the environment info to the log for debugging help
-    def report_environment_info
-      write_verbose_log("Environment Info: #{environment_info}")
-    end
+    self
+  end
 
-    # Prints out the response body from Honeybadger for debugging help
-    def report_response_body(response)
-      write_verbose_log("Response from Honeybadger: \n#{response}")
-    end
-
-    # Returns the Ruby version, Rails version, and current Rails environment
-    def environment_info
-      info = "[Ruby: #{RUBY_VERSION}]"
-      info << " [#{configuration.framework}]" if configuration.framework
-      info << " [Env: #{configuration.environment_name}]" if configuration.environment_name
-    end
-
-    # Writes out the given message to the #logger
-    def write_verbose_log(message, level = Honeybadger.configuration.debug ? :info : :debug)
-      logger.send(level, LOG_PREFIX + message) if logger
-    end
-
-    # Look for the Rails logger currently defined
-    def logger
-      self.configuration.logger
-    end
-
-    # Public: Call this method to modify defaults in your initializers.
-    #
-    # Examples:
-    #
-    #   Honeybadger.configure do |config|
-    #     config.api_key = '1234567890abcdef'
-    #     config.secure  = false
-    #   end
-    #
-    # Yields Honeybadger configuration
-    def configure(silent = false)
-      yield(configuration)
-      self.sender = Sender.new(configuration)
-      report_ready unless silent
-      self.sender
-    end
-
-    # Public: The configuration object.
-    # See Honeybadger.configure
-    #
-    # Returns Honeybadger configuration
-    def configuration
-      @configuration ||= Configuration.new
-    end
-
-    # Internal: Contacts the Honeybadger service and configures features
-    #
-    # configuration - the Configuration object to use
-    #
-    # Returns Hash features on success, NilClass on failure
-    def ping(configuration)
-      if configuration.public?
-        if result = sender.ping({ :version => Honeybadger::VERSION, :framework => configuration.framework, :environment => configuration.environment_name, :hostname => configuration.hostname })
-          if features = result['features']
-            configuration.features = features
-            configuration.metrics = false unless features['metrics']
-            configuration.traces = false unless features['traces']
-            features
-          end
-        end
-      end
-    end
-
-    # Public: Sends an exception manually using this method, even when you are not in a controller.
-    #
-    # exception - The exception you want to notify Honeybadger about.
-    # options   - Data that will be sent to Honeybadger.
-    #             :api_key          - The API key for this project. The API key is a unique identifier
-    #                                 that Honeybadger uses for identification.
-    #             :error_message    - The error returned by the exception (or the message you want to log).
-    #             :backtrace        - A backtrace, usually obtained with +caller+.
-    #             :rack_env         - The Rack environment.
-    #             :session          - The contents of the user's session.
-    #             :environment_name - The application environment name.
-    #             :context          - Custom hash to send
-    #
-    # Returns exception ID from Honeybadger on success, false on failure
-    def notify(exception, options = {})
-      send_notice(build_notice_for(exception, options))
-    end
-
-    # Public: Sends the notice unless it is one of the default ignored exceptions
-    # see Honeybadger.notify
-    def notify_or_ignore(exception, opts = {})
-      notice = build_notice_for(exception, opts)
-      send_notice(notice) unless notice.ignore?
-    end
-
-    def build_lookup_hash_for(exception, options = {})
-      notice = build_notice_for(exception, options)
-
-      result = {}
-      result[:action]           = notice.action      rescue nil
-      result[:component]        = notice.component   rescue nil
-      result[:error_class]      = notice.error_class if notice.error_class
-      result[:environment_name] = 'production'
-
-      unless notice.backtrace.lines.empty?
-        result[:file]        = notice.backtrace.lines[0].file
-        result[:line_number] = notice.backtrace.lines[0].number
-      end
-
-      result
-    end
-
-    def context(hash = nil)
-      unless hash.nil?
-        Thread.current[:honeybadger_context] ||= {}
-        Thread.current[:honeybadger_context].merge!(hash)
-      end
-
-      self
-    end
-
-    def clear!
-      Thread.current[:honeybadger_context] = nil
-    end
-
-    private
-
-    def send_notice(notice)
-      return false unless sender
-
-      if configuration.public?
-        if configuration.async?
-          configuration.async.call(notice)
-        else
-          Honeybadger.sender.send_to_honeybadger(notice)
-        end
-      end
-    end
-
-    def build_notice_for(exception, opts = {})
-      exception = unwrap_exception(exception)
-      opts = opts.merge(:exception => exception) if exception.is_a?(Exception)
-      opts = opts.merge(exception.to_hash) if exception.respond_to?(:to_hash)
-      Notice.new(configuration.merge(opts))
-    end
-
-    def unwrap_exception(exception)
-      return exception unless configuration.unwrap_exceptions
-      exception.respond_to?(:original_exception) && exception.original_exception ||
-      exception.respond_to?(:continued_exception) && exception.continued_exception ||
-      exception.respond_to?(:cause) && exception.cause ||
-      exception
-    end
+  # Internal: Clears the global context
+  def clear!
+    Thread.current[:__honeybadger_context] = nil
   end
 end
 
-unless defined?(Rails)
-  Honeybadger::Dependency.inject!
+if defined?(::Rails::Railtie)
+  require 'honeybadger/init/rails'
+elsif defined?(Sinatra::Base)
+  require 'honeybadger/init/sinatra'
 end

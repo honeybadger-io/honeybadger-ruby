@@ -1,221 +1,186 @@
-require 'honeybadger/payload'
-require 'socket'
+require 'json'
+require 'securerandom'
+require 'forwardable'
+require 'ostruct'
+
+require 'honeybadger/version'
+require 'honeybadger/backtrace'
+require 'honeybadger/util/stats'
+require 'honeybadger/util/sanitizer'
+require 'honeybadger/util/request_sanitizer'
+require 'honeybadger/rack/request_hash'
 
 module Honeybadger
+  NOTIFIER = {
+    name: 'honeybadger-ruby'.freeze,
+    url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
+    version: VERSION,
+    language: 'ruby'.freeze
+  }.freeze
+
+  # Internal: Substitution for gem root in backtrace lines.
+  GEM_ROOT = '[GEM_ROOT]'.freeze
+
+  # Internal: Substitution for project root in backtrace lines.
+  PROJECT_ROOT = '[PROJECT_ROOT]'.freeze
+
+  # Internal: Empty String (used for equality comparisons and assignment)
+  STRING_EMPTY = ''.freeze
+
+  # Internal: Matches lines beginning with ./
+  RELATIVE_ROOT = Regexp.new('^\.\/').freeze
+
   class Notice
-    # The exception that caused this notice, if any
+    extend Forwardable
+
+    # Public: The unique ID of this notice which can be used to reference the
+    # error in Honeybadger.
+    attr_reader :id
+
+    # Public: The exception that caused this notice, if any.
     attr_reader :exception
 
-    # The backtrace from the given exception or hash.
+    # Public: The backtrace from the given exception or hash.
     attr_reader :backtrace
 
-    # Custom fingerprint for error, used to group similar errors together (optional)
+    # Public: Custom fingerprint for error, used to group similar errors together.
     attr_reader :fingerprint
 
-    # The name of the class of error (such as RuntimeError)
+    # Public: The name of the class of error. (example: RuntimeError)
     attr_reader :error_class
 
-    # Excerpt from source file
-    attr_reader :source_extract
-
-    # The number of lines of context to include before and after source excerpt
-    attr_reader :source_extract_radius
-
-    # The name of the server environment (such as "production")
-    attr_reader :environment_name
-
-    # CGI variables such as HTTP_METHOD
-    attr_reader :cgi_data
-
-    # The message from the exception, or a general description of the error
+    # Public: The message from the exception, or a general description of the error.
     attr_reader :error_message
 
-    # See Configuration#send_request_session
-    attr_reader :send_request_session
+    # Public: Excerpt from source file.
+    attr_reader :source
 
-    # See Configuration#backtrace_filters
-    attr_reader :backtrace_filters
+    # Public: CGI variables such as HTTP_METHOD.
+    def_delegator :@request, :cgi_data
 
-    # See Configuration#params_filters
-    attr_reader :params_filters
+    # Public: A hash of parameters from the query string or post body.
+    def_delegator :@request, :params
+    alias_method :parameters, :params
 
-    # A hash of parameters from the query string or post body.
-    attr_reader :parameters
-    alias_method :params, :parameters
-
-    # The component (if any) which was used in this request (usually the controller)
-    attr_reader :component
+    # Public: The component (if any) which was used in this request. (usually the controller)
+    def_delegator :@request, :component
     alias_method :controller, :component
 
-    # The action (if any) that was called in this request
-    attr_reader :action
+    # Public: The action (if any) that was called in this request.
+    def_delegator :@request, :action
 
-    # A hash of session data from the request
-    attr_reader :session_data
+    # Public: A hash of session data from the request.
+    def_delegator :@request, :session
 
-    # Additional contextual information (custom data)
-    attr_reader :context
+    # Public: The URL at which the error occurred (if any).
+    def_delegator :@request, :url
 
-    # The path to the project that caused the error (usually Rails.root)
-    attr_reader :project_root
-
-    # The URL at which the error occurred (if any)
-    attr_reader :url
-
-    # See Configuration#ignore
-    attr_reader :ignore
-
-    # See Configuration#ignore_by_filters
-    attr_reader :ignore_by_filters
-
-    # The name of the notifier library sending this notice, such as "Honeybadger Notifier"
-    attr_reader :notifier_name
-
-    # The version number of the notifier library sending this notice, such as "2.1.3"
-    attr_reader :notifier_version
-
-    # A URL for more information about the notifier library sending this notice
-    attr_reader :notifier_url
-
-    # The host name where this error occurred (if any)
-    attr_reader :hostname
-
-    # System stats
-    attr_reader :stats
-
-    # The api_key to use when sending notice (optional)
-    attr_reader :api_key
-
-    # Local variables are extracted from first frame of backtrace
+    # Public: Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
-    # Additional features to enable/disable
-    attr_reader :features
+    # Internal: Cache project path substitutions for backtrace lines.
+    PROJECT_ROOT_CACHE = {}
 
-    def initialize(args)
-      self.args         = args
-      self.features     = args[:features] || {}
-      self.exception    = args[:exception]
-      self.project_root = args[:project_root]
+    # Internal: Cache gem path substitutions for backtrace lines.
+    GEM_ROOT_CACHE = {}
 
-      self.notifier_name    = args[:notifier_name]
-      self.notifier_version = args[:notifier_version]
-      self.notifier_url     = args[:notifier_url]
+    # Internal: A list of backtrace filters to run all the time.
+    BACKTRACE_FILTERS = [
+      lambda { |line, config|
+        return line unless config
+        c = (PROJECT_ROOT_CACHE[config[:root]] ||= {})
+        return c[line] if c.has_key?(line)
+        c[line] ||= if (root = config[:root].to_s) != STRING_EMPTY
+                      line.sub(root, PROJECT_ROOT)
+                    else
+                      line
+                    end
+      },
+      lambda { |line| line.sub(RELATIVE_ROOT, STRING_EMPTY) },
+      lambda { |line|
+        if defined?(Gem)
+          GEM_ROOT_CACHE[line] ||= Gem.path.reduce(line) do |line, path|
+            line.sub(path, GEM_ROOT)
+          end
+        end
+      },
+      lambda { |line| line if line !~ %r{lib/honeybadger} }
+    ].freeze
 
-      self.ignore              = args[:ignore]              || []
-      self.ignore_by_filters   = args[:ignore_by_filters]   || []
-      self.backtrace_filters   = args[:backtrace_filters]   || []
-      self.params_filters      = args[:params_filters]      || []
-      self.parameters          = args[:parameters] ||
-                                   action_dispatch_params ||
-                                   rack_env(:params) ||
-                                   {}
-      self.component           = args[:component] || args[:controller] || parameters['controller']
-      self.action              = args[:action] || parameters['action']
+    def initialize(config, opts = {})
+      @now = Time.now.utc
+      @id = SecureRandom.uuid
 
-      self.environment_name = args[:environment_name]
-      self.cgi_data         = args[:cgi_data] || args[:rack_env]
-      self.backtrace        = Backtrace.parse(exception_attribute(:backtrace, caller), :filters => self.backtrace_filters)
-      self.fingerprint      = hashed_fingerprint
-      self.error_class      = exception_attribute(:error_class) {|exception| exception.class.name }
-      self.error_message    = trim_size(1024) do
+      @opts = opts
+      @config = config
+
+      @exception = opts[:exception]
+      @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
+      @error_message = trim_size(1024) do
         exception_attribute(:error_message, 'Notification') do |exception|
           "#{exception.class.name}: #{exception.message}"
         end
       end
+      @backtrace = Backtrace.parse(
+        exception_attribute(:backtrace, caller),
+        filters: construct_backtrace_filters(opts),
+        config: config
+      )
+      @source = extract_source_from_backtrace(@backtrace, config, opts)
+      @fingerprint = construct_fingerprint(opts)
 
-      self.url              = args[:url] || rack_env(:url)
-      self.hostname         = local_hostname
-      self.stats            = Stats.all
-      self.api_key          = args[:api_key]
+      @sanitizer = Util::Sanitizer.new(filters: config.params_filters)
+      @request_sanitizer = Util::RequestSanitizer.new(@sanitizer)
+      @request = OpenStruct.new(construct_request_hash(config.request, opts, @request_sanitizer))
+      @context = construct_context_hash(opts, @sanitizer)
 
-      self.source_extract_radius = args[:source_extract_radius] || 2
-      self.source_extract        = extract_source_from_backtrace
+      @stats = Util::Stats.all
 
-      self.local_variables = send_local_variables? ? local_variables_from_exception(exception) : {}
+      @local_variables = send_local_variables?(config) ? local_variables_from_exception(exception, config) : {}
 
-      self.send_request_session = args[:send_request_session].nil? ? true : args[:send_request_session]
-
-      find_session_data
-      also_use_rack_params_filters
-      set_context
-      clean_rack_request_data
+      @api_key = opts[:api_key] || config[:api_key]
     end
 
-    # Deprecated. Remove in 2.0.
-    def deliver
-      return false unless Honeybadger.sender
-      Honeybadger.sender.send_to_honeybadger(self)
-    end
-
-    # Public: Template used to create JSON payload
+    # Internal: Template used to create JSON payload
     #
-    # Returns JSON representation of notice
-    def as_json(options = {})
-      Payload.new({
-        :api_key => api_key,
-        :notifier => {
-          :name => notifier_name,
-          :url => notifier_url,
-          :version => notifier_version,
-          :language => 'ruby'
+    # Returns Hash JSON representation of notice
+    def as_json(*args)
+      {
+        api_key: api_key,
+        notifier: NOTIFIER,
+        error: {
+          token: id,
+          class: error_class,
+          message: error_message,
+          backtrace: backtrace,
+          source: source,
+          fingerprint: fingerprint
         },
-        :error => {
-          :class => error_class,
-          :message => error_message,
-          :backtrace => backtrace,
-          :source => source_extract,
-          :fingerprint => fingerprint
+        request: {
+          url: url,
+          component: component,
+          action: action,
+          params: params,
+          session: session,
+          cgi_data: cgi_data,
+          context: context,
+          local_variables: local_variables
         },
-        :request => {
-          :url => url,
-          :component => component,
-          :action => action,
-          :params => parameters,
-          :session => session_data,
-          :cgi_data => cgi_data,
-          :context => context,
-          :local_variables => local_variables
-        },
-        :server => {
-          :project_root => project_root,
-          :environment_name => environment_name,
-          :hostname => hostname,
-          :stats => stats
+        server: {
+          project_root: config[:root],
+          environment_name: config[:env],
+          hostname: config[:hostname],
+          stats: stats,
+          time: now
         }
-      }, :filters => params_filters)
+      }
     end
 
     # Public: Creates JSON
     #
-    # Returns valid JSON representation of notice
+    # Returns valid JSON representation of Notice
     def to_json(*a)
       as_json.to_json(*a)
-    end
-
-    # Public: Determines if error class should be ignored
-    #
-    # ignored_class_name - The name of the ignored class. May be a
-    # string or regexp (optional)
-    #
-    # Returns true/false with an argument, otherwise a Proc object
-    def ignore_by_class?(ignored_class = nil)
-      @ignore_by_class ||= Proc.new do |ignored_class|
-        case error_class
-        when (ignored_class.respond_to?(:name) ? ignored_class.name : ignored_class)
-          true
-        else
-          exception && ignored_class.is_a?(Class) && exception.class < ignored_class
-        end
-      end
-
-      ignored_class ? @ignore_by_class.call(ignored_class) : @ignore_by_class
-    end
-
-    # Public: Determines if this notice should be ignored
-    def ignore?
-      ignore.any?(&ignore_by_class?) ||
-        ignore_by_filters.any? {|filter| filter.call(self) }
     end
 
     # Public: Allows properties to be accessed using a hash-like syntax
@@ -236,20 +201,19 @@ module Honeybadger
       end
     end
 
+    # Internal: Determines if this notice should be ignored
+    def ignore?
+      config[:'exceptions.ignore'].any?(&ignore_by_class?) or
+        opts[:callbacks] &&
+        opts[:callbacks].exception_filter &&
+        opts[:callbacks].exception_filter.call(self)
+    end
+
     private
 
-    attr_writer :exception, :backtrace, :fingerprint, :error_class,
-      :error_message, :backtrace_filters, :parameters, :params_filters,
-      :environment_filters, :session_data, :project_root, :url, :ignore,
-      :ignore_by_filters, :notifier_name, :notifier_url, :notifier_version,
-      :component, :action, :cgi_data, :environment_name, :hostname, :stats,
-      :context, :source_extract, :source_extract_radius, :send_request_session,
-      :api_key, :features, :local_variables
+    attr_reader :config, :opts, :context, :stats, :api_key, :now
 
-    # Private: Arguments given in the initializer
-    attr_accessor :args
-
-    # Internal: Gets a property named "attribute" of an exception, either from
+    # Gets a property named "attribute" of an exception, either from
     # the #args hash or actual exception (in order of precidence)
     #
     # attribute - A Symbol existing as a key in #args and/or attribute on
@@ -260,10 +224,10 @@ module Honeybadger
     #
     # Returns attribute value from args or exception, otherwise default
     def exception_attribute(attribute, default = nil, &block)
-      args[attribute] || (exception && from_exception(attribute, &block)) || default
+      opts[attribute] || (opts[:exception] && from_exception(attribute, &block)) || default
     end
 
-    # Private: Gets a property named +attribute+ from an exception.
+    # Gets a property named +attribute+ from an exception.
     #
     # If a block is given, it will be used when getting the property from an
     # exception. The block should accept and exception and return the value for
@@ -272,107 +236,35 @@ module Honeybadger
     # If no block is given, a method with the same name as +attribute+ will be
     # invoked for the value.
     def from_exception(attribute)
+      return unless opts[:exception]
+
       if block_given?
-        yield(exception)
+        yield(opts[:exception])
       else
-        exception.send(attribute)
+        opts[:exception].send(attribute)
       end
     end
 
-    def clean_rack_request_data
-      if cgi_data
-        self.cgi_data = cgi_data.reject {|k,_| k == 'QUERY_STRING' || !k.match(/\A[A-Z_]+\Z/) }
-      end
-    end
-
-    def fingerprint_from_args
-      if args[:fingerprint].respond_to?(:call)
-        args[:fingerprint].call(self)
-      else
-        args[:fingerprint]
-      end
-    end
-
-    def hashed_fingerprint
-      fingerprint = fingerprint_from_args
-      if fingerprint && fingerprint.respond_to?(:to_s)
-        Digest::SHA1.hexdigest(fingerprint.to_s)
-      end
-    end
-
-    def extract_source_from_backtrace
-      if backtrace.lines.empty?
-        nil
-      else
-        # ActionView::Template::Error has its own source_extract method.
-        # If present, use that instead.
-        if exception.respond_to?(:source_extract)
-          Hash[exception.source_extract.split("\n").map do |line|
-            parts = line.split(': ')
-            [parts[0].strip, parts[1] || '']
-          end]
-        elsif backtrace.application_lines.any?
-          backtrace.application_lines.first.source(source_extract_radius)
+    # Internal: Determines if error class should be ignored
+    #
+    # ignored_class_name - The name of the ignored class. May be a
+    # string or regexp (optional)
+    #
+    # Returns true/false with an argument, otherwise a Proc object
+    def ignore_by_class?(ignored_class = nil)
+      @ignore_by_class ||= Proc.new do |ignored_class|
+        case error_class
+        when (ignored_class.respond_to?(:name) ? ignored_class.name : ignored_class)
+          true
         else
-          backtrace.lines.first.source(source_extract_radius)
+          exception && ignored_class.is_a?(Class) && exception.class < ignored_class
         end
       end
+
+      ignored_class ? @ignore_by_class.call(ignored_class) : @ignore_by_class
     end
 
-    def find_session_data
-      if send_request_session
-        self.session_data = args[:session_data] || args[:session] || rack_session || {}
-        self.session_data = session_data[:data] if session_data[:data]
-      end
-    rescue => e
-      # Rails raises ArgumentError when `config.secret_token` is missing, and
-      # ActionDispatch::Session::SessionRestoreError when the session can't be
-      # restored.
-      self.session_data = { :error => "Failed to access session data -- #{e.message}" }
-    end
-
-    def set_context
-      self.context = {}
-      self.context.merge!(Thread.current[:honeybadger_context]) if Thread.current[:honeybadger_context]
-      self.context.merge!(args[:context]) if args[:context]
-      self.context = nil if context.empty?
-    end
-
-    def rack_env(method)
-      rack_request.send(method) if rack_request
-    rescue => e
-      { :error => "Failed to call #{method} on Rack::Request -- #{e.message}" }
-    end
-
-    def rack_request
-      @rack_request ||= if args[:rack_env]
-        ::Rack::Request.new(args[:rack_env])
-      end
-    end
-
-    def action_dispatch_params
-      args[:rack_env]['action_dispatch.request.parameters'] if args[:rack_env]
-    end
-
-    def rack_session
-      rack_env(:session).to_hash if args[:rack_env]
-    end
-
-    # Private: (Rails 3+) Adds params filters to filter list
-    #
-    # Returns nothing
-    def also_use_rack_params_filters
-      if cgi_data
-        @params_filters ||= []
-        @params_filters += cgi_data['action_dispatch.parameter_filter'] || []
-      end
-    end
-
-    def local_hostname
-      args[:hostname] || Socket.gethostname
-    end
-
-    # Internal: Limit size of string to bytes
+    # Limit size of string to bytes
     #
     # input - The String to be trimmed.
     # bytes - The Integer bytes to trim.
@@ -395,18 +287,90 @@ module Honeybadger
       input
     end
 
+    def construct_backtrace_filters(opts)
+      [
+        opts[:callbacks] ? opts[:callbacks].backtrace_filter : nil
+      ].compact | BACKTRACE_FILTERS
+    end
+
+    def construct_request_hash(rack_request, opts, sanitizer)
+      defaults = {
+        url: opts[:url],
+        component: opts[:component] || opts[:controller],
+        action: opts[:action],
+        params: opts[:params] || opts[:parameters] || {},
+        session: opts[:session] || {},
+        cgi_data: opts[:cgi_data] || {}
+      }
+
+      request = {}
+      request.merge!(Rack::RequestHash.new(rack_request)) if rack_request
+
+      defaults.each_pair do |k,v|
+        request[k] = v if opts.has_key?(k) || !request.has_key?(k)
+      end
+
+      request[:session] = request[:session][:data] if request[:session][:data]
+
+      sanitizer.sanitize(request)
+    end
+
+    def construct_context_hash(opts, sanitizer)
+      context = {}
+      context.merge!(Thread.current[:__honeybadger_context]) if Thread.current[:__honeybadger_context]
+      context.merge!(opts[:context]) if opts[:context]
+      context.empty? ? nil : sanitizer.sanitize(context)
+    end
+
+    def extract_source_from_backtrace(backtrace, config, opts)
+      if backtrace.lines.empty?
+        nil
+      else
+        # ActionView::Template::Error has its own source_extract method.
+        # If present, use that instead.
+        if opts[:exception].respond_to?(:source_extract)
+          Hash[exception.source_extract.split("\n").map do |line|
+            parts = line.split(': ')
+            [parts[0].strip, parts[1] || '']
+          end]
+        elsif backtrace.application_lines.any?
+          backtrace.application_lines.first.source(config[:'exceptions.source_radius'])
+        else
+          backtrace.lines.first.source(config[:'exceptions.source_radius'])
+        end
+      end
+    end
+
+    def fingerprint_from_opts(opts)
+      callback = opts[:fingerprint]
+      callback ||= opts[:callbacks] && opts[:callbacks].exception_fingerprint
+
+      if callback.respond_to?(:call)
+        callback.call(self)
+      else
+        callback
+      end
+    end
+
+    def construct_fingerprint(opts)
+      fingerprint = fingerprint_from_opts(opts)
+      if fingerprint && fingerprint.respond_to?(:to_s)
+        Digest::SHA1.hexdigest(fingerprint.to_s)
+      end
+    end
+
     # Internal: Fetch local variables from first frame of backtrace.
     #
     # exception - The Exception containing the bindings stack.
     #
     # Returns a Hash of local variables
-    def local_variables_from_exception(exception)
+    def local_variables_from_exception(exception, config)
       return {} unless Exception === exception
       return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
       return {} if exception.__honeybadger_bindings_stack.empty?
 
-      if project_root
-        binding = exception.__honeybadger_bindings_stack.find { |b| b.eval('__FILE__') =~ /^#{Regexp.escape(project_root.to_s)}/ }
+      if config[:root]
+        binding = exception.__honeybadger_bindings_stack.find { |b| b.eval('__FILE__') =~ /^#{Regexp.escape(config[:root].to_s)}/ }
       end
 
       binding ||= exception.__honeybadger_bindings_stack[0]
@@ -418,8 +382,8 @@ module Honeybadger
     # Internal: Should local variables be sent?
     #
     # Returns true to send local_variables
-    def send_local_variables?
-      args[:send_local_variables] && features['local_variables']
+    def send_local_variables?(config)
+      config[:'exceptions.local_variables']
     end
   end
 end

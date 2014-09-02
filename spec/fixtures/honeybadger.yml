@@ -1,0 +1,11 @@
+enabled: true
+api_key: 'zxcv'
+foo:
+  bar: 'baz'
+  baz: 'other'
+a:
+  really:
+    deeply:
+      nested: 'option'
+production:
+  api_key: 'asdf'

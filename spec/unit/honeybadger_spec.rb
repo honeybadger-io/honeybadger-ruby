@@ -1,0 +1,93 @@
+require 'honeybadger'
+
+RSpec::Matchers.define :define do |expected|
+  match do |actual|
+    expect(actual.constants).to include(expected)
+  end
+end
+
+describe Honeybadger do
+  it { should be_a Module }
+  it { should respond_to :notify }
+  it { should respond_to :start }
+
+  it { should define(:Rack) }
+
+  describe Honeybadger::Rack do
+    it { should define(:ErrorNotifier) }
+    it { should define(:UserFeedback) }
+    it { should define(:UserInformer) }
+  end
+
+  describe "#notify" do
+    let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+    let(:worker) { double('Honeybadger::Worker', notice: true) }
+
+    before do
+      allow(Honeybadger::Agent).to receive(:instance).and_return(instance)
+      allow(instance).to receive(:worker).and_return(worker)
+    end
+
+    it "creates and send a notice for an exception" do
+      exception = build_exception
+      notice = stub_notice!(config)
+
+      expect(instance).to receive(:notice).with(hash_including(exception: exception)).and_call_original
+      expect(worker).to receive(:notice).with(notice)
+
+      Honeybadger.notify(exception)
+    end
+
+    it "creates and send a notice for a hash" do
+      exception = build_exception
+      notice = stub_notice!(config)
+
+      expect(instance).to receive(:notice).with(hash_including(error_message: 'uh oh')).and_call_original
+      expect(worker).to receive(:notice).with(notice)
+
+      Honeybadger.notify(error_message: 'uh oh')
+    end
+
+    it "does not pass the hash as an exception when sending a notice for it" do
+      notice = stub_notice!
+
+      expect(Honeybadger::Notice).to receive(:new).with(anything, hash_excluding(:exception))
+      expect(worker).to receive(:notice).with(notice)
+
+      Honeybadger.notify(error_message: 'uh oh')
+    end
+
+    it "creates and sends a notice for an exception and hash" do
+      exception = build_exception
+      notice = stub_notice!
+      notice_args = { error_message: 'uh oh' }
+
+      expect(instance).to receive(:notice).with(hash_including(notice_args.merge(exception: exception))).and_call_original
+      expect(worker).to receive(:notice).with(notice)
+
+      Honeybadger.notify(exception, notice_args)
+    end
+
+    it "does not deliver an ignored exception when notifying implicitly" do
+      exception = build_exception
+      notice = stub_notice!
+      allow(notice).to receive(:ignore?).and_return(true)
+
+      expect(worker).not_to receive(:notice)
+
+      Honeybadger.notify(exception)
+    end
+
+    it "passes config to created notices" do
+      exception = build_exception
+      config_opts = { 'one' => 'two', 'three' => 'four' }
+
+      notice = stub_notice(config)
+
+      expect(Honeybadger::Notice).to receive(:new).with(config, kind_of(Hash)).and_return(notice)
+
+      Honeybadger.notify(exception)
+    end
+  end
+end

@@ -1,5 +1,7 @@
 require 'erb'
 require 'uri'
+require 'forwardable'
+require 'rack'
 
 begin
   require 'i18n'
@@ -16,8 +18,11 @@ end
 module Honeybadger
   module Rack
     class UserFeedback
-      def initialize(app)
+      extend Forwardable
+
+      def initialize(app, config)
         @app = app
+        @config = config
       end
 
       def call(env)
@@ -34,16 +39,12 @@ module Honeybadger
         [status, headers, body]
       end
 
-      def config
-        Honeybadger.configuration
-      end
-
       def enabled?
-        config.feedback && config.features['feedback']
+        config[:'feedback.enabled']
       end
 
       def action
-        URI.parse("#{config.protocol}://#{config.host}:#{config.port}/v1/feedback/").to_s
+        URI.parse("#{config.connection_protocol}://#{config[:'connection.host']}:#{config.connection_port}/v1/feedback/").to_s
       rescue URI::InvalidURIError
         nil
       end
@@ -54,8 +55,7 @@ module Honeybadger
       end
 
       def custom_template_file
-        @custom_template_file ||= config.project_root &&
-          File.join(config.project_root, 'lib', 'honeybadger', 'templates', 'feedback_form.erb')
+        @custom_template_file ||= File.join(config[:root], 'lib', 'honeybadger', 'templates', 'feedback_form.erb')
       end
 
       def custom_template_file?
@@ -69,6 +69,11 @@ module Honeybadger
           File.expand_path('../../templates/feedback_form.erb', __FILE__)
         end
       end
+
+      private
+
+      attr_reader :config
+      def_delegator :@config, :logger
     end
   end
 end

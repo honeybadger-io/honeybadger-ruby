@@ -1,21 +1,7 @@
-*.gem
-*.rbc
-.bundle
-.config
-coverage
-InstalledFiles
-lib/bundler/man
-pkg
-rdoc
-spec/reports
-test/tmp
-test/version_tmp
-tmp
-bin
-
-# YARD artifacts
-.yardoc
-_yardoc
+tmp/
 doc/
-
-gemfiles/*.lock
+gemfiles/
+coverage/
+pkg/
+.rbenv-vars
+java.hprof.txt

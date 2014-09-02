@@ -1,12 +1,15 @@
+require 'rack'
+require 'honeybadger'
+require 'forwardable'
+
 module Honeybadger
   module Rack
-    # Middleware for Rack applications. Any errors raised by the upstream
+    # Public: Middleware for Rack applications. Any errors raised by the upstream
     # application will be delivered to Honeybadger and re-raised.
     #
-    # Synopsis:
+    # Examples:
     #
-    #   require 'rack'
-    #   require 'honeybadger'
+    #   require 'honeybadger/rack/error_notifier'
     #
     #   Honeybadger.configure do |config|
     #     config.api_key = 'my_api_key'
@@ -21,39 +24,53 @@ module Honeybadger
     #
     # Use a standard Honeybadger.configure call to configure your api key.
     class ErrorNotifier
-      def initialize(app)
+      extend Forwardable
+
+      def initialize(app, config)
         @app = app
-        Honeybadger.configuration.framework = "Rack: #{::Rack.release}"
+        @config = config
       end
 
+      def call(env)
+        config.with_request(::Rack::Request.new(env)) do
+          begin
+            env['honeybadger.config'] = config
+            response = @app.call(env)
+          rescue Exception => raised
+            env['honeybadger.error_id'] = notify_honeybadger(raised, env)
+            raise
+          end
+
+          framework_exception = framework_exception(env)
+          if framework_exception
+            env['honeybadger.error_id'] = notify_honeybadger(framework_exception, env)
+          end
+
+          response
+        end
+      ensure
+        Honeybadger.context.clear!
+      end
+
+      private
+
+      attr_reader :config
+      def_delegator :@config, :logger
+
       def ignored_user_agent?(env)
-        true if Honeybadger.
-          configuration.
-          ignore_user_agent.
+        true if config[:'exceptions.ignored_user_agents'].
           flatten.
           any? { |ua| ua === env['HTTP_USER_AGENT'] }
       end
 
-      def notify_honeybadger(exception,env)
-        Honeybadger.notify_or_ignore(exception, :rack_env => env) unless ignored_user_agent?(env)
+      def notify_honeybadger(exception, env)
+        return if ignored_user_agent?(env)
+        Honeybadger.notify_or_ignore(exception)
       end
 
-      def call(env)
-        begin
-          response = @app.call(env)
-        rescue Exception => raised
-          env['honeybadger.error_id'] = notify_honeybadger(raised, env)
-          raise
-        end
-
-        framework_exception = env['rack.exception'] || env['sinatra.error']
-        if framework_exception
-          env['honeybadger.error_id'] = notify_honeybadger(framework_exception, env)
-        end
-
-        response
-      ensure
-        Honeybadger.context.clear!
+      def framework_exception(env)
+        env['action_dispatch.exception'] || env['rack.exception'] ||
+          env['sinatra.error'] || env['honeybadger.exception']
       end
     end
   end

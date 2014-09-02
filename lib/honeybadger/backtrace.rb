@@ -1,33 +1,38 @@
-module Honeybadger
-  # Public: Front end to parsing the backtrace for each notice
-  class Backtrace
+require 'json'
 
-    # Public: Handles backtrace parsing line by line
+module Honeybadger
+  # Internal: Front end to parsing the backtrace for each notice
+  class Backtrace
+    # Internal: Handles backtrace parsing line by line
     class Line
-      # regexp (optionally allowing leading X: for windows support)
+      # Backtrace line regexp (optionally allowing leading X: for windows support)
       INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in `([^']+)')?$}.freeze
 
-      # Public: The file portion of the line (such as app/models/user.rb)
+      # The file portion of the line (such as app/models/user.rb)
       attr_reader :file
 
-      # Public: The line number portion of the line
+      # The line number portion of the line
       attr_reader :number
 
-      # Public: The method of the line (such as index)
+      # The method of the line (such as index)
       attr_reader :method
 
-      # Public: Filtered representations
+      # Filtered representations
       attr_reader :filtered_file, :filtered_number, :filtered_method
 
-      # Public: Parses a single line of a given backtrace
+      # Parses a single line of a given backtrace
       #
       # unparsed_line - The raw line from +caller+ or some backtrace
       #
       # Returns the parsed backtrace line
       def self.parse(unparsed_line, opts = {})
         filters = opts[:filters] || []
-        filtered_line = filters.inject(unparsed_line) do |line, proc|
-          proc.call(line)
+        filtered_line = filters.reduce(unparsed_line) do |line, proc|
+          if proc.arity == 2
+            proc.call(line, opts[:config])
+          else
+            proc.call(line)
+          end
         end
 
         if filtered_line
@@ -49,7 +54,7 @@ module Honeybadger
         self.method          = method
       end
 
-      # Public: Reconstructs the line in a readable fashion
+      # Reconstructs the line in a readable fashion.
       def to_s
         "#{filtered_file}:#{filtered_number}:in `#{filtered_method}'"
       end
@@ -62,13 +67,13 @@ module Honeybadger
         "<Line:#{to_s}>"
       end
 
-      # Public: Determines if this line is part of the application trace or not
+      # Determines if this line is part of the application trace or not.
       def application?
         (filtered_file =~ /^\[PROJECT_ROOT\]/i) && !(filtered_file =~ /^\[PROJECT_ROOT\]\/vendor/i)
       end
 
-      # Public: An excerpt from the source file, lazily loaded to preserve
-      # performance
+      # An excerpt from the source file, lazily loaded to preserve
+      # performance.
       def source(radius = 2)
         @source ||= get_source(file, number, radius)
       end
@@ -77,9 +82,9 @@ module Honeybadger
 
       attr_writer :file, :number, :method, :filtered_file, :filtered_number, :filtered_method
 
-      # Private: Open source file and read line(s)
+      # Open source file and read line(s).
       #
-      # Returns an array of line(s) from source file
+      # Returns an array of line(s) from source file.
       def get_source(file, number, radius = 2)
         if file && File.exists?(file)
           before = after = radius
@@ -98,7 +103,7 @@ module Honeybadger
       end
     end
 
-    # Public: holder for an Array of Backtrace::Line instances
+    # Holder for an Array of Backtrace::Line instances.
     attr_reader :lines, :application_lines
 
     def self.parse(ruby_backtrace, opts = {})
@@ -116,24 +121,24 @@ module Honeybadger
       self.application_lines = lines.select(&:application?)
     end
 
-    # Public
+    # Convert Backtrace to arry.
     #
-    # Returns array containing backtrace lines
+    # Returns array containing backtrace lines.
     def to_ary
       lines.map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method } }
     end
     alias :to_a :to_ary
 
-    # Public: JSON support
+    # JSON support.
     #
-    # Returns JSON representation of backtrace
+    # Returns JSON representation of backtrace.
     def as_json(options = {})
       to_ary
     end
 
-    # Public: Creates JSON
+    # Creates JSON.
     #
-    # Returns valid JSON representation of backtrace
+    # Returns valid JSON representation of backtrace.
     def to_json(*a)
       as_json.to_json(*a)
     end

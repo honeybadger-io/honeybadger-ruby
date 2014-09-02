@@ -1,0 +1,76 @@
+namespace :honeybadger do
+  def sshkit_outdated?
+    !::SSHKit.config.command_map.respond_to?(:prefix)
+  end
+
+  desc 'Notify Honeybadger of the deployment.'
+  task :deploy => :env do
+    next if sshkit_outdated?
+    if server = fetch(:honeybadger_server)
+      on server do |host|
+        info 'Notifying Honeybadger of deploy.'
+
+        executable = fetch(:honeybadger, :honeybadger)
+
+        revision = fetch(:current_revision) do
+          within(repo_path) do
+            capture("cd #{repo_path} && git rev-parse --short HEAD")
+          end
+        end
+
+        options = [
+          'deploy',
+          '--environment', fetch(:honeybadger_env, fetch(:rails_env, 'production')),
+          '--revision', revision,
+          '--repository', fetch(:repo_url),
+          '--user', fetch(:honeybadger_user, ENV['USER'] || ENV['USERNAME'])
+        ]
+
+        api_key = fetch(:honeybadger_api_key, ENV['HONEYBADGER_API_KEY'])
+        options += ['--api-key', api_key] if api_key
+
+        if fetch(:honeybadger_async_notify, false)
+          ::SSHKit.config.command_map.prefix[:honeybadger].push(:nohup)
+          options << '>> /dev/null 2>&1 &'
+        end
+
+        within release_path do
+          execute executable, options
+        end
+
+        info 'Honeybadger notification complete.'
+      end
+    end
+  end
+
+  desc 'Setup ENV for Honeybadger deploy rake task.'
+  task :env do
+    if sshkit_outdated?
+      run_locally do
+        warn 'Unable to notify Honeybadger: you are using an outdated version of SSHKIT. Please upgrade to >= 1.2.0.'
+      end
+      next
+    end
+
+    server = fetch(:honeybadger_server) do
+      s = primary(:app)
+      set(:honeybadger_server, s.select?({exclude: :no_release}) ? s : nil)
+    end
+
+    if server
+      on server do |host|
+        rails_env = fetch(:rails_env, 'production')
+        env = ["RAILS_ENV=#{rails_env}"]
+        ::SSHKit.config.command_map.prefix[:honeybadger].unshift(*env)
+      end
+    end
+  end
+end
+
+namespace :load do
+  task :defaults do
+    set :bundle_bins, fetch(:bundle_bins, []).push('honeybadger')
+  end
+end
+
+after 'deploy:finishing', 'honeybadger:deploy'
