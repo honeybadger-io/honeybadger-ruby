@@ -14,7 +14,7 @@ gem 'aruba'
 gem 'simplecov'
 
 gem 'ruby-prof' unless RUBY_PLATFORM =~ /java/
-gem 'allocation_stats' unless RUBY_VERSION < '2.1'
+gem 'allocation_stats' unless RUBY_VERSION < '2.0.99'
 
 gem 'capistrano', '>= 3.2.0', require: false
 
