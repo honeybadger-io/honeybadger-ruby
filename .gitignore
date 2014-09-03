@@ -1,6 +1,6 @@
 tmp/
 doc/
-gemfiles/
+gemfiles/*.lock
 coverage/
 pkg/
 .rbenv-vars
