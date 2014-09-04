@@ -86,6 +86,12 @@ module Honeybadger
 
     # Internal: A list of backtrace filters to run all the time.
     BACKTRACE_FILTERS = [
+      lambda { |line|
+        return line unless defined?(Gem)
+        GEM_ROOT_CACHE[line] ||= Gem.path.reduce(line) do |line, path|
+          line.sub(path, GEM_ROOT)
+        end
+      },
       lambda { |line, config|
         return line unless config
         c = (PROJECT_ROOT_CACHE[config[:root]] ||= {})
@@ -97,13 +103,6 @@ module Honeybadger
                     end
       },
       lambda { |line| line.sub(RELATIVE_ROOT, STRING_EMPTY) },
-      lambda { |line|
-        if defined?(Gem)
-          GEM_ROOT_CACHE[line] ||= Gem.path.reduce(line) do |line, path|
-            line.sub(path, GEM_ROOT)
-          end
-        end
-      },
       lambda { |line| line if line !~ %r{lib/honeybadger} }
     ].freeze
 
