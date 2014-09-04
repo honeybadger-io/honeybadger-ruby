@@ -12,8 +12,8 @@ gem "timecop"
 gem "appraisal"
 gem "aruba"
 gem "simplecov"
-gem "ruby-prof"
-gem "allocation_stats"
+gem "ruby-prof", :platforms => :mri
+gem "allocation_stats", :platforms => :mri_21
 gem "capistrano", ">= 3.2.0", :require => false
 gem "codeclimate-test-reporter", :require => false, :group => :test
 gem "thor"
