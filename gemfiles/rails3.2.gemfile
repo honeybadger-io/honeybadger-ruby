@@ -17,7 +17,7 @@ gem "allocation_stats", :platforms => :mri_21
 gem "capistrano", ">= 3.2.0", :require => false
 gem "codeclimate-test-reporter", :require => false, :group => :test
 gem "rails", "~> 3.2.12"
-gem "better_errors", :require => false
+gem "better_errors", :require => false, :platforms => [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", :require => false
 
 gemspec :path => "../"
