@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'rdoc'
 gem 'rspec', '>= 3.0'
 gem 'rspec-its'
 gem 'guard'

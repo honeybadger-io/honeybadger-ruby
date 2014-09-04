@@ -50,6 +50,7 @@ GEM
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
     i18n (0.6.11)
+    json (1.8.1)
     listen (2.7.9)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
@@ -70,6 +71,8 @@ GEM
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
+    rdoc (4.1.1)
+      json (~> 1.4)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -115,6 +118,7 @@ DEPENDENCIES
   guard-rspec
   honeybadger!
   rack
+  rdoc
   rspec (>= 3.0)
   rspec-its
   ruby-prof
