@@ -389,8 +389,8 @@ describe Honeybadger::Notice do
     end
 
     it "sets the time in utc" do
-      notice = nil
-      Timecop.freeze(now = Time.now) do
+      notice, now = nil, Time.now
+      Timecop.freeze(now) do
         notice = build_notice
       end
 
