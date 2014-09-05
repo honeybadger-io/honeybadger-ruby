@@ -41,7 +41,7 @@ begin
 
         it "queues a new trace" do
           trace = nil
-          expect(Honeybadger::Agent).to receive(:trace).with(kind_of(Honeybadger::Trace))
+          expect(Honeybadger::Agent).to receive(:trace).with(kind_of(Honeybadger::Trace)).once
           worker.work_off
         end
 
