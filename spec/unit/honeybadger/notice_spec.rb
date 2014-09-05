@@ -389,11 +389,8 @@ describe Honeybadger::Notice do
     end
 
     it "sets the time in utc" do
-      notice, now = nil, Time.now
-      Timecop.freeze(now) do
-        notice = build_notice
-      end
-
+      allow(Time).to receive(:now).and_return(now = Time.now)
+      notice = build_notice
       expect(notice.as_json[:server][:time]).to eq now.utc
     end
   end
