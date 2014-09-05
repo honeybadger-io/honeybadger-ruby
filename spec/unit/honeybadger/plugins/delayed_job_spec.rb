@@ -49,7 +49,7 @@ begin
         context "and an exception occurs" do
           let(:method_name) { :will_raise }
 
-          after  { worker.work_off }
+          after { worker.work_off }
 
           it "notifies Honeybadger" do
             expect(Honeybadger).to receive(:notify_or_ignore).once
