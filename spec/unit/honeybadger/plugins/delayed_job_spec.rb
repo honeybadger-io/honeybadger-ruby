@@ -28,6 +28,7 @@ begin
 
       before do
         Delayed::Worker.plugins = [Honeybadger::Plugins::DelayedJob::Plugin]
+        p worker.plugins
       end
 
       after  { Delayed::Job.delete_all }
