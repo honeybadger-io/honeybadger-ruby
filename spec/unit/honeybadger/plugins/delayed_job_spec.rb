@@ -24,11 +24,11 @@ begin
 
     context "when it's installed" do
       let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
-      let(:worker) { Delayed::Worker.new }
+      let(:worker) { @worker }
 
-      before do
+      before(:all) do
         Delayed::Worker.plugins = [Honeybadger::Plugins::DelayedJob::Plugin]
-        p worker.plugins
+        @worker = Delayed::Worker.new
       end
 
       after  { Delayed::Job.delete_all }
@@ -52,7 +52,7 @@ begin
           after { worker.work_off }
 
           it "notifies Honeybadger" do
-            expect(Honeybadger).to receive(:notify_or_ignore).once
+            expect(Honeybadger).to receive(:notify_or_ignore)
           end
         end
       end
