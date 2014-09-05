@@ -1,35 +1,17 @@
-require 'honeybadger/plugins/delayed_job'
 require 'honeybadger/config'
 require 'honeybadger/agent'
 require 'honeybadger/trace'
 
 begin
   require 'delayed_job'
-  DELAYED_JOB_INSTALLED = true
-rescue LoadError
-  DELAYED_JOB_INSTALLED = false
-  nil
-end
+  require 'honeybadger/plugins/delayed_job/plugin'
 
-describe "DelayedJob integration" do
-  if ! DELAYED_JOB_INSTALLED
-    context "when it's not installed" do
-      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
-
-      it "doesn't install the plugin" do
-        expect(Honeybadger::Plugin.instances[:delayed_job].load!(config)).to eq false
-      end
-    end
-  else
+  describe "DelayedJob integration" do
     # Prepend the load path with delayed_job's spec directory so that we can take
     # advantage of their test backend:
     # https://github.com/collectiveidea/delayed_job/blob/master/spec/delayed/backend/test.rb
     $:.unshift(File.join(Gem::Specification.find_by_name('delayed_job').full_gem_path, 'spec'))
     Delayed::Worker.backend = :test
-
-    # Note: This is happening once before the tests run.
-    CONFIG = Honeybadger::Config.new(logger: NULL_LOGGER)
-    Honeybadger::Plugin.instances[:delayed_job].load!(CONFIG)
 
     class ExceptionTester
       def null_method
@@ -40,9 +22,13 @@ describe "DelayedJob integration" do
       end
     end
 
-    context "when it's installed", order: :defined do
-      let(:config) { CONFIG }
+    context "when it's installed" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
       let(:worker) { Delayed::Worker.new }
+
+      before do
+        Delayed::Worker.plugins = [Honeybadger::Plugins::DelayedJob::Plugin]
+      end
 
       after  { Delayed::Job.delete_all }
 
@@ -71,4 +57,6 @@ describe "DelayedJob integration" do
       end
     end
   end
+rescue LoadError
+  nil
 end
