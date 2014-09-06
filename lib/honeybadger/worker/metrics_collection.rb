@@ -2,6 +2,8 @@ module Honeybadger
   class Worker
     # This code comes from batsd
     class MetricsCollection < Array
+      PERCENTILE_METHOD_SIGNATURE = /\Apercentile_(.+)\z/.freeze
+
       # Calculates the sum of values in the array
       def sum
         inject( nil ) { |sum,x| sum ? sum+x : x };
@@ -44,11 +46,15 @@ module Honeybadger
 
       # Allow [1,2,3].percentile_90, [1,2,3].percentile(75), etc.
       def method_missing(method, *args, &block)
-        if method.to_s =~ /^percentile_(.+)$/
+        if method.to_s =~ PERCENTILE_METHOD_SIGNATURE
           percentile($1.to_i)
         else
           super
         end
+      end
+
+      def respond_to_missing?(method, include_private = false)
+        method.to_s =~ PERCENTILE_METHOD_SIGNATURE or super
       end
     end
   end
