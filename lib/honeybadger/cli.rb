@@ -162,7 +162,7 @@ module Honeybadger
 
     def load_rails(opts = {})
       begin
-        require 'honeybadger/railtie'
+        require 'honeybadger/init/rails'
         if ::Rails::VERSION::MAJOR >= 3
           say("Detected Rails #{::Rails::VERSION::STRING}") if opts[:verbose]
         else
