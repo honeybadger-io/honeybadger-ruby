@@ -1,7 +1,7 @@
 require 'honeybadger/config'
 
 feature "Installing honeybadger via the cli" do
-  RSpec.shared_examples "cli installer" do
+  RSpec.shared_examples "cli installer" do |expected_output|
     let(:config) { Honeybadger::Config.new(:api_key => 'asdf', :'config.path' => config_file) }
 
     before { set_env('HONEYBADGER_BACKEND', 'debug') }
@@ -12,6 +12,7 @@ feature "Installing honeybadger via the cli" do
       expect(all_output).to match /Installation complete/i
       expect(all_output).not_to match /heroku/i
       expect(all_output).not_to match /Starting Honeybadger/i
+      expect(all_output).to match /#{expected_output}/i
     end
 
     it "creates the configuration file" do
@@ -50,13 +51,13 @@ feature "Installing honeybadger via the cli" do
   scenario "in a standalone project" do
     let(:config_file) { CMD_ROOT.join('honeybadger.yml') }
 
-    it_behaves_like "cli installer"
+    it_behaves_like "cli installer", "Rails was not detected"
   end
 
   scenario "in a Rails project", framework: :rails do
     let(:config_file) { RAILS_ROOT.join('config', 'honeybadger.yml') }
 
-    it_behaves_like "cli installer"
+    it_behaves_like "cli installer", "Detected rails"
   end
 
 end
