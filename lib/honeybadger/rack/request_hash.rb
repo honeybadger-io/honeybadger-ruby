@@ -1,10 +1,12 @@
+require 'rack/request'
+
 module Honeybadger
   module Rack
     # Internal: Constructs a request hash from a Rack::Request matching the
     # /v1/notices API specification.
     class RequestHash < ::Hash
       def initialize(request)
-        unless request.class.name == 'Rack::Request'
+        unless request.kind_of?(::Rack::Request)
           raise ArgumentError, "Expected Rack::Request, got #{request.class.name}"
         end
 
