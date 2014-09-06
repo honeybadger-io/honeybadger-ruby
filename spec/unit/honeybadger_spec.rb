@@ -19,6 +19,49 @@ describe Honeybadger do
     it { should define(:UserInformer) }
   end
 
+  describe "delegated methods" do
+    method_and_args = {
+      start: nil,
+      stop: nil,
+      exception_filter: nil,
+      exception_fingerprint: nil,
+      backtrace_filter: nil
+    }
+
+    method_and_args.keys.each do |method|
+      it "delegates ##{method} to Agent" do
+        args = Array(method_and_args[method])
+
+        if args.any?
+          expect(Honeybadger::Agent).to receive(method).with(*args)
+        else
+          expect(Honeybadger::Agent).to receive(method)
+        end
+
+        described_class.send(method, *args)
+      end
+    end
+  end
+
+  describe "#context" do
+    let(:c) { {foo: :bar} }
+
+    before { described_class.context(c) }
+
+    it "sets the context" do
+      described_class.context(c)
+    end
+
+    it "merges existing context" do
+      described_class.context({bar: :baz})
+      expect(Thread.current[:__honeybadger_context]).to eq({foo: :bar, bar: :baz})
+    end
+
+    it "clears the context" do
+      expect { described_class.context.clear! }.to change { Thread.current[:__honeybadger_context] }.from(c).to(nil)
+    end
+  end
+
   describe "#notify" do
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
     let(:instance) { Honeybadger::Agent.new(config) }
