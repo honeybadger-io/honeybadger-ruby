@@ -4,7 +4,7 @@ module Honeybadger
   module Backend
     class Debug < Null
       def notify(feature, payload)
-        logger.debug(sprintf("notifying debug backend of feature=%s\n\t#{payload.to_json}", feature))
+        logger.debug("notifying debug backend of feature=#{feature}\n\t#{payload.to_json}")
         super
       end
     end
