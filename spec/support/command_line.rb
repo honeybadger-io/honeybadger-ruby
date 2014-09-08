@@ -23,7 +23,11 @@ module CommandLine
     :terminate_processes!, :processes=, :dirs=, :aruba_timeout_seconds=,
     :aruba_io_wait_seconds=, :last_exit_status, :append_to_file
 
-  Result = Struct.new(:cmd, :code)
+  Result = Struct.new(:cmd, :code) do
+    def success?
+      (200..299).cover?(code.to_i)
+    end
+  end
 
   def cmd(cmd, fail_on_error = false)
     run_simple(unescape(cmd), fail_on_error)
