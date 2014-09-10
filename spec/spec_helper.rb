@@ -128,6 +128,8 @@ RSpec.configure do |config|
     config.filter_run_excluding framework: ->(v) { v != :rails }
   elsif ENV['BUNDLE_GEMFILE'] =~ /sinatra/
     config.filter_run_excluding framework: ->(v) { v != :sinatra }
+  elsif ENV['BUNDLE_GEMFILE'] =~ /rake/
+    config.filter_run_excluding framework: ->(v) { v != :rake }
   else
     config.filter_run_excluding framework: ->(v) { v != :ruby }
   end

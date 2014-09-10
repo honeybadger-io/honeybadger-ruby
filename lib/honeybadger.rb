@@ -178,3 +178,7 @@ if defined?(::Rails::Railtie)
 elsif defined?(Sinatra::Base)
   require 'honeybadger/init/sinatra'
 end
+
+if defined?(Rake.application)
+  require 'honeybadger/init/rake'
+end

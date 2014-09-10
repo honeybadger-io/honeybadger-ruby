@@ -21,7 +21,7 @@ module CommandLine
   def_delegators :ArubaApiWrapper, :run_simple, :unescape, :cd, :all_output,
     :set_env, :restore_env, :write_file, :clean_current_dir,
     :terminate_processes!, :processes=, :dirs=, :aruba_timeout_seconds=,
-    :aruba_io_wait_seconds=, :last_exit_status, :append_to_file
+    :aruba_io_wait_seconds=, :last_exit_status, :append_to_file, :current_dir
 
   Result = Struct.new(:cmd, :code) do
     def success?

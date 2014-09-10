@@ -1,0 +1,32 @@
+# A test harness for RakeHandler
+#
+require 'rake'
+require 'rubygems'
+require 'honeybadger'
+
+# Should catch exception
+task :honeybadger do
+  Honeybadger.start
+  stub_tty_output(false)
+  raise_exception
+end
+
+# Should not catch exception as tty_output is true
+task :honeybadger_autodetect_from_terminal do
+  Honeybadger.start
+  stub_tty_output(true)
+  raise_exception
+end
+
+def stub_tty_output(value)
+  Rake.application.instance_eval do
+    @tty_output_stub = value
+    def tty_output?
+      @tty_output_stub
+    end
+  end
+end
+
+def raise_exception
+  raise 'Jim has left the building :('
+end

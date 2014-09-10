@@ -202,15 +202,22 @@ module Honeybadger
 
     # Internal: Determines if this notice should be ignored
     def ignore?
-      config[:'exceptions.ignore'].any?(&ignore_by_class?) or
-        opts[:callbacks] &&
-        opts[:callbacks].exception_filter &&
-        opts[:callbacks].exception_filter.call(self)
+      ignore_by_origin? || ignore_by_class? || ignore_by_callbacks?
     end
 
     private
 
     attr_reader :config, :opts, :context, :stats, :api_key, :now
+
+    def ignore_by_origin?
+      opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
+    end
+
+    def ignore_by_callbacks?
+      opts[:callbacks] &&
+        opts[:callbacks].exception_filter &&
+        opts[:callbacks].exception_filter.call(self)
+    end
 
     # Gets a property named "attribute" of an exception, either from
     # the #args hash or actual exception (in order of precidence)
@@ -249,7 +256,7 @@ module Honeybadger
     # ignored_class_name - The name of the ignored class. May be a
     # string or regexp (optional)
     #
-    # Returns true/false with an argument, otherwise a Proc object
+    # Returns true or false
     def ignore_by_class?(ignored_class = nil)
       @ignore_by_class ||= Proc.new do |ignored_class|
         case error_class
@@ -260,7 +267,7 @@ module Honeybadger
         end
       end
 
-      ignored_class ? @ignore_by_class.call(ignored_class) : @ignore_by_class
+      ignored_class ? @ignore_by_class.call(ignored_class) : config[:'exceptions.ignore'].any?(&@ignore_by_class)
     end
 
     # Limit size of string to bytes
