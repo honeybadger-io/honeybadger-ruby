@@ -1,3 +1,7 @@
+* Support Resque natively.
+
+  *Joshua Wood*
+
 * Configure sidekiq.attempt_threshold to suppress notifications until retry
   threshold is reached.
 
