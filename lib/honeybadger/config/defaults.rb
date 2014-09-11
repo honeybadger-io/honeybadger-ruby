@@ -5,9 +5,10 @@ module Honeybadger
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
                       'ActionController::InvalidAuthenticityToken',
-                      'CGI::Session::CookieStore::TamperedWithCookie',
                       'ActionController::UnknownAction',
+                      'ActionController::UnknownFormat',
                       'AbstractController::ActionNotFound',
+                      'CGI::Session::CookieStore::TamperedWithCookie',
                       'Mongoid::Errors::DocumentNotFound',
                       'Sinatra::NotFound'].map(&:freeze).freeze
 
