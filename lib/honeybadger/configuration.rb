@@ -163,7 +163,8 @@ module Honeybadger
                       'ActionController::UnknownAction',
                       'AbstractController::ActionNotFound',
                       'Mongoid::Errors::DocumentNotFound',
-                      'Sinatra::NotFound']
+                      'Sinatra::NotFound',
+                      'ActionController::UnknownFormat']
 
     alias_method :secure?, :secure
     alias_method :use_system_ssl_cert_chain?, :use_system_ssl_cert_chain

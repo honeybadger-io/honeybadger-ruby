@@ -1,3 +1,9 @@
+## Honeybadger 1.16.5 ##
+
+* Ignore ActionController::UnknownFormat by default.
+  
+  *Sergey Rezvanov*
+
 ## Honeybadger 1.16.4 ##
 
 * Include a portion of longer queries with traces.
