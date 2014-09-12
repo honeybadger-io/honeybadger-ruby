@@ -6,7 +6,7 @@ module Honeybadger
   class Config
     class Yaml < ::Hash
       def initialize(path, env = 'production')
-        @path = Pathname.new(path)
+        @path = path.kind_of?(Pathname) ? path : Pathname.new(path)
 
         if !@path.exist?
           raise ConfigError, "The configuration file #{@path} was not found."

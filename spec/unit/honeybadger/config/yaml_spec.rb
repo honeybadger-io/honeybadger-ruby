@@ -1,7 +1,8 @@
 require 'honeybadger/config'
 
 describe Honeybadger::Config::Yaml do
-  subject { described_class.new(FIXTURES_PATH.join('honeybadger.yml'), env) }
+  subject { described_class.new(path, env) }
+  let(:path) { FIXTURES_PATH.join('honeybadger.yml') }
   let(:env) { 'production' }
 
   it { should be_a Hash }
@@ -17,20 +18,35 @@ describe Honeybadger::Config::Yaml do
       expect(subject[:api_key]).to eq 'asdf'
     end
 
-    context "and the environment collides with an option namespace" do
-      let(:env) { 'foo' }
-
-      it "prioritizes the environment namespace" do
-        expect(subject[:bar]).to eq 'baz'
-        expect(subject[:baz]).to eq 'other'
-      end
-    end
-
     context "and the environment collides with an option name" do
       let(:env) { 'api_key' }
 
       it "prioritizes the option name" do
         expect(subject[:api_key]).to eq 'zxcv'
+      end
+    end
+
+    context "and the environment collides with an option namespace" do
+      let(:env) { 'logging' }
+      let(:yaml) { <<-YAML }
+api_key: "cobras"
+top: true
+logging:
+  api_key: "badgers"
+  path: "log/my.log"
+  level: "DEBUG"
+      YAML
+
+      before do
+        allow(path).to receive(:read).and_return(yaml)
+      end
+
+      it "merges all the options" do
+        expect(subject[:'logging.path']).to eq 'log/my.log'
+        expect(subject[:'logging.level']).to eq 'DEBUG'
+        expect(subject[:'logging.api_key']).to eq 'badgers'
+        expect(subject[:api_key]).to eq 'badgers'
+        expect(subject[:top]).to eq true
       end
     end
   end
