@@ -65,6 +65,11 @@ describe Honeybadger::Notice do
     expect(build_notice(controller: 'users_controller').controller).to eq 'users_controller'
   end
 
+  it "aliases the params as parameters" do
+    expect(build_notice(parameters: {foo: 'foo'}).params).to eq({foo: 'foo'})
+    expect(build_notice(params: {bar: 'bar'}).parameters).to eq({bar: 'bar'})
+  end
+
   it "accepts an action" do
     expect(build_notice(action: 'index').action).to eq 'index'
   end
@@ -174,24 +179,6 @@ describe Honeybadger::Notice do
         payload = JSON.parse(json)
         expect(payload['request'][var]).to eq nil
       end
-    end
-  end
-
-  %w(url controller action).each do |var|
-    it "sends a request if #{var} is present" do
-      notice = build_notice(var.to_sym => 'value')
-      json = notice.to_json
-      payload = JSON.parse(json)
-      expect(payload['request']).not_to be_nil
-    end
-  end
-
-  %w(parameters cgi_data session_data context).each do |var|
-    it "sends a request if #{var} is present" do
-      notice = build_notice(var.to_sym => {'key' => 'value'})
-      json = notice.to_json
-      payload = JSON.parse(json)
-      expect(payload['request']).not_to be_nil
     end
   end
 
@@ -335,7 +322,7 @@ describe Honeybadger::Notice do
         env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
         notice = config.with_request(Rack::Request.new(env)) { build_notice }
 
-        expect(notice.parameters).to eq params
+        expect(notice.params).to eq params
         expect(notice.component).to eq params['controller']
         expect(notice.action).to eq params['action']
       end
