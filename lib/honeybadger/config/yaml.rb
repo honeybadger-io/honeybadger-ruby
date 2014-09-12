@@ -1,5 +1,6 @@
 require 'pathname'
 require 'yaml'
+require 'erb'
 
 module Honeybadger
   class Config
@@ -14,7 +15,7 @@ module Honeybadger
         elsif !@path.writable?
           raise ConfigError, "The configuration file #{@path} is not writable."
         else
-          yaml = YAML.load(@path.read)
+          yaml = YAML.load(ERB.new(@path.read).result)
           yaml.merge!(yaml[env]) if yaml[env].kind_of?(Hash)
           update(dotify_keys(yaml))
         end

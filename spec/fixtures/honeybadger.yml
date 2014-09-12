@@ -9,3 +9,4 @@ a:
       nested: 'option'
 production:
   api_key: 'asdf'
+erb: <%= 'erb!' %>

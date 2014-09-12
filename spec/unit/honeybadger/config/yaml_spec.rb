@@ -8,7 +8,7 @@ describe Honeybadger::Config::Yaml do
 
   context "when options are nested" do
     it "converts deeply nested options to dotted hash syntax" do
-      should eq({:enabled => true, :api_key => 'asdf', :'foo.bar' => 'baz', :'foo.baz' => 'other', :'a.really.deeply.nested' => 'option', :'production.api_key' => 'asdf'})
+      expect(subject[:'a.really.deeply.nested']).to eq 'option'
     end
   end
 
@@ -40,6 +40,12 @@ describe Honeybadger::Config::Yaml do
 
     it "falls back to the top level namespace" do
       expect(subject[:api_key]).to eq 'zxcv'
+    end
+  end
+
+  context "when ERB is used" do
+    it "evaluates ERB" do
+      expect(subject[:erb]).to eq 'erb!'
     end
   end
 
