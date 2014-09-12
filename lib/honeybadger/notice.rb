@@ -130,7 +130,7 @@ module Honeybadger
 
       @sanitizer = Util::Sanitizer.new(filters: config.params_filters)
       @request_sanitizer = Util::RequestSanitizer.new(@sanitizer)
-      @request = OpenStruct.new(construct_request_hash(config.request, opts, @request_sanitizer))
+      @request = OpenStruct.new(construct_request_hash(config.request, opts, @request_sanitizer, config.excluded_request_keys))
       @context = construct_context_hash(opts, @sanitizer)
 
       @stats = Util::Stats.all
@@ -299,21 +299,26 @@ module Honeybadger
       ].compact | BACKTRACE_FILTERS
     end
 
-    def construct_request_hash(rack_request, opts, sanitizer)
-      defaults = {
-        url: opts[:url],
-        component: opts[:component] || opts[:controller],
-        action: opts[:action],
-        params: opts[:params] || opts[:parameters] || {},
-        session: opts[:session] || {},
-        cgi_data: opts[:cgi_data] || {}
-      }
+    # Internal: default values to use request data.
+    REQUEST_DEFAULTS = {
+      url: nil,
+      component: nil,
+      action: nil,
+      params: {}.freeze,
+      session: {}.freeze,
+      cgi_data: {}.freeze
+    }.freeze
 
+    def construct_request_hash(rack_request, opts, sanitizer, excluded_keys = [])
       request = {}
       request.merge!(Rack::RequestHash.new(rack_request)) if rack_request
 
-      defaults.each_pair do |k,v|
-        request[k] = v if opts.has_key?(k) || !request.has_key?(k)
+      request[:component] = opts[:controller] if opts.has_key?(:controller)
+      request[:params] = opts[:parameters] if opts.has_key?(:parameters)
+
+      REQUEST_DEFAULTS.each do |key, default|
+        request[key] = opts[key] if opts.has_key?(key)
+        request[key] = default if !request[key] || excluded_keys.include?(key)
       end
 
       request[:session] = request[:session][:data] if request[:session][:data]

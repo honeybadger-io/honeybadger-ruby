@@ -141,6 +141,42 @@ describe Honeybadger::Notice do
     expect(payload['request']['action']).to be_nil
   end
 
+  %w(params session cgi_data).each do |var|
+    it "does not filter top level #{var}" do
+      notice = build_notice(:config => build_config(:'request.filter_keys' => [var]), var.to_sym => {var => 'hello'})
+      json = notice.to_json
+      payload = JSON.parse(json)
+      expect(payload['request'][var]).to eq({var => '[FILTERED]'})
+    end
+
+    context "when #{var} is excluded" do
+      it "sends default value" do
+        notice = build_notice(:config => build_config(:'request.exclude_keys' => [var]), var.to_sym => {var => 'hello'})
+        json = notice.to_json
+        payload = JSON.parse(json)
+        expect(payload['request'][var]).to eq({})
+      end
+    end
+  end
+
+  %w(url component action).each do |var|
+    it "does not filter top level #{var}" do
+      notice = build_notice(:config => build_config(:'request.filter_keys' => [var]), var.to_sym => 'hello')
+      json = notice.to_json
+      payload = JSON.parse(json)
+      expect(payload['request'][var]).to eq 'hello'
+    end
+
+    context "when #{var} is excluded" do
+      it "sends default value" do
+        notice = build_notice(:config => build_config(:'request.exclude_keys' => [var]), var.to_sym => 'hello')
+        json = notice.to_json
+        payload = JSON.parse(json)
+        expect(payload['request'][var]).to eq nil
+      end
+    end
+  end
+
   %w(url controller action).each do |var|
     it "sends a request if #{var} is present" do
       notice = build_notice(var.to_sym => 'value')

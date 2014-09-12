@@ -178,6 +178,10 @@ module Honeybadger
       request && request.env['action_dispatch.parameter_filter'] or []
     end
 
+    def excluded_request_keys
+      Array(self[:'request.exclude_keys']).map(&:to_sym)
+    end
+
     def write
       path = config_path
 
