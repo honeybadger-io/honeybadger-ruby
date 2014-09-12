@@ -15,8 +15,8 @@ module Honeybadger
           raise ConfigError, "The configuration file #{@path} is not writable."
         else
           yaml = YAML.load(@path.read)
-          override = yaml.delete(env)
-          update(dotify_keys(yaml.merge(override || {})))
+          yaml.merge!(yaml[env]) if yaml[env].kind_of?(Hash)
+          update(dotify_keys(yaml))
         end
 
       rescue StandardError => e
