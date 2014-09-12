@@ -30,7 +30,7 @@ module Honeybadger
   # Internal: Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
 
-  # Internal: default values to use request data.
+  # Internal: default values to use for request data.
   REQUEST_DEFAULTS = {
     url: nil,
     component: nil,
