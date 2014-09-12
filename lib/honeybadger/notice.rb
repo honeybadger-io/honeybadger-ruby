@@ -30,6 +30,16 @@ module Honeybadger
   # Internal: Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
 
+  # Internal: default values to use request data.
+  REQUEST_DEFAULTS = {
+    url: nil,
+    component: nil,
+    action: nil,
+    params: {}.freeze,
+    session: {}.freeze,
+    cgi_data: {}.freeze
+  }.freeze
+
   class Notice
     extend Forwardable
 
@@ -298,16 +308,6 @@ module Honeybadger
         opts[:callbacks] ? opts[:callbacks].backtrace_filter : nil
       ].compact | BACKTRACE_FILTERS
     end
-
-    # Internal: default values to use request data.
-    REQUEST_DEFAULTS = {
-      url: nil,
-      component: nil,
-      action: nil,
-      params: {}.freeze,
-      session: {}.freeze,
-      cgi_data: {}.freeze
-    }.freeze
 
     def construct_request_hash(rack_request, opts, sanitizer, excluded_keys = [])
       request = {}
