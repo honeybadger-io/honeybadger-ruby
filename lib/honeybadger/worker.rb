@@ -70,15 +70,26 @@ module Honeybadger
     def trace(trace)
       if trace.duration > config[:'traces.threshold']
         debug { sprintf('worker adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
-        mutex.synchronize do
-          traces.push(trace)
-        end
+        traces.push(trace)
+        flush_traces if traces.flush?
+        true
       else
         debug { sprintf('worker discarding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        false
       end
     end
 
-    def_delegators :@metrics, :timing, :increment
+    def timing(*args, &block)
+      metrics.timing(*args, &block)
+      flush_metrics if metrics.flush?
+      true
+    end
+
+    def increment(*args, &block)
+      metrics.increment(*args, &block)
+      flush_metrics if metrics.flush?
+      true
+    end
 
     private
 
@@ -108,14 +119,18 @@ module Honeybadger
 
     def flush_metrics
       debug { 'worker flushing metrics feature=metrics' } # TODO: Include count.
-      metrics.chunk(100, &method(:push).to_proc.curry[:metrics])
-      mutex.synchronize { init_metrics }
+      mutex.synchronize do
+        metrics.chunk(100, &method(:push).to_proc.curry[:metrics])
+        init_metrics
+      end
     end
 
     def flush_traces
       debug { sprintf('worker flushing traces feature=traces count=%d', traces.size) }
-      push(:traces, traces) unless traces.empty?
-      mutex.synchronize { init_traces }
+      mutex.synchronize do
+        push(:traces, traces) unless traces.empty?
+        init_traces
+      end
     end
 
     def flush_queue
@@ -145,9 +160,7 @@ module Honeybadger
         return false
       end
 
-      mutex.synchronize do
-        queue[feature].push(object)
-      end
+      queue[feature].push(object)
 
       true
     end
