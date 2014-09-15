@@ -46,7 +46,7 @@ module Honeybadger
         default: false
       },
       development_environments: {
-        description: 'Environments which will not send data by default (use report_data to enable/disable explicitly).',
+        description: 'Environments which will not report data by default (use report_data to enable/disable explicitly).',
         default: ['development'.freeze, 'test'.freeze, 'cucumber'.freeze].freeze
       },
       plugins: {
