@@ -3,6 +3,7 @@ require 'honeybadger/monitor'
 
 begin
   require 'delayed_job'
+  require 'honeybadger/integrations/delayed_job/plugin'
   DELAYED_JOB_INSTALLED = true
 rescue LoadError
   DELAYED_JOB_INSTALLED = false
@@ -26,9 +27,13 @@ if DELAYED_JOB_INSTALLED
   end
 
   describe "DelayedJob integration" do
-    let(:worker) { Delayed::Worker.new }
+    let(:worker) { @worker }
 
-    before { Honeybadger::Dependency.inject! }
+    before(:all) do
+      Delayed::Worker.plugins = [Honeybadger::Integrations::DelayedJob::Plugin]
+      @worker = Delayed::Worker.new
+    end
+
     after { Delayed::Job.delete_all }
 
     context "when a method is delayed" do
