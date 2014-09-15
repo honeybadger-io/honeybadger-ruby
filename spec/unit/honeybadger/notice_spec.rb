@@ -156,7 +156,8 @@ describe Honeybadger::Notice do
 
     context "when #{var} is excluded" do
       it "sends default value" do
-        notice = build_notice(:config => build_config(:'request.exclude_keys' => [var]), var.to_sym => {var => 'hello'})
+        cfg = var == 'cgi_data' ? 'environment' : var
+        notice = build_notice(:config => build_config(:"request.disable_#{cfg}" => true), var.to_sym => {var => 'hello'})
         json = notice.to_json
         payload = JSON.parse(json)
         expect(payload['request'][var]).to eq({})
@@ -171,14 +172,14 @@ describe Honeybadger::Notice do
       payload = JSON.parse(json)
       expect(payload['request'][var]).to eq 'hello'
     end
+  end
 
-    context "when #{var} is excluded" do
-      it "sends default value" do
-        notice = build_notice(:config => build_config(:'request.exclude_keys' => [var]), var.to_sym => 'hello')
-        json = notice.to_json
-        payload = JSON.parse(json)
-        expect(payload['request'][var]).to eq nil
-      end
+  context "when url is excluded" do
+    it "sends default value" do
+      notice = build_notice(:config => build_config(:'request.disable_url' => true), :url => 'hello')
+      json = notice.to_json
+      payload = JSON.parse(json)
+      expect(payload['request']['url']).to eq nil
     end
   end
 

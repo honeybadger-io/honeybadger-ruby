@@ -113,9 +113,21 @@ module Honeybadger
         description: 'A list of keys to filter when sending request data.',
         default: ['password'.freeze, 'password_confirmation'.freeze].freeze
       },
-      :'request.exclude_keys' => {
-        description: 'A list of top-level keys to exclude when sending request data.',
-        default: [].freeze
+      :'request.disable_session' => {
+        description: 'Prevent session from being sent with request data.',
+        default: false
+      },
+      :'request.disable_params' => {
+        description: 'Prevent params from being sent with request data.',
+        default: false
+      },
+      :'request.disable_environment' => {
+        description: 'Prevent Rack environment from being sent with request data.',
+        default: false
+      },
+      :'request.disable_url' => {
+        description: 'Prevent url from being sent with request data (Rack environment may still contain it in some cases).',
+        default: false
       },
       :'user_informer.enabled' => {
         description: 'Enable the UserInformer middleware.',

@@ -179,7 +179,12 @@ module Honeybadger
     end
 
     def excluded_request_keys
-      Array(self[:'request.exclude_keys']).map(&:to_sym)
+      [].tap do |keys|
+        keys << :session  if self[:'request.disable_session']
+        keys << :params   if self[:'request.disable_params']
+        keys << :cgi_data if self[:'request.disable_environment']
+        keys << :url      if self[:'request.disable_url']
+      end
     end
 
     def write
