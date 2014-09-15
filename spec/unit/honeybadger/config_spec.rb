@@ -4,7 +4,7 @@ require 'net/http'
 describe Honeybadger::Config do
   it { should_not be_valid }
 
-  specify { expect(subject[:enabled]).to eq true }
+  specify { expect(subject[:disabled]).to eq false }
   specify { expect(subject[:env]).to eq nil }
 
   describe "#logger=" do
@@ -175,6 +175,35 @@ describe Honeybadger::Config do
 
       its(:framework) { should eq :rack }
       its(:framework_name) { should match /Rack 1\.0/ }
+    end
+  end
+
+  describe "#default_backend" do
+    its(:default_backend) { should eq :server }
+
+    context "when disabled explicitly" do
+      before { subject[:report_data] = false }
+      its(:default_backend) { should eq :null }
+    end
+
+    context "when environment is not a development environment" do
+      before { subject[:env] = 'production' }
+      its(:default_backend) { should eq :server }
+
+      context "when disabled explicitly" do
+        before { subject[:report_data] = false }
+        its(:default_backend) { should eq :null }
+      end
+    end
+
+    context "when environment is a development environment" do
+      before { subject[:env] = 'development' }
+      its(:default_backend) { should eq :null }
+
+      context "when enabled explicitly" do
+        before { subject[:report_data] = true }
+        its(:default_backend) { should eq :server }
+      end
     end
   end
 end

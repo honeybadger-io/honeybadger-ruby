@@ -80,9 +80,9 @@ module Honeybadger
     end
 
     def public?
-      return true if self[:public]
-      return false if self[:public] == false
-      !self[:env] || self[:environments].include?(self[:env])
+      return true if self[:report_data]
+      return false if self[:report_data] == false
+      !self[:env] || !Array(self[:development_environments]).include?(self[:env])
     end
 
     def default_backend

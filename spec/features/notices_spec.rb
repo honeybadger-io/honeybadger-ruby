@@ -45,11 +45,10 @@ feature "error notifications" do
       ACTION
 
       define_route('/test/index', 'test#index')
-
-      perform_request('http://example.com:123/test/index?param=value')
     end
 
     it "reports the exception to Honeybadger" do
+      perform_request('http://example.com:123/test/index?param=value')
       assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'})
     end
   end

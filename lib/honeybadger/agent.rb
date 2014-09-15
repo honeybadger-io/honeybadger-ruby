@@ -50,7 +50,7 @@ module Honeybadger
         config = Config.new(config)
       end
 
-      if !config[:enabled]
+      if config[:disabled]
         config.logger.info('Unable to start Honeybadger -- disabled by configuration.')
         return false
       elsif !config.valid?

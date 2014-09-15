@@ -39,7 +39,7 @@ module CommandLine
   end
 
   def assert_no_notification
-    expect(all_output).not_to match(/Debug Backend received :notices/)
+    expect(all_output).not_to match(/notifying debug backend of feature=notices/)
   end
 
   def assert_notification(expected = {})

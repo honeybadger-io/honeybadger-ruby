@@ -13,41 +13,41 @@ module Honeybadger
                       'Sinatra::NotFound'].map(&:freeze).freeze
 
     OPTIONS = {
-      enabled: {
-        description: 'Determines if Honeybadger will start.',
-        default: true
-      },
-      debug: {
-        description: 'Forces metrics and traces to be reported every 10 seconds rather than 60.',
-        default: false
-      },
       api_key: {
         description: 'The API key for your Honeybadger project.',
-        default: nil
-      },
-      hostname: {
-        description: 'The hostname of the current box.',
-        default: Socket.gethostname
-      },
-      root: {
-        description: 'The project\'s absolute root path.',
-        default: Dir.pwd
-      },
-      backend: {
-        description: 'An alternate backend to use for reporting data.',
         default: nil
       },
       env: {
         description: 'The current application\'s environment name.',
         default: ENV['HONEYBADGER_ENV']
       },
-      public: {
-        description: 'Enable reporting of data.',
+      report_data: {
+        description: 'Enable/disable reporting of data. Defaults to true for non-development environments.',
         default: nil
       },
-      environments: {
-        description: 'Public environments which are enabled for reporting automatically.',
-        default: ['production'.freeze, 'staging'.freeze].freeze
+      root: {
+        description: 'The project\'s absolute root path.',
+        default: Dir.pwd
+      },
+      hostname: {
+        description: 'The hostname of the current box.',
+        default: Socket.gethostname
+      },
+      backend: {
+        description: 'An alternate backend to use for reporting data.',
+        default: nil
+      },
+      debug: {
+        description: 'Forces metrics and traces to be reported every 10 seconds rather than 60.',
+        default: false
+      },
+      disabled: {
+        description: 'Prevents Honeybadger from starting entirely.',
+        default: false
+      },
+      development_environments: {
+        description: 'Environments which are disabled by default (use report_data to enable/disable explicitly).',
+        default: ['development'.freeze, 'test'.freeze, 'cucumber'.freeze].freeze
       },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',

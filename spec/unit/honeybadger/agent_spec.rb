@@ -61,7 +61,7 @@ describe Honeybadger::Agent do
       end
 
       context "when disabled" do
-        before { config[:enabled] = false }
+        before { config[:disabled] = true }
 
         it { should eq false }
 
