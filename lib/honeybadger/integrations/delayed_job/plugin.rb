@@ -24,7 +24,7 @@ module Honeybadger
                   :attempts      => job.attempts,
                   :queue         => job.queue
                 }
-              )
+              ) if job.attempts.to_i >= ::Honeybadger.configuration.delayed_job_attempt_threshold.to_i
               raise error
             ensure
               ::Honeybadger.context.clear!

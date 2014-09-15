@@ -10,7 +10,7 @@ module Honeybadger
                :user_information, :feedback, :rescue_rake_exceptions, :source_extract_radius,
                :send_request_session, :debug, :fingerprint, :hostname, :features, :metrics,
                :log_exception_on_send_failure, :send_local_variables, :traces,
-               :trace_threshold, :unwrap_exceptions].freeze
+               :trace_threshold, :unwrap_exceptions, :delayed_job_attempt_threshold].freeze
 
     # The API key for your project, found on the project edit form.
     attr_accessor :api_key
@@ -135,6 +135,9 @@ module Honeybadger
     # Which features the API says we have
     attr_accessor :features
 
+    # Do not notify unless Delayed Job attempts reaches or exceeds this value
+    attr_accessor :delayed_job_attempt_threshold
+
     DEFAULT_PARAMS_FILTERS = %w(password password_confirmation).freeze
 
     DEFAULT_BACKTRACE_FILTERS = [
@@ -201,6 +204,7 @@ module Honeybadger
       @feedback                      = true
       @trace_threshold               = 2000
       @unwrap_exceptions             = true
+      @delayed_job_attempt_threshold = 0
     end
 
     # Public: Takes a block and adds it to the list of backtrace filters. When

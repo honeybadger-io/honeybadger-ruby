@@ -64,6 +64,19 @@ if DELAYED_JOB_INSTALLED
           Honeybadger.should_receive(:notify_or_ignore).once
         end
       end
+
+      context "and a threshold is set" do
+        let(:method_name) { :will_raise }
+
+        before { ::Honeybadger.configuration.delayed_job_attempt_threshold = 2 }
+        after { ::Honeybadger.configuration.delayed_job_attempt_threshold = 0 }
+
+        it "does not notify Honeybadger on first occurence" do
+          Honeybadger.should_not_receive(:notify_or_ignore)
+
+          worker.work_off
+        end
+      end
     end
   end
 end
