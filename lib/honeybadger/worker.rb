@@ -170,7 +170,7 @@ module Honeybadger
         debug { 'worker started' }
         work until finish
       rescue Exception => e
-        error(sprintf('error in worker thread (shutting down) class=%s message=%s location=%s', e.class, e.message.dump, e.backtrace.first.dump))
+        error(sprintf('error in worker thread (shutting down) class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
         raise e
       ensure
         debug { 'stopping worker' }
@@ -189,7 +189,7 @@ module Honeybadger
 
       sleep(0.1)
     rescue StandardError => e
-      error(sprintf('error in worker thread class=%s message=%s location=%s', e.class, e.message.dump, e.backtrace.first.dump))
+      error(sprintf('error in worker thread class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
       sleep(1)
     end
 
