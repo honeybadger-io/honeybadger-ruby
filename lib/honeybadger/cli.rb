@@ -229,8 +229,8 @@ module Honeybadger
           say(tab_indent(hierarchy.size) << "#{key}:")
           indent = tab_indent(hierarchy.size+1)
           say(indent + "Description: #{Config::OPTIONS[dotted_key][:description]}")
-          say(indent + "Default: #{Config::OPTIONS[dotted_key][:default].to_s}")
-          say(indent + "Current: #{value.to_s}")
+          say(indent + "Default: #{Config::OPTIONS[dotted_key][:default].inspect}")
+          say(indent + "Current: #{value.inspect}")
         end
       end
     end
