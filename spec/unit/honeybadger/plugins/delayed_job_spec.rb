@@ -55,6 +55,18 @@ begin
             expect(Honeybadger).to receive(:notify_or_ignore)
           end
         end
+
+        context "and a threshold is set" do
+          let(:method_name) { :will_raise }
+
+          before { ::Honeybadger::Agent.config[:'delayed_job.attempt_threshold'] = 2 }
+          after { ::Honeybadger::Agent.config[:'delayed_job.attempt_threshold'] = 0 }
+
+          it "does not notify Honeybadger on first occurence" do
+            expect(Honeybadger).not_to receive(:notify_or_ignore)
+            worker.work_off
+          end
+        end
       end
     end
   end

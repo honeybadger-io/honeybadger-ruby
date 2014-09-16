@@ -180,6 +180,10 @@ module Honeybadger
       :'traces.threshold' => {
         description: 'The threshold in seconds to send traces.',
         default: 2000
+      },
+      :'delayed_job.attempt_threshold' => {
+        description: 'The number of attempts before notifications will be sent.',
+        default: 0
       }
     }.freeze
 

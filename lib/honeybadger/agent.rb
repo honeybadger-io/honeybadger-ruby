@@ -98,6 +98,20 @@ module Honeybadger
       @at_exit
     end
 
+    # Internal: Not for public consumption. :)
+    #
+    # Prefer dependency injection over accessing config directly, but some
+    # cases (such as the delayed_job plugin) necessitate it.
+    #
+    # Returns the Agent's config if running, otherwise default config
+    def self.config
+      if running?
+        instance.send(:config)
+      else
+        @config ||= Config.new
+      end
+    end
+
     def initialize(config)
       @config = config
       @worker = Worker.new(config)
