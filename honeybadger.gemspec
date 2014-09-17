@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.5'
 
   s.name              = 'honeybadger'
-  s.version           = '1.16.4'
-  s.date              = '2014-08-26'
+  s.version           = '1.16.5'
+  s.date              = '2014-09-17'
 
   s.summary     = 'Error reports you can be happy about.'
   s.description = 'Make managing application errors a more pleasant experience.'
@@ -75,7 +75,6 @@ Gem::Specification.new do |s|
     gemfiles/rails3.0.gemfile
     gemfiles/rails3.1.gemfile
     gemfiles/rails3.2.gemfile
-    gemfiles/rails4.0.gemfile
     gemfiles/rails4.1.gemfile
     gemfiles/rake.gemfile
     gemfiles/sinatra.gemfile
