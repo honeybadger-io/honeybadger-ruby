@@ -44,7 +44,7 @@ module Honeybadger
 
       update(Env.new(ENV))
 
-      self.logger = Logging::SupplementedLogger.new(build_logger(l))
+      self.logger = Logging::ConfigLogger.new(self, build_logger(l))
       Logging::BootLogger.instance.flush(logger)
 
       @features = Hash[FEATURES.map{|f| [f, true] }]
@@ -97,8 +97,12 @@ module Honeybadger
       self[:api_key] =~ /\S/
     end
 
+    def debug?
+      self[:debug]
+    end
+
     def logger
-      @logger || Logging::SupplementedLogger.new(Logging::BootLogger.instance)
+      @logger || Logging::ConfigLogger.new(Logging::BootLogger.instance)
     end
 
     def logger=(logger)

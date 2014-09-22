@@ -79,6 +79,7 @@ module Honeybadger
         end
       end
 
+      ENV['HONEYBADGER_DEBUG']           = 'true'
       ENV['HONEYBADGER_LOGGING_PATH']  ||= 'STDOUT'
       ENV['HONEYBADGER_LOGGING_LEVEL'] ||= '0'
       ENV['HONEYBADGER_REPORT_DATA']   ||= 'true'

@@ -7,7 +7,7 @@ require 'honeybadger/notice'
 
 describe Honeybadger::Worker do
   let(:instance) { Honeybadger::Worker.new(config) }
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:enable_thread) { false }
 
   subject { instance }

@@ -65,11 +65,15 @@ describe Honeybadger::Config do
   end
 
   describe "#ping" do
-    let(:logger) { double('Logger', level: 0, debug: nil, warn: nil) }
-    let(:instance) { Honeybadger::Config.new(logger: logger, enabled: false) }
+    let(:instance) { Honeybadger::Config.new(logger: NULL_LOGGER, enabled: false, debug: true) }
+    let(:logger) { instance.logger }
     let(:body) { {'top' => 'foo'} }
 
     subject { instance.ping }
+
+    before do
+      allow(logger).to receive(:debug)
+    end
 
     context "when connection succeeds" do
       before { stub_http(body: body.to_json) }

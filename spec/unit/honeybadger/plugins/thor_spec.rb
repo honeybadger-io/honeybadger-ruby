@@ -2,7 +2,7 @@ require 'honeybadger/plugins/thor'
 require 'honeybadger/config'
 
 describe "Thor Dependency" do
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do
     Honeybadger::Plugin.instances[:thor].reset!

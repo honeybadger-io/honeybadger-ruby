@@ -2,7 +2,7 @@ require 'honeybadger/plugin'
 require 'honeybadger/config'
 
 describe Honeybadger::Plugin do
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:plugin) { Honeybadger::Plugin.new(:testing) }
   subject { plugin }
 

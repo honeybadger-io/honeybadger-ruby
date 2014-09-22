@@ -23,7 +23,7 @@ begin
     end
 
     context "when it's installed" do
-      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
       let(:worker) { @worker }
 
       before(:all) do

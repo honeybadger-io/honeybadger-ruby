@@ -2,9 +2,8 @@ require 'honeybadger/backend/test'
 require 'honeybadger/config'
 
 describe Honeybadger::Backend::Test do
-  let(:logger) { double('Logger', warn: true, debug: true) }
-  let(:config) { Honeybadger::Config.new(logger: logger) }
-
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+  let(:logger) { config.logger }
 
   let(:instance) { described_class.new(config) }
 

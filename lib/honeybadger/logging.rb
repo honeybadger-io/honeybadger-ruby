@@ -6,12 +6,15 @@ module Honeybadger
   module Logging
     PREFIX = '** [Honeybadger] '.freeze
 
+    # Internal: Logging helper methods. Requires a Honeybadger::Config @config
+    # instance variable to exist and/or #debug? and #logger to be defined.
     module Helper
       def debug(msg = nil)
-        return if Logger::Severity::DEBUG < logger.level
+        return unless debug?
         msg = yield if block_given?
         logger.debug(msg)
       end
+      alias :d :debug
 
       def info(msg = nil)
         return if Logger::Severity::INFO < logger.level
@@ -29,6 +32,10 @@ module Honeybadger
         return if Logger::Severity::ERROR < logger.level
         msg = yield if block_given?
         logger.error(msg)
+      end
+
+      def debug?
+        @config[:debug]
       end
 
       def logger
@@ -95,22 +102,30 @@ module Honeybadger
       end
     end
 
-    class SupplementedLogger < SimpleDelegator
+    class ConfigLogger < SimpleDelegator
       LOCATE_CALLER_LOCATION = Regexp.new("#{Regexp.escape(__FILE__)}").freeze
       CALLER_LOCATION = Regexp.new("#{Regexp.escape(File.expand_path('../../../', __FILE__))}/(.*)").freeze
 
       INFO_SUPPLEMENT = ' level=%s pid=%s'.freeze
       DEBUG_SUPPLEMENT = ' at=%s'.freeze
 
-      def initialize(logger = Logger.new('/dev/null'))
+      def initialize(config, logger = Logger.new('/dev/null'))
         raise ArgumentError, 'logger not specified' unless logger
-        super
+        @config = config
+        super(logger)
       end
 
       Logger::Severity.constants.each do |severity|
+        next if severity == :DEBUG
         define_method l = severity.downcase do |msg|
           __getobj__().send(l, supplement(msg, l))
         end
+      end
+
+      # There is no debug level in Honeybadger. Debug logs will be logged at
+      # the info level if the debug config option is on.
+      def debug(msg)
+        __getobj__().info(supplement(msg, :debug)) if @config[:debug]
       end
 
       private

@@ -20,14 +20,14 @@ feature "Installing honeybadger via the cli" do
     end
 
     it "sends a test notification" do
-      set_env('HONEYBADGER_LOGGING_LEVEL', '0')
+      set_env('HONEYBADGER_LOGGING_LEVEL', '1')
       assert_cmd('honeybadger install asdf')
       assert_notification('error' => {'class' => 'HoneybadgerTestingException'})
     end
 
     context "with the --no-test option" do
       it "skips the test notification" do
-        set_env('HONEYBADGER_LOGGING_LEVEL', '0')
+        set_env('HONEYBADGER_LOGGING_LEVEL', '1')
         assert_cmd('honeybadger install asdf --no-test')
         assert_no_notification
       end

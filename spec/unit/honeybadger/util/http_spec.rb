@@ -4,8 +4,8 @@ require 'honeybadger/util/http'
 require 'honeybadger/config'
 
 describe Honeybadger::Util::HTTP do
-  let(:logger) { Logger.new('/dev/null') }
-  let(:config) { Honeybadger::Config.new(logger: logger, api_key: 'abc123') }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, api_key: 'abc123') }
+  let(:logger) { config.logger }
 
   subject { described_class.new(config) }
 
