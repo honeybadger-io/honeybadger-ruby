@@ -94,11 +94,14 @@ module Honeybadger
       say("\nConfiguration\n\n", :bold)
       output_config(config.to_hash)
 
+      say("\nStarting Honeybadger\n\n", :bold)
+      Honeybadger.start(config) unless load_rails_env(verbose: true)
+
       if options[:test]
-        Honeybadger.start(config) unless load_rails_env(verbose: true)
         say("\nSending test notice\n\n", :bold)
         send_test
       end
+
       say("\nRunning at exit hooks\n\n", :bold)
     end
 
