@@ -9,8 +9,6 @@ describe Honeybadger::Config do
   specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
 
   describe "#initialize" do
-    let(:logger) { double('Logger', debug: nil, info: nil, warn: nil, error: nil) }
-
     context "with multiple forms of config" do
       it "overrides config with options" do
         config = Honeybadger::Config.new(logger: NULL_LOGGER, enabled: false)
