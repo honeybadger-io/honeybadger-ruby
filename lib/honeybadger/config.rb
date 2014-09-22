@@ -44,15 +44,15 @@ module Honeybadger
 
       update(Env.new(ENV))
 
-      self.logger = Logging::ConfigLogger.new(self, build_logger(l))
-      Logging::BootLogger.instance.flush(logger)
+      @logger = Logging::ConfigLogger.new(self, build_logger(l))
+      Logging::BootLogger.instance.flush(@logger)
 
       @features = Hash[FEATURES.map{|f| [f, true] }]
     end
 
     def_delegators :@values, :update
 
-    attr_reader :features
+    attr_reader :logger, :features
 
     def get(key)
       key = key.to_sym
@@ -99,14 +99,6 @@ module Honeybadger
 
     def debug?
       self[:debug]
-    end
-
-    def logger
-      @logger || Logging::ConfigLogger.new(Logging::BootLogger.instance)
-    end
-
-    def logger=(logger)
-      @logger = logger.nil? ? Logger.new('/dev/null') : logger
     end
 
     # Internal: Optional path to honeybadger.log log file. If nil, STDOUT will be used

@@ -8,15 +8,6 @@ describe Honeybadger::Config do
   specify { expect(subject[:env]).to eq nil }
   specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
 
-  describe "#logger=" do
-    let(:logger) { double('Logger') }
-
-    it "configures the logger" do
-      subject.logger = logger
-      expect(subject.logger).to eq logger
-    end
-  end
-
   describe "#initialize" do
     let(:logger) { double('Logger', debug: nil, info: nil, warn: nil, error: nil) }
 
