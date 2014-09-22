@@ -128,6 +128,14 @@ describe Honeybadger::Agent do
             expect(described_class).to receive(:new).with(config).and_return(instance)
             expect { described_class.start(config) }.to change(Honeybadger::Agent, :instance).to(instance)
           end
+
+          context "and a null backend is used" do
+            it "warns when it's initialized" do
+              config[:backend] = 'null'
+              expect(logger).to receive(:warn).with(/development backend/)
+              described_class.start(config)
+            end
+          end
         end
       end
     end

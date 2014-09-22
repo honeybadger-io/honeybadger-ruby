@@ -12,11 +12,6 @@ describe Honeybadger::Backend::Test do
 
   it { should respond_to :notifications }
 
-  it "warns when it's initialized" do
-    expect(logger).to receive(:warn).with(/development backend/)
-    described_class.new(config)
-  end
-
   describe "#notify" do
     let(:notice) { double('Notice') }
 

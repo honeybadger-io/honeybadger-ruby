@@ -11,11 +11,6 @@ describe Honeybadger::Backend::Null do
 
   it { should respond_to :notify }
 
-  it "warns when it's initialized" do
-    expect(logger).to receive(:warn).with(/development backend/)
-    described_class.new(config)
-  end
-
   describe "#notify" do
     subject { instance.notify(:notices, double('Notice')) }
     it { should be_a Honeybadger::Backend::Response }

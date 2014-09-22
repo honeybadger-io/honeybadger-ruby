@@ -122,7 +122,15 @@ module Honeybadger
       end
     end
 
-    def_delegators :@worker, :start, :fork, :trace, :timing, :increment
+    def_delegators :@worker, :fork, :trace, :timing, :increment
+
+    def start
+      unless worker.backend.kind_of?(Backend::Server)
+        warn('Initializing development backend: data will not be reported.')
+      end
+
+      worker.start
+    end
 
     def stop(force = false)
       info("Shutting down Honeybadger version #{VERSION}")
