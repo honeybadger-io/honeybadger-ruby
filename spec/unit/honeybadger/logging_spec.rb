@@ -44,9 +44,9 @@ describe Honeybadger::Logging::FormattedLogger do
 end
 
 describe Honeybadger::Logging::ConfigLogger do
-  let(:config) { Honeybadger::Config.new(logger: logger, debug: true, :'logging.tty' => tty) }
+  let(:config) { Honeybadger::Config.new(logger: logger, debug: true, :'logging.tty_level' => tty_level) }
   let(:logger) { Logger.new('/dev/null') }
-  let(:tty) { false }
+  let(:tty_level) { 'ERROR' }
 
   subject { described_class.new(config, logger) }
 
@@ -81,7 +81,7 @@ describe Honeybadger::Logging::ConfigLogger do
     end
 
     context "and logging.tty is enabled" do
-      let(:tty) { true }
+      let(:tty_level) { 'DEBUG' }
 
       LOG_SEVERITIES.each do |severity|
         it "delegates ##{severity} to configured logger" do

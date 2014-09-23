@@ -200,8 +200,8 @@ api_key: #{self[:api_key]}
       end
     end
 
-    def log_level
-      case self[:'logging.level'].to_s
+    def log_level(key = :'logging.level')
+      case self[key].to_s
       when /\A(0|debug)\z/i then Logger::DEBUG
       when /\A(1|info)\z/i  then Logger::INFO
       when /\A(2|warn)\z/i  then Logger::WARN

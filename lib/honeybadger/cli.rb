@@ -79,10 +79,11 @@ module Honeybadger
         end
       end
 
-      ENV['HONEYBADGER_DEBUG']           = 'true'
-      ENV['HONEYBADGER_LOGGING_PATH']  ||= 'STDOUT'
-      ENV['HONEYBADGER_LOGGING_LEVEL'] ||= '0'
-      ENV['HONEYBADGER_REPORT_DATA']   ||= 'true'
+      ENV['HONEYBADGER_LOGGING_LEVEL']     ||= '0'
+      ENV['HONEYBADGER_LOGGING_TTY_LEVEL']   = '0'
+      ENV['HONEYBADGER_LOGGING_PATH']        = 'STDOUT'
+      ENV['HONEYBADGER_DEBUG']               = 'true'
+      ENV['HONEYBADGER_REPORT_DATA']         = 'true'
 
       exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
       say("\n") if options[:platform] # Print a blank line if we just logged the platform.
@@ -110,9 +111,10 @@ module Honeybadger
     def install(api_key)
       say("Installing Honeybadger #{VERSION}")
 
-      ENV['HONEYBADGER_LOGGING_PATH']  ||= 'STDOUT'
-      ENV['HONEYBADGER_LOGGING_LEVEL'] ||= '2'
-      ENV['HONEYBADGER_REPORT_DATA']   ||= 'true'
+      ENV['HONEYBADGER_LOGGING_LEVEL']     ||= '2'
+      ENV['HONEYBADGER_LOGGING_TTY_LEVEL']   = '0'
+      ENV['HONEYBADGER_LOGGING_PATH']        = 'STDOUT'
+      ENV['HONEYBADGER_REPORT_DATA']         = 'true'
 
       exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
 

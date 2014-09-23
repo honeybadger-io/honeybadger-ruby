@@ -59,10 +59,6 @@ module Honeybadger
       def level
         Logger::Severity::Debug
       end
-
-      def tty?
-        STDOUT.tty?
-      end
     end
 
     class BootLogger < Base
@@ -123,6 +119,8 @@ module Honeybadger
 
       def initialize(config, logger = Logger.new('/dev/null'))
         @config = config
+        @tty = STDOUT.tty?
+        @tty_level = @config.log_level(:'logging.tty_level')
         super(logger)
       end
 
@@ -146,9 +144,7 @@ module Honeybadger
       end
 
       def suppress_tty?(severity)
-        tty? &&
-          severity < Logger::Severity::ERROR &&
-          !@config[:'logging.tty']
+        @tty && severity < @tty_level
       end
 
       def supplement(msg, severity)
