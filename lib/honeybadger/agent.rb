@@ -122,7 +122,7 @@ module Honeybadger
       end
     end
 
-    def_delegators :@worker, :fork, :trace, :timing, :increment
+    def_delegators :@worker, :stop, :fork, :trace, :timing, :increment
 
     def start
       unless worker.backend.kind_of?(Backend::Server)
@@ -130,11 +130,6 @@ module Honeybadger
       end
 
       worker.start
-    end
-
-    def stop(force = false)
-      info("Shutting down Honeybadger version #{VERSION}")
-      worker.stop(force)
     end
 
     def notice(opts)
