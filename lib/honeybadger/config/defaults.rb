@@ -70,8 +70,8 @@ module Honeybadger
         default: 'INFO'
       },
       :'logging.tty_level' => {
-        description: 'Level to log when attached to a terminal (must be >= logging.level).',
-        default: 'ERROR'
+        description: 'Level to log when attached to a terminal (anything < logging.level will always be ignored).',
+        default: 'DEBUG'
       },
       :'connection.secure' => {
         description: 'Use SSL when sending data.',
