@@ -52,7 +52,7 @@ module Honeybadger
         end
       end
 
-      def add(severity, message)
+      def add(severity, msg)
         raise NotImplementedError, 'must define #add on subclass.'
       end
 
@@ -69,8 +69,8 @@ module Honeybadger
         @logger = logger
       end
 
-      def add(severity, message)
-        @logger.add(severity, format_message(message))
+      def add(severity, msg)
+        @logger.add(severity, format(msg))
       end
 
       def level
@@ -79,9 +79,9 @@ module Honeybadger
 
       private
 
-      def format_message(message)
-        return message unless message.kind_of?(String)
-        PREFIX + message
+      def format(msg)
+        return msg unless msg.kind_of?(String)
+        PREFIX + msg
       end
     end
 
@@ -92,8 +92,8 @@ module Honeybadger
         @messages = []
       end
 
-      def add(severity, message)
-        @messages << [severity, message]
+      def add(severity, msg)
+        @messages << [severity, msg]
       end
 
       def flush(logger)
