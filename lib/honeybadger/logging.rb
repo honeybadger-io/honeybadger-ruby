@@ -7,12 +7,12 @@ module Honeybadger
     PREFIX = '** [Honeybadger] '.freeze
 
     # Internal: Logging helper methods. Requires a Honeybadger::Config @config
-    # instance variable to exist and/or #debug? and #logger to be defined. Each
+    # instance variable to exist and/or #logger to be defined. Each
     # method is defined/block captured in this module rather than delegating to
     # the logger directly to avoid extra object allocation.
     module Helper
       def debug(msg = nil)
-        return unless debug?
+        return unless logger.debug?
         msg = yield if block_given?
         logger.debug(msg)
       end
@@ -34,10 +34,6 @@ module Honeybadger
         return if Logger::Severity::ERROR < logger.level
         msg = yield if block_given?
         logger.error(msg)
-      end
-
-      def debug?
-        @config.debug?
       end
 
       def logger
@@ -137,10 +133,14 @@ module Honeybadger
         @logger.add(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
       end
 
+      def debug?
+        @config.debug?
+      end
+
       private
 
       def suppress_debug?
-        !@config[:debug]
+        !debug?
       end
 
       def suppress_tty?(severity)
