@@ -7,17 +7,17 @@ feature "Running the debug cli command" do
     it "displays expected debug output" do
       assert_cmd("honeybadger debug")
       expect(all_output).to match /asdf/
-      expect(all_output).not_to match /Starting Honeybadger/
+      expect(all_output).to match /Starting Honeybadger/
+      expect(all_output).to match /Shutting down Honeybadger/
       expect(all_output).not_to match /HoneybadgerTestingException/
-      expect(all_output).not_to match /Shutting down Honeybadger/
     end
 
     context "with the test option" do
       it "starts Honeybadger and performs the test" do
         assert_cmd("honeybadger debug --test")
         expect(all_output).to match /Starting Honeybadger/
-        expect(all_output).to match /HoneybadgerTestingException/
         expect(all_output).to match /Shutting down Honeybadger/
+        expect(all_output).to match /HoneybadgerTestingException/
       end
 
       context "with invalid configuration" do
