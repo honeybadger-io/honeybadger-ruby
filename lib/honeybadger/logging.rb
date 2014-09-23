@@ -122,15 +122,15 @@ module Honeybadger
 
       def add(severity, msg)
         return true if suppress_tty?(severity)
-        super(severity, supplement(msg, severity))
-      end
 
-      # There is no debug level in Honeybadger. Debug logs will be logged at
-      # the info level if the debug config option is on.
-      def debug(msg)
-        return true if suppress_tty?(Logger::Severity::DEBUG)
-        return true if suppress_debug?
-        @logger.add(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
+        # There is no debug level in Honeybadger. Debug logs will be logged at
+        # the info level if the debug config option is on.
+        if severity == Logger::Severity::DEBUG
+          return true if suppress_debug?
+          super(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
+        else
+          super(severity, supplement(msg, severity))
+        end
       end
 
       def debug?
