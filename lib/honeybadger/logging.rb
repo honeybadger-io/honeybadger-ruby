@@ -12,26 +12,26 @@ module Honeybadger
     # the logger directly to avoid extra object allocation.
     module Helper
       def debug(msg = nil)
-        return unless logger.debug?
+        return true unless logger.debug?
         msg = yield if block_given?
         logger.debug(msg)
       end
       alias :d :debug
 
       def info(msg = nil)
-        return if Logger::Severity::INFO < logger.level
+        return true if Logger::Severity::INFO < logger.level
         msg = yield if block_given?
         logger.info(msg)
       end
 
       def warn(msg = nil)
-        return if Logger::Severity::WARN < logger.level
+        return true if Logger::Severity::WARN < logger.level
         msg = yield if block_given?
         logger.warn(msg)
       end
 
       def error(msg = nil)
-        return if Logger::Severity::ERROR < logger.level
+        return true if Logger::Severity::ERROR < logger.level
         msg = yield if block_given?
         logger.error(msg)
       end
