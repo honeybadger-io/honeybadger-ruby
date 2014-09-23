@@ -7,6 +7,7 @@ describe Honeybadger::Config do
   specify { expect(subject[:disabled]).to eq false }
   specify { expect(subject[:env]).to eq nil }
   specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
+  specify { expect(subject[:debug]).to eq false }
 
   describe "#initialize" do
     context "with multiple forms of config" do

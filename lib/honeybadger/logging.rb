@@ -35,7 +35,7 @@ module Honeybadger
       end
 
       def debug?
-        @config[:debug]
+        @config.debug?
       end
 
       def logger
