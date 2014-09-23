@@ -69,6 +69,10 @@ module Honeybadger
         description: 'The log level.',
         default: 'INFO'
       },
+      :'logging.tty' => {
+        description: 'Log when attached to a terminal.',
+        default: false
+      },
       :'connection.secure' => {
         description: 'Use SSL when sending data.',
         default: true

@@ -1,4 +1,5 @@
 require 'honeybadger/logging'
+require 'honeybadger/config'
 
 LOG_SEVERITIES = [:debug, :info, :warn, :error, :fatal].freeze
 
@@ -38,6 +39,58 @@ describe Honeybadger::Logging::FormattedLogger do
     it "delegates ##{severity} to configured logger" do
       expect(logger).to receive(:add).with(Logger::Severity.const_get(severity.to_s.upcase), :foo)
       subject.send(severity, :foo)
+    end
+  end
+end
+
+describe Honeybadger::Logging::ConfigLogger do
+  let(:config) { Honeybadger::Config.new(logger: logger, debug: true, :'logging.tty' => tty) }
+  let(:logger) { Logger.new('/dev/null') }
+  let(:tty) { false }
+
+  subject { described_class.new(config, logger) }
+
+  LOG_SEVERITIES.each do |severity|
+    it { should respond_to severity }
+  end
+
+  context "when not attached to terminal", unless: STDOUT.tty? do
+    LOG_SEVERITIES.each do |severity|
+      it "delegates ##{severity} to configured logger" do
+        # Debug is logged at the info level.
+        const = Logger::Severity.const_get((severity == :debug ? :info : severity).to_s.upcase)
+        expect(logger).to receive(:add).with(const, :foo)
+        subject.send(severity, :foo)
+      end
+    end
+  end
+
+  context "when attached to terminal", if: STDOUT.tty? do
+    [:debug, :info, :warn].each do |severity|
+      it "suppresses ##{severity} from configured logger" do
+        expect(logger).not_to receive(:add)
+        subject.send(severity, :foo)
+      end
+    end
+
+    [:error, :fatal].each do |severity|
+      it "delegates ##{severity} to configured logger" do
+        expect(logger).to receive(:add).with(Logger::Severity.const_get(severity.to_s.upcase), :foo)
+        subject.send(severity, :foo)
+      end
+    end
+
+    context "and logging.tty is enabled" do
+      let(:tty) { true }
+
+      LOG_SEVERITIES.each do |severity|
+        it "delegates ##{severity} to configured logger" do
+          # Debug is logged at the info level.
+          const = Logger::Severity.const_get((severity == :debug ? :info : severity).to_s.upcase)
+          expect(logger).to receive(:add).with(const, :foo)
+          subject.send(severity, :foo)
+        end
+      end
     end
   end
 end

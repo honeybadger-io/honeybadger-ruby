@@ -3,8 +3,8 @@ require 'honeybadger/backend/server'
 require 'honeybadger/config'
 
 describe Honeybadger::Backend::Server do
-  let(:logger) { Logger.new('/dev/null') }
-  let(:config) { Honeybadger::Config.new(logger: logger, api_key: 'abc123') }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, api_key: 'abc123') }
+  let(:logger) { config.logger }
 
   subject { described_class.new(config) }
 

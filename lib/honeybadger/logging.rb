@@ -59,29 +59,9 @@ module Honeybadger
       def level
         Logger::Severity::Debug
       end
-    end
 
-    class FormattedLogger < Base
-      def initialize(logger = Logger.new('/dev/null'))
-        raise ArgumentError, 'logger not specified' unless logger
-        raise ArgumentError, 'logger must be a logger' unless logger.respond_to?(:add)
-
-        @logger = logger
-      end
-
-      def add(severity, msg)
-        @logger.add(severity, format_message(msg))
-      end
-
-      def level
-        @logger.level
-      end
-
-      private
-
-      def format_message(msg)
-        return msg unless msg.kind_of?(String)
-        PREFIX + msg
+      def tty?
+        STDOUT.tty?
       end
     end
 
@@ -104,7 +84,37 @@ module Honeybadger
       end
     end
 
-    class ConfigLogger < SimpleDelegator
+    class StandardLogger < Base
+      def initialize(logger = Logger.new('/dev/null'))
+        raise ArgumentError, 'logger not specified' unless logger
+        raise ArgumentError, 'logger must be a logger' unless logger.respond_to?(:add)
+
+        @logger = logger
+      end
+
+      def add(severity, msg)
+        @logger.add(severity, msg)
+      end
+
+      def level
+        @logger.level
+      end
+    end
+
+    class FormattedLogger < StandardLogger
+      def add(severity, msg)
+        super(severity, format_message(msg))
+      end
+
+      private
+
+      def format_message(msg)
+        return msg unless msg.kind_of?(String)
+        PREFIX + msg
+      end
+    end
+
+    class ConfigLogger < StandardLogger
       LOCATE_CALLER_LOCATION = Regexp.new("#{Regexp.escape(__FILE__)}").freeze
       CALLER_LOCATION = Regexp.new("#{Regexp.escape(File.expand_path('../../../', __FILE__))}/(.*)").freeze
 
@@ -112,32 +122,41 @@ module Honeybadger
       DEBUG_SUPPLEMENT = ' at=%s'.freeze
 
       def initialize(config, logger = Logger.new('/dev/null'))
-        raise ArgumentError, 'logger not specified' unless logger
         @config = config
         super(logger)
       end
 
-      Logger::Severity.constants.each do |severity|
-        next if severity == :DEBUG
-        define_method l = severity.downcase do |msg|
-          __getobj__().send(l, supplement(msg, l))
-        end
+      def add(severity, msg)
+        return true if suppress_tty?(severity)
+        super(severity, supplement(msg, severity))
       end
 
       # There is no debug level in Honeybadger. Debug logs will be logged at
       # the info level if the debug config option is on.
       def debug(msg)
-        __getobj__().info(supplement(msg, :debug)) if @config[:debug]
+        return true if suppress_tty?(Logger::Severity::DEBUG)
+        return true if suppress_debug?
+        @logger.add(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
       end
 
       private
 
-      def supplement(msg, level)
+      def suppress_debug?
+        !@config[:debug]
+      end
+
+      def suppress_tty?(severity)
+        tty? &&
+          severity < Logger::Severity::ERROR &&
+          !@config[:'logging.tty']
+      end
+
+      def supplement(msg, severity)
         return msg unless msg.kind_of?(String)
 
         r = msg.dup
-        r << sprintf(INFO_SUPPLEMENT, level, Process.pid)
-        if level == :debug && l = caller_location
+        r << sprintf(INFO_SUPPLEMENT, severity, Process.pid)
+        if severity == Logger::Severity::DEBUG && l = caller_location
           r << sprintf(DEBUG_SUPPLEMENT, l.dump)
         end
 
