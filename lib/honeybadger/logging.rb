@@ -133,11 +133,15 @@ module Honeybadger
       private
 
       def supplement(msg, level)
-        msg << sprintf(INFO_SUPPLEMENT, level, Process.pid)
+        return msg unless msg.kind_of?(String)
+
+        r = msg.dup
+        r << sprintf(INFO_SUPPLEMENT, level, Process.pid)
         if level == :debug && l = caller_location
-          msg << sprintf(DEBUG_SUPPLEMENT, l.dump)
+          r << sprintf(DEBUG_SUPPLEMENT, l.dump)
         end
-        msg
+
+        r
       end
 
       def caller_location
