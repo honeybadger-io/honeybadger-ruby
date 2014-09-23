@@ -70,7 +70,7 @@ module Honeybadger
       end
 
       def add(severity, msg)
-        @logger.add(severity, format(msg))
+        @logger.add(severity, format_message(msg))
       end
 
       def level
@@ -79,7 +79,7 @@ module Honeybadger
 
       private
 
-      def format(msg)
+      def format_message(msg)
         return msg unless msg.kind_of?(String)
         PREFIX + msg
       end
