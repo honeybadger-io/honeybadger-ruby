@@ -83,7 +83,7 @@ feature "Running the debug cli command" do
         it "displays expected debug output" do
           assert_cmd("honeybadger debug --test")
           expect(all_output).to match /Unable to start Honeybadger/
-          expect(all_output).to match /invalid configuration/
+          expect(all_output).to match /invalid/
         end
       end
     end
