@@ -24,7 +24,33 @@ feature "Running the debug cli command" do
         it "displays expected debug output" do
           assert_cmd("honeybadger debug --test")
           expect(all_output).to match /Unable to start Honeybadger/
-          expect(all_output).to match /invalid configuration/
+          expect(all_output).to match /invalid/
+        end
+      end
+    end
+
+    context "with the --file option" do
+      let(:file) { File.join(current_dir, 'debug.txt') }
+
+      after do
+        FileUtils.rm(file)
+      end
+
+      context "and valid config" do
+        before { set_env('HONEYBADGER_API_KEY', 'asdf') }
+
+        it "saves the debug output to file" do
+          assert_cmd("honeybadger debug --file debug.txt")
+          expect(all_output).to match /Output written to debug\.txt/
+          expect(File.exist?(file))
+        end
+      end
+
+      context "and invalid config" do
+        it "saves the debug output to file" do
+          assert_cmd("honeybadger debug --file debug.txt")
+          expect(all_output).to match /Output written to debug\.txt/
+          expect(File.exist?(file))
         end
       end
     end
