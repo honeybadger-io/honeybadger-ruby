@@ -11,7 +11,7 @@ describe Honeybadger::Backend::Debug do
 
   before do
     allow(logger).to receive(:warn)
-    allow(logger).to receive(:info)
+    allow(logger).to receive(:unknown)
   end
 
   it { should respond_to :notify }
@@ -24,7 +24,7 @@ describe Honeybadger::Backend::Debug do
     it { should be_a Honeybadger::Backend::Response }
 
     it "logs the notice" do
-      expect(logger).to receive(:info).with(/feature=notices/)
+      expect(logger).to receive(:unknown).with(/feature=notices/)
       instance.notify(:notices, notice)
     end
   end

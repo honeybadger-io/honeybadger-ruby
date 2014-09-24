@@ -85,11 +85,11 @@ module Honeybadger
       say("Detecting framework\n\n", :bold)
       load_rails(verbose: true)
 
-      ENV['HONEYBADGER_LOGGING_LEVEL']     ||= '0'
-      ENV['HONEYBADGER_LOGGING_TTY_LEVEL']   = '0'
-      ENV['HONEYBADGER_LOGGING_PATH']        = 'STDOUT'
-      ENV['HONEYBADGER_DEBUG']               = 'true'
-      ENV['HONEYBADGER_REPORT_DATA']         = 'true'
+      ENV['HONEYBADGER_LOGGING_LEVEL']     = '0'
+      ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
+      ENV['HONEYBADGER_LOGGING_PATH']      = 'STDOUT'
+      ENV['HONEYBADGER_DEBUG']             = 'true'
+      ENV['HONEYBADGER_REPORT_DATA']       = 'true'
 
       config = Config.new(rails_framework_opts)
       say("\nConfiguration\n\n", :bold)
@@ -115,10 +115,10 @@ module Honeybadger
 
       load_rails(verbose: true)
 
-      ENV['HONEYBADGER_LOGGING_LEVEL']     ||= '2'
-      ENV['HONEYBADGER_LOGGING_TTY_LEVEL']   = '0'
-      ENV['HONEYBADGER_LOGGING_PATH']        = 'STDOUT'
-      ENV['HONEYBADGER_REPORT_DATA']         = 'true'
+      ENV['HONEYBADGER_LOGGING_LEVEL']     = '2'
+      ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
+      ENV['HONEYBADGER_LOGGING_PATH']      = 'STDOUT'
+      ENV['HONEYBADGER_REPORT_DATA']       = 'true'
 
       config = Config.new(rails_framework_opts)
       config[:api_key] = api_key
