@@ -54,7 +54,7 @@ module Honeybadger
         config.logger.info('Unable to start Honeybadger -- disabled by configuration.')
         return false
       elsif !config.valid?
-        config.logger.warn('Unable to start Honeybadger -- invalid configuration.')
+        config.logger.warn('Unable to start Honeybadger -- api_key is missing or invalid.')
         return false
       elsif !config.ping
         config.logger.warn('Unable to start Honeybadger -- failed to connect to server.')
