@@ -11,6 +11,7 @@ module Honeybadger
 
         def render_exception_with_honeybadger(env, exception)
           env['honeybadger.exception'] = exception
+          env['honeybadger.request.url'] = ::Rack::Request.new(env).url rescue nil
           render_exception_without_honeybadger(env,exception)
         end
       end
@@ -47,6 +48,7 @@ module Honeybadger
         requirement { defined?(::Rails) }
 
         execution do
+          require 'rack/request'
           if defined?(::ActionDispatch::DebugExceptions)
             # Rails 3.2.x+
             ::ActionDispatch::DebugExceptions.send(:include, ExceptionsCatcher)

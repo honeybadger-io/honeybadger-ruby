@@ -21,7 +21,7 @@ module Honeybadger
       private
 
       def extract_url(request)
-        request.url
+        request.env['honeybadger.request.url'] || request.url
       rescue => e
         # TODO: Log these errors
         "Error: #{e.message}"

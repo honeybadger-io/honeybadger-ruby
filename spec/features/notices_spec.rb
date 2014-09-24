@@ -32,6 +32,8 @@ feature "error notifications" do
   end
 
   scenario "an unhandled exception occurs in a Rails controller", framework: :rails do
+    let(:url) { 'http://example.com:123/test/index?param=value' }
+
     before do
       set_env('SECRET_KEY_BASE', 'sekret')
       set_env('HONEYBADGER_API_KEY', 'asdf')
@@ -48,8 +50,8 @@ feature "error notifications" do
     end
 
     it "reports the exception to Honeybadger" do
-      perform_request('http://example.com:123/test/index?param=value')
-      assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'})
+      perform_request(url)
+      assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'}, 'request' => {'url' => url})
     end
   end
 
@@ -73,7 +75,7 @@ feature "error notifications" do
 
     it "reports the exception to Honeybadger" do
       assert_cmd('ruby request.rb')
-      assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Sinatra has left the building'})
+      assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Sinatra has left the building'}, 'request' => {'url' => url})
     end
   end
 end

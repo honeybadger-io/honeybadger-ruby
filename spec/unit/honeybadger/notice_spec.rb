@@ -316,6 +316,18 @@ describe Honeybadger::Notice do
       expect(notice.cgi_data['REQUEST_METHOD']).to eq 'GET'
     end
 
+    it "prefers honeybadger.request.url to default PATH_INFO" do
+      url = 'https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2'
+      env = Rack::MockRequest.env_for(url)
+      env['honeybadger.request.url'] = 'http://foo.com'
+
+      notice = config.with_request(Rack::Request.new(env)) do
+        build_notice
+      end
+
+      expect(notice.url).to eq 'http://foo.com'
+    end
+
     context "with action_dispatch info" do
       let(:params) { {'controller' => 'users', 'action' => 'index', 'id' => '7'} }
 
