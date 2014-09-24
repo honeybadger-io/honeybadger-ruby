@@ -66,7 +66,7 @@ describe Honeybadger::Agent do
         it { should eq false }
 
         it "logs failure to start" do
-          expect(logger).to receive(:info).with(/disabled/)
+          expect(logger).to receive(:warn).with(/disabled/)
           described_class.start(config)
         end
 

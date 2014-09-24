@@ -51,7 +51,7 @@ module Honeybadger
       end
 
       if config[:disabled]
-        config.logger.info('Unable to start Honeybadger -- disabled by configuration.')
+        config.logger.warn('Unable to start Honeybadger -- disabled by configuration.')
         return false
       elsif !config.valid?
         config.logger.warn('Unable to start Honeybadger -- api_key is missing or invalid.')
