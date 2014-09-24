@@ -68,7 +68,7 @@ module Honeybadger
         out = StringIO.new
         $stdout = out
 
-        Agent.at_exit do
+        flush = Proc.new do
           $stdout = STDOUT
           File.open(options[:file], 'w+') do |f|
             out.rewind
@@ -76,6 +76,14 @@ module Honeybadger
           end
 
           say("Output written to #{options[:file]}", :green)
+        end
+
+        Agent.at_exit(&flush)
+
+        at_exit do
+          # If the agent couldn't be started, the callback should happen here
+          # instead.
+          flush.() unless Agent.running?
         end
       end
 
