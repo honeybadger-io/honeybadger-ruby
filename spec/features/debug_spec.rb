@@ -42,7 +42,7 @@ feature "Running the debug cli command" do
         it "saves the debug output to file" do
           assert_cmd("honeybadger debug --file debug.txt")
           expect(all_output).to match /Output written to debug\.txt/
-          expect(File.exist?(file))
+          expect(File.exist?(file)).to eq true
         end
       end
 
@@ -50,7 +50,7 @@ feature "Running the debug cli command" do
         it "saves the debug output to file" do
           assert_cmd("honeybadger debug --file debug.txt")
           expect(all_output).to match /Output written to debug\.txt/
-          expect(File.exist?(file))
+          expect(File.exist?(file)).to eq true
         end
       end
     end
