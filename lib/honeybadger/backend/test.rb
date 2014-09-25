@@ -7,15 +7,19 @@ module Honeybadger
       #
       # Examples:
       #
-      #   backend.notifications[:notices] # => [Notice, Notice, ...]
+      #   Test.notifications[:notices] # => [Notice, Notice, ...]
       #
       # Returns the Hash notifications.
+      def self.notifications
+        @notifications ||= Hash.new {|h,k| h[k] = [] }
+      end
+
+      # Internal: Local helper.
       def notifications
-        @notifications ||= Hash.new([])
+        self.class.notifications
       end
 
       def notify(feature, payload)
-        notifications[feature] = [] unless notifications.include?(feature)
         notifications[feature] << payload
         super
       end

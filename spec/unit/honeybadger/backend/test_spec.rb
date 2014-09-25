@@ -9,6 +9,10 @@ describe Honeybadger::Backend::Test do
 
   subject { instance }
 
+  after do
+    Honeybadger::Backend::Test.notifications.clear
+  end
+
   it { should respond_to :notifications }
 
   describe "#notify" do
