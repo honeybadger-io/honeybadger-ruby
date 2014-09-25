@@ -15,6 +15,14 @@ describe Honeybadger::Backend::Test do
 
   it { should respond_to :notifications }
 
+  describe "#notifications" do
+    it "sets a default key value rather than just return one" do
+      expect(instance.notifications).not_to have_key(:foo)
+      expect(instance.notifications[:foo]).to eq []
+      expect(instance.notifications).to have_key(:foo)
+    end
+  end
+
   describe "#notify" do
     let(:notice) { double('Notice') }
 
