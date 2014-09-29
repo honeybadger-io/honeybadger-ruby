@@ -1,5 +1,5 @@
 module Honeybadger
-  class Worker
+  class Agent
     # This code comes from batsd
     class MetricsCollection < Array
       PERCENTILE_METHOD_SIGNATURE = /\Apercentile_(.+)\z/.freeze

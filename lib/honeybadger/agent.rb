@@ -2,7 +2,6 @@ require 'forwardable'
 
 require 'honeybadger/version'
 require 'honeybadger/config'
-require 'honeybadger/worker'
 require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
@@ -13,6 +12,13 @@ module Honeybadger
     extend Forwardable
 
     include Logging::Helper
+
+    # Internal: Sub-class thread so we have a named thread (useful for debugging in Thread.list).
+    class Thread < ::Thread; end
+
+    autoload :Worker, 'honeybadger/agent/worker'
+    autoload :Batch, 'honeybadger/agent/batch'
+    autoload :MetricsCollector, 'honeybadger/agent/metrics_collector'
 
     class << self
       extend Forwardable
@@ -114,7 +120,11 @@ module Honeybadger
 
     def initialize(config)
       @config = config
-      @worker = Worker.new(config)
+      @delay = 60
+      @mutex = Mutex.new
+
+      init_traces
+      init_metrics
 
       at_exit do
         stop
@@ -122,14 +132,56 @@ module Honeybadger
       end
     end
 
-    def_delegators :@worker, :stop, :fork, :trace, :timing, :increment
-
     def start
-      unless worker.backend.kind_of?(Backend::Server)
+      # TODO: meh.
+      unless config.backend.kind_of?(Backend::Server)
         warn('Initializing development backend: data will not be reported.')
       end
 
-      worker.start
+      @pid = Process.pid
+      @workers = {
+        notices: Worker.new(config, :notices),
+        metrics: Worker.new(config, :metrics),
+        traces: Worker.new(config, :traces)
+      }.freeze
+      @thread = Thread.new { run }
+
+      true
+    end
+
+    def stop(force = false)
+      debug { 'stopping agent' }
+
+      # Kill the collector
+      Thread.kill(thread) if thread
+
+      unless force
+        flush_traces
+        flush_metrics
+      end
+
+      if workers
+        workers.each do |_, worker|
+          worker.send(force ? :shutdown! : :shutdown)
+        end
+      end
+
+      @pid = @workers = @thread = nil
+
+      true
+    end
+
+    def fork
+      debug { 'forking agent' }
+
+      stop
+
+      mutex.synchronize do
+        init_traces
+        init_metrics
+      end
+
+      start
     end
 
     def notice(opts)
@@ -141,13 +193,82 @@ module Honeybadger
         false
       else
         debug { sprintf('notice feature=notices id=%s', notice.id) }
-        worker.notice(notice)
+        workers[:notices].push(notice)
         notice.id
       end
     end
 
+    def trace(trace)
+      if trace.duration > config[:'traces.threshold']
+        debug { sprintf('worker adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        traces.push(trace)
+        flush_traces if traces.flush?
+        true
+      else
+        debug { sprintf('worker discarding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        false
+      end
+    end
+
+    def timing(*args, &block)
+      metrics.timing(*args, &block)
+      flush_metrics if metrics.flush?
+      true
+    end
+
+    def increment(*args, &block)
+      metrics.increment(*args, &block)
+      flush_metrics if metrics.flush?
+      true
+    end
+
     private
 
-    attr_reader :worker, :config
+    attr_reader :config, :delay, :mutex, :workers, :pid, :thread, :traces, :metrics
+
+    def push(feature, object)
+      unless config.features[feature]
+        debug { sprintf('worker dropping feature=%s reason=ping', feature) }
+        return false
+      end
+
+      workers[feature].push(object)
+
+      true
+    end
+
+    def run
+      loop { work }
+    end
+
+    def work
+      flush_metrics if metrics.flush?
+      flush_traces if traces.flush?
+      sleep(delay)
+    end
+
+    def init_traces
+      @traces = Batch.new(config, :traces, 20, config[:debug] ? 10 : 60)
+    end
+
+    def init_metrics
+      @metrics = MetricsCollector.new(config, config[:debug] ? 10 : 60)
+    end
+
+    def flush_metrics
+      debug { 'worker flushing metrics feature=metrics' } # TODO: Include count.
+      mutex.synchronize do
+        metrics.chunk(100, &method(:push).to_proc.curry[:metrics])
+        init_metrics
+      end
+    end
+
+    def flush_traces
+      debug { sprintf('worker flushing traces feature=traces count=%d', traces.size) }
+      mutex.synchronize do
+        push(:traces, traces) unless traces.empty?
+        init_traces
+      end
+    end
   end
 end

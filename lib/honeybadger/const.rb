@@ -7,7 +7,6 @@ module Honeybadger
   autoload :Config, 'honeybadger/config'
   autoload :Logging, 'honeybadger/logging'
   autoload :Notice, 'honeybadger/notice'
-  autoload :Worker, 'honeybadger/worker'
   autoload :Trace, 'honeybadger/trace'
   autoload :Plugin, 'honeybadger/plugin'
 

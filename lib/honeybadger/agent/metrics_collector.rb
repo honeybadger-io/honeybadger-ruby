@@ -2,8 +2,8 @@ require 'securerandom'
 require 'forwardable'
 
 module Honeybadger
-  class Worker
-    autoload :MetricsCollection, 'honeybadger/worker/metrics_collection'
+  class Agent
+    autoload :MetricsCollection, 'honeybadger/agent/metrics_collection'
 
     class MetricsCollector
       extend Forwardable

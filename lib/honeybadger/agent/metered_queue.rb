@@ -1,5 +1,5 @@
 module Honeybadger
-  class Worker
+  class Agent
     # Internal: A thread-safe first-in-first-out queue. Values are pushed onto
     # the queue and released at a defined interval.
     class MeteredQueue
