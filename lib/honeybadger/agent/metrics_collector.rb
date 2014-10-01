@@ -46,6 +46,14 @@ module Honeybadger
         now >= future
       end
 
+      def size
+        mutex.synchronize do
+          metrics.reduce(0) do |count, hash|
+            count + hash[1].size
+          end
+        end
+      end
+
       def to_a
         mutex.synchronize do
           [].tap do |m|

@@ -271,16 +271,16 @@ module Honeybadger
     end
 
     def flush_metrics
-      debug { 'agent flushing metrics feature=metrics' } # TODO: Include count.
       mutex.synchronize do
+        debug { sprintf('agent flushing metrics feature=metrics count=%d', metrics.size) }
         metrics.chunk(100, &method(:push).to_proc.curry[:metrics])
         init_metrics
       end
     end
 
     def flush_traces
-      debug { sprintf('agent flushing traces feature=traces count=%d', traces.size) }
       mutex.synchronize do
+        debug { sprintf('agent flushing traces feature=traces count=%d', traces.size) }
         push(:traces, traces) unless traces.empty?
         init_traces
       end
