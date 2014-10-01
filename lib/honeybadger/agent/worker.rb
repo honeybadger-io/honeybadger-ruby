@@ -5,7 +5,7 @@ require 'honeybadger/logging'
 
 module Honeybadger
   class Agent
-    # Internal: A worker for when the agent is stopped.
+    # Internal: A default worker which does nothing.
     class NullWorker
       def push(*args, &block)
         true
@@ -72,7 +72,7 @@ module Honeybadger
         @shutdown = true
         return true unless thread
 
-        push(SHUTDOWN)
+        queue.push(SHUTDOWN)
 
         r = true
         unless Thread.current.eql?(thread)

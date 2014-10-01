@@ -16,6 +16,8 @@ feature "Running the debug cli command" do
         assert_cmd("honeybadger debug --test")
         expect(all_output).to match /Starting Honeybadger/
         expect(all_output).to match /HoneybadgerTestingException/
+        # Make sure the worker timeout isn't being exceeded.
+        expect(all_output).not_to match /kill/
       end
 
       context "with invalid configuration" do

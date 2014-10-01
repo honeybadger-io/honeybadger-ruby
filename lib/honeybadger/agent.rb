@@ -71,7 +71,8 @@ module Honeybadger
       config.logger.info("Starting Honeybadger version #{VERSION}")
       load_plugins(config)
       @instance = new(config)
-      @instance.start
+
+      true
     end
 
     def self.stop(*args)
@@ -123,6 +124,11 @@ module Honeybadger
       @config = config
       @delay = config[:debug] ? 10 : 60
       @mutex = Mutex.new
+      @pid = Process.pid
+
+      unless config.backend.kind_of?(Backend::Server)
+        warn('Initializing development backend: data will not be reported.')
+      end
 
       init_workers
       init_traces
@@ -134,14 +140,12 @@ module Honeybadger
       end
     end
 
+    # Internal: Spawn the agent thread. This method is idempotent.
+    #
+    # Returns false if the Agent is stopped, otherwise true.
     def start
-      unless config.backend.kind_of?(Backend::Server)
-        warn('Initializing development backend: data will not be reported.')
-      end
-
-      workers[:notices] = Worker.new(config, :notices)
-      workers[:traces]  = Worker.new(config, :traces)
-      workers[:metrics] = Worker.new(config, :metrics)
+      return false unless pid
+      return true if thread && thread.alive?
 
       @pid = Process.pid
       @thread = Thread.new { run }
@@ -162,7 +166,6 @@ module Honeybadger
 
       workers.each_pair do |key, worker|
         worker.send(force ? :shutdown! : :shutdown)
-        workers.delete(key)
       end
 
       @pid = @thread = nil
@@ -171,16 +174,7 @@ module Honeybadger
     end
 
     def fork
-      debug { 'forking agent' }
-
-      stop
-
-      mutex.synchronize do
-        init_traces
-        init_metrics
-      end
-
-      start
+      # noop
     end
 
     def notice(opts)
@@ -198,26 +192,34 @@ module Honeybadger
     end
 
     def trace(trace)
+      start
+
       if trace.duration > config[:'traces.threshold']
-        debug { sprintf('worker adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        debug { sprintf('agent adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
         mutex.synchronize { traces.push(trace) }
         flush_traces if traces.flush?
         true
       else
-        debug { sprintf('worker discarding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        debug { sprintf('agent discarding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
         false
       end
     end
 
     def timing(*args, &block)
+      start
+
       mutex.synchronize { metrics.timing(*args, &block) }
       flush_metrics if metrics.flush?
+
       true
     end
 
     def increment(*args, &block)
+      start
+
       mutex.synchronize { metrics.increment(*args, &block) }
       flush_metrics if metrics.flush?
+
       true
     end
 
@@ -227,7 +229,7 @@ module Honeybadger
 
     def push(feature, object)
       unless config.features[feature]
-        debug { sprintf('worker dropping feature=%s reason=ping', feature) }
+        debug { sprintf('agent dropping feature=%s reason=ping', feature) }
         return false
       end
 
@@ -255,6 +257,9 @@ module Honeybadger
 
     def init_workers
       @workers = Hash.new(NullWorker.new)
+      workers[:notices] = Worker.new(config, :notices)
+      workers[:traces]  = Worker.new(config, :traces)
+      workers[:metrics] = Worker.new(config, :metrics)
     end
 
     def init_traces
@@ -266,7 +271,7 @@ module Honeybadger
     end
 
     def flush_metrics
-      debug { 'worker flushing metrics feature=metrics' } # TODO: Include count.
+      debug { 'agent flushing metrics feature=metrics' } # TODO: Include count.
       mutex.synchronize do
         metrics.chunk(100, &method(:push).to_proc.curry[:metrics])
         init_metrics
@@ -274,7 +279,7 @@ module Honeybadger
     end
 
     def flush_traces
-      debug { sprintf('worker flushing traces feature=traces count=%d', traces.size) }
+      debug { sprintf('agent flushing traces feature=traces count=%d', traces.size) }
       mutex.synchronize do
         push(:traces, traces) unless traces.empty?
         init_traces
