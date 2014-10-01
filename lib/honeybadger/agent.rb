@@ -17,6 +17,7 @@ module Honeybadger
     class Thread < ::Thread; end
 
     autoload :Worker, 'honeybadger/agent/worker'
+    autoload :NullWorker, 'honeybadger/agent/worker'
     autoload :Batch, 'honeybadger/agent/batch'
     autoload :MetricsCollector, 'honeybadger/agent/metrics_collector'
 
@@ -130,20 +131,6 @@ module Honeybadger
       at_exit do
         stop
         self.class.at_exit.call if self.class.at_exit
-      end
-    end
-
-    class NullWorker
-      def push(*args, &block)
-        true
-      end
-
-      def shutdown
-        true
-      end
-
-      def shutdown!
-        true
       end
     end
 

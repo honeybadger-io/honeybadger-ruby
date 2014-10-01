@@ -5,6 +5,21 @@ require 'honeybadger/logging'
 
 module Honeybadger
   class Agent
+    # Internal: A worker for when the agent is stopped.
+    class NullWorker
+      def push(*args, &block)
+        true
+      end
+
+      def shutdown
+        true
+      end
+
+      def shutdown!
+        true
+      end
+    end
+
     # Internal: A concurrent queue to notify the backend.
     class Worker
       extend Forwardable
