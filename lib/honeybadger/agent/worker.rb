@@ -54,10 +54,14 @@ module Honeybadger
         @throttles = []
         @mutex = Mutex.new
         @queue = Queue.new(1000)
-        @thread = Thread.new { run }
+        @shutdown = false
       end
 
-      def_delegator :queue, :push
+      def push(obj)
+        if start
+          queue.push(obj)
+        end
+      end
 
       # Internal: Shutdown the worker.
       #
@@ -65,6 +69,9 @@ module Honeybadger
       #
       # Returns false if timeout reached, otherwise true.
       def shutdown(timeout = 3)
+        @shutdown = true
+        return true unless thread
+
         push(SHUTDOWN)
 
         r = true
@@ -81,13 +88,24 @@ module Honeybadger
 
       def shutdown!
         d { sprintf('killing worker thread feature=%s', feature) }
-        Thread.kill(thread) if thread.alive?
+        @shutdown = true
+        Thread.kill(thread) if thread && thread.alive?
         true
       end
 
       private
 
       attr_reader :config
+
+      def start
+        return false if @shutdown
+        return true if thread && thread.alive?
+
+        @pid = Process.pid
+        @thread = Thread.new { run }
+
+        true
+      end
 
       def run
         d { sprintf('worker started feature=%s', feature) }
@@ -100,6 +118,7 @@ module Honeybadger
         error(sprintf('error in worker thread (shutting down) feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
       ensure
         d { sprintf('stopping worker feature=%s', feature) }
+        @thread = @pid = nil
       end
 
       def process(msg)
@@ -112,7 +131,9 @@ module Honeybadger
 
       def throttle_interval
         return 0 unless throttles[0]
-        throttles.reduce(1) {|a,e| a*e }
+        mutex.synchronize do
+          throttles.reduce(1) {|a,e| a*e }
+        end
       end
 
       def notify_backend(payload)
@@ -141,10 +162,10 @@ module Honeybadger
           debug { sprintf('worker applying throttle=1.25 interval=%s feature=%s code=%s', throttle_interval, feature, response.code) }
         when 402
           warn { sprintf('worker disabling feature=%s code=%s', feature, response.code) }
-          mutex.synchronize { features[feature] = false } # FIXME
+          shutdown!
         when 403
           error { sprintf('worker shutting down (unauthorized) feature=%s code=%s', feature, response.code) }
-          Honeybadger::Agent.stop(true)
+          shutdown!
         when 201
           if throttle = del_throttle
             debug { sprintf('worker removing throttle=%s interval=%s feature=%s code=%s', throttle, throttle_interval, feature, response.code) }
