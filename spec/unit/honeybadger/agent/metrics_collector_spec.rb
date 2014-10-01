@@ -1,7 +1,7 @@
-require 'honeybadger/worker/metrics_collector'
+require 'honeybadger/agent/metrics_collector'
 require 'honeybadger/config'
 
-describe Honeybadger::Worker::MetricsCollector do
+describe Honeybadger::Agent::MetricsCollector do
   let(:config) { Honeybadger::Config.new }
   let(:instance) { described_class.new(config) }
 

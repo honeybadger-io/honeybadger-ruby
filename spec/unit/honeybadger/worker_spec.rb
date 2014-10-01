@@ -1,12 +1,12 @@
 require 'timecop'
 
-require 'honeybadger/worker'
+require 'honeybadger/agent/worker'
 require 'honeybadger/config'
 require 'honeybadger/backend'
 require 'honeybadger/notice'
 
-describe Honeybadger::Worker do
-  let(:instance) { Honeybadger::Worker.new(config) }
+describe Honeybadger::Agent::Worker, pending: true do
+  let(:instance) { described_class.new(config) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:enable_thread) { false }
 

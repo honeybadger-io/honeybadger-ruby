@@ -1,6 +1,6 @@
-require 'honeybadger/worker/metrics_collection'
+require 'honeybadger/agent/metrics_collection'
 
-describe Honeybadger::Worker::MetricsCollection do
+describe Honeybadger::Agent::MetricsCollection do
   describe "#sum" do
     it "returns the sum of values in the collection" do
       subject.replace([1,2,3])

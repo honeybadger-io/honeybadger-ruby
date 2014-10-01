@@ -7,7 +7,7 @@ require 'honeybadger/plugin'
 require 'honeybadger/logging'
 
 module Honeybadger
-  # Internal: A broker for the configuration and the worker.
+  # Internal: A broker for the configuration and the workers.
   class Agent
     extend Forwardable
 
@@ -123,6 +123,7 @@ module Honeybadger
       @delay = 60
       @mutex = Mutex.new
 
+      init_workers
       init_traces
       init_metrics
 
@@ -132,18 +133,34 @@ module Honeybadger
       end
     end
 
+    class NullWorker
+      def push(*args, &block)
+        true
+      end
+
+      def shutdown
+        true
+      end
+
+      def shutdown!
+        true
+      end
+    end
+
+    def init_workers
+      @workers = Hash.new(NullWorker.new)
+    end
+
     def start
-      # TODO: meh.
       unless config.backend.kind_of?(Backend::Server)
         warn('Initializing development backend: data will not be reported.')
       end
 
+      workers[:notices] = Worker.new(config, :notices)
+      workers[:traces]  = Worker.new(config, :traces)
+      workers[:metrics] = Worker.new(config, :metrics)
+
       @pid = Process.pid
-      @workers = {
-        notices: Worker.new(config, :notices),
-        metrics: Worker.new(config, :metrics),
-        traces: Worker.new(config, :traces)
-      }.freeze
       @thread = Thread.new { run }
 
       true
@@ -160,13 +177,12 @@ module Honeybadger
         flush_metrics
       end
 
-      if workers
-        workers.each do |_, worker|
-          worker.send(force ? :shutdown! : :shutdown)
-        end
+      workers.each_pair do |key, worker|
+        worker.send(force ? :shutdown! : :shutdown)
+        workers.delete(key)
       end
 
-      @pid = @workers = @thread = nil
+      @pid = @thread = nil
 
       true
     end
@@ -201,7 +217,7 @@ module Honeybadger
     def trace(trace)
       if trace.duration > config[:'traces.threshold']
         debug { sprintf('worker adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
-        traces.push(trace)
+        mutex.synchronize { traces.push(trace) }
         flush_traces if traces.flush?
         true
       else
@@ -211,13 +227,13 @@ module Honeybadger
     end
 
     def timing(*args, &block)
-      metrics.timing(*args, &block)
+      mutex.synchronize { metrics.timing(*args, &block) }
       flush_metrics if metrics.flush?
       true
     end
 
     def increment(*args, &block)
-      metrics.increment(*args, &block)
+      mutex.synchronize { metrics.increment(*args, &block) }
       flush_metrics if metrics.flush?
       true
     end
@@ -239,11 +255,18 @@ module Honeybadger
 
     def run
       loop { work }
+    rescue Exception => e
+      error(sprintf('error in agent thread (shutting down) class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
+    ensure
+      d { sprintf('stopping agent', feature) }
     end
 
     def work
       flush_metrics if metrics.flush?
       flush_traces if traces.flush?
+    rescue StandardError => e
+      error(sprintf('error in agent thread class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
+    ensure
       sleep(delay)
     end
 

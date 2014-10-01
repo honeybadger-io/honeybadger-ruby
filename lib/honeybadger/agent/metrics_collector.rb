@@ -47,20 +47,22 @@ module Honeybadger
       end
 
       def to_a
-        [].tap do |m|
-          metrics[:counter].each do |metric, values|
-            m << "#{metric} #{values.sum}"
+        mutex.synchronize do
+          [].tap do |m|
+            metrics[:counter].each do |metric, values|
+              m << "#{metric} #{values.sum}"
+            end
+            metrics[:timing].each do |metric, values|
+              m << "#{metric}:mean #{values.mean}"
+              m << "#{metric}:median #{values.median}"
+              m << "#{metric}:percentile_90 #{values.percentile(90)}"
+              m << "#{metric}:min #{values.min}"
+              m << "#{metric}:max #{values.max}"
+              m << "#{metric}:stddev #{values.standard_dev}" if values.count > 1
+              m << "#{metric} #{values.count}"
+            end
+            m.compact!
           end
-          metrics[:timing].each do |metric, values|
-            m << "#{metric}:mean #{values.mean}"
-            m << "#{metric}:median #{values.median}"
-            m << "#{metric}:percentile_90 #{values.percentile(90)}"
-            m << "#{metric}:min #{values.min}"
-            m << "#{metric}:max #{values.max}"
-            m << "#{metric}:stddev #{values.standard_dev}" if values.count > 1
-            m << "#{metric} #{values.count}"
-          end
-          m.compact!
         end
       end
 

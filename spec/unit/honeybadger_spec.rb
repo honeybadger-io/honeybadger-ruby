@@ -65,11 +65,11 @@ describe Honeybadger do
   describe "#notify" do
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
     let(:instance) { Honeybadger::Agent.new(config) }
-    let(:worker) { double('Honeybadger::Worker', notice: true) }
+    let(:worker) { double('Honeybadger::Worker') }
 
     before do
       allow(Honeybadger::Agent).to receive(:instance).and_return(instance)
-      allow(instance).to receive(:worker).and_return(worker)
+      allow(instance).to receive(:workers).and_return({notices: worker})
     end
 
     it "creates and send a notice for an exception" do
@@ -77,7 +77,7 @@ describe Honeybadger do
       notice = stub_notice!(config)
 
       expect(instance).to receive(:notice).with(hash_including(exception: exception)).and_call_original
-      expect(worker).to receive(:notice).with(notice)
+      expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(exception)
     end
@@ -87,7 +87,7 @@ describe Honeybadger do
       notice = stub_notice!(config)
 
       expect(instance).to receive(:notice).with(hash_including(error_message: 'uh oh')).and_call_original
-      expect(worker).to receive(:notice).with(notice)
+      expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(error_message: 'uh oh')
     end
@@ -96,7 +96,7 @@ describe Honeybadger do
       notice = stub_notice!
 
       expect(Honeybadger::Notice).to receive(:new).with(anything, hash_excluding(:exception))
-      expect(worker).to receive(:notice).with(notice)
+      expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(error_message: 'uh oh')
     end
@@ -107,7 +107,7 @@ describe Honeybadger do
       notice_args = { error_message: 'uh oh' }
 
       expect(instance).to receive(:notice).with(hash_including(notice_args.merge(exception: exception))).and_call_original
-      expect(worker).to receive(:notice).with(notice)
+      expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(exception, notice_args)
     end
@@ -117,7 +117,7 @@ describe Honeybadger do
       notice = stub_notice!
       allow(notice).to receive(:ignore?).and_return(true)
 
-      expect(worker).not_to receive(:notice)
+      expect(worker).not_to receive(:push)
 
       Honeybadger.notify(exception)
     end
@@ -128,6 +128,7 @@ describe Honeybadger do
 
       notice = stub_notice(config)
 
+      allow(worker).to receive(:push)
       expect(Honeybadger::Notice).to receive(:new).with(config, kind_of(Hash)).and_return(notice)
 
       Honeybadger.notify(exception)

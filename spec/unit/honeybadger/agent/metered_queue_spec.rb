@@ -1,7 +1,7 @@
 require 'timecop'
-require 'honeybadger/worker/metered_queue'
+require 'honeybadger/agent/metered_queue'
 
-describe Honeybadger::Worker::MeteredQueue do
+describe Honeybadger::Agent::MeteredQueue do
   let(:now) { Time.now }
   let(:queue) { described_class.new(10, 2, now) }
 

@@ -5,6 +5,7 @@ require 'honeybadger/logging'
 
 module Honeybadger
   class Agent
+    # Internal: A concurrent queue to notify the backend.
     class Worker
       extend Forwardable
 
@@ -33,7 +34,7 @@ module Honeybadger
       #
       # timeout - The Integer timeout to wait before killing thread.
       #
-      # Returns false if timeout reached, otherwise false.
+      # Returns false if timeout reached, otherwise true.
       def shutdown(timeout = 3)
         push(SHUTDOWN)
 
@@ -60,26 +61,23 @@ module Honeybadger
       attr_reader :config
 
       def run
-        begin
-          d { sprintf('worker started feature=%s', feature) }
-          loop do
-            msg = queue.pop
-            break if msg == SHUTDOWN
-            process(msg)
-          end
-        rescue Exception => e
-          error(sprintf('error in worker thread (shutting down) class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
-          raise e # TODO: do we really want to raise this?
-        ensure
-          d { sprintf('stopping worker feature=%s', feature) }
+        d { sprintf('worker started feature=%s', feature) }
+        loop do
+          msg = queue.pop
+          break if msg == SHUTDOWN
+          process(msg)
         end
+      rescue Exception => e
+        error(sprintf('error in worker thread (shutting down) feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
+      ensure
+        d { sprintf('stopping worker feature=%s', feature) }
       end
 
       def process(msg)
         handle_response(notify_backend(msg))
         sleep(throttle_interval)
       rescue StandardError => e
-        error(sprintf('error in worker thread class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
+        error(sprintf('error in worker thread feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
         sleep(1)
       end
 

@@ -29,19 +29,12 @@ describe Honeybadger::Agent do
 
     describe "::start" do
       let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
-      let(:logger) { double('Logger', level: 0, debug: nil, info: nil, warn: nil, error: nil) }
+      let(:logger) { config.logger }
 
       subject { described_class.start(config) }
 
       before do
-        allow(config).to receive(:logger) { logger }
         allow(config).to receive(:ping).and_return(true)
-
-        # This is a quick win, but beware:
-        # https://relishapp.com/rspec/rspec-mocks/docs/working-with-legacy-code/any-instance
-        # Dependency injection (of Worker) may be a better option, eventually.
-        allow_any_instance_of(Honeybadger::Worker).to receive(:start).and_return(true)
-        allow_any_instance_of(Honeybadger::Worker).to receive(:stop).and_return(true)
 
         # Don't actually load plugins
         allow(Honeybadger::Plugin).to receive(:instances).and_return({})
