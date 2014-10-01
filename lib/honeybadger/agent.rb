@@ -134,10 +134,6 @@ module Honeybadger
       end
     end
 
-    def init_workers
-      @workers = Hash.new(NullWorker.new)
-    end
-
     def start
       unless config.backend.kind_of?(Backend::Server)
         warn('Initializing development backend: data will not be reported.')
@@ -255,6 +251,10 @@ module Honeybadger
       error(sprintf('error in agent thread class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
     ensure
       sleep(delay)
+    end
+
+    def init_workers
+      @workers = Hash.new(NullWorker.new)
     end
 
     def init_traces
