@@ -120,7 +120,7 @@ module Honeybadger
 
     def initialize(config)
       @config = config
-      @delay = 60
+      @delay = config[:debug] ? 10 : 60
       @mutex = Mutex.new
 
       init_workers

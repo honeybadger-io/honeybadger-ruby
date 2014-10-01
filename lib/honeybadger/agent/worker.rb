@@ -14,6 +14,20 @@ module Honeybadger
       # Internal: See Agent::Thread
       class Thread < ::Thread; end
 
+      # Internal: A queue which enforces a maximum size.
+      class Queue < ::Queue
+        attr_reader :max_size
+
+        def initialize(max_size)
+          @max_size = max_size
+          super()
+        end
+
+        def push(obj)
+          super unless size == max_size
+        end
+      end
+
       SHUTDOWN = :__hb_worker_shutdown!
 
       attr_reader :backend, :feature, :queue, :pid, :mutex, :thread, :throttles
@@ -24,7 +38,7 @@ module Honeybadger
         @backend = config.backend
         @throttles = []
         @mutex = Mutex.new
-        @queue = Queue.new
+        @queue = Queue.new(1000)
         @thread = Thread.new { run }
       end
 
