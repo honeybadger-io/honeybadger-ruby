@@ -172,10 +172,31 @@ module Honeybadger
     Thread.current[:__honeybadger_context] = nil
   end
 
-  # Public: Flushes all data from workers before returning.
+  # Public: Flushes all data from workers before returning. This is most useful
+  # in tests when using the test backend, where normally the asynchronous
+  # nature of this library could create race conditions.
   #
   # block - The optional block to execute (exceptions will propagate after data
   # is flushed).
+  #
+  # Examples:
+  #
+  #   # Without a block:
+  #   expect {
+  #     Honeybadger.notify(StandardError.new('test backend'))
+  #     Honeybadger.flush
+  #   }.to change(Honeybadger::Backend::Test.notifications[:notices], :size).by(1)
+  #
+  #   # With a block:
+  #   it "sends a notification to Honeybadger" do
+  #     expect {
+  #       Honeybadger.flush do
+  #         50.times do
+  #           Honeybadger.notify(StandardError.new('test backend'))
+  #         end
+  #       end
+  #     }.to change(Honeybadger::Backend::Test.notifications[:notices], :size).by(50)
+  #   end
   #
   # Returns value of block if block is given, otherwise true on success or
   # false if Honeybadger isn't running.
