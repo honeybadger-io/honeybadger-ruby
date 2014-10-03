@@ -181,6 +181,13 @@ module Honeybadger
   def synchronize(&block)
     Agent.synchronize(&block)
   end
+
+  # Public: Flush all data from workers.
+  #
+  # Returns true if successful, otherwise false.
+  def flush
+    Agent.flush
+  end
 end
 
 if defined?(::Rails::Railtie)

@@ -104,6 +104,10 @@ module Honeybadger
       end
     end
 
+    def self.flush
+      self.instance ? self.instance.flush : false
+    end
+
     # Internal: Callback to perform after agent has been stopped at_exit.
     #
     # block - An optional block to execute.
@@ -238,9 +242,17 @@ module Honeybadger
       yield
       true
     ensure
+      flush
+    end
+
+    # Internal: Flush the workers. See Honeybadger#flush.
+    #
+    # Returns true
+    def flush
       flush_metrics
       flush_traces
       workers.values.each(&:flush)
+      true
     end
 
     private
