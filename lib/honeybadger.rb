@@ -171,6 +171,16 @@ module Honeybadger
   def clear!
     Thread.current[:__honeybadger_context] = nil
   end
+
+  # Public: Synchronize with the agent. This method executes it's
+  # block and then waits for data to be sent before returning.
+  #
+  # block - The block to execute. (required)
+  #
+  # Returns true
+  def synchronize(&block)
+    Agent.synchronize(&block)
+  end
 end
 
 if defined?(::Rails::Railtie)

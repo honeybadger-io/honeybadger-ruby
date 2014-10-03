@@ -45,7 +45,7 @@ module Honeybadger
 
       SHUTDOWN = :__hb_worker_shutdown!
 
-      attr_reader :backend, :feature, :queue, :pid, :mutex, :thread, :throttles
+      attr_reader :backend, :feature, :queue, :pid, :mutex, :marker, :thread, :throttles
 
       def initialize(config, feature)
         @config = config
@@ -53,6 +53,7 @@ module Honeybadger
         @backend = config.backend
         @throttles = []
         @mutex = Mutex.new
+        @marker = ConditionVariable.new
         @queue = Queue.new(1000)
         @shutdown = false
       end
@@ -93,6 +94,18 @@ module Honeybadger
         true
       end
 
+      # Internal: Blocks until queue is processed up to this point in time.
+      #
+      # Returns nothing.
+      def flush
+        return unless start
+
+        mutex.synchronize do
+          queue.push(marker)
+          marker.wait(mutex)
+        end
+      end
+
       private
 
       attr_reader :config
@@ -110,14 +123,17 @@ module Honeybadger
       def run
         d { sprintf('worker started feature=%s', feature) }
         loop do
-          msg = queue.pop
-          break if msg == SHUTDOWN
-          process(msg)
+          case msg = queue.pop
+          when SHUTDOWN then break
+          when ConditionVariable then signal_marker(msg)
+          else process(msg)
+          end
         end
       rescue Exception => e
         error(sprintf('error in worker thread (shutting down) feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
       ensure
         d { sprintf('stopping worker feature=%s', feature) }
+        release_marker
         @thread = @pid = nil
       end
 
@@ -174,6 +190,25 @@ module Honeybadger
           # Error logged by backend.
         else
           warn { sprintf('worker unknown response feature=%s code=%s', feature, response.code) }
+        end
+      end
+
+      # Internal: Release the marker. Important to perform during cleanup when
+      # shutting down, otherwise it could end up waiting indefinitely.
+      #
+      # Returns nothing.
+      def release_marker
+        signal_marker(marker)
+      end
+
+      # Internal: Signal a marker.
+      #
+      # marker - The ConditionVariable marker to signal.
+      #
+      # Returns nothing.
+      def signal_marker(marker)
+        mutex.synchronize do
+          marker.signal
         end
       end
     end

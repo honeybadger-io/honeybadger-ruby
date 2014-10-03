@@ -96,6 +96,14 @@ module Honeybadger
       self.instance ? self.instance.increment(*args) : false
     end
 
+    def self.synchronize(&block)
+      if self.instance
+        self.instance.synchronize(&block)
+      else
+        yield
+      end
+    end
+
     # Internal: Callback to perform after agent has been stopped at_exit.
     #
     # block - An optional block to execute.
@@ -221,6 +229,18 @@ module Honeybadger
       flush_metrics if metrics.flush?
 
       true
+    end
+
+    # Internal: Synchronize with workers. See Honeybadger#synchronize.
+    #
+    # Returns true
+    def synchronize
+      yield
+      true
+    ensure
+      flush_metrics
+      flush_traces
+      workers.values.each(&:flush)
     end
 
     private
