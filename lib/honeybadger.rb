@@ -172,21 +172,14 @@ module Honeybadger
     Thread.current[:__honeybadger_context] = nil
   end
 
-  # Public: Synchronize with the agent. This method executes it's
-  # block and then waits for data to be sent before returning.
+  # Public: Flushes all data from workers before returning.
   #
-  # block - The block to execute. (required)
+  # block - The optional block to execute (exceptions will propogate).
   #
-  # Returns true
-  def synchronize(&block)
-    Agent.synchronize(&block)
-  end
-
-  # Public: Flush all data from workers.
-  #
-  # Returns true if successful, otherwise false.
-  def flush
-    Agent.flush
+  # Returns value of block if block is given, otherwise true on success or
+  # false if Honeybadger isn't running.
+  def flush(&block)
+    Agent.flush(&block)
   end
 end
 

@@ -96,16 +96,14 @@ module Honeybadger
       self.instance ? self.instance.increment(*args) : false
     end
 
-    def self.synchronize(&block)
+    def self.flush(&block)
       if self.instance
-        self.instance.synchronize(&block)
+        self.instance.flush(&block)
+      elsif !block_given?
+        false
       else
         yield
       end
-    end
-
-    def self.flush
-      self.instance ? self.instance.flush : false
     end
 
     # Internal: Callback to perform after agent has been stopped at_exit.
@@ -235,8 +233,7 @@ module Honeybadger
       true
     end
 
-    # Internal: Flush the workers. See Honeybadger#flush and
-    # Honeybadger#synchronize.
+    # Internal: Flush the workers. See Honeybadger#flush.
     #
     # block - an option block which is executed before flushing data.
     #
@@ -249,7 +246,6 @@ module Honeybadger
       flush_traces
       workers.values.each(&:flush)
     end
-    alias :synchronize :flush
 
     private
 
