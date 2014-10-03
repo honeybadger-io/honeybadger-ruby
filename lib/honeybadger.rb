@@ -174,7 +174,8 @@ module Honeybadger
 
   # Public: Flushes all data from workers before returning.
   #
-  # block - The optional block to execute (exceptions will propogate).
+  # block - The optional block to execute (exceptions will propagate after data
+  # is flushed).
   #
   # Returns value of block if block is given, otherwise true on success or
   # false if Honeybadger isn't running.
