@@ -182,10 +182,12 @@ module Honeybadger
   # Examples:
   #
   #   # Without a block:
-  #   expect {
-  #     Honeybadger.notify(StandardError.new('test backend'))
-  #     Honeybadger.flush
-  #   }.to change(Honeybadger::Backend::Test.notifications[:notices], :size).by(1)
+  #   it "sends a notification to Honeybadger" do
+  #     expect {
+  #       Honeybadger.notify(StandardError.new('test backend'))
+  #       Honeybadger.flush
+  #     }.to change(Honeybadger::Backend::Test.notifications[:notices], :size).by(1)
+  #   end
   #
   #   # With a block:
   #   it "sends a notification to Honeybadger" do
