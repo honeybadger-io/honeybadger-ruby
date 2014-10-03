@@ -235,25 +235,21 @@ module Honeybadger
       true
     end
 
-    # Internal: Synchronize with workers. See Honeybadger#synchronize.
+    # Internal: Flush the workers. See Honeybadger#flush and
+    # Honeybadger#synchronize.
     #
-    # Returns true
-    def synchronize
-      yield
-      true
-    ensure
-      flush
-    end
-
-    # Internal: Flush the workers. See Honeybadger#flush.
+    # block - an option block which is executed before flushing data.
     #
-    # Returns true
+    # Returns value from block if block is given, otherwise true.
     def flush
+      return true unless block_given?
+      yield
+    ensure
       flush_metrics
       flush_traces
       workers.values.each(&:flush)
-      true
     end
+    alias :synchronize :flush
 
     private
 
