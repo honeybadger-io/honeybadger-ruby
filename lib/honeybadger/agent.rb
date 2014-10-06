@@ -132,7 +132,7 @@ module Honeybadger
 
     def initialize(config)
       @config = config
-      @delay = config[:debug] ? 10 : 60
+      @delay = config.debug? ? 10 : 60
       @mutex = Mutex.new
       @pid = Process.pid
 
@@ -287,11 +287,11 @@ module Honeybadger
     end
 
     def init_traces
-      @traces = Batch.new(config, :traces, 20, config[:debug] ? 10 : 60)
+      @traces = Batch.new(config, :traces, 20, config.debug? ? 10 : 60)
     end
 
     def init_metrics
-      @metrics = MetricsCollector.new(config, config[:debug] ? 10 : 60)
+      @metrics = MetricsCollector.new(config, config.debug? ? 10 : 60)
     end
 
     def flush_metrics

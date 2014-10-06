@@ -79,10 +79,14 @@ module Honeybadger
       Backend.for((self[:backend] || default_backend).to_sym).new(self)
     end
 
+    def dev?
+      self[:env] && Array(self[:development_environments]).include?(self[:env])
+    end
+
     def public?
       return true if self[:report_data]
       return false if self[:report_data] == false
-      !self[:env] || !Array(self[:development_environments]).include?(self[:env])
+      !self[:env] || !dev?
     end
 
     def default_backend
@@ -98,7 +102,12 @@ module Honeybadger
     end
 
     def debug?
-      self[:debug]
+      !!self[:debug]
+    end
+
+    def log_debug?
+      return debug? if self[:'logging.debug'].nil?
+      !!self[:'logging.debug']
     end
 
     # Internal: Optional path to honeybadger.log log file. If nil, STDOUT will be used

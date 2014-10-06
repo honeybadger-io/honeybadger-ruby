@@ -134,7 +134,7 @@ module Honeybadger
       end
 
       def debug?
-        @config.debug?
+        @config.log_debug?
       end
 
       private

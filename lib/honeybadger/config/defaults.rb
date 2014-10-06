@@ -69,6 +69,10 @@ module Honeybadger
         description: 'The log level.',
         default: 'INFO'
       },
+      :'logging.debug' => {
+        description: 'Override debug logging.',
+        default: nil
+      },
       :'logging.tty_level' => {
         description: 'Level to log when attached to a terminal (anything < logging.level will always be ignored).',
         default: 'DEBUG'
