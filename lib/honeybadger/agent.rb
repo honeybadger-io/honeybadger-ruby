@@ -271,7 +271,7 @@ module Honeybadger
     rescue Exception => e
       error(sprintf('error in agent thread (shutting down) class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
     ensure
-      d { sprintf('stopping agent', feature) }
+      d { sprintf('stopping agent') }
     end
 
     def work
