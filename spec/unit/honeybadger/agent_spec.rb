@@ -14,28 +14,6 @@ describe Honeybadger::Agent do
 
     after { instance.stop(true) }
 
-    describe "#run" do
-      def run
-        t = Thread.new { instance.send(:run) }
-        t.join(0.001)
-      end
-
-      context "when an exception occurs" do
-        before do
-          allow(instance).to receive(:work).and_raise(StandardError.new('Oops :('))
-        end
-
-        it "logs error" do
-          expect(config.logger).to receive(:error).with(/Oops/)
-          run
-        end
-
-        it "doesn't re-raise" do
-          expect { run }.not_to raise_error
-        end
-      end
-    end
-
     describe "#initialize" do
       describe "#metrics" do
         subject { instance.metrics }
@@ -122,6 +100,28 @@ describe Honeybadger::Agent do
       it "changes the pid to the current pid" do
         allow(Process).to receive(:pid).and_return(101)
         expect { instance.start }.to change(instance, :pid).to(101)
+      end
+    end
+
+    describe "#run" do
+      def run
+        t = Thread.new { instance.send(:run) }
+        t.join(0.001)
+      end
+
+      context "when an exception occurs" do
+        before do
+          allow(instance).to receive(:work).and_raise(StandardError.new('Oops :('))
+        end
+
+        it "logs error" do
+          expect(config.logger).to receive(:error).with(/Oops/)
+          run
+        end
+
+        it "doesn't re-raise" do
+          expect { run }.not_to raise_error
+        end
       end
     end
 
