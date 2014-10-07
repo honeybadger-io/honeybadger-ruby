@@ -77,7 +77,8 @@ module Honeybadger
       # Returns false if timeout reached, otherwise true.
       def shutdown(timeout = 3)
         @shutdown = true
-        return true unless thread
+
+        return true unless thread && thread.alive?
 
         queue.push(SHUTDOWN)
 
@@ -90,16 +91,23 @@ module Honeybadger
           end
         end
 
+        @pid = nil
+
         r
       end
 
       def shutdown!
-        d { sprintf('killing worker thread feature=%s', feature) }
         @shutdown = true
+
+        d { sprintf('killing worker thread feature=%s', feature) }
+
         if thread && thread.alive?
           Thread.kill(thread)
           thread.join # Allow ensure block to execute.
         end
+
+        @pid = nil
+
         true
       end
 
@@ -144,7 +152,6 @@ module Honeybadger
       ensure
         d { sprintf('stopping worker feature=%s', feature) }
         release_marker
-        @thread = @pid = nil
       end
 
       def process(msg)

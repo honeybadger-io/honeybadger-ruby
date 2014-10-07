@@ -70,7 +70,7 @@ describe Honeybadger::Agent::Worker do
     before { subject.start }
 
     it "stops the thread" do
-      expect { subject.shutdown }.to change(subject, :thread).to(nil)
+      expect { subject.shutdown }.to change(subject.send(:thread), :alive?).to(false)
     end
 
     it "clears the pid" do
@@ -79,7 +79,7 @@ describe Honeybadger::Agent::Worker do
 
     context "with an optional timeout" do
       it "kills the thread" do
-        expect { subject.shutdown(0) }.to change(subject, :thread).to(nil)
+        expect { subject.shutdown }.to change(subject.send(:thread), :alive?).to(false)
       end
 
       it "logs debug info" do
