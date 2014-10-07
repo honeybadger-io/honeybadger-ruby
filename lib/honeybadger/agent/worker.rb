@@ -96,7 +96,10 @@ module Honeybadger
       def shutdown!
         d { sprintf('killing worker thread feature=%s', feature) }
         @shutdown = true
-        Thread.kill(thread) if thread && thread.alive?
+        if thread && thread.alive?
+          Thread.kill(thread)
+          thread.join # Allow ensure block to execute.
+        end
         true
       end
 

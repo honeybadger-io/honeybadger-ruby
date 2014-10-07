@@ -79,7 +79,7 @@ describe Honeybadger::Agent::Worker do
 
     context "with an optional timeout" do
       it "kills the thread" do
-        expect { subject.shutdown(0); subject.send(:thread).join(1) }.to change(subject, :thread).to(nil)
+        expect { subject.shutdown(0) }.to change(subject, :thread).to(nil)
       end
 
       it "logs debug info" do
