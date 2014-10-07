@@ -96,8 +96,9 @@ RSpec.configure do |config|
 
   config.before(:all, type: :feature) do
     self.dirs = ['tmp', 'features']
-    self.aruba_timeout_seconds = 5
-    self.aruba_io_wait_seconds = 5
+    t = RUBY_PLATFORM == 'java' ? 120 : 5
+    self.aruba_timeout_seconds = t
+    self.aruba_io_wait_seconds = t
     clean_current_dir
   end
 
