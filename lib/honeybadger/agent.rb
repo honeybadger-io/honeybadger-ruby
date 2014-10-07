@@ -130,6 +130,8 @@ module Honeybadger
       end
     end
 
+    attr_reader :delay, :workers, :pid, :thread, :traces, :metrics
+
     def initialize(config)
       @config = config
       @delay = config.debug? ? 10 : 60
@@ -156,6 +158,8 @@ module Honeybadger
     def start
       return false unless pid
       return true if thread && thread.alive?
+
+      debug { 'starting agent' }
 
       @pid = Process.pid
       @thread = Thread.new { run }
@@ -249,7 +253,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :delay, :mutex, :workers, :pid, :thread, :traces, :metrics
+    attr_reader :config, :mutex
 
     def push(feature, object)
       unless config.features[feature]

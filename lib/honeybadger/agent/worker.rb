@@ -106,10 +106,6 @@ module Honeybadger
         end
       end
 
-      private
-
-      attr_reader :config
-
       def start
         return false if @shutdown
         return true if thread && thread.alive?
@@ -119,6 +115,10 @@ module Honeybadger
 
         true
       end
+
+      private
+
+      attr_reader :config
 
       def run
         d { sprintf('worker started feature=%s', feature) }
