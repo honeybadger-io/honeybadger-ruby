@@ -28,6 +28,7 @@ module Honeybadger
       def self.parse(unparsed_line, opts = {})
         filters = opts[:filters] || []
         filtered_line = filters.reduce(unparsed_line) do |line, proc|
+          # TODO: Break if nil
           if proc.arity == 2
             proc.call(line, opts[:config])
           else
