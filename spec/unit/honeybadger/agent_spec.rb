@@ -167,7 +167,7 @@ describe Honeybadger::Agent do
     describe "#run" do
       def run
         t = Thread.new { instance.send(:run) }
-        t.join(0.001)
+        t.join(1)
       end
 
       context "when an exception occurs" do
