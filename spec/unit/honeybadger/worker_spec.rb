@@ -10,6 +10,7 @@ describe Honeybadger::Agent::Worker do
   let(:instance) { described_class.new(config, feature) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
   let(:feature) { :badgers }
+  let(:obj) { double('Badger', id: :foo, to_json: '{}') }
 
   subject { instance }
 
@@ -39,9 +40,8 @@ describe Honeybadger::Agent::Worker do
 
   describe "#push" do
     it "flushes payload to backend" do
-      payload = double('Badger', id: :foo, to_json: '{}')
-      expect(instance.backend).to receive(:notify).with(feature, payload).and_call_original
-      instance.push(payload)
+      expect(instance.backend).to receive(:notify).with(feature, obj).and_call_original
+      instance.push(obj)
       instance.flush
     end
   end
@@ -84,7 +84,6 @@ describe Honeybadger::Agent::Worker do
 
   describe "#flush" do
     it "blocks until queue is flushed" do
-      obj = double('Badger', id: :foo, to_json: '{}')
       expect(subject.backend).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
       subject.push(obj)
       subject.flush
