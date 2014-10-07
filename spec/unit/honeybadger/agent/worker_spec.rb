@@ -79,8 +79,7 @@ describe Honeybadger::Agent::Worker do
 
     context "with an optional timeout" do
       it "kills the thread" do
-        # Sleep 1ms to give the thread time to execute the ensure block.
-        expect { subject.shutdown(0); sleep(0.001) }.to change(subject, :thread).to(nil)
+        expect { subject.shutdown(0); subject.send(:thread).join(1) }.to change(subject, :thread).to(nil)
       end
 
       it "logs debug info" do
