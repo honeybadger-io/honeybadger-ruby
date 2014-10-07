@@ -15,15 +15,6 @@ describe Honeybadger::Agent::Worker do
 
   after { instance.shutdown! }
 
-  describe "#push" do
-    it "flushes payload to backend" do
-      payload = double('Badger', id: :foo, to_json: '{}')
-      expect(instance.backend).to receive(:notify).with(feature, payload).and_call_original
-      instance.push(payload)
-      instance.flush
-    end
-  end
-
   describe "#initialize" do
     describe "#queue" do
       subject { instance.queue }
@@ -43,6 +34,15 @@ describe Honeybadger::Agent::Worker do
       it "is initialized from config" do
         should eq config.backend
       end
+    end
+  end
+
+  describe "#push" do
+    it "flushes payload to backend" do
+      payload = double('Badger', id: :foo, to_json: '{}')
+      expect(instance.backend).to receive(:notify).with(feature, payload).and_call_original
+      instance.push(payload)
+      instance.flush
     end
   end
 
@@ -79,6 +79,15 @@ describe Honeybadger::Agent::Worker do
         expect(config.logger).to receive(:debug).with(/kill/i)
         subject.shutdown(0)
       end
+    end
+  end
+
+  describe "#flush" do
+    it "blocks until queue is flushed" do
+      obj = double('Badger', id: :foo, to_json: '{}')
+      expect(subject.backend).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
+      subject.push(obj)
+      subject.flush
     end
   end
 end

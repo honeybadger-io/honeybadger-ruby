@@ -103,6 +103,46 @@ describe Honeybadger::Agent do
       end
     end
 
+    describe "#flush" do
+      subject { instance.flush(&block) }
+
+      context "when no block is given" do
+        let(:block) { nil }
+        it { should eq true }
+
+        it "flushes metrics" do
+          expect(instance).to receive(:flush_metrics)
+          subject
+        end
+      end
+
+      context "when no block is given" do
+        let(:block) { Proc.new { expecting.call } }
+        let(:expecting) { double(call: true) }
+
+        it { should eq true }
+
+        it "executes the block" do
+          expect(expecting).to receive(:call)
+          subject
+        end
+
+        it "flushes metrics" do
+          expect(instance).to receive(:flush_metrics)
+          subject
+        end
+      end
+
+      context "when an exception occurs" do
+        let(:block) { Proc.new { fail 'oops' } }
+
+        it "flushes metrics" do
+          expect(instance).to receive(:flush_metrics)
+          expect { subject }.to raise_error /oops/
+        end
+      end
+    end
+
     describe "#start" do
       subject { instance.start }
 
@@ -202,6 +242,39 @@ describe Honeybadger::Agent do
 
     its(:callbacks) { should be_a Honeybadger::Config::Callbacks }
     its(:instance) { should be_nil }
+
+    describe "::flush" do
+      let(:block) { nil }
+
+      subject { described_class.flush(&block) }
+
+      context "when idle" do
+        it { should eq false }
+
+        context "and a block is given" do
+          let(:block) { Proc.new { expecting.call } }
+          let(:expecting) { double(call: true) }
+
+          it "executes the block" do
+            expect(expecting).to receive(:call)
+            subject
+          end
+        end
+      end
+
+      context "when running" do
+        let(:instance) { double('Honeybadger::Agent', flush: :flush) }
+
+        before do
+          allow(described_class).to receive(:instance).and_return(instance)
+        end
+
+        it "delegates to instance" do
+          expect(instance).to receive(:flush)
+          expect(described_class.flush).to eq :flush
+        end
+      end
+    end
 
     describe "::exception_filter" do
       it "configures the exception_filter callback" do

@@ -25,7 +25,8 @@ describe Honeybadger do
       stop: nil,
       exception_filter: nil,
       exception_fingerprint: nil,
-      backtrace_filter: nil
+      backtrace_filter: nil,
+      flush: nil
     }
 
     method_and_args.keys.each do |method|
