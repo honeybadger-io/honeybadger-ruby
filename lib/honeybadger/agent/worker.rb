@@ -7,15 +7,23 @@ module Honeybadger
   class Agent
     # Internal: A default worker which does nothing.
     class NullWorker
-      def push(*args, &block)
+      def push(obj)
         true
       end
 
-      def shutdown
+      def shutdown(timeout = nil)
         true
       end
 
       def shutdown!
+        true
+      end
+
+      def flush
+        true
+      end
+
+      def start
         true
       end
     end
@@ -44,8 +52,6 @@ module Honeybadger
       end
 
       SHUTDOWN = :__hb_worker_shutdown!
-
-      attr_reader :backend, :feature, :queue, :pid, :mutex, :marker, :thread, :throttles
 
       def initialize(config, feature)
         @config = config
@@ -118,7 +124,8 @@ module Honeybadger
 
       private
 
-      attr_reader :config
+      attr_reader :config, :backend, :feature, :queue, :pid, :mutex, :marker,
+        :thread, :throttles
 
       def run
         d { sprintf('worker started feature=%s', feature) }

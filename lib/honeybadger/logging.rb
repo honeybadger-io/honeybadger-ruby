@@ -11,6 +11,7 @@ module Honeybadger
     # method is defined/block captured in this module rather than delegating to
     # the logger directly to avoid extra object allocation.
     module Helper
+      private
       def debug(msg = nil)
         return true unless logger.debug?
         msg = yield if block_given?

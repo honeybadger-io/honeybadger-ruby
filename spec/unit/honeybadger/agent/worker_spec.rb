@@ -6,6 +6,15 @@ require 'honeybadger/config'
 require 'honeybadger/backend'
 require 'honeybadger/notice'
 
+describe Honeybadger::Agent::NullWorker do
+  Honeybadger::Agent::Worker.instance_methods.each do |method|
+    it "responds to #{method}" do
+      expect(subject).to respond_to(method)
+      expect(subject.method(method).arity).to eq Honeybadger::Agent::Worker.instance_method(method).arity
+    end
+  end
+end
+
 describe Honeybadger::Agent::Worker do
   let(:instance) { described_class.new(config, feature) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
@@ -18,13 +27,13 @@ describe Honeybadger::Agent::Worker do
 
   describe "#initialize" do
     describe "#queue" do
-      subject { instance.queue }
+      subject { instance.send(:queue) }
 
       it { should be_a Queue }
     end
 
     describe "#backend" do
-      subject { instance.backend }
+      subject { instance.send(:backend) }
 
       before do
         allow(Honeybadger::Backend::Null).to receive(:new).with(config).and_return(config.backend)
@@ -40,7 +49,7 @@ describe Honeybadger::Agent::Worker do
 
   describe "#push" do
     it "flushes payload to backend" do
-      expect(instance.backend).to receive(:notify).with(feature, obj).and_call_original
+      expect(instance.send(:backend)).to receive(:notify).with(feature, obj).and_call_original
       instance.push(obj)
       instance.flush
     end
@@ -84,7 +93,7 @@ describe Honeybadger::Agent::Worker do
 
   describe "#flush" do
     it "blocks until queue is flushed" do
-      expect(subject.backend).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
+      expect(subject.send(:backend)).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
       subject.push(obj)
       subject.flush
     end
