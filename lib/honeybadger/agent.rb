@@ -156,19 +156,25 @@ module Honeybadger
     #
     # Returns false if the Agent is stopped, otherwise true.
     def start
-      return false unless pid
-      return true if thread && thread.alive?
+      mutex.synchronize do
+        return false unless pid
+        return true if thread && thread.alive?
 
-      debug { 'starting agent' }
+        debug { 'starting agent' }
 
-      @pid = Process.pid
-      @thread = Thread.new { run }
+        @pid = Process.pid
+        @thread = Thread.new { run }
+      end
 
       true
     end
 
     def stop(force = false)
       debug { 'stopping agent' }
+
+      mutex.synchronize do
+        @pid = nil
+      end
 
       # Kill the collector
       Thread.kill(thread) if thread
@@ -181,8 +187,6 @@ module Honeybadger
       workers.each_pair do |key, worker|
         worker.send(force ? :shutdown! : :shutdown)
       end
-
-      @pid = @thread = nil
 
       true
     end
