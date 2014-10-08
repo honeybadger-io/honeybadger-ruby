@@ -2,32 +2,10 @@ require 'forwardable'
 require 'net/http'
 
 require 'honeybadger/logging'
+require 'Honeybadger/agent/null_worker'
 
 module Honeybadger
   class Agent
-    # Internal: A default worker which does nothing.
-    class NullWorker
-      def push(obj)
-        true
-      end
-
-      def shutdown(timeout = nil)
-        true
-      end
-
-      def shutdown!
-        true
-      end
-
-      def flush
-        true
-      end
-
-      def start
-        true
-      end
-    end
-
     # Internal: A concurrent queue to notify the backend.
     class Worker
       extend Forwardable
@@ -76,11 +54,13 @@ module Honeybadger
       #
       # Returns false if timeout reached, otherwise true.
       def shutdown(timeout = 3)
-        @shutdown = true
+        mutex.synchronize do
+          @shutdown = true
+          @pid = nil
+          queue.push(SHUTDOWN)
+        end
 
-        return true unless thread && thread.alive?
-
-        queue.push(SHUTDOWN)
+        return true unless thread
 
         r = true
         unless Thread.current.eql?(thread)
@@ -91,22 +71,21 @@ module Honeybadger
           end
         end
 
-        @pid = nil
-
         r
       end
 
       def shutdown!
-        @shutdown = true
+        mutex.synchronize do
+          @shutdown = true
+          @pid = nil
+        end
 
         d { sprintf('killing worker thread feature=%s', feature) }
 
-        if thread && thread.alive?
+        if thread
           Thread.kill(thread)
-          thread.join # Allow ensure block to execute.
+          thread.join # Allow ensure blocks to execute.
         end
-
-        @pid = nil
 
         true
       end
@@ -115,20 +94,22 @@ module Honeybadger
       #
       # Returns nothing.
       def flush
-        return unless start
-
         mutex.synchronize do
-          queue.push(marker)
-          marker.wait(mutex)
+          if thread && thread.alive?
+            queue.push(marker)
+            marker.wait(mutex)
+          end
         end
       end
 
       def start
-        return false if @shutdown
-        return true if thread && thread.alive?
+        mutex.synchronize do
+          return false if @shutdown
+          return true if thread && thread.alive?
 
-        @pid = Process.pid
-        @thread = Thread.new { run }
+          @pid = Process.pid
+          @thread = Thread.new { run }
+        end
 
         true
       end
@@ -139,18 +120,21 @@ module Honeybadger
         :thread, :throttles
 
       def run
-        d { sprintf('worker started feature=%s', feature) }
-        loop do
-          case msg = queue.pop
-          when SHUTDOWN then break
-          when ConditionVariable then signal_marker(msg)
-          else process(msg)
+        begin
+          d { sprintf('worker started feature=%s', feature) }
+          loop do
+            case msg = queue.pop
+            when SHUTDOWN then break
+            when ConditionVariable then signal_marker(msg)
+            else process(msg)
+            end
           end
+        ensure
+          d { sprintf('stopping worker feature=%s', feature) }
         end
       rescue Exception => e
         error(sprintf('error in worker thread (shutting down) feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
       ensure
-        d { sprintf('stopping worker feature=%s', feature) }
         release_marker
       end
 
@@ -194,10 +178,10 @@ module Honeybadger
           add_throttle(1.25)
           debug { sprintf('worker applying throttle=1.25 interval=%s feature=%s code=%s', throttle_interval, feature, response.code) }
         when 402
-          warn { sprintf('worker disabling feature=%s code=%s', feature, response.code) }
+          warn { sprintf('worker shutting down (payment required) feature=%s code=%s', feature, response.code) }
           shutdown!
         when 403
-          error { sprintf('worker shutting down (unauthorized) feature=%s code=%s', feature, response.code) }
+          warn { sprintf('worker shutting down (unauthorized) feature=%s code=%s', feature, response.code) }
           shutdown!
         when 201
           if throttle = del_throttle

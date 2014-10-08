@@ -23,7 +23,55 @@ describe Honeybadger::Agent::Worker do
 
   subject { instance }
 
-  after { instance.shutdown! }
+  after do
+    Thread.list.each do |thread|
+      next unless thread.kind_of?(Honeybadger::Agent::Worker::Thread)
+      Thread.kill(thread)
+    end
+  end
+
+  context "when an exception happens in the worker loop" do
+    before do
+      allow(instance.send(:queue)).to receive(:pop).and_raise('fail')
+      instance.push(obj)
+      instance.flush
+    end
+
+    it "does not raise when shutting down" do
+      expect { instance.shutdown }.not_to raise_error
+    end
+
+    it "exits the loop" do
+      expect(instance.send(:thread)).not_to be_alive
+    end
+  end
+
+  context "when an exception happens during processing" do
+    before do
+      allow(instance).to receive(:sleep)
+      allow(instance).to receive(:handle_response).and_raise('fail')
+    end
+
+    def flush
+      instance.push(obj)
+      instance.flush
+    end
+
+    it "does not raise when shutting down" do
+      flush
+      expect { instance.shutdown }.not_to raise_error
+    end
+
+    it "does not exit the loop" do
+      flush
+      expect(instance.send(:thread)).to be_alive
+    end
+
+    it "sleeps for a short period" do
+      expect(instance).to receive(:sleep).with(1..5)
+      flush
+    end
+  end
 
   describe "#initialize" do
     describe "#queue" do
@@ -70,23 +118,27 @@ describe Honeybadger::Agent::Worker do
     before { subject.start }
 
     it "stops the thread" do
-      expect { subject.shutdown }.to change(subject.send(:thread), :alive?).to(false)
+      subject.shutdown
+      expect(subject.send(:thread)).not_to be_alive
     end
 
     it "clears the pid" do
       expect { subject.shutdown }.to change(subject, :pid).to(nil)
     end
+  end
 
-    context "with an optional timeout" do
-      it "kills the thread" do
-        expect { subject.shutdown }.to change(subject.send(:thread), :alive?).to(false)
-      end
+  describe "#shutdown!" do
+    before { subject.start }
 
-      it "logs debug info" do
-        allow(config.logger).to receive(:debug)
-        expect(config.logger).to receive(:debug).with(/kill/i)
-        subject.shutdown(0)
-      end
+    it "kills the thread" do
+      subject.shutdown!
+      expect(subject.send(:thread)).not_to be_alive
+    end
+
+    it "logs debug info" do
+      allow(config.logger).to receive(:debug)
+      expect(config.logger).to receive(:debug).with(/kill/i)
+      subject.shutdown!
     end
   end
 
@@ -95,6 +147,80 @@ describe Honeybadger::Agent::Worker do
       expect(subject.send(:backend)).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
       subject.push(obj)
       subject.flush
+    end
+  end
+
+  describe "#handle_response" do
+    def handle_response
+      instance.send(:handle_response, response)
+    end
+
+    context "when 429" do
+      let(:response) { Honeybadger::Backend::Response.new(429) }
+
+      it "adds throttle" do
+        expect { handle_response }.to change(instance, :throttle_interval).by(1.25)
+      end
+    end
+
+    context "when 402" do
+      let(:response) { Honeybadger::Backend::Response.new(402) }
+
+      it "shuts down the worker" do
+        expect(instance).to receive(:shutdown!)
+        handle_response
+      end
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/worker/)
+        handle_response
+      end
+    end
+
+    context "when 403" do
+      let(:response) { Honeybadger::Backend::Response.new(403) }
+
+      it "shuts down the worker" do
+        expect(instance).to receive(:shutdown!)
+        handle_response
+      end
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/worker/)
+        handle_response
+      end
+    end
+
+    context "when 201" do
+      let(:response) { Honeybadger::Backend::Response.new(201) }
+
+      context "and there is no throttle" do
+        it "doesn't change throttle" do
+          expect { handle_response }.not_to change(instance, :throttle_interval)
+        end
+      end
+
+      context "and a throttle is set" do
+        before { instance.send(:add_throttle, 1.25) }
+
+        it "removes throttle" do
+          expect { handle_response }.to change(instance, :throttle_interval).by(-1.25)
+        end
+      end
+
+      it "doesn't warn" do
+        expect(config.logger).not_to receive(:warn)
+        handle_response
+      end
+    end
+
+    context "when unknown" do
+      let(:response) { Honeybadger::Backend::Response.new(418) }
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/worker/)
+        handle_response
+      end
     end
   end
 end
