@@ -664,4 +664,32 @@ describe Honeybadger::Notice do
       end
     end
   end
+
+  context "adding tags" do
+    context "directly" do
+      it "converts String to tags Array" do
+        expect(build_notice(tags: ' foo  , bar, ,  $baz   ').tags).to eq(%w(foo bar baz))
+      end
+
+      it "accepts an Array" do
+        expect(build_notice(tags: [' foo  ', ' bar', ' ', '  $baz   ']).tags).to eq(%w(foo bar baz))
+      end
+    end
+
+    context "from context" do
+      it "converts String to tags Array" do
+        expect(build_notice(context: { tags: ' foo  , , bar,  $baz   ' }).tags).to eq(%w(foo bar baz))
+      end
+
+      it "accepts an Array" do
+        expect(build_notice(tags: [' foo  ', ' bar', ' ', '  $baz   ']).tags).to eq(%w(foo bar baz))
+      end
+    end
+
+    context "from both" do
+      it "merges tags" do
+        expect(build_notice(tags: 'baz', context: { tags: ' foo  , bar ' }).tags).to eq(%w(foo bar baz))
+      end
+    end
+  end
 end

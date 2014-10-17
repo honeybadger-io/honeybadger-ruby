@@ -27,6 +27,9 @@ module Honeybadger
   # Internal: Empty String (used for equality comparisons and assignment)
   STRING_EMPTY = ''.freeze
 
+  # Internal: A Regexp which matches non-blank characters.
+  NOT_BLANK = /\S/.freeze
+
   # Internal: Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
 
@@ -43,6 +46,12 @@ module Honeybadger
   class Notice
     extend Forwardable
 
+    # Internal: The String character used to split tag strings.
+    TAG_SEPERATOR = ','.freeze
+
+    # Internal: The Regexp used to strip invalid characters from individual tags.
+    TAG_SANITIZER = /[^\w]/.freeze
+
     # Public: The unique ID of this notice which can be used to reference the
     # error in Honeybadger.
     attr_reader :id
@@ -55,6 +64,9 @@ module Honeybadger
 
     # Public: Custom fingerprint for error, used to group similar errors together.
     attr_reader :fingerprint
+
+    # Public: Tags which will be applied to error.
+    attr_reader :tags
 
     # Public: The name of the class of error. (example: RuntimeError)
     attr_reader :error_class
@@ -143,6 +155,9 @@ module Honeybadger
       @request = OpenStruct.new(construct_request_hash(config.request, opts, @request_sanitizer, config.excluded_request_keys))
       @context = construct_context_hash(opts, @sanitizer)
 
+      @tags = construct_tags(opts[:tags])
+      @tags = construct_tags(context[:tags]) | @tags if context
+
       @stats = Util::Stats.all
 
       @local_variables = send_local_variables?(config) ? local_variables_from_exception(exception, config) : {}
@@ -163,7 +178,8 @@ module Honeybadger
           message: error_message,
           backtrace: backtrace,
           source: source,
-          fingerprint: fingerprint
+          fingerprint: fingerprint,
+          tags: tags
         },
         request: {
           url: url,
@@ -368,6 +384,18 @@ module Honeybadger
       if fingerprint && fingerprint.respond_to?(:to_s)
         Digest::SHA1.hexdigest(fingerprint.to_s)
       end
+    end
+
+    def construct_tags(tags)
+      ret = []
+      Array(tags).flatten.each do |val|
+        val.to_s.split(TAG_SEPERATOR).each do |tag|
+          tag.gsub!(TAG_SANITIZER, STRING_EMPTY)
+          ret << tag if tag =~ NOT_BLANK
+        end
+      end
+
+      ret
     end
 
     # Internal: Fetch local variables from first frame of backtrace.
