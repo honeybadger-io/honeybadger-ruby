@@ -212,7 +212,7 @@ module Honeybadger
       ignored_class ? @ignore_by_class.call(ignored_class) : @ignore_by_class
     end
 
-    # Ignore notices based on job retry count
+    # Ignore exceptions based on Sidekiq job retry count. 
     def ignore_by_sidekiq_attempts 
       threshold = ::Honeybadger.configuration.sidekiq_job_attempt_threshold.to_i || 0
       retry_count = parameters['retry_count'].to_i || 0

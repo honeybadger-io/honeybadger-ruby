@@ -1,5 +1,9 @@
 ## Honeybadger 1.16.5 ##
 
+* Add `sidekiq_job_attempt_threshold` configuration variable. 
+
+  *Brad Johnson*
+  
 * Add `delayed_job_attempt_threshold` configuration variable. Notifications will not be sent until this threshold is reached.
 
   *Tadas Tamosauskas*
