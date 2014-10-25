@@ -15,16 +15,16 @@ module Honeybadger
     class_option :app, aliases: :'-a', type: :string, default: nil, desc: 'Specify optional APP with PLATFORM'
 
     desc 'deploy', 'Notify Honeybadger of deployment'
-    option :environment, aliases: [:'-e', :'--env'], type: :string, desc: 'Environment of the deploy (i.e. "production", "staging")'
-    option :revision, aliases: [:'-r', :'--rev', :'--sha'], type: :string, desc: 'The revision/sha that is being deployed'
-    option :repository, aliases: :'--repo', type: :string, desc: 'The address of your repository'
-    option :local_username, aliases: [:'--user', :'-u'], type: :string, default: ENV['USER'] || ENV['USERNAME'], desc: 'The local user who is deploying'
-    option :api_key, aliases: [:'-k', :'--key'], type: :string, desc: 'Api key of your Honeybadger application'
+    option :environment, aliases: :'-e', type: :string, desc: 'Environment of the deploy (i.e. "production", "staging")'
+    option :revision, aliases: :'-s', type: :string, desc: 'The revision/sha that is being deployed'
+    option :repository, aliases: :'-r', type: :string, desc: 'The address of your repository'
+    option :user, aliases: :'-u', type: :string, default: ENV['USER'] || ENV['USERNAME'], desc: 'The local user who is deploying'
+    option :api_key, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
     def deploy
       load_rails(verbose: true)
       exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
 
-      payload = Hash[[:environment, :revision, :repository, :local_username].map {|k| [k, options[k]] }]
+      payload = Hash[[:environment, :revision, :repository, :user].map {|k| [k, options[k]] }]
 
       say('Loading configuration')
       config = Config.new(rails_framework_opts)
