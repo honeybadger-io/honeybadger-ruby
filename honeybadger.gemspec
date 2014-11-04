@@ -13,6 +13,16 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 1.9.3'
 
+  s.post_install_message = <<-MSG
+
+  Thanks for installing honeybadger version 2.0! If you're upgrading, please
+  note that there may be a few configuration changes required. Read the upgrade
+  instructions at:
+
+  https://www.honeybadger.io/s/gem-upgrade
+
+  MSG
+
   s.rdoc_options << '--markup=tomdoc'
   s.rdoc_options << '--main=README.md'
 
