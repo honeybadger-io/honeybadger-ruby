@@ -205,6 +205,11 @@ module Honeybadger
   def flush(&block)
     Agent.flush(&block)
   end
+
+  def configure(*args)
+    warn('UPGRADE WARNING: Honeybadger.configure was removed in v2.0 and has no effect. Please upgrade: http://bit.ly/upgrade-hb-gem')
+    nil
+  end
 end
 
 if defined?(::Rails::Railtie)

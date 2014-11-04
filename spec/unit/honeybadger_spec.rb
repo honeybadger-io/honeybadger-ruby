@@ -135,4 +135,13 @@ describe Honeybadger do
       Honeybadger.notify(exception)
     end
   end
+
+  describe "#configure" do
+    it "warns that an upgrade is required" do
+      expect(Honeybadger).to receive(:warn).with(/upgrade/)
+      Honeybadger.configure do |config|
+        config.api_key = 'asdf'
+      end
+    end
+  end
 end
