@@ -60,10 +60,10 @@ module Honeybadger
       output_config(config.to_hash(options[:default]))
     end
 
-    desc 'debug', 'Output debug information'
-    option :test, aliases: :'-t', type: :boolean, default: false, desc: 'Send a test error'
-    option :file, aliases: :'-f', type: :string, default: nil, desc: 'Write the output to FILE.'
-    def debug
+    desc 'test', 'Output test/debug information'
+    option :dry_run, aliases: :'-d', type: :boolean, default: false, desc: 'Skip sending data to Honeybadger'
+    option :file, aliases: :'-f', type: :string, default: nil, desc: 'Write the output to FILE'
+    def test
       if options[:file]
         out = StringIO.new
         $stdout = out
@@ -97,7 +97,7 @@ module Honeybadger
       ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
       ENV['HONEYBADGER_LOGGING_PATH']      = 'STDOUT'
       ENV['HONEYBADGER_DEBUG']             = 'true'
-      ENV['HONEYBADGER_REPORT_DATA']       = 'true'
+      ENV['HONEYBADGER_REPORT_DATA']       = options[:dry_run] ? 'false' : 'true'
 
       config = Config.new(rails_framework_opts)
       say("\nConfiguration\n\n", :bold)
@@ -106,10 +106,8 @@ module Honeybadger
       say("\nStarting Honeybadger\n\n", :bold)
       Honeybadger.start(config) unless load_rails_env(verbose: true)
 
-      if options[:test]
-        say("\nSending test notice\n\n", :bold)
-        send_test
-      end
+      say("\nSending test notice\n\n", :bold)
+      send_test
 
       say("\nRunning at exit hooks\n\n", :bold)
     end
