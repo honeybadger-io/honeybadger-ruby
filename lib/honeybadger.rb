@@ -207,7 +207,7 @@ module Honeybadger
   end
 
   def configure(*args)
-    warn('UPGRADE WARNING: Honeybadger.configure was removed in v2.0 and has no effect. Please upgrade: http://bit.ly/upgrade-hb-gem')
+    warn('UPGRADE WARNING: Honeybadger.configure was removed in v2.0 and has no effect. Please upgrade: https://www.honeybadger.io/s/gem-upgrade')
     nil
   end
 end
