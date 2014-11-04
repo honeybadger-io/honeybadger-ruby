@@ -5,6 +5,10 @@ module Honeybadger
   module Init
     module Rails
       class Railtie < ::Rails::Railtie
+        rake_tasks do
+          load 'honeybadger/tasks.rb'
+        end
+
         initializer 'honeybadger.install' do
           config = Config.new(local_config)
           if Honeybadger.start(config)
