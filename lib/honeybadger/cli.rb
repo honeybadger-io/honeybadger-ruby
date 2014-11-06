@@ -120,7 +120,7 @@ module Honeybadger
     def install(api_key)
       say("Installing Honeybadger #{VERSION}")
 
-      load_platform(options[:platform], options[:app])
+      platform, app = load_platform(options[:platform], options[:app])
 
       load_rails(verbose: true)
 
@@ -132,13 +132,11 @@ module Honeybadger
       config = Config.new(rails_framework_opts)
       config[:api_key] = api_key
 
-      if options[:platform]
-        if options[:platform] == 'heroku'
-          say("Adding config HONEYBADGER_API_KEY=#{api_key} to heroku.", :magenta)
-          unless write_heroku_env({'HONEYBADGER_API_KEY' => api_key}, options[:app])
-            say('Unable to update heroku config. Do you need to specify an app name?', :red)
-            return
-          end
+      if platform == 'heroku'
+        say("Adding config HONEYBADGER_API_KEY=#{api_key} to heroku.", :magenta)
+        unless write_heroku_env({'HONEYBADGER_API_KEY' => api_key}, app)
+          say('Unable to update heroku config. Do you need to specify an app name?', :red)
+          return
         end
       elsif (path = config.config_path).exist?
         say("You're already on Honeybadger, so you're all set.", :yellow)
@@ -256,7 +254,14 @@ module Honeybadger
       end
     end
 
-    def load_platform(platform, app = nil)
+    # Public: Load platform (currently this means Heroku).
+    #
+    # platform - The platform to use. (optional: If platform and app are both
+    #            nil we'll attempt to detect Heroku from GIT.)
+    # app      - The app to use if a platform is detected. (optional)
+    #
+    # Returns Array [platform, app] if loaded, otherwise nil.
+    def load_platform(platform = nil, app = nil)
       # We never want to detect/prompt the user unless we're attached to a terminal.
       if STDIN.tty? && (!platform || platform == 'heroku') && !app
         platform = 'heroku' if app = detect_heroku_app(platform != 'heroku')
@@ -269,10 +274,10 @@ module Honeybadger
           exit(1)
         end
 
-        return true
+        return [platform, app]
       end
 
-      false
+      nil
     end
 
     # Internal: Detects the Heroku app name from GIT.
@@ -307,7 +312,7 @@ module Honeybadger
         elsif apps.size > 1
           say "We detected the following Heroku apps:"
           apps.each_with_index {|a,i| say "\s\s#{i+1}. #{a[1]}" }
-          say "\s\s#{apps.size+1}. Don't use Heroku."
+          say "\s\s#{apps.size+1}. Skip Heroku config."
           say "Please select an option (1-#{apps.size+1}):"
           apps.values[STDIN.gets.chomp.to_i-1]
         end
