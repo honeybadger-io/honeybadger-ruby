@@ -264,7 +264,7 @@ module Honeybadger
     # Returns Array [platform, app] if loaded, otherwise nil.
     def load_platform(platform = nil, app = nil)
       # We never want to detect/prompt the user unless we're attached to a terminal.
-      if STDIN.tty? && (!platform || platform == 'heroku') && !app
+      if STDIN.tty? && !ENV['HONEYBADGER_DISABLE_DETECT_PLATFORM'] && (!platform || platform == 'heroku') && !app
         platform = 'heroku' if app = detect_heroku_app(platform != 'heroku')
       end
 
