@@ -1,4 +1,5 @@
 $:.unshift(File.expand_path('../../../vendor/thor/lib', __FILE__))
+$:.unshift(File.expand_path('../../../vendor/inifile/lib', __FILE__))
 
 require 'thor'
 require 'honeybadger'
@@ -21,8 +22,9 @@ module Honeybadger
     option :user, aliases: :'-u', type: :string, default: ENV['USER'] || ENV['USERNAME'], desc: 'The local user who is deploying'
     option :api_key, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
     def deploy
+      load_platform(options[:platform], options[:app])
+
       load_rails(verbose: true)
-      exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
 
       payload = Hash[[:environment, :revision, :repository, :user].map {|k| [k, options[k]] }]
 
@@ -54,7 +56,7 @@ module Honeybadger
     desc 'config', 'List configuration options'
     option :default, aliases: :'-d', type: :boolean, default: true, desc: 'Output default options'
     def config
-      exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
+      load_platform(options[:platform], options[:app])
       load_rails
       config = Config.new(rails_framework_opts)
       output_config(config.to_hash(options[:default]))
@@ -87,8 +89,9 @@ module Honeybadger
         end
       end
 
-      exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
-      say("\n") if options[:platform] # Print a blank line if we just logged the platform.
+      if load_platform(options[:platform], options[:app])
+        say("\n") # Print a blank line if we just logged the platform.
+      end
 
       say("Detecting framework\n\n", :bold)
       load_rails(verbose: true)
@@ -117,7 +120,7 @@ module Honeybadger
     def install(api_key)
       say("Installing Honeybadger #{VERSION}")
 
-      exit(1) unless !options[:platform] || load_platform(options[:platform], options[:app])
+      load_platform(options[:platform], options[:app])
 
       load_rails(verbose: true)
 
@@ -254,15 +257,61 @@ module Honeybadger
     end
 
     def load_platform(platform, app = nil)
-      if platform.to_sym == :heroku
-        say("Using platform: #{platform}" << (app ? " (app: #{app})" : ""))
-        unless set_env_from_heroku(app)
-          say("Unable to load ENV from Heroku. Do you need to specify an app name?", :red)
-          return false
-        end
+      # We never want to detect/prompt the user unless we're attached to a terminal.
+      if STDIN.tty? && (!platform || platform == 'heroku') && !app
+        platform = 'heroku' if app = detect_heroku_app(platform != 'heroku')
       end
 
-      true
+      if platform == 'heroku'
+        say("Using platform: #{platform}" << (app ? " (app: #{app})" : "") << "\n")
+        unless set_env_from_heroku(app)
+          say("Unable to load ENV from Heroku. Do you need to specify an app name?", :red)
+          exit(1)
+        end
+
+        return true
+      end
+
+      false
+    end
+
+    # Internal: Detects the Heroku app name from GIT.
+    #
+    # prompt_on_default - If a single remote is discoverd, should we prompt the
+    #                     user before returning it?
+    #
+    # Returns the String app name if detected, otherwise nil.
+    def detect_heroku_app(prompt_on_default = true)
+      apps, git_config = {}, File.join(Dir.pwd, '.git', 'config')
+      if File.exist?(git_config)
+        require 'inifile'
+        ini = IniFile.load(git_config)
+        ini.each_section do |section|
+          if match = section.match(/remote \"(?<remote>.+)\"/)
+            url = ini[section]['url']
+            if url_match = url.match(/heroku\.com:(?<app>.+)\.git$/)
+              apps[match[:remote]] = url_match[:app]
+            end
+          end
+        end
+
+        if apps.size == 1
+          if !prompt_on_default
+            apps.values.first
+          else
+            say "We detected a Heroku app named #{apps.values.first}. Do you want to load the config? (y/yes or n/no)"
+            if STDIN.gets.chomp =~ /(y|yes)/i
+              apps.values.first
+            end
+          end
+        elsif apps.size > 1
+          say "We detected the following Heroku apps:"
+          apps.each_with_index {|a,i| say "\s\s#{i+1}. #{a[1]}" }
+          say "\s\s#{apps.size+1}. Don't use Heroku."
+          say "Please select an option (1-#{apps.size+1}):"
+          apps.values[STDIN.gets.chomp.to_i-1]
+        end
+      end
     end
 
     def read_heroku_env(app = nil)
