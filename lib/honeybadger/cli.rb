@@ -134,9 +134,10 @@ module Honeybadger
 
       if platform == 'heroku'
         say("Adding config HONEYBADGER_API_KEY=#{api_key} to heroku.", :magenta)
+        ENV['HONEYBADGER_API_KEY'] = api_key
         unless write_heroku_env({'HONEYBADGER_API_KEY' => api_key}, app)
           say('Unable to update heroku config. Do you need to specify an app name?', :red)
-          return
+          exit(1)
         end
       elsif (path = config.config_path).exist?
         say("You're already on Honeybadger, so you're all set.", :yellow)
@@ -280,7 +281,7 @@ module Honeybadger
       nil
     end
 
-    # Internal: Detects the Heroku app name from GIT.
+    # Public: Detects the Heroku app name from GIT.
     #
     # prompt_on_default - If a single remote is discoverd, should we prompt the
     #                     user before returning it?
