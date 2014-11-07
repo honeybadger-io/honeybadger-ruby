@@ -72,7 +72,7 @@ module Honeybadger
               end
             end
           elsif apps.size > 1
-            say "We detected the following apps:"
+            say "We detected the following Heroku apps:"
             apps.each_with_index {|a,i| say "\s\s#{i+1}. #{a[1]}" }
             say "\s\s#{apps.size+1}. Use default"
             say "Please select an option (1-#{apps.size+1}):"
