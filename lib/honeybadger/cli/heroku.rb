@@ -9,15 +9,10 @@ module Honeybadger
       def install(api_key)
         say("Installing Honeybadger #{VERSION}")
 
-        ENV['HONEYBADGER_LOGGING_LEVEL']     = '2'
-        ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
-        ENV['HONEYBADGER_LOGGING_PATH']      = 'STDOUT'
-        ENV['HONEYBADGER_REPORT_DATA']       = 'true'
+        ENV['HONEYBADGER_API_KEY'] = api_key
 
         app = options[:app] || detect_heroku_app(false)
-
         say("Adding config HONEYBADGER_API_KEY=#{api_key} to Heroku.", :magenta)
-        ENV['HONEYBADGER_API_KEY'] = api_key
         unless write_heroku_env({'HONEYBADGER_API_KEY' => api_key}, app)
           say('Unable to update heroku config. Do you need to specify an app name?', :red)
           exit(1)
