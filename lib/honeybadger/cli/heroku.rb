@@ -13,8 +13,6 @@ module Honeybadger
       option :api_key, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
       option :environment, aliases: :'-e', type: :string, desc: 'Environment of your Heroku application (i.e. "production", "staging")'
       def install_deploy_notification
-        say('Installing deploy notification addon')
-
         app       = options.has_key?('app') ? options['app'] : detect_heroku_app(false)
         rails_env = options['environment'] || heroku_var('RAILS_ENV', app)
         api_key   = options['api_key'] || heroku_var('HONEYBADGER_API_KEY', app)
@@ -57,19 +55,20 @@ module Honeybadger
           exit(1)
         end
 
+        if env = heroku_var('RAILS_ENV', app, heroku_var('RACK_ENV', app))
+          say('Installing deploy notification addon', :magenta)
+          invoke :install_deploy_notification, [], { app: app, api_key: api_key, environment: env }
+        else
+          say('Skipping deploy notification installation: we were unable to determine the environment name from your Heroku app.', :yellow)
+          say("To install manually, try `honeybadger heroku install_deploy_notification#{app ? " -a #{app}" : ""} -k #{api_key} --environment ENVIRONMENT`", :yellow)
+        end
+
         config = Config.new(rails_framework_opts)
         Honeybadger.start(config) unless load_rails_env(verbose: true)
         say('Sending test notice')
         unless Agent.instance && send_test(false)
           say("Honeybadger is installed, but failed to send a test notice. Try `HONEYBADGER_API_KEY=#{api_key} honeybadger test`.", :red)
           exit(1)
-        end
-
-        if env = heroku_var('RAILS_ENV', app, heroku_var('RACK_ENV', app))
-          invoke :install_deploy_notification, [], { app: app, api_key: api_key, environment: env }
-        else
-          say('Skipping deploy notification installation: we were unable to determine the environment name from your Heroku app.', :yellow)
-          say("To install manually, try `honeybadger heroku install_deploy_notification#{app ? " --app #{app}" : ""} --api-key #{api_key} --environment ENVIRONMENT`", :yellow)
         end
 
         say("Installation complete. Happy 'badgering!", :green)
