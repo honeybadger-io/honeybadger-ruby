@@ -3,4 +3,4 @@
 	url = https://github.com/erikhuda/thor.git
 [submodule "vendor/inifile"]
 	path = vendor/inifile
-	url = git@github.com:TwP/inifile.git
+	url = https://github.com/TwP/inifile.git
