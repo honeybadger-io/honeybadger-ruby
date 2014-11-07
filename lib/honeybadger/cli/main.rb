@@ -4,7 +4,7 @@ require 'honeybadger/cli/helpers'
 
 module Honeybadger
   module CLI
-    class Honeybadger < Thor
+    class Main < Thor
       include Helpers
 
       class HoneybadgerTestingException < RuntimeError; end
