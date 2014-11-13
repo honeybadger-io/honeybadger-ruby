@@ -22,6 +22,11 @@ module Honeybadger
 
         payload = Hash[[:environment, :revision, :repository, :user].map {|k| [k, options[k]] }]
 
+        ENV['HONEYBADGER_LOGGING_LEVEL']     = '2'
+        ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
+        ENV['HONEYBADGER_LOGGING_PATH']      = 'STDOUT'
+        ENV['HONEYBADGER_REPORT_DATA']       = 'true'
+
         say('Loading configuration')
         config = Config.new(rails_framework_opts)
         config.update(api_key: options[:api_key]) if options[:api_key] =~ NOT_BLANK
