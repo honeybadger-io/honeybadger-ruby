@@ -20,7 +20,8 @@ module Honeybadger
       def deploy
         load_rails(verbose: true)
 
-        payload = Hash[[:environment, :revision, :repository, :user].map {|k| [k, options[k]] }]
+        payload = Hash[[:environment, :revision, :repository].map {|k| [k, options[k]] }]
+        payload[:local_username] = options[:user]
 
         ENV['HONEYBADGER_LOGGING_LEVEL']     = '2'
         ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
