@@ -1,3 +1,9 @@
+## Honeybadger 1.16.6 ##
+
+* Fix cap3 bug where app server is not found for deploy notification.
+
+  *Joshua Wood*
+
 ## Honeybadger 1.16.5 ##
 
 * Add `delayed_job_attempt_threshold` configuration variable. Notifications will not be sent until this threshold is reached.

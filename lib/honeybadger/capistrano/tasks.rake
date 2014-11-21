@@ -39,27 +39,33 @@ namespace :honeybadger do
     end
 
     server = fetch(:honeybadger_server) do
-      s = primary(:app)
-      set(:honeybadger_server, s.select?({ :exclude => :no_release }) ? s : nil)
+      if s = primary(:app)
+        set(:honeybadger_server, s.select?({ :exclude => :no_release }) ? s : nil)
+      end
     end
 
-    if server
-      on server do |host|
-        rails_env       = fetch(:rails_env, "production")
-        honeybadger_env = fetch(:honeybadger_env, rails_env)
-        repository      = fetch(:repo_url)
-        local_user      = fetch(:honeybadger_user, ENV['USER'] || ENV['USERNAME'])
-        api_key         = fetch(:honeybadger_api_key, ENV['HONEYBADGER_API_KEY'] || ENV['API_KEY'])
-        revision        = fetch(:current_revision) do
-          within(repo_path) do
-            capture("cd #{repo_path} && git rev-parse --short HEAD")
-          end
-        end
-
-        env = ["RAILS_ENV=#{rails_env}", "TO=#{honeybadger_env}", "REVISION=#{revision}", "REPO=#{repository}", "USER=#{local_user}"]
-        env << "API_KEY=#{api_key}" if api_key
-        ::SSHKit.config.command_map.prefix[:rake].unshift(*env)
+    unless server
+      run_locally do
+        warn 'Unable to notify Honeybadger: could not find app server for notification. Try setting honeybadger_server.'
       end
+      next
+    end
+
+    on server do |host|
+      rails_env       = fetch(:rails_env, "production")
+      honeybadger_env = fetch(:honeybadger_env, rails_env)
+      repository      = fetch(:repo_url)
+      local_user      = fetch(:honeybadger_user, ENV['USER'] || ENV['USERNAME'])
+      api_key         = fetch(:honeybadger_api_key, ENV['HONEYBADGER_API_KEY'] || ENV['API_KEY'])
+      revision        = fetch(:current_revision) do
+        within(repo_path) do
+          capture("cd #{repo_path} && git rev-parse --short HEAD")
+        end
+      end
+
+      env = ["RAILS_ENV=#{rails_env}", "TO=#{honeybadger_env}", "REVISION=#{revision}", "REPO=#{repository}", "USER=#{local_user}"]
+      env << "API_KEY=#{api_key}" if api_key
+      ::SSHKit.config.command_map.prefix[:rake].unshift(*env)
     end
   end
 end
