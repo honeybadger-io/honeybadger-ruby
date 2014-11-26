@@ -53,16 +53,22 @@ namespace :honeybadger do
     end
 
     server = fetch(:honeybadger_server) do
-      s = primary(:app)
-      set(:honeybadger_server, s.select?({exclude: :no_release}) ? s : nil)
+      if s = primary(:app)
+        set(:honeybadger_server, s.select?({exclude: :no_release}) ? s : nil)
+      end
     end
 
-    if server
-      on server do |host|
-        rails_env = fetch(:rails_env, 'production')
-        env = ["RAILS_ENV=#{rails_env}"]
-        ::SSHKit.config.command_map.prefix[:honeybadger].unshift(*env)
+    unless server
+      run_locally do
+        warn 'Unable to notify Honeybadger: could not find app server for notification. Try setting honeybadger_server.'
       end
+      next
+    end
+
+    on server do |host|
+      rails_env = fetch(:rails_env, 'production')
+      env = ["RAILS_ENV=#{rails_env}"]
+      ::SSHKit.config.command_map.prefix[:honeybadger].unshift(*env)
     end
   end
 end
