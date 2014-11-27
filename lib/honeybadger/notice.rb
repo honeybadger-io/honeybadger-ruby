@@ -43,6 +43,8 @@ module Honeybadger
     cgi_data: {}.freeze
   }.freeze
 
+  MAX_EXCEPTION_CAUSES = 5
+
   class Notice
     extend Forwardable
 
@@ -142,11 +144,7 @@ module Honeybadger
           "#{exception.class.name}: #{exception.message}"
         end
       end
-      @backtrace = Backtrace.parse(
-        exception_attribute(:backtrace, caller),
-        filters: construct_backtrace_filters(opts),
-        config: config
-      )
+      @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))
       @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
@@ -154,6 +152,8 @@ module Honeybadger
       @request_sanitizer = Util::RequestSanitizer.new(@sanitizer)
       @request = OpenStruct.new(construct_request_hash(config.request, opts, @request_sanitizer, config.excluded_request_keys))
       @context = construct_context_hash(opts, @sanitizer)
+
+      @causes = unwrap_causes(opts[:exception])
 
       @tags = construct_tags(opts[:tags])
       @tags = construct_tags(context[:tags]) | @tags if context
@@ -179,7 +179,8 @@ module Honeybadger
           backtrace: backtrace,
           source: source,
           fingerprint: fingerprint,
-          tags: tags
+          tags: tags,
+          causes: causes
         },
         request: {
           url: url,
@@ -233,7 +234,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now
+    attr_reader :config, :opts, :context, :stats, :api_key, :now, :causes
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
@@ -423,6 +424,54 @@ module Honeybadger
     # Returns true to send local_variables
     def send_local_variables?(config)
       config[:'exceptions.local_variables']
+    end
+
+    # Internal: Parse Backtrace from exception backtrace.
+    #
+    # backtrace - The Array backtrace from exception.
+    #
+    # Returns the Backtrace.
+    def parse_backtrace(backtrace)
+      Backtrace.parse(
+        backtrace,
+        filters: construct_backtrace_filters(opts),
+        config: config
+      )
+    end
+
+    # Internal: Fetch cause from exception.
+    #
+    # exception - Exception to fetch cause from.
+    #
+    # Returns the Exception cause.
+    def exception_cause(exception)
+      e = exception
+      if e.respond_to?(:cause) && e.cause
+        e.cause
+      elsif e.respond_to?(:original_exception) && e.original_exception
+        e.original_exception
+      elsif e.respond_to?(:continued_exception) && e.continued_exception
+        e.continued_exception
+      end
+    end
+
+    # Internal: Unwrap causes from exception.
+    #
+    # exception - Exception to unwrap.
+    #
+    # Returns Hash causes (in payload format).
+    def unwrap_causes(exception)
+      c, e, i = [], exception, 0
+      while (e = exception_cause(e)) && i < MAX_EXCEPTION_CAUSES
+        c << {
+          class: e.class.name,
+          message: trim_size(1024) { e.message },
+          backtrace: parse_backtrace(e.backtrace || caller)
+        }
+        i += 1
+      end
+
+      c
     end
   end
 end

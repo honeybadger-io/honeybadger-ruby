@@ -692,4 +692,54 @@ describe Honeybadger::Notice do
       end
     end
   end
+
+  context "exception cause" do
+    class CauseError < StandardError
+      attr_reader :cause
+      def cause=(e); @cause = e; end
+    end
+
+    class OriginalExceptionError < StandardError
+      attr_reader :original_exception
+      def cause=(e); @original_exception = e; end
+    end
+
+    class ContinuedExceptionError < StandardError
+      attr_reader :continued_exception
+      def cause=(e); @continued_exception = e; end
+    end
+
+    [CauseError, OriginalExceptionError, ContinuedExceptionError].each do |error_class|
+      context "when raising #{error_class} without a cause" do
+        it "includes empty cause in payload" do
+          exception = error_class.new('badgers!')
+          causes = build_notice(exception: exception).as_json[:error][:causes]
+          expect(causes.size).to eq 0
+        end
+      end
+
+      context "when raising #{error_class} with a cause" do
+        it "includes the cause in the payload" do
+          exception = error_class.new('badgers!')
+          exception.cause = StandardError.new('cause!')
+          causes = build_notice(exception: exception).as_json[:error][:causes]
+          expect(causes.size).to eq 1
+          expect(causes[0][:class]).to eq 'StandardError'
+          expect(causes[0][:message]).to eq 'cause!'
+          expect(causes[0][:backtrace]).to be_a Honeybadger::Backtrace
+        end
+
+        it "stops unwrapping at 5" do
+          exception = e = error_class.new('badgers!')
+
+          0.upto(6) do
+            e.cause = e = error_class.new('cause!')
+          end
+
+          causes = build_notice(exception: exception).as_json[:error][:causes]
+          expect(causes.size).to eq 5
+        end
+      end
+    end
+  end
 end
