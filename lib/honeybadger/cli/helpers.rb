@@ -142,8 +142,19 @@ module Honeybadger
           end
         end
 
-        ::Rails.application.routes.draw do
-          match 'verify' => 'application#verify', :as => 'verify', :via => :get
+        ::Rails.application.routes.tap do |r|
+          # RouteSet#disable_clear_and_finalize prevents existing routes from
+          # being cleared. We'll set it back to the original value when we're
+          # done so not to mess with Rails state.
+          d = r.disable_clear_and_finalize
+          begin
+            r.disable_clear_and_finalize = true
+            r.draw do
+              match 'verify' => 'application#verify', :as => 'verify', :via => :get
+            end
+          ensure
+            r.disable_clear_and_finalize = d
+          end
         end
 
         say('Processing request.')
