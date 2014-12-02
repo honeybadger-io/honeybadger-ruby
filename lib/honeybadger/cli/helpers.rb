@@ -123,24 +123,20 @@ module Honeybadger
         end
 
         say('Setting up the Controller.')
-        ::ApplicationController.class_eval do
+        eval(<<-CONTROLLER)
+        class Honeybadger::TestController < ApplicationController
           # This is to bypass any filters that may prevent access to the action.
           prepend_before_filter :test_honeybadger
+
           def test_honeybadger
-            puts "Raising '#{exception_class.name}' to simulate application failure."
-            raise exception_class.new, 'Testing honeybadger via "rake honeybadger:test". If you can see this, it works.'
+            puts "Raising '#{test_exception_class.name}' to simulate application failure."
+            raise #{test_exception_class}.new, 'Testing honeybadger via "honeybadger testhoneybadger test", it works.'
           end
 
           # Ensure we actually have an action to go to.
           def verify; end
-
-          def exception_class
-            exception_name = ENV['EXCEPTION'] || 'HoneybadgerTestingException'
-            Object.const_get(exception_name)
-          rescue
-            Object.const_set(exception_name, Class.new(Exception))
-          end
         end
+        CONTROLLER
 
         ::Rails.application.routes.tap do |r|
           # RouteSet#disable_clear_and_finalize prevents existing routes from
@@ -150,7 +146,7 @@ module Honeybadger
           begin
             r.disable_clear_and_finalize = true
             r.draw do
-              match 'verify' => 'application#verify', :as => 'verify', :via => :get
+              match 'verify' => 'honeybadger/test#verify', :as => 'verify', :via => :get
             end
           ensure
             r.disable_clear_and_finalize = d
