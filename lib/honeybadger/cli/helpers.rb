@@ -38,12 +38,7 @@ module Honeybadger
         return false unless rails?(opts)
 
         puts('Loading Rails environment') if opts[:verbose]
-        begin
-          require File.expand_path('config/environment')
-        rescue LoadError
-          say('Error: could not load Rails environment. Please ensure you run this command from your project root.', :red)
-          exit(1)
-        end
+        ::Rails.application.require_environment!
 
         true
       end
