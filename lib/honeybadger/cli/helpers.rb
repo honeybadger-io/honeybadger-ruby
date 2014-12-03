@@ -140,9 +140,12 @@ module Honeybadger
           d = r.disable_clear_and_finalize
           begin
             r.disable_clear_and_finalize = true
+            r.clear!
+            ::Rails.application.routes_reloader.paths.each{ |path| load(path) }
             r.draw do
               match 'verify' => 'honeybadger/test#verify', :as => 'verify', :via => :get
             end
+            ::ActiveSupport.on_load(:action_controller) { r.finalize! }
           ensure
             r.disable_clear_and_finalize = d
           end
