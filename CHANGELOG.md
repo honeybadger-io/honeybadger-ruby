@@ -1,3 +1,9 @@
+## Honeybadger 1.16.7 ##
+
+* Support Ruby 2.2.
+
+  *@voanhduy1512*
+
 ## Honeybadger 1.16.6 ##
 
 * Fix cap3 bug where app server is not found for deploy notification.
