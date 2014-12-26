@@ -67,17 +67,25 @@ if RUBY_VERSION > '1.9'
   end
 
   if RUBY_VERSION > '1.9.2'
-    # The latest officially supported Rails release
-    appraise 'rails' do
-      gem 'rails', '~> 4.0.3'
+    appraise 'rails4.0' do
+      gem 'rails', '~> 4.0.0'
       gem 'honeybadger', :path => '../'
       gem 'capistrano', '~> 3.0'
-    gem 'better_errors', '~> 1.0', :require => false
+      gem 'better_errors', '~> 1.0', :require => false
       gem 'rack-mini-profiler', :require => false
     end
 
     appraise 'rails4.1' do
-      gem 'rails', '~> 4.1.0.beta1'
+      gem 'rails', '~> 4.1.0'
+      gem 'honeybadger', :path => '../'
+      gem 'capistrano', '~> 3.0'
+      gem 'better_errors', '~> 1.0', :require => false
+      gem 'rack-mini-profiler', :require => false
+    end
+
+    # The latest officially supported Rails release
+    appraise 'rails' do
+      gem 'rails', '~> 4.2.0'
       gem 'honeybadger', :path => '../'
       gem 'capistrano', '~> 3.0'
       gem 'better_errors', '~> 1.0', :require => false
