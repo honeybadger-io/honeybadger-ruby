@@ -12,7 +12,7 @@ to the Honeybadger server specified in your environment.
 
 #### IMPORTANT: As of version 1.16.0, Ruby 1.8.7 and 1.9.2 are unsupported. Please ensure you are running Ruby 1.9.3 or greater before upgrading.
 
-Honeybadger supports Ruby 1.9.3 through 2.1.
+Honeybadger supports Ruby 1.9.3 through 2.2.
 
 ## Supported Rails versions
 
