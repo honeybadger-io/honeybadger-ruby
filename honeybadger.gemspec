@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency('json')
 
-  s.add_development_dependency('cucumber',   '~> 1.3.10')
   s.add_development_dependency('rspec',      '~> 2.14.0')
   s.add_development_dependency('sham_rack',  '~> 1.3.0')
   s.add_development_dependency('capistrano', '~> 2.0')

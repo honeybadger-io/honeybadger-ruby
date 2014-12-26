@@ -2,11 +2,15 @@
 
 source "https://rubygems.org"
 
-gem "allocation_stats", :platforms=>:mri_21
+gem "allocation_stats", :platforms => :mri_21
 gem "rails", "~> 3.2.12"
-gem "honeybadger", :path=>"../"
-gem "better_errors", "~> 1.0", :require=>false
-gem "rack-mini-profiler", :require=>false
+gem "honeybadger", :path => "../"
+gem "better_errors", "~> 1.0", :require => false
+gem "rack-mini-profiler", :require => false
 gem "capistrano", "~> 2.0"
 
-gemspec :path=>"../"
+group :development, :test do
+  gem "cucumber", "~> 1.3.10", :github => "cucumber/cucumber", :branch => "v1.3.x-bugfix"
+end
+
+gemspec :path => "../"

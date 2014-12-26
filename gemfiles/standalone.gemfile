@@ -2,7 +2,11 @@
 
 source "https://rubygems.org"
 
-gem "allocation_stats", :platforms=>:mri_21
-gem "honeybadger", :path=>"../"
+gem "allocation_stats", :platforms => :mri_21
+gem "honeybadger", :path => "../"
 
-gemspec :path=>"../"
+group :development, :test do
+  gem "cucumber", "~> 1.3.10", :github => "cucumber/cucumber", :branch => "v1.3.x-bugfix"
+end
+
+gemspec :path => "../"
