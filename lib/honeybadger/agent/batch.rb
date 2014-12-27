@@ -3,7 +3,7 @@ require 'securerandom'
 module Honeybadger
   class Agent
     class Batch
-      def initialize(config, name = :data, max = 100, interval = 60, now = now)
+      def initialize(config, name = :data, max = 100, interval = 60, now = now())
         @id = SecureRandom.uuid
         @config = config
         @name = name

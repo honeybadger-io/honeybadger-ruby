@@ -21,7 +21,7 @@ module Honeybadger
         def_delegators :@metrics, :to_json, :size
       end
 
-      def initialize(config, interval = 60, now = now)
+      def initialize(config, interval = 60, now = now())
         @id = SecureRandom.uuid
         @config = config
         @interval = interval

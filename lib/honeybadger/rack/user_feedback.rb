@@ -49,7 +49,7 @@ module Honeybadger
         nil
       end
 
-      def render_form(error_id, action = action)
+      def render_form(error_id, action = action())
         return unless action
         ERB.new(@template ||= File.read(template_file)).result(binding)
       end

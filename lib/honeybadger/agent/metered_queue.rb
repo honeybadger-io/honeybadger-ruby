@@ -3,7 +3,7 @@ module Honeybadger
     # Internal: A thread-safe first-in-first-out queue. Values are pushed onto
     # the queue and released at a defined interval.
     class MeteredQueue
-      def initialize(interval = 1, max = 1000, now = now)
+      def initialize(interval = 1, max = 1000, now = now())
         @interval = interval
         @max = max
         @values = Array.new
@@ -68,11 +68,11 @@ module Honeybadger
         Time.now
       end
 
-      def calculate_future(now = now, interval = interval)
+      def calculate_future(now = now(), interval = interval())
         now.to_i + throttled_interval(interval)
       end
 
-      def throttled_interval(interval = interval)
+      def throttled_interval(interval = interval())
         throttles.reduce(interval) {|a,e| a * e }
       end
     end
