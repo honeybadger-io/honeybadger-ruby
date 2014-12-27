@@ -64,7 +64,7 @@ end
 
 # The latest officially supported Rails release
 appraise 'rails' do
-  gem 'rails', '~> 4.2.0.beta1'
+  gem 'rails', '~> 4.2.0'
   gem 'capistrano', '~> 3.0'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
