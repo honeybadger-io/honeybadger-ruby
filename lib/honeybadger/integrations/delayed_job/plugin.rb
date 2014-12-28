@@ -17,7 +17,9 @@ module Honeybadger
                 :error_class   => error.class.name,
                 :error_message => "#{ error.class.name }: #{ error.message }",
                 :backtrace     => error.backtrace,
-                  :context       => {
+                :component     => job.payload_object.object.class,
+                :action        => job.payload_object.method_name,
+                :context       => {
                   :job_id        => job.id,
                   :handler       => job.handler,
                   :last_error    => job.last_error,
