@@ -14,6 +14,13 @@ rescue LoadError
   nil
 end
 
+begin
+  require 'i18n'
+  I18n.enforce_available_locales = false
+rescue LoadError
+  nil
+end
+
 # Require files in spec/support/ and its subdirectories.
 Dir[File.expand_path('../../spec/support/**/*.rb', __FILE__)].each {|f| require f}
 
