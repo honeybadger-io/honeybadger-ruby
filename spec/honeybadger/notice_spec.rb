@@ -378,6 +378,30 @@ describe Honeybadger::Notice do
     expect(notice.ignore?).to be_true
   end
 
+  it "ignores an exception if the retry_count is below the sidekiq threshold" do 
+    ::Honeybadger.configuration.sidekiq_job_attempt_threshold = 1
+    notice = Honeybadger::Notice.new(:parameters => { 'retry_count' => 0 })
+    expect(notice.ignore?).to be_true
+  end
+
+  it "does not ignore an exception if the retry_count is above the sidekiq threshold" do 
+    ::Honeybadger.configuration.sidekiq_job_attempt_threshold = 2
+    notice = Honeybadger::Notice.new(:parameters => { 'retry_count' => 3 })
+    expect(notice.ignore?).to be_false
+  end
+
+  it "does not ignore an exception if the retry_count equals the sidekiq threshold" do 
+    ::Honeybadger.configuration.sidekiq_job_attempt_threshold = 2
+    notice = Honeybadger::Notice.new(:parameters => { 'retry_count' => 2 })
+    expect(notice.ignore?).to be_false
+  end
+
+  it "does not ignore an exception if sidekiq_job_attempt_threshold is not set" do 
+    ::Honeybadger.configuration.sidekiq_job_attempt_threshold = nil
+    notice = build_notice
+    expect(notice.ignore?).to be_false
+  end
+
   it "does not raise without an ignore list" do
     notice = build_notice(:ignore => nil, :ignore_by_filters => nil)
     expect { notice.ignore? }.not_to raise_error

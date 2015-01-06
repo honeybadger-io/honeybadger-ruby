@@ -212,10 +212,18 @@ module Honeybadger
       ignored_class ? @ignore_by_class.call(ignored_class) : @ignore_by_class
     end
 
+    # Ignore exceptions based on Sidekiq job retry count. 
+    def ignore_by_sidekiq_attempts 
+      threshold = ::Honeybadger.configuration.sidekiq_job_attempt_threshold.to_i || 0
+      retry_count = parameters['retry_count'].to_i || 0
+      retry_count < threshold
+    end
+
     # Public: Determines if this notice should be ignored
     def ignore?
       ignore.any?(&ignore_by_class?) ||
-        ignore_by_filters.any? {|filter| filter.call(self) }
+        ignore_by_filters.any? {|filter| filter.call(self) } ||
+        ignore_by_sidekiq_attempts
     end
 
     # Public: Allows properties to be accessed using a hash-like syntax
