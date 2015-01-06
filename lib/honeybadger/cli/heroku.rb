@@ -29,10 +29,10 @@ module Honeybadger
           exit(1)
         end
 
-        command = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{rails_env}&deploy[local_username]={{user}}&deploy[revision]={{head}}&api_key=#{api_key}"#{app ? " --app #{app}" : ''})
+        cmd = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{rails_env}&deploy[local_username]={{user}}&deploy[revision]={{head}}&api_key=#{api_key}"#{app ? " --app #{app}" : ''})
 
-        say("Running: `#{command}`")
-        say(`#{command}`)
+        say("Running: `#{cmd}`")
+        say(run(cmd))
       end
 
       desc 'install API_KEY', 'Install Honeybadger on Heroku using API_KEY'
@@ -115,16 +115,20 @@ module Honeybadger
         end
       end
 
+      def run(cmd)
+        Bundler.with_clean_env { `#{cmd}` }
+      end
+
       def heroku_var(var, app_name, default = nil)
         app = app_name ? "--app #{app_name}" : ''
-        result = Bundler.with_clean_env { `heroku config:get #{var} #{app} 2> /dev/null`.strip }
+        result = run("heroku config:get #{var} #{app} 2> /dev/null").strip
         result.split.find(lambda { default }) {|x| x =~ /\S/ }
       end
 
       def read_heroku_env(app = nil)
         cmd = ['heroku config']
         cmd << "--app #{app}" if app
-        output = Bundler.with_clean_env { `#{cmd.join("\s")}` }
+        output = run(cmd.join("\s"))
         return false unless $?.to_i == 0
         Hash[output.scan(/(HONEYBADGER_[^:]+):\s*(\S.*)\s*$/)]
       end
@@ -140,7 +144,7 @@ module Honeybadger
         cmd = ["heroku config:set"]
         Hash(env).each_pair {|k,v| cmd << "#{k}=#{v}" }
         cmd << "--app #{app}" if app
-        Bundler.with_clean_env { `#{cmd.join("\s")}` }
+        run(cmd.join("\s"))
         $?.to_i == 0
       end
     end
