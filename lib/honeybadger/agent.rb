@@ -148,8 +148,15 @@ module Honeybadger
       init_metrics
 
       at_exit do
+        # Fix for https://bugs.ruby-lang.org/issues/5218
+        if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' && RUBY_VERSION =~ /1\.9/
+          exit_status = $!.status if $!.is_a?(SystemExit)
+        end
+
         stop if config[:'send_data_at_exit']
         self.class.at_exit.call if self.class.at_exit
+
+        exit(exit_status) if exit_status
       end
     end
 
