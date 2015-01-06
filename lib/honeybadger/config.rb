@@ -98,7 +98,7 @@ module Honeybadger
     end
 
     def valid?
-      self[:api_key] =~ /\S/
+      self[:api_key].to_s =~ /\S/
     end
 
     def debug?
@@ -204,7 +204,7 @@ module Honeybadger
       File.open(path, 'w+') do |file|
         file.write(<<-CONFIG)
 ---
-api_key: #{self[:api_key]}
+api_key: '#{self[:api_key]}'
                    CONFIG
       end
     end

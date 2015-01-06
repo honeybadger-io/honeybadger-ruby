@@ -123,7 +123,7 @@ module Honeybadger
         ENV['HONEYBADGER_REPORT_DATA']       = 'true'
 
         config = Config.new(rails_framework_opts)
-        config[:api_key] = api_key
+        config[:api_key] = api_key.to_s
 
         if (path = config.config_path).exist?
           say("You're already on Honeybadger, so you're all set.", :yellow)
