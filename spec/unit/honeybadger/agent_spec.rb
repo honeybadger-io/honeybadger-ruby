@@ -358,15 +358,17 @@ describe Honeybadger::Agent do
             allow(config).to receive(:ping).and_return(false)
           end
 
-          it { should eq false }
+          it { should eq true }
 
           it "logs failure to start" do
-            expect(logger).to receive(:warn).with(/failed to connect/)
+            expect(logger).to receive(:warn).with(/failed to connect/i)
             described_class.start(config)
           end
 
-          it "doesn't create an instance" do
-            expect { described_class.start(config) }.not_to change(Honeybadger::Agent, :instance)
+          it "creates an instance" do
+            instance = double('Honeybadger::Agent', start: true, stop: true)
+            expect(described_class).to receive(:new).with(config).and_return(instance)
+            expect { described_class.start(config) }.to change(Honeybadger::Agent, :instance).to(instance)
           end
         end
 
