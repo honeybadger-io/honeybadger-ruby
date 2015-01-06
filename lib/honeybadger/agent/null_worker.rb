@@ -6,7 +6,7 @@ module Honeybadger
         true
       end
 
-      def shutdown(timeout = nil)
+      def shutdown
         true
       end
 

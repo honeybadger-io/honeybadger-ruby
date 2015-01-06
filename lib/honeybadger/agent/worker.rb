@@ -48,12 +48,10 @@ module Honeybadger
         end
       end
 
-      # Internal: Shutdown the worker.
+      # Internal: Shutdown the worker after sending remaining data.
       #
-      # timeout - The Integer timeout to wait before killing thread.
-      #
-      # Returns false if timeout reached, otherwise true.
-      def shutdown(timeout = 3)
+      # Returns true.
+      def shutdown
         mutex.synchronize do
           @shutdown = true
           @pid = nil
@@ -65,7 +63,7 @@ module Honeybadger
         r = true
         unless Thread.current.eql?(thread)
           begin
-            r = !!thread.join(timeout)
+            r = !!thread.join
           ensure
             shutdown! unless r
           end
