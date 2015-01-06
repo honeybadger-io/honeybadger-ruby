@@ -733,7 +733,8 @@ describe Honeybadger::Notice do
           exception = e = error_class.new('badgers!')
 
           0.upto(6) do
-            e.cause = e = error_class.new('cause!')
+            e.cause = c = error_class.new('cause!')
+            e = c
           end
 
           causes = build_notice(exception: exception).as_json[:error][:causes]
