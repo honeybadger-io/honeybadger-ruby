@@ -49,6 +49,10 @@ module Honeybadger
         description: 'Environments which will not report data by default (use report_data to enable/disable explicitly).',
         default: ['development'.freeze, 'test'.freeze, 'cucumber'.freeze].freeze
       },
+      :'send_data_at_exit' => {
+        description: 'Send remaining data when Ruby exits.',
+        default: true
+      },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
         default: nil

@@ -148,7 +148,7 @@ module Honeybadger
       init_metrics
 
       at_exit do
-        stop
+        stop if config[:'send_data_at_exit']
         self.class.at_exit.call if self.class.at_exit
       end
     end
