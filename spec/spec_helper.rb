@@ -114,6 +114,7 @@ RSpec.configure do |config|
     self.processes = []
     self.dirs = ['tmp', 'features']
     restore_env
+    set_env('RAILS_ENV', 'production')
     set_env('HONEYBADGER_BACKEND', 'debug')
     set_env('HONEYBADGER_LOGGING_PATH', 'STDOUT')
   end
