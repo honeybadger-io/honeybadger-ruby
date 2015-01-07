@@ -3,7 +3,7 @@ require 'securerandom'
 module Honeybadger
   module Monitor
     class Trace
-      UUIDS_ENABLED = SecureRandom.respond_to?(:uuid).freeze
+      UUIDS_ENABLED = SecureRandom.respond_to?(:uuid)
 
       attr_reader :id, :duration, :key
 
