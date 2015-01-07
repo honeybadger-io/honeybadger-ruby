@@ -1,6 +1,7 @@
 dependencies:
   pre:
     - git submodule init
+    - git submodule update
   post:
     - bundle exec appraisal install
 test:
