@@ -3,7 +3,9 @@ require 'pathname'
 require 'logger'
 require 'simplecov'
 
+# Minimum ENV required for Rails in production.
 ENV['RAILS_ENV'] = 'production'
+ENV['SECRET_KEY_BASE'] = '13556183a3c710cbc76f2a95569ae03d981714486d67ce828ed896a167bc2e8ea17855d3bccc49c8c12228adf319dd06211f60cb9bbcc010ec13709b2718f1cb'
 
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
@@ -116,7 +118,6 @@ RSpec.configure do |config|
     self.processes = []
     self.dirs = ['tmp', 'features']
     restore_env
-    set_env('RAILS_ENV', 'production')
     set_env('HONEYBADGER_BACKEND', 'debug')
     set_env('HONEYBADGER_LOGGING_PATH', 'STDOUT')
   end
