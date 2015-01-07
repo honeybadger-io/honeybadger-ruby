@@ -3,6 +3,8 @@ require 'pathname'
 require 'logger'
 require 'simplecov'
 
+ENV['RAILS_ENV'] = 'production'
+
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
 NULL_LOGGER = Logger.new('/dev/null')
