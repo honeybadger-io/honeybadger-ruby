@@ -62,7 +62,7 @@ describe Honeybadger::Agent do
     end
 
     describe "#trace" do
-      let(:trace) { double('Trace', duration: duration, id: :foo, to_h: {}) }
+      let(:trace) { double('Trace', duration: duration, id: :foo, key: :bar, to_h: {}) }
 
       context "when the duration exceeds threshold" do
         let(:duration) { 8000 }
@@ -187,7 +187,7 @@ describe Honeybadger::Agent do
     end
 
     describe "#work" do
-      let(:trace) { double('Honeybadger::Trace') }
+      let(:trace) { double('Honeybadger::Trace', key: :foo) }
 
       before do
         allow(instance).to receive(:sleep)

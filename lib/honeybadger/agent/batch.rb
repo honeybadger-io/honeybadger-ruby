@@ -3,14 +3,14 @@ require 'securerandom'
 module Honeybadger
   class Agent
     class Batch
-      def initialize(config, name = :data, max = 100, interval = 60, now = now())
+      def initialize(config, name, opts = {})
         @id = SecureRandom.uuid
         @config = config
         @name = name
-        @max = max
-        @interval = interval
-        @future = now + interval
-        @values = Array.new
+        @max = opts.fetch(:max, 100)
+        @interval = opts.fetch(:interval, 60)
+        @future = opts.fetch(:now, now()) + interval
+        @values = opts.fetch(:collection, Array.new)
         @mutex = Mutex.new
       end
 
@@ -34,13 +34,13 @@ module Honeybadger
 
       def as_json(*args)
         mutex.synchronize do
-          { name => values.compact.map(&:to_h), :environment => config[:env], :hostname => config[:hostname] }
+          { name => values.map(&:to_h), :environment => config[:env], :hostname => config[:hostname] }
         end
       end
 
       private
 
-      attr_reader :config, :name, :max, :values, :future, :mutex
+      attr_reader :config, :name, :max, :interval, :values, :future, :mutex
 
       def now
         Time.now.to_i

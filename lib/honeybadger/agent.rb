@@ -20,6 +20,7 @@ module Honeybadger
     autoload :NullWorker, 'honeybadger/agent/worker'
     autoload :Batch, 'honeybadger/agent/batch'
     autoload :MetricsCollector, 'honeybadger/agent/metrics_collector'
+    autoload :TraceCollection, 'honeybadger/agent/trace_collection'
 
     class << self
       extend Forwardable
@@ -303,7 +304,7 @@ module Honeybadger
     end
 
     def init_traces
-      @traces = Batch.new(config, :traces, 20, config.debug? ? 10 : 60)
+      @traces = Batch.new(config, :traces, max: 20, interval: config.debug? ? 10 : 60, collection: TraceCollection.new)
     end
 
     def init_metrics
