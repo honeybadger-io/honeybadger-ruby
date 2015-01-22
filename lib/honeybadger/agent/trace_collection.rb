@@ -12,7 +12,7 @@ module Honeybadger
         @traces = {}
       end
 
-      def_delegators :traces, :each, :empty?, :size
+      def_delegators :to_a, :each, :empty?, :size
 
       def push(trace)
         if !traces.key?(trace.key) || traces[trace.key].duration < trace.duration

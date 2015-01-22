@@ -1,14 +1,33 @@
 require 'honeybadger/agent/trace_collection'
 
 describe Honeybadger::Agent::TraceCollection do
+  let(:instance) { described_class.new }
+  subject { instance }
+
   it { should respond_to :size }
   it { should respond_to :empty? }
   it { should respond_to :to_a }
   it { should respond_to :push }
   it { should respond_to :map }
 
+  describe "#each" do
+    let(:traces) { [] }
+
+    before do
+      traces << double('Honeybadger::Trace', key: :foo, duration: 3000)
+      traces << double('Honeybadger::Trace', key: :bar, duration: 3000)
+      traces << double('Honeybadger::Trace', key: :baz, duration: 3000)
+      traces.each(&instance.method(:push).to_proc)
+    end
+
+    it "yields each trace" do
+      instance.each do |trace|
+        expect(trace).to eq traces.shift
+      end
+    end
+  end
+
   describe "#push" do
-    let(:instance) { described_class.new }
     let(:old) { double('Honeybadger::Trace', key: :foo, duration: 4000) }
 
     before do
