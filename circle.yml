@@ -3,6 +3,7 @@ dependencies:
     - git submodule init
     - git submodule update
   post:
+    - gem install bundler --install-dir=/home/ubuntu/honeybadger-ruby/vendor/bundle/ruby/1.9.1
     - bundle exec appraisal install
 test:
   override:
