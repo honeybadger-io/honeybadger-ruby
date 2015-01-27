@@ -41,7 +41,8 @@ module Honeybadger
     Agent.stop
   end
 
-  # Public: Send an exception to Honeybadger.
+  # Public: Send an exception to Honeybadger. Does not report ignored
+  # exceptions by default.
   #
   # exception_or_opts - An Exception object, or a Hash of options which is used
   #                     to build the notice.
@@ -49,6 +50,8 @@ module Honeybadger
   #                     Exception. (default: {}):
   #                     :error_class   - The String class name of the error.
   #                     :error_message - The String error message.
+  #                     :force         - Always report the exception (even when
+  #                                      ignored).
   #
   # Examples:
   #
@@ -68,7 +71,8 @@ module Honeybadger
   #     context: {my_data: 'value'}
   #   }) # => '06221c5a-b471-41e5-baeb-de247da45a56'
   #
-  # Returns a String UUID reference to the notice within Honeybadger.
+  # Returns a String UUID reference to the notice within Honeybadger or false
+  # when ignored.
   def notify(exception_or_opts, opts = {})
     opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
     opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)

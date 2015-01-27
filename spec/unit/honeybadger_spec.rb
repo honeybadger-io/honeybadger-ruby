@@ -123,6 +123,16 @@ describe Honeybadger do
       Honeybadger.notify(exception)
     end
 
+    it "delivers an ignored exception when notifying implicitly with :force option" do
+      exception = build_exception
+      notice = stub_notice!
+      allow(notice).to receive(:ignore?).and_return(true)
+
+      expect(worker).to receive(:push)
+
+      Honeybadger.notify(exception, force: true)
+    end
+
     it "passes config to created notices" do
       exception = build_exception
       config_opts = { 'one' => 'two', 'three' => 'four' }

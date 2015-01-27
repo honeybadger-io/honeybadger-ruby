@@ -208,7 +208,7 @@ module Honeybadger
       opts.merge!(callbacks: self.class.callbacks)
       notice = Notice.new(config, opts)
 
-      if notice.ignore?
+      if !opts[:force] && notice.ignore?
         debug { sprintf('ignore notice feature=notices id=%s', notice.id) }
         false
       else
