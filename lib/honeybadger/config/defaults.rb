@@ -19,7 +19,7 @@ module Honeybadger
       },
       env: {
         description: 'The current application\'s environment name.',
-        default: ENV['HONEYBADGER_ENV']
+        default: ENV['HONEYBADGER_ENV'] || ENV['RACK_ENV']
       },
       report_data: {
         description: 'Enable/disable reporting of data. Defaults to true for non-development environments.',
