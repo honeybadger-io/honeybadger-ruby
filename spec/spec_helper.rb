@@ -7,6 +7,9 @@ require 'simplecov'
 ENV['RAILS_ENV'] = 'production'
 ENV['SECRET_KEY_BASE'] = '13556183a3c710cbc76f2a95569ae03d981714486d67ce828ed896a167bc2e8ea17855d3bccc49c8c12228adf319dd06211f60cb9bbcc010ec13709b2718f1cb'
 
+# We don't want this bleeding through in tests. (i.e. from CircleCi)
+ENV['RACK_ENV'] = nil
+
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
 NULL_LOGGER = Logger.new('/dev/null')
