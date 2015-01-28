@@ -148,7 +148,7 @@ module Honeybadger
           else
             say("Appending Capistrano tasks to: #{capfile}", :yellow)
             File.open(capfile, 'a') do |f|
-              f.puts(%(require 'capistrano/honeybadger'))
+              f.puts("\nrequire 'capistrano/honeybadger'")
             end
           end
         end
