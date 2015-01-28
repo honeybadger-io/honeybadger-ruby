@@ -143,9 +143,13 @@ module Honeybadger
         end
 
         if (capfile = Pathname.new(config[:root]).join('Capfile')).exist?
-          say("Appending Capistrano tasks to: #{capfile}", :yellow)
-          File.open(capfile, 'a') do |f|
-            f.puts(%(require 'capistrano/honeybadger'))
+          if capfile.read.match(/honeybadger/)
+            say("Detected Honeybadger in Capfile; skipping Capistrano installation.", :yellow)
+          else
+            say("Appending Capistrano tasks to: #{capfile}", :yellow)
+            File.open(capfile, 'a') do |f|
+              f.puts(%(require 'capistrano/honeybadger'))
+            end
           end
         end
 
