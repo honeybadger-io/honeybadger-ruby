@@ -38,6 +38,12 @@ module CommandLine
     cmd(cmd, true)
   end
 
+  def capify
+    unless cmd('bundle exec cap install .').success?
+      assert_cmd('bundle exec capify .')
+    end
+  end
+
   def assert_no_notification
     expect(all_output).not_to match(/notifying debug backend of feature=notices/)
   end

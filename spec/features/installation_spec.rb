@@ -46,6 +46,20 @@ feature "Installing honeybadger via the cli" do
         expect(all_output).to match /Installation complete/i
       end
     end
+
+    scenario "when capistrano is detected" do
+      let(:capfile) { CMD_ROOT.join('Capfile') }
+
+      before do
+        capify
+      end
+
+      it "installs capistrano command" do
+        assert_cmd('honeybadger install asdf')
+        assert_cmd('bundle exec cap -T')
+        expect(all_output).to match(/honeybadger\:deploy/i)
+      end
+    end
   end
 
   scenario "in a standalone project" do

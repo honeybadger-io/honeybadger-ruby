@@ -1,10 +1,7 @@
 feature "Installing honeybadger via the cli" do
   RSpec.shared_examples "capistrano deployment" do
     before do
-      unless cmd('bundle exec cap install .').success?
-        assert_cmd('bundle exec capify .')
-      end
-
+      capify
       append_to_file('Capfile', %(\nrequire 'capistrano/honeybadger'))
     end
 

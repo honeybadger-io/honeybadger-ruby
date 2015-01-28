@@ -142,6 +142,12 @@ module Honeybadger
           end
         end
 
+        if (capfile = Pathname.new(config[:root]).join('Capfile')).exist?
+          File.open(capfile, 'a') do |f|
+            f.puts(%(require 'capistrano/honeybadger'))
+          end
+        end
+
         if !skip_test && (options[:test].nil? || options[:test])
           Honeybadger.start(config) unless load_rails_env(verbose: true)
           say('Sending test notice', :yellow)
