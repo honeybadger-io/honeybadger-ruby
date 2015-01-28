@@ -160,7 +160,7 @@ module Honeybadger
 
       @stats = Util::Stats.all
 
-      @local_variables = send_local_variables?(config) ? local_variables_from_exception(exception, config) : {}
+      @local_variables = local_variables_from_exception(exception, config, @sanitizer)
 
       @api_key = opts[:api_key] || config[:api_key]
     end
@@ -404,7 +404,8 @@ module Honeybadger
     # exception - The Exception containing the bindings stack.
     #
     # Returns a Hash of local variables
-    def local_variables_from_exception(exception, config)
+    def local_variables_from_exception(exception, config, sanitizer)
+      return {} unless send_local_variables?(config)
       return {} unless Exception === exception
       return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
       return {} if exception.__honeybadger_bindings_stack.empty?
@@ -416,7 +417,9 @@ module Honeybadger
       binding ||= exception.__honeybadger_bindings_stack[0]
 
       vars = binding.eval('local_variables')
-      Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
+      h = Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
+
+      sanitizer.sanitize(h)
     end
 
     # Internal: Should local variables be sent?
