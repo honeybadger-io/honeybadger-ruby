@@ -6,8 +6,8 @@ module Honeybadger
           def build_with_honeybadger(*args, &block)
             config = Honeybadger::Config.new(honeybadger_config(self))
             if Honeybadger.start(config)
-              use(Honeybadger::Rack::ErrorNotifier, config)
-              use(Honeybadger::Rack::MetricsReporter, config)
+              use(Honeybadger::Rack::ErrorNotifier, config) if config.feature?(:notices) && config[:'exceptions.enabled']
+              use(Honeybadger::Rack::MetricsReporter, config) if config.feature?(:metrics) && config[:'metrics.enabled']
             end
 
             build_without_honeybadger(*args, &block)

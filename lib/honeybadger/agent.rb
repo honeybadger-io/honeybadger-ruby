@@ -213,7 +213,7 @@ module Honeybadger
         false
       else
         debug { sprintf('notice feature=notices id=%s', notice.id) }
-        workers[:notices].push(notice)
+        push(:notices, notice)
         notice.id
       end
     end
@@ -269,7 +269,7 @@ module Honeybadger
     attr_reader :config, :mutex
 
     def push(feature, object)
-      unless config.features[feature]
+      unless config.feature?(feature)
         debug { sprintf('agent dropping feature=%s reason=ping', feature) }
         return false
       end

@@ -75,6 +75,10 @@ module Honeybadger
     end
     alias :to_h :to_hash
 
+    def feature?(feature)
+      !!features[feature.to_sym]
+    end
+
     def backend
       Backend.for((self[:backend] || default_backend).to_sym).new(self)
     end

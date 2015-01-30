@@ -12,13 +12,15 @@ module Honeybadger
         initializer 'honeybadger.install' do
           config = Config.new(local_config)
           if Honeybadger.start(config)
-            ::Rails.application.config.middleware.tap do |middleware|
-              middleware.insert(0, 'Honeybadger::Rack::ErrorNotifier', config)
-              middleware.insert_before('Honeybadger::Rack::ErrorNotifier', 'Honeybadger::Rack::UserFeedback', config)
-              middleware.insert_before('Honeybadger::Rack::UserFeedback', 'Honeybadger::Rack::UserInformer', config)
+            if config.feature?(:notices) && config[:'exceptions.enabled']
+              ::Rails.application.config.middleware.tap do |middleware|
+                middleware.insert(0, 'Honeybadger::Rack::ErrorNotifier', config)
+                middleware.insert_before('Honeybadger::Rack::ErrorNotifier', 'Honeybadger::Rack::UserFeedback', config)
+                middleware.insert_before('Honeybadger::Rack::UserFeedback', 'Honeybadger::Rack::UserInformer', config)
+              end
             end
 
-            if config[:'traces.enabled']
+            if config.feature?(:traces) && config[:'traces.enabled']
               ActiveSupport::Notifications.subscribe('start_processing.action_controller') do |name, started, finished, id, data|
                 Trace.create(id)
               end
@@ -46,7 +48,7 @@ module Honeybadger
               end
             end
 
-            if config[:'metrics.enabled']
+            if config.feature?(:metrics) && config[:'metrics.enabled']
               ActiveSupport::Notifications.subscribe('process_action.action_controller') do |*args|
                 event = ActiveSupport::Notifications::Event.new(*args)
                 status = event.payload[:exception] ? 500 : event.payload[:status]

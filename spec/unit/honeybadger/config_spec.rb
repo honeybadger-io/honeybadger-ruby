@@ -202,4 +202,24 @@ describe Honeybadger::Config do
       end
     end
   end
+
+  describe "#feature?" do
+    let(:instance) { described_class.new }
+
+    subject { instance.feature?(:notice) }
+
+    before do
+      instance.features.merge!(notice: state)
+    end
+
+    context "when feature is active" do
+      let(:state) { true }
+      it { should eq true }
+    end
+
+    context "when feature is inactive" do
+      let(:state) { false }
+      it { should eq false }
+    end
+  end
 end
