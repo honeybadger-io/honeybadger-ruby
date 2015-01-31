@@ -20,7 +20,7 @@ Honeybadger supports Rails 2.3 through Rails 4.2 (latest releases).
 
 ## Documentation
 
-[View the Documentation](http://docs.honeybadger.io/article/50-honeybadger-gem-documentation)
+[View the Documentation](./docs/index.md)
 
 ## Contributing
 
