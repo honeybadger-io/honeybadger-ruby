@@ -11,18 +11,13 @@ module Honeybadger
     #
     #   require 'honeybadger/rack/error_notifier'
     #
-    #   Honeybadger.configure do |config|
-    #     config.api_key = 'my_api_key'
-    #   end
-    #
     #   app = Rack::Builder.app do
     #     run lambda { |env| raise "Rack down" }
     #   end
     #
     #   use Honeybadger::Rack::ErrorNotifier
-    #   run app
     #
-    # Use a standard Honeybadger.configure call to configure your api key.
+    #   run app
     class ErrorNotifier
       extend Forwardable
 
