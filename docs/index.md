@@ -3,7 +3,7 @@
 Add the Honeybadger gem to your gemfile:
 
 ```ruby
-gem 'honeybadger'
+gem 'honeybadger', '~> 1.16'
 ```
 
 Then generate the initializer:
@@ -26,13 +26,13 @@ That's it!
 Add the honeybadger gem to your app. In `config/environment.rb`:
 
 ```ruby
-config.gem 'honeybadger'
+config.gem 'honeybadger', '~> 1.16'
 ```
 
 or if you are using bundler:
 
 ```ruby
-gem 'honeybadger', :require => 'honeybadger/rails'
+gem 'honeybadger', '~> 1.16', :require => 'honeybadger/rails'
 ```
 
 Then from your project's `RAILS_ROOT`, and in your development environment, run:
