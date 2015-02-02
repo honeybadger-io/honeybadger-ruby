@@ -53,6 +53,32 @@ describe Honeybadger::Config do
         expect(log_file.exist?).to eq true
       end
     end
+
+    context "when the config path is defined" do
+      let(:config_file) { TMP_DIR.join('honeybadger.yml') }
+
+      before { File.write(config_file, '') }
+      after { File.unlink(config_file) }
+
+      def build_instance
+        Honeybadger::Config.new(logger: NULL_LOGGER, :'config.path' => config_file)
+      end
+
+      context "when a config error occurrs while loading file" do
+        before do
+          allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
+        end
+
+        it "does not raise an exception" do
+          expect { build_instance }.not_to raise_error
+        end
+
+        it "logs the error message to the boot logger" do
+          expect(Honeybadger::Logging::BootLogger.instance).to receive(:error).with(/ouch/)
+          build_instance
+        end
+      end
+    end
   end
 
   describe "#ping" do
