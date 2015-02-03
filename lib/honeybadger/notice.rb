@@ -163,6 +163,8 @@ module Honeybadger
       @local_variables = local_variables_from_exception(exception, config, @sanitizer)
 
       @api_key = opts[:api_key] || config[:api_key]
+
+      monkey_patch_action_dispatch_test_process!
     end
 
     # Internal: Template used to create JSON payload
@@ -475,6 +477,20 @@ module Honeybadger
       end
 
       c
+    end
+
+    # Internal: This is how much Honeybadger cares about Rails developers. :)
+    #
+    # Returns nothing
+    def monkey_patch_action_dispatch_test_process!
+      return unless defined?(ActionDispatch::TestProcess)
+
+      if @request.method(:session).source_location[0] =~ /action_dispatch/
+        STDOUT.puts('WARNING: It appears you may be including ActionDispatch::TestProcess globally. Check out https://www.honeybadger.io/s/adtp for more info.')
+        def @request.session
+          @table[:session]
+        end
+      end
     end
   end
 end

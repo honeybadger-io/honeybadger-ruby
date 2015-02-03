@@ -52,8 +52,22 @@ feature "error notifications" do
     it "reports the exception to Honeybadger" do
       perform_request(url)
       assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'}, 'request' => {'url' => url})
+      expect(all_output).not_to match /honeybadger.io\/s\/adtp/
+    end
+
+    context "and ActionDispatch::Test process has been included globally" do
+      before do
+        append_to_file(RAILS_ROOT.join('config', 'initializers', 'adtp.rb'), 'include ActionDispatch::TestProcess')
+      end
+
+      it "reports the exception to Honeybadger" do
+        perform_request(url)
+        assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'}, 'request' => {'url' => url})
+        expect(all_output).to match /honeybadger.io\/s\/adtp/
+      end
     end
   end
+
 
   scenario "an unhandled exception occurs in a Sinatra app", framework: :sinatra do
     let(:url) { 'http://example.com:123/test/failure?param=value' }
