@@ -1,3 +1,8 @@
+* Detect ActionDispatch::TestProcess being included globally, fix issue locally,
+  warn the user.
+
+  *Joshua Wood*
+
 * Fix a nil logger bug when a config error occurs.
 
   *Joshua Wood*
