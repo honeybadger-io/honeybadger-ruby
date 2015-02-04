@@ -504,8 +504,13 @@ module Honeybadger
 
       if @request.method(:session).source_location[0] =~ ACTION_DISPATCH_FILE
         STDOUT.puts('WARNING: It appears you may be including ActionDispatch::TestProcess globally. Check out https://www.honeybadger.io/s/adtp for more info.')
+
         def @request.session
           @table[:session]
+        end
+
+        def self.session
+          @request.session
         end
       end
     end
