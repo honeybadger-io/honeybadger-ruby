@@ -54,9 +54,6 @@ module Honeybadger
     # Internal: The Regexp used to strip invalid characters from individual tags.
     TAG_SANITIZER = /[^\w]/.freeze
 
-    # Internal: The Regexp used to match an ActionDispatch file.
-    ACTION_DISPATCH_FILE = /action_dispatch/
-
     # Public: The unique ID of this notice which can be used to reference the
     # error in Honeybadger.
     attr_reader :id
@@ -500,18 +497,16 @@ module Honeybadger
     #
     # Returns nothing
     def monkey_patch_action_dispatch_test_process!
-      return unless defined?(ActionDispatch::TestProcess)
+      return unless defined?(ActionDispatch::TestProcess) && defined?(self.fixture_file_upload)
 
-      if @request.method(:session).source_location[0] =~ ACTION_DISPATCH_FILE
-        STDOUT.puts('WARNING: It appears you may be including ActionDispatch::TestProcess globally. Check out https://www.honeybadger.io/s/adtp for more info.')
+      STDOUT.puts('WARNING: It appears you may be including ActionDispatch::TestProcess globally. Check out https://www.honeybadger.io/s/adtp for more info.')
 
-        def @request.session
-          @table[:session]
-        end
+      def @request.session
+        @table[:session]
+      end
 
-        def self.session
-          @request.session
-        end
+      def self.session
+        @request.session
       end
     end
   end
