@@ -52,7 +52,7 @@ module Honeybadger
 
     def_delegators :@values, :update
 
-    attr_reader :logger, :features
+    attr_reader :features
 
     def get(key)
       key = key.to_sym
@@ -77,6 +77,10 @@ module Honeybadger
 
     def feature?(feature)
       !!features[feature.to_sym]
+    end
+
+    def logger
+      @logger || Logging::BootLogger.instance
     end
 
     def backend

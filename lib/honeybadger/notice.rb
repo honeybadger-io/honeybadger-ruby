@@ -163,6 +163,8 @@ module Honeybadger
       @local_variables = local_variables_from_exception(exception, config, @sanitizer)
 
       @api_key = opts[:api_key] || config[:api_key]
+
+      monkey_patch_action_dispatch_test_process!
     end
 
     # Internal: Template used to create JSON payload
@@ -475,6 +477,37 @@ module Honeybadger
       end
 
       c
+    end
+
+    # Internal: This is how much Honeybadger cares about Rails developers. :)
+    #
+    # Some Rails projects include ActionDispatch::TestProcess globally for the
+    # use of `fixture_file_upload` in tests. This is a bad practice because it
+    # includes other methods -- such as #session -- which override existing
+    # methods on *all objects*. This creates the following bug in Notice:
+    #
+    # When you call #session on any object which had previously defined it
+    # (such as OpenStruct), that newly defined method calls #session on
+    # @request (defined in `ActionDispatch::TestProcess`), and if @request
+    # doesn't exist in that object, it calls #session *again* on `nil`, which
+    # also inherited it from Object, resulting in a SystemStackError.
+    #
+    # This method restores the correct #session method on @request and warns
+    # the user of the issue.
+    #
+    # Returns nothing
+    def monkey_patch_action_dispatch_test_process!
+      return unless defined?(ActionDispatch::TestProcess) && defined?(self.fixture_file_upload)
+
+      STDOUT.puts('WARNING: It appears you may be including ActionDispatch::TestProcess globally. Check out https://www.honeybadger.io/s/adtp for more info.')
+
+      def @request.session
+        @table[:session]
+      end
+
+      def self.session
+        @request.session
+      end
     end
   end
 end
