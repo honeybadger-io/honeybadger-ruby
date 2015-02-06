@@ -1,3 +1,7 @@
+* Support for capistrano-rvm gem in Capistrano task.
+
+  *Kyle Rippey*
+
 * Don't require honeybadger.yml to be writable when reading.
 
   *Joshua Wood*
