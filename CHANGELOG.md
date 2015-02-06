@@ -1,3 +1,7 @@
+* Don't require honeybadger.yml to be writable when reading.
+
+  *Joshua Wood*
+
 * Detect ActionDispatch::TestProcess being included globally, fix issue locally,
   warn the user.
 

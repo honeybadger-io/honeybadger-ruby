@@ -12,8 +12,8 @@ module Honeybadger
           raise ConfigError, "The configuration file #{@path} was not found."
         elsif !@path.file?
           raise ConfigError, "The configuration file #{@path} is not a file."
-        elsif !@path.writable?
-          raise ConfigError, "The configuration file #{@path} is not writable."
+        elsif !@path.readable?
+          raise ConfigError, "The configuration file #{@path} is not readable."
         else
           yaml = YAML.load(ERB.new(@path.read).result)
           yaml.merge!(yaml[env]) if yaml[env].kind_of?(Hash)
