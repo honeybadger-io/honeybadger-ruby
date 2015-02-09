@@ -1,3 +1,14 @@
+* Exceptions with the same type but caused within different delayed jobs are not grouped together. They have their component and action set so that the application class name and excecuted action is displayed in the UI.
+
+  *Panos Korros*
+
+All events ents logged within a delayed_job even those logged by Honeybadger.notify inherit the context of the delayed job and include the job_id, attempts, last_error and queue
+
+
+* All events logged within a delayed_job even those logged by Honeybadger.notify inherit the context of the delayed job and include the job_id, attempts, last_error and queue
+
+  *Panos Korros*
+
 * Detect ActionDispatch::TestProcess being included globally, fix issue locally,
   warn the user.
 
