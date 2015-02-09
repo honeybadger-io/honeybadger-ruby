@@ -19,11 +19,17 @@ module Honeybadger
                 block.call(job)
               end
             rescue Exception => error
-              component = job.payload_object.object.is_a?(Class) ? job.payload_object.object.name : job.payload_object.object.class.name rescue nil
+              begin #buildin suport for Delayed::PerformableMethod
+                component = job.payload_object.object.is_a?(Class) ? job.payload_object.object.name : job.payload_object.object.class.name
+                action    = job.payload_object.method_name.to_s
+              rescue #fallback to support all other classes
+                component = job.payload_object.class.name
+                action    = 'perform'
+              end
 
               ::Honeybadger.notify_or_ignore(
                 :component     => component,
-                :action        => job.payload_object.method_name.to_s,
+                :action        => action,
                 :error_class   => error.class.name,
                 :error_message => "#{ error.class.name }: #{ error.message }",
                 :backtrace     => error.backtrace
