@@ -76,6 +76,7 @@ end
 namespace :load do
   task :defaults do
     set :bundle_bins, fetch(:bundle_bins, []).push('honeybadger')
+    set :rbenv_map_bins, fetch(:rbenv_map_bins, []).push('honeybadger')
     set :rvm_map_bins, fetch(:rvm_map_bins, []).push('honeybadger')
   end
 end
