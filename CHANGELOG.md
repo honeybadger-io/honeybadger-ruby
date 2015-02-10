@@ -1,3 +1,7 @@
+* Support for capistrano-rbenv gem in Capistrano task.
+
+  *Chris Gunther*
+
 * Support for capistrano-rvm gem in Capistrano task.
 
   *Kyle Rippey*
