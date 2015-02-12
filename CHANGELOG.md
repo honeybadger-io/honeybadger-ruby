@@ -1,3 +1,8 @@
+* Merge exceptions.ignore config values with default ignored exception class
+  names and add exceptions.ignore_only option to override.
+
+  *Joshua Wood*
+
 * Support for capistrano-rbenv gem in Capistrano task.
 
   *Chris Gunther*
