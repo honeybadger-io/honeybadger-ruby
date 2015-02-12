@@ -81,6 +81,41 @@ describe Honeybadger::Config do
     end
   end
 
+  describe "#get" do
+    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, enabled: false, debug: true}.merge!(opts)) }
+    let(:opts) { {} }
+
+    context "when a normal option doesn't exist" do
+      it 'returns the default option value' do
+        expect(instance.get(:development_environments)).to eq Honeybadger::Config::DEFAULTS[:development_environments]
+      end
+    end
+
+    context "when a normal option exists" do
+      let(:opts) { { :development_environments => ['foo']} }
+
+      it 'returns the option value' do
+        expect(instance.get(:development_environments)).to eq ['foo']
+      end
+    end
+
+    context "when a merge option exists" do
+      let(:opts) { { :'exceptions.ignore' => ['foo']} }
+
+      it 'returns the option value plus defaults' do
+        expect(instance.get(:'exceptions.ignore')).to eq (Honeybadger::Config::DEFAULTS[:'exceptions.ignore'] | ['foo'])
+      end
+    end
+
+    context "when an override exists" do
+      let(:opts) { { :'exceptions.ignore_only' => ['bar']} }
+
+      it "returns the override" do
+        expect(instance.get(:'exceptions.ignore')).to eq ['bar']
+      end
+    end
+  end
+
   describe "#ping" do
     let(:instance) { Honeybadger::Config.new(logger: NULL_LOGGER, enabled: false, debug: true) }
     let(:logger) { instance.logger }

@@ -33,16 +33,22 @@ module Honeybadger
 
     FEATURES = [:notices, :local_variables, :metrics, :traces].freeze
 
+    MERGE_DEFAULT = [:'exceptions.ignore'].freeze
+
+    OVERRIDE = {
+      :'exceptions.ignore' => :'exceptions.ignore_only'
+    }.freeze
+
     def initialize(opts = {})
       l = opts.delete(:logger)
 
       @values = opts
 
-      load_config_from_disk do |yml|
-        update(yml)
-      end
-
-      update(Env.new(ENV))
+      priority = {}
+      priority.update(opts)
+      load_config_from_disk {|yml| priority.update(yml) }
+      priority.update(Env.new(ENV))
+      update(merge_defaults!(priority))
 
       @logger = Logging::ConfigLogger.new(self, build_logger(l))
       Logging::BootLogger.instance.flush(@logger)
@@ -56,7 +62,9 @@ module Honeybadger
 
     def get(key)
       key = key.to_sym
-      if @values.include?(key)
+      if OVERRIDE.has_key?(key) && @values.has_key?(OVERRIDE[key])
+        @values[OVERRIDE[key]]
+      elsif @values.has_key?(key)
         @values[key]
       else
         DEFAULTS[key]
@@ -350,6 +358,21 @@ api_key: '#{self[:api_key]}'
 
     def symbolize_keys(hash)
       Hash[hash.map {|k,v| [k.to_sym, v] }]
+    end
+
+    # Internal: Merges supplied config options with defaults.
+    #
+    # config - The Hash config options to merge.
+    #
+    # Returns the updated Hash config with merged values.
+    def merge_defaults!(config)
+      MERGE_DEFAULT.each do |option|
+        if config[option].kind_of?(Array)
+          config[option] = (DEFAULTS[option] | config[option])
+        end
+      end
+
+      config
     end
   end
 end

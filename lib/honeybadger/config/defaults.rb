@@ -12,6 +12,8 @@ module Honeybadger
                       'Mongoid::Errors::DocumentNotFound',
                       'Sinatra::NotFound'].map(&:freeze).freeze
 
+    DEVELOPMENT_ENVIRONMENTS = ['development', 'test', 'cucumber'].map(&:freeze).freeze
+
     OPTIONS = {
       api_key: {
         description: 'The API key for your Honeybadger project.',
@@ -47,7 +49,7 @@ module Honeybadger
       },
       development_environments: {
         description: 'Environments which will not report data by default (use report_data to enable/disable explicitly).',
-        default: ['development'.freeze, 'test'.freeze, 'cucumber'.freeze].freeze
+        default: DEVELOPMENT_ENVIRONMENTS
       },
       :'send_data_at_exit' => {
         description: 'Send remaining data when Ruby exits.',
@@ -158,8 +160,12 @@ module Honeybadger
         default: true
       },
       :'exceptions.ignore' => {
-        description: 'A list of exceptions to ignore.',
+        description: 'A list of additional exceptions to ignore (includes default ignored exceptions).',
         default: IGNORE_DEFAULT
+      },
+      :'exceptions.ignore_only' => {
+        description: 'A list of exceptions to ignore (overrides the default ignored exceptions).',
+        default: [].freeze
       },
       :'exceptions.ignored_user_agents' => {
         description: 'A list of user agents to ignore.',
