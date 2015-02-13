@@ -275,6 +275,15 @@ api_key: '#{self[:api_key]}'
       end
     end
 
+    # Internal: Match the project root.
+    #
+    # Returns Regexp matching the project root in a file string.
+    def root_regexp
+      return @root_regexp if @root_regexp
+      return nil if @no_root or (root = get(:root).to_s) !~ NOT_BLANK && @no_root = true
+      @root_regexp = Regexp.new("^#{ Regexp.escape(root) }")
+    end
+
     private
 
     def ping_payload
@@ -305,11 +314,11 @@ api_key: '#{self[:api_key]}'
     end
 
     def locate_absolute_path(path, root)
-      path = Pathname.new(path)
+      path = Pathname.new(path.to_s)
       if path.absolute?
         path
       else
-        Pathname.new(root).join(path)
+        Pathname.new(root.to_s).join(path.to_s)
       end
     end
 

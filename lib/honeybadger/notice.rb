@@ -120,8 +120,8 @@ module Honeybadger
         return line unless config
         c = (PROJECT_ROOT_CACHE[config[:root]] ||= {})
         return c[line] if c.has_key?(line)
-        c[line] ||= if (root = config[:root].to_s) != STRING_EMPTY
-                      line.sub(root, PROJECT_ROOT)
+        c[line] ||= if config.root_regexp
+                      line.sub(config.root_regexp, PROJECT_ROOT)
                     else
                       line
                     end

@@ -283,4 +283,26 @@ describe Honeybadger::Config do
       it { should eq false }
     end
   end
+
+  describe "#root_regexp" do
+    let(:instance) { described_class.new(root: root) }
+
+    subject { instance.root_regexp }
+
+    context "when root is missing" do
+      let(:root) { nil }
+      it { should be_nil }
+    end
+
+    context "when root is present" do
+      let(:root) { '/bar' }
+      it { should match '/bar/baz' }
+      it { should_not match '/foo/bar/baz' }
+    end
+
+    context "when root is blank" do
+      let(:root) { '' }
+      it { should be_nil }
+    end
+  end
 end

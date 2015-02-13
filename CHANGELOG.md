@@ -1,3 +1,7 @@
+* Don't sub partial project root in backtrace lines.
+
+  *Joshua Wood*
+
 * Merge exceptions.ignore config values with default ignored exception class
   names and add exceptions.ignore_only option to override.
 

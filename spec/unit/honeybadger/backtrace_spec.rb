@@ -167,12 +167,12 @@ describe Honeybadger::Backtrace do
       backtrace_with_root = Honeybadger::Backtrace.parse(
         ["#{@project_root}/app/models/user.rb:7:in `latest'",
          "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
-         "/lib/something.rb:41:in `open'"],
+         "/lib/app/something.rb:41:in `open'"],
          :filters => default_filters, :config => config)
          backtrace_without_root = Honeybadger::Backtrace.parse(
            ["[PROJECT_ROOT]/app/models/user.rb:7:in `latest'",
             "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
-            "/lib/something.rb:41:in `open'"])
+            "/lib/app/something.rb:41:in `open'"])
 
          expect(backtrace_without_root).to eq backtrace_with_root
     end
