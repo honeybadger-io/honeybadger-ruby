@@ -280,7 +280,11 @@ api_key: '#{self[:api_key]}'
     # Returns Regexp matching the project root in a file string.
     def root_regexp
       return @root_regexp if @root_regexp
-      return nil if @no_root or (root = get(:root).to_s) !~ NOT_BLANK && @no_root = true
+      return nil if @no_root
+
+      root = get(:root).to_s
+      @no_root = true and return nil unless root =~ NOT_BLANK
+
       @root_regexp = Regexp.new("^#{ Regexp.escape(root) }")
     end
 
