@@ -2,9 +2,6 @@
 
   *Panos Korros*
 
-All events ents logged within a delayed_job even those logged by Honeybadger.notify inherit the context of the delayed job and include the job_id, attempts, last_error and queue
-
-
 * All events logged within a delayed_job even those logged by Honeybadger.notify inherit the context of the delayed job and include the job_id, attempts, last_error and queue
 
   *Panos Korros*
