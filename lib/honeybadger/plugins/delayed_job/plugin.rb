@@ -8,17 +8,6 @@ module Honeybadger
         callbacks do |lifecycle|
           lifecycle.around(:invoke_job) do |job, &block|
             begin
-              ::Honeybadger.context(
-                :job_id        => job.id,
-                :handler       => job.handler,
-                :last_error    => job.last_error,
-                :attempts      => job.attempts,
-                :queue         => job.queue
-              )
-              ::Honeybadger::Trace.instrument("#{job.payload_object.class}#perform", {source: 'delayed_job', jid: job.id, class: job.payload_object.class.name}) do
-                block.call(job)
-              end
-            rescue Exception => error
               begin #buildin suport for Delayed::PerformableMethod
                 component = job.payload_object.object.is_a?(Class) ? job.payload_object.object.name : job.payload_object.object.class.name
                 action    = job.payload_object.method_name.to_s
@@ -27,9 +16,21 @@ module Honeybadger
                 action    = 'perform'
               end
 
-              ::Honeybadger.notify_or_ignore(
+              ::Honeybadger.context(
                 :component     => component,
                 :action        => action,
+                :job_id        => job.id,
+                :handler       => job.handler,
+                :last_error    => job.last_error,
+                :attempts      => job.attempts,
+                :queue         => job.queue
+              )
+
+              ::Honeybadger::Trace.instrument("#{job.payload_object.class}#perform", {source: 'delayed_job', jid: job.id, class: job.payload_object.class.name}) do
+                block.call(job)
+              end
+            rescue Exception => error
+              ::Honeybadger.notify_or_ignore(
                 :error_class   => error.class.name,
                 :error_message => "#{ error.class.name }: #{ error.message }",
                 :backtrace     => error.backtrace
