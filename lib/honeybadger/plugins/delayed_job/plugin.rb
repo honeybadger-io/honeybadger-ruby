@@ -31,6 +31,8 @@ module Honeybadger
               end
             rescue Exception => error
               ::Honeybadger.notify_or_ignore(
+                :component     => component,
+                :action        => action,
                 :error_class   => error.class.name,
                 :error_message => "#{ error.class.name }: #{ error.message }",
                 :backtrace     => error.backtrace
