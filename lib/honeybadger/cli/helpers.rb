@@ -125,7 +125,7 @@ module Honeybadger
 
           def test_honeybadger
             puts "Raising '#{test_exception_class.name}' to simulate application failure."
-            raise #{test_exception_class}.new, 'Testing honeybadger via "honeybadger testhoneybadger test", it works.'
+            raise #{test_exception_class}.new, 'Testing honeybadger via "honeybadger test", it works.'
           end
 
           # Ensure we actually have an action to go to.
