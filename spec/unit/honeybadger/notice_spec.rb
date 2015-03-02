@@ -429,6 +429,11 @@ describe Honeybadger::Notice do
       notice = build_notice
       expect(notice.as_json[:server][:time]).to eq now.utc
     end
+
+    it "sets the process id" do
+      notice = build_notice
+      expect(notice.as_json[:server][:pid]).to eq Process.pid
+    end
   end
 
   context "custom fingerprint" do

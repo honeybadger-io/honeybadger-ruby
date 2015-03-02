@@ -1,3 +1,7 @@
+* Send the id of the current process with error reports.
+
+  *Joshua Wood*
+
 * Don't sub partial project root in backtrace lines.
 
   *Joshua Wood*

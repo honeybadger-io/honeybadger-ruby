@@ -132,6 +132,7 @@ module Honeybadger
 
     def initialize(config, opts = {})
       @now = Time.now.utc
+      @pid = Process.pid
       @id = SecureRandom.uuid
 
       @opts = opts
@@ -199,7 +200,8 @@ module Honeybadger
           environment_name: config[:env],
           hostname: config[:hostname],
           stats: stats,
-          time: now
+          time: now,
+          pid: pid
         }
       }
     end
@@ -236,7 +238,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now, :causes
+    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
