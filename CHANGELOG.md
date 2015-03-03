@@ -1,3 +1,7 @@
+* Always send a test notice on install.
+
+  *Joshua Wood*
+
 * Send the id of the current process with error reports.
 
   *Joshua Wood*

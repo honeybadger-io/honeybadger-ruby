@@ -127,7 +127,6 @@ module Honeybadger
 
         if (path = config.config_path).exist?
           say("You're already on Honeybadger, so you're all set.", :yellow)
-          skip_test = true if options[:test].nil? # Only if it wasn't specified.
         else
           say("Writing configuration to: #{path}", :yellow)
 
@@ -153,7 +152,7 @@ module Honeybadger
           end
         end
 
-        if !skip_test && (options[:test].nil? || options[:test])
+        if options[:test].nil? || options[:test]
           Honeybadger.start(config) unless load_rails_env(verbose: true)
           say('Sending test notice', :yellow)
           unless Agent.instance && send_test(false)
