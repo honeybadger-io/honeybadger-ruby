@@ -122,7 +122,7 @@ describe Honeybadger::Plugin do
       it { should eq false }
 
       it "logs the failure" do
-        expect(config.logger).to receive(:error).with(/oops!/).once
+        expect(config.logger).to receive(:error).with(/oops!/).twice
         plugin.ok?(config)
       end
     end
@@ -164,7 +164,7 @@ describe Honeybadger::Plugin do
       end
 
       it "logs the failure" do
-        expect(config.logger).to receive(:error).with(/oh noes!/).once
+        expect(config.logger).to receive(:error).with(/oh noes!/).twice
         plugin.load!(config)
       end
 

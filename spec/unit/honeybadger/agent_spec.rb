@@ -172,6 +172,7 @@ describe Honeybadger::Agent do
 
       context "when an exception occurs" do
         before do
+          allow(config.logger).to receive(:error)
           allow(instance).to receive(:work).and_raise(StandardError.new('Oops :('))
         end
 
@@ -215,6 +216,7 @@ describe Honeybadger::Agent do
 
       context "when an exception occurs" do
         before do
+          allow(config.logger).to receive(:error)
           allow(instance.metrics).to receive(:flush?).and_raise(RuntimeError.new('snakes!'))
         end
 

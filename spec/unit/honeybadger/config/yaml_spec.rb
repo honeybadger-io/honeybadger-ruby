@@ -82,8 +82,8 @@ logging:
       allow(YAML).to receive(:load).and_raise(RuntimeError)
     end
 
-    it "raises a ConfigError" do
-      expect { subject }.to raise_error(Honeybadger::Config::ConfigError)
+    it "raises original exception" do
+      expect { subject }.to raise_error(RuntimeError)
     end
   end
 end

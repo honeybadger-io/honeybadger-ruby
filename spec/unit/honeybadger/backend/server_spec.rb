@@ -24,16 +24,6 @@ describe Honeybadger::Backend::Server do
           allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
           expect { notify_backend }.to raise_error(NoMemoryError)
         end
-
-        it "should be logged" do
-          proxy = double()
-          allow(proxy).to receive(:new).and_raise(RuntimeError.new('Snakes!'))
-          allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
-
-          expect(logger).to receive(:error).with(/Snakes/)
-
-          expect { notify_backend }.to raise_error(RuntimeError)
-        end
       end
 
       context "connection errors" do
@@ -52,6 +42,15 @@ describe Honeybadger::Backend::Server do
           Honeybadger::Backend::Server::HTTP_ERRORS.each do |error|
             allow(http).to receive(:post).and_raise(error)
             expect { notify_backend }.not_to raise_error
+          end
+        end
+
+        it "logs the http exception" do
+          http = stub_http
+          Honeybadger::Backend::Server::HTTP_ERRORS.each do |error|
+            allow(http).to receive(:post).and_raise(error)
+            expect(logger).to receive(:error).with(/#{ error.name }/)
+            notify_backend
           end
         end
       end

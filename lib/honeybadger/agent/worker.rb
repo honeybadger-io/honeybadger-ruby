@@ -131,7 +131,8 @@ module Honeybadger
           d { sprintf('stopping worker feature=%s', feature) }
         end
       rescue Exception => e
-        error(sprintf('error in worker thread (shutting down) feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
+        error { sprintf('error in worker thread (shutting down) feature=%s class=%s message=%s', feature, e.class, e.message.dump) }
+        log_exception(e)
       ensure
         release_marker
       end
@@ -140,7 +141,8 @@ module Honeybadger
         handle_response(notify_backend(msg))
         sleep(throttle_interval)
       rescue StandardError => e
-        error(sprintf('error in worker thread feature=%s class=%s message=%s at=%s', feature, e.class, e.message.dump, e.backtrace.first.dump))
+        error { sprintf('error in worker thread feature=%s class=%s message=%s', feature, e.class, e.message.dump) }
+        log_exception(e)
         sleep(1)
       end
 

@@ -80,16 +80,6 @@ describe Honeybadger::Util::HTTP do
         allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
         expect { http_post }.to raise_error(NoMemoryError)
       end
-
-      it "should be logged" do
-        proxy = double()
-        allow(proxy).to receive(:new).and_raise(RuntimeError.new('Oops'))
-        allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
-
-        expect(logger).to receive(:error).with(/error class=RuntimeError message="Oops"/)
-
-        expect { http_post }.to raise_error(RuntimeError)
-      end
     end
 
     # context "connection errors" do

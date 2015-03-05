@@ -6,6 +6,13 @@ module Honeybadger
   module Logging
     PREFIX = '** [Honeybadger] '.freeze
 
+    BACKTRACE_DELIMITER = "\n\t".freeze
+    EXCEPTION_FORMAT = "%s: %s#{ BACKTRACE_DELIMITER }%s".freeze
+
+    def self.dump_exception(e)
+      sprintf(EXCEPTION_FORMAT, e.class, e.message, Array(e.backtrace).join(BACKTRACE_DELIMITER))
+    end
+
     # Internal: Logging helper methods. Requires a Honeybadger::Config @config
     # instance variable to exist and/or #logger to be defined. Each
     # method is defined/block captured in this module rather than delegating to
@@ -35,6 +42,10 @@ module Honeybadger
         return true if Logger::Severity::ERROR < logger.level
         msg = yield if block_given?
         logger.error(msg)
+      end
+
+      def log_exception(e)
+        error { Logging.dump_exception(e) }
       end
 
       def logger

@@ -354,6 +354,10 @@ api_key: '#{self[:api_key]}'
     rescue ConfigError => e
       logger.error("Error while loading config from disk: #{e}")
       nil
+    rescue StandardError => e
+      logger.error("Error while loading config from disk: #{e}")
+      log_exception(e)
+      nil
     end
 
     def undotify_keys(hash)

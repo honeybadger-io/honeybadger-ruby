@@ -43,7 +43,7 @@ module Honeybadger
         Response.new(@http.post(ENDPOINTS[feature], payload))
       rescue *HTTP_ERRORS => e
         Response.new(:error, nil, "HTTP Error: #{e.class}").tap do |response|
-          error { sprintf('http error class=%s message=%s', e.class, e.message.dump) }
+          error { sprintf('http error feature=%s class=%s message=%s', feature, e.class, e.message.dump) }
         end
       end
     end
