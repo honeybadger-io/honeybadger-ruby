@@ -54,7 +54,7 @@ module Honeybadger
       end
 
       def level
-        Logger::Severity::Debug
+        Logger::Severity::DEBUG
       end
     end
 

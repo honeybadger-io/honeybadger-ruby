@@ -78,6 +78,26 @@ describe Honeybadger::Config do
           build_instance
         end
       end
+
+      context "when a generic error occurrs while loading file" do
+        before do
+          allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
+        end
+
+        it "does not raise an exception" do
+          expect { build_instance }.not_to raise_error
+        end
+
+        it "logs the error message to the boot logger" do
+          expect(Honeybadger::Logging::BootLogger.instance).to receive(:error).with(/ouch/)
+          build_instance
+        end
+
+        it "logs the backtrace to the boot logger" do
+          expect(Honeybadger::Logging::BootLogger.instance).to receive(:error).with(/config_spec\.rb/)
+          build_instance
+        end
+      end
     end
   end
 

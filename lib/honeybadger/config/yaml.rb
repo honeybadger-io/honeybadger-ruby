@@ -19,9 +19,6 @@ module Honeybadger
           yaml.merge!(yaml[env]) if yaml[env].kind_of?(Hash)
           update(dotify_keys(yaml))
         end
-
-      rescue StandardError => e
-        raise ConfigError, "An unknown error occured: #{e.class} -- #{e.message}\n\t#{e.backtrace.first}"
       end
 
       private
