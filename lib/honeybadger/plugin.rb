@@ -71,7 +71,7 @@ module Honeybadger
     def ok?(config)
       @requirements.all? {|r| Execution.new(config, &r).call }
     rescue => e
-      config.logger.error(sprintf('plugin error name=%s class=%s message=%s at=%s', name, e.class, e.message.dump, e.backtrace.first.dump))
+      config.logger.error(sprintf("plugin error name=%s class=%s message=%s\n\t%s", name, e.class, e.message.dump, Array(e.backtrace).join("\n\t")))
       false
     end
 
@@ -89,7 +89,7 @@ module Honeybadger
 
       @loaded
     rescue => e
-      config.logger.error(sprintf('plugin error name=%s class=%s message=%s at=%s', name, e.class, e.message.dump, e.backtrace.first.dump))
+      config.logger.error(sprintf("plugin error name=%s class=%s message=%s\n\t%s", name, e.class, e.message.dump, Array(e.backtrace).join("\n\t")))
       @loaded = true
       false
     end

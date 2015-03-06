@@ -282,7 +282,10 @@ module Honeybadger
     def run
       loop { work }
     rescue Exception => e
-      error(sprintf('error in agent thread (shutting down) class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
+      error {
+        msg = "error in agent thread (shutting down) class=%s message=%s\n\t%s"
+        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
+      }
     ensure
       d { sprintf('stopping agent') }
     end
@@ -291,7 +294,10 @@ module Honeybadger
       flush_metrics if metrics.flush?
       flush_traces if traces.flush?
     rescue StandardError => e
-      error(sprintf('error in agent thread class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump))
+      error {
+        msg = "error in agent thread class=%s message=%s\n\t%s"
+        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
+      }
     ensure
       sleep(delay)
     end
