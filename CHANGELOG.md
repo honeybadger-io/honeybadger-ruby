@@ -1,3 +1,7 @@
+* Include full backtrace when logging worker exceptions.
+
+  *Joshua Wood*
+
 * Always send a test notice on install.
 
   *Joshua Wood*
