@@ -187,7 +187,7 @@ describe Honeybadger::Notice do
     it "does not ignore an exception not matching ignore filters" do
       callbacks.exception_filter {|n| false }
       notice = build_notice(error_class: 'ArgumentError',
-                            ignore: ['Argument'],
+                            config: build_config(:'exceptions.ignore' => ['Argument']),
                             callbacks: callbacks)
       expect(notice.ignore?).to eq false
     end
@@ -225,12 +225,12 @@ describe Honeybadger::Notice do
     end
 
     it "does not raise without callbacks" do
-      notice = build_notice(ignore: nil, callbacks: nil)
+      notice = build_notice(callbacks: nil)
       expect { notice.ignore? }.not_to raise_error
     end
 
     it "does not raise with default callbacks" do
-      notice = build_notice(ignore: nil, callbacks: callbacks)
+      notice = build_notice(callbacks: callbacks)
       expect { notice.ignore? }.not_to raise_error
     end
 
