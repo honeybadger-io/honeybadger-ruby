@@ -64,11 +64,6 @@ module Honeybadger
         end
 
         http
-      rescue => e
-        error do
-          sprintf('http error class=%s message=%s at=%s', e.class, e.message.dump, e.backtrace.first.dump)
-        end
-        raise e
       end
 
       def compress(string, level = Zlib::DEFAULT_COMPRESSION)
