@@ -7,7 +7,6 @@ require 'honeybadger/version'
 require 'honeybadger/backtrace'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
-require 'honeybadger/util/request_sanitizer'
 require 'honeybadger/rack/request_hash'
 
 module Honeybadger
@@ -137,6 +136,7 @@ module Honeybadger
 
       @opts = opts
       @config = config
+      @sanitizer = Util::Sanitizer.new(filters: config.params_filters)
 
       @exception = opts[:exception]
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
@@ -149,10 +149,9 @@ module Honeybadger
       @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
-      @sanitizer = Util::Sanitizer.new(filters: config.params_filters)
-      @request_sanitizer = Util::RequestSanitizer.new(@sanitizer)
-      @request = OpenStruct.new(construct_request_hash(config.request, opts, @request_sanitizer, config.excluded_request_keys))
-      @context = construct_context_hash(opts, @sanitizer)
+      @request = OpenStruct.new(construct_request_hash(config.request, opts, config.excluded_request_keys))
+
+      @context = construct_context_hash(opts)
 
       @causes = unwrap_causes(opts[:exception])
 
@@ -161,7 +160,7 @@ module Honeybadger
 
       @stats = Util::Stats.all
 
-      @local_variables = local_variables_from_exception(exception, config, @sanitizer)
+      @local_variables = local_variables_from_exception(exception, config)
 
       @api_key = opts[:api_key] || config[:api_key]
 
@@ -173,32 +172,32 @@ module Honeybadger
     # Returns Hash JSON representation of notice
     def as_json(*args)
       {
-        api_key: api_key,
+        api_key: s(api_key),
         notifier: NOTIFIER,
         error: {
           token: id,
-          class: error_class,
-          message: error_message,
-          backtrace: backtrace,
-          source: source,
-          fingerprint: fingerprint,
-          tags: tags,
-          causes: causes
+          class: s(error_class),
+          message: s(error_message),
+          backtrace: s(backtrace),
+          source: s(source),
+          fingerprint: s(fingerprint),
+          tags: s(tags),
+          causes: s(causes)
         },
         request: {
-          url: url,
-          component: component,
-          action: action,
-          params: params,
-          session: session,
-          cgi_data: cgi_data,
-          context: context,
-          local_variables: local_variables
+          url: sanitized_url,
+          component: s(component),
+          action: s(action),
+          params: s(params),
+          session: s(session),
+          cgi_data: s(cgi_data),
+          context: s(context),
+          local_variables: s(local_variables)
         },
         server: {
-          project_root: config[:root],
-          environment_name: config[:env],
-          hostname: config[:hostname],
+          project_root: s(config[:root]),
+          environment_name: s(config[:env]),
+          hostname: s(config[:hostname]),
           stats: stats,
           time: now,
           pid: pid
@@ -210,7 +209,7 @@ module Honeybadger
     #
     # Returns valid JSON representation of Notice
     def to_json(*a)
-      as_json.to_json(*a)
+      ::JSON.generate(as_json(*a))
     end
 
     # Public: Allows properties to be accessed using a hash-like syntax
@@ -238,7 +237,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes
+    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
@@ -330,7 +329,7 @@ module Honeybadger
       ].compact | BACKTRACE_FILTERS
     end
 
-    def construct_request_hash(rack_request, opts, sanitizer, excluded_keys = [])
+    def construct_request_hash(rack_request, opts, excluded_keys = [])
       request = {}
       request.merge!(Rack::RequestHash.new(rack_request)) if rack_request
 
@@ -344,14 +343,14 @@ module Honeybadger
 
       request[:session] = request[:session][:data] if request[:session][:data]
 
-      sanitizer.sanitize(request)
+      request
     end
 
-    def construct_context_hash(opts, sanitizer)
+    def construct_context_hash(opts)
       context = {}
       context.merge!(Thread.current[:__honeybadger_context]) if Thread.current[:__honeybadger_context]
       context.merge!(opts[:context]) if opts[:context]
-      context.empty? ? nil : sanitizer.sanitize(context)
+      context.empty? ? nil : context
     end
 
     def extract_source_from_backtrace(backtrace, config, opts)
@@ -403,12 +402,21 @@ module Honeybadger
       ret
     end
 
+    def s(data)
+      sanitizer.sanitize(data)
+    end
+
+    def sanitized_url
+      return nil unless url
+      sanitizer.filter_url(s(url))
+    end
+
     # Internal: Fetch local variables from first frame of backtrace.
     #
     # exception - The Exception containing the bindings stack.
     #
     # Returns a Hash of local variables
-    def local_variables_from_exception(exception, config, sanitizer)
+    def local_variables_from_exception(exception, config)
       return {} unless send_local_variables?(config)
       return {} unless Exception === exception
       return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
@@ -421,9 +429,7 @@ module Honeybadger
       binding ||= exception.__honeybadger_bindings_stack[0]
 
       vars = binding.eval('local_variables')
-      h = Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
-
-      sanitizer.sanitize(h)
+      Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
     end
 
     # Internal: Should local variables be sent?

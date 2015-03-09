@@ -1,3 +1,7 @@
+* Handle bad encodings in exception payloads.
+
+  *Joshua Wood*
+
 * Include full backtrace when logging worker exceptions.
 
   *Joshua Wood*

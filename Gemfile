@@ -15,7 +15,7 @@ gem 'aruba'
 gem 'simplecov'
 
 gem 'ruby-prof', platforms: :mri
-gem 'allocation_stats', platforms: :mri_21
+gem 'allocation_stats', platforms: [:mri_21, :mri_22]
 
 gem 'capistrano', '>= 3.2.0', require: false
 
