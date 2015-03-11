@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'honeybadger/notice'
 require 'honeybadger/config'
 require 'honeybadger/plugins/local_variables'
@@ -187,7 +189,7 @@ describe Honeybadger::Notice do
     it "does not ignore an exception not matching ignore filters" do
       callbacks.exception_filter {|n| false }
       notice = build_notice(error_class: 'ArgumentError',
-                            ignore: ['Argument'],
+                            config: build_config(:'exceptions.ignore' => ['Argument']),
                             callbacks: callbacks)
       expect(notice.ignore?).to eq false
     end
@@ -225,12 +227,12 @@ describe Honeybadger::Notice do
     end
 
     it "does not raise without callbacks" do
-      notice = build_notice(ignore: nil, callbacks: nil)
+      notice = build_notice(callbacks: nil)
       expect { notice.ignore? }.not_to raise_error
     end
 
     it "does not raise with default callbacks" do
-      notice = build_notice(ignore: nil, callbacks: callbacks)
+      notice = build_notice(callbacks: callbacks)
       expect { notice.ignore? }.not_to raise_error
     end
 
@@ -577,6 +579,26 @@ describe Honeybadger::Notice do
         expect(JSON.parse(notice.to_json)['request']['local_variables']).to eq({})
       end
     end
+
+    context "when bad encodings exist in payload" do
+      let(:bad_string) { 'hello ümlaut'.force_encoding('BINARY') }
+      let(:invalid) { (100..1000).to_a.pack('c*').force_encoding('utf-8') }
+
+      it "doesn't blow up with bad encoding" do
+        notice = build_notice(error_message: bad_string)
+        expect { notice.to_json }.not_to raise_error
+      end
+
+      it "doesn't blow up with invalid encoding" do
+        notice = build_notice(error_message: invalid)
+        expect { notice.to_json }.not_to raise_error
+      end
+
+      it "converts to utf-8" do
+        notice = build_notice(error_message: bad_string)
+        expect(JSON.parse(notice.to_json)['error']['message']).to eq 'hello ??mlaut'
+      end
+    end
   end
 
   describe "#local_variables", order: :defined do
@@ -731,7 +753,7 @@ describe Honeybadger::Notice do
           expect(causes.size).to eq 1
           expect(causes[0][:class]).to eq 'StandardError'
           expect(causes[0][:message]).to eq 'cause!'
-          expect(causes[0][:backtrace]).to be_a Honeybadger::Backtrace
+          expect(causes[0][:backtrace]).not_to be_empty
         end
 
         it "stops unwrapping at 5" do

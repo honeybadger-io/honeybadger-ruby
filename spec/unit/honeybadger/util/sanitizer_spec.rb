@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'honeybadger/util/sanitizer'
 
 describe Honeybadger::Util::Sanitizer do
@@ -10,7 +12,7 @@ describe Honeybadger::Util::Sanitizer do
   end
 
   context "when filters option is passed to #initialize" do
-    FILTER_ARRAY = [:foo].freeze
+    FILTER_ARRAY = ['foo'].freeze
 
     subject { described_class.new(filters: FILTER_ARRAY) }
     its(:filters) { should eq FILTER_ARRAY }
@@ -47,33 +49,70 @@ describe Honeybadger::Util::Sanitizer do
     it "ensures #to_ary is called on objects that support it" do
       expect { described_class.new(:session => { :object => double(:to_ary => {}) }) }.not_to raise_error
     end
-  end
 
-  describe "#filter" do
-    subject { described_class.new(filters: filters).filter(original) }
-
-    let(:filters) { ["abc", :def, /private/, /^foo_.*$/] }
-
-    let(:original) do
-      { 'abc' => "123", 'def' => "456", 'ghi' => "789", 'nested' => { 'abc' => '100' },
-      'something_with_abc' => 'match the entire string', 'private_param' => 'prra',
-      'foo_param' => 'bar', 'not_foo_param' => 'baz', 'nested_foo' => { 'foo_nested' => 'bla'} }
+    it "allocates under 1/2 objects vs. the original hash.", if: defined?(AllocationStats) do
+      o = AllocationStats.trace { deep_hash }
+      expect { sanitized_hash }.to allocate_under((o.new_allocations.size/2)).objects
     end
 
-    let(:filtered) do
-      {'abc'    => "[FILTERED]",
-       'def'    => "[FILTERED]",
-       'something_with_abc' => "match the entire string",
-       'ghi'    => "789",
-       'nested' => { 'abc' => '[FILTERED]' },
-       'private_param' => '[FILTERED]',
-       'foo_param' => '[FILTERED]',
-       'not_foo_param' => 'baz',
-       'nested_foo' => { 'foo_nested' => '[FILTERED]'}}
+    context "with bad encodings" do
+      let(:string) { 'hello ümlaut' }
+      let(:binary) { string.dup.force_encoding(Encoding::BINARY) }
+      let(:windows) { string.dup.force_encoding(Encoding::Windows_31J) }
+      let(:invalid) { (100..1000).to_a.pack('c*').force_encoding('utf-8') }
+
+      it "generates JSON with incompatible encodings" do
+        expect { described_class.new.sanitize('string' => binary).to_json }.not_to raise_error
+      end
+
+      it "generates JSON with bad encodings" do
+        expect { described_class.new.sanitize('string' => invalid).to_json }.not_to raise_error
+      end
+
+      it "converts to utf-8 when invalid" do
+        expect(described_class.new.sanitize('string' => invalid)['string'].encoding).to eq Encoding::UTF_8
+      end
+
+      it "converts to utf-8 when binary" do
+        expect(described_class.new.sanitize('string' => binary)['string']).to eq 'hello ??mlaut'
+      end
+
+      it "converts to UTF-8 when otherwise valid" do
+        expect(described_class.new.sanitize('string' => windows)['string']).to eq windows.encode!(Encoding::UTF_8)
+      end
     end
 
-    it "filters the hash" do
-      should eq filtered
+    context "with filters" do
+      subject { described_class.new(filters: filters).sanitize(original) }
+
+      let!(:filters) { ["abc", :def, /private/, /^foo_.*$/] }
+
+      let!(:original) do
+        { 'abc' => "123", 'def' => "456", 'ghi' => "789", 'nested' => { 'abc' => '100' },
+          'something_with_abc' => 'match the entire string', 'private_param' => 'prra',
+          'foo_param' => 'bar', 'not_foo_param' => 'baz', 'nested_foo' => { 'foo_nested' => 'bla'} }
+      end
+
+      let!(:filtered) do
+        {'abc'    => "[FILTERED]",
+         'def'    => "[FILTERED]",
+         'something_with_abc' => "match the entire string",
+         'ghi'    => "789",
+         'nested' => { 'abc' => '[FILTERED]' },
+         'private_param' => '[FILTERED]',
+         'foo_param' => '[FILTERED]',
+         'not_foo_param' => 'baz',
+         'nested_foo' => { 'foo_nested' => '[FILTERED]'}}
+      end
+
+      it "filters the hash" do
+        should eq filtered
+      end
+
+      it "allocates approximately same number of objects as without filters.", if: defined?(AllocationStats) do
+        o = AllocationStats.trace { described_class.new.sanitize(original) }
+        expect { subject }.to allocate_under(o.new_allocations.size+6).objects
+      end
     end
   end
 
@@ -109,7 +148,8 @@ describe Honeybadger::Util::Sanitizer do
         :sub_hash => {
           :sub_object => object
         },
-        :array => [object]
+        :array => [object],
+        :set => Set.new([object])
       }
 
       payload_keys = keys.dup
@@ -124,6 +164,8 @@ describe Honeybadger::Util::Sanitizer do
       expect(hash[:sub_hash][:sub_object]).to eq object.to_s # subhash members should be serialized
       expect(hash[:array]).to be_a Array # arrays should be kept
       expect(hash[:array].first).to eq object.to_s # array members should be serialized
+      expect(hash[:set]).to be_a Array # sets should be converted to arrays
+      expect(hash[:set].first).to eq object.to_s # set members should be serialized
     end
   end
 end
