@@ -12,31 +12,33 @@ module Honeybadger
         end
       end
 
-      def sanitize(data, depth = 0, stack = [])
-        return '[possible infinite recursion halted]' if stack.any?{|item| item == data.object_id }
+      def sanitize(data, depth = 0, stack = Set.new)
+        if recursive?(data)
+          return '[possible infinite recursion halted]' if stack.include?(data.object_id)
+          stack = stack.dup
+          stack << data.object_id
+        end
 
         if data.kind_of?(String)
           sanitize_string(data)
-        elsif data.respond_to?(:to_hash)
+        elsif data.kind_of?(Hash)
           return '[max depth reached]' if depth >= max_depth
           hash = data.to_hash
           new_hash = {}
-          new_stack = stack.dup.push(data.object_id)
           hash.each_pair do |key, value|
             k = key.kind_of?(Symbol) ? key : sanitize(key, depth+1, stack)
             if filter_key?(k)
               new_hash[k] = FILTERED_REPLACEMENT
             else
-              new_hash[k] = sanitize(value, depth+1, new_stack)
+              new_hash[k] = sanitize(value, depth+1, stack)
             end
           end
           new_hash
-        elsif data.respond_to?(:to_ary)
+        elsif data.kind_of?(Array) || data.kind_of?(Set)
           return '[max depth reached]' if depth >= max_depth
-          new_stack = stack.dup.push(data.object_id)
-          data.to_ary.collect do |value|
-            sanitize(value, depth+1, new_stack)
-          end
+          data.map do |value|
+            sanitize(value, depth+1, stack)
+          end.compact
         elsif OBJECT_WHITELIST.any? {|c| data.kind_of?(c) }
           data
         else
@@ -61,6 +63,10 @@ module Honeybadger
       UTF8_STRING = ''.freeze
 
       attr_reader :max_depth, :filters
+
+      def recursive?(data)
+        data.kind_of?(Hash) || data.kind_of?(Array) || data.kind_of?(Set)
+      end
 
       def filter_key?(key)
         return false unless filters
