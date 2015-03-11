@@ -436,6 +436,12 @@ describe Honeybadger::Notice do
       notice = build_notice
       expect(notice.as_json[:server][:pid]).to eq Process.pid
     end
+
+    it "converts the backtrace as an array" do
+      notice = build_notice
+      expect(notice.as_json[:error][:backtrace]).to be_a Array
+      expect(notice.as_json[:error][:backtrace]).to eq notice.backtrace.to_ary
+    end
   end
 
   context "custom fingerprint" do

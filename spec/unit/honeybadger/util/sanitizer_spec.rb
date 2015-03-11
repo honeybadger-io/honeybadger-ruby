@@ -148,8 +148,7 @@ describe Honeybadger::Util::Sanitizer do
         :sub_hash => {
           :sub_object => object
         },
-        :array => [object],
-        :set => Set.new([object])
+        :array => [object]
       }
 
       payload_keys = keys.dup
@@ -164,8 +163,6 @@ describe Honeybadger::Util::Sanitizer do
       expect(hash[:sub_hash][:sub_object]).to eq object.to_s # subhash members should be serialized
       expect(hash[:array]).to be_a Array # arrays should be kept
       expect(hash[:array].first).to eq object.to_s # array members should be serialized
-      expect(hash[:set]).to be_a Array # sets should be converted to arrays
-      expect(hash[:set].first).to eq object.to_s # set members should be serialized
     end
   end
 end

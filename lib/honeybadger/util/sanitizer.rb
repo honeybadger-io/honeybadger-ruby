@@ -21,7 +21,7 @@ module Honeybadger
 
         if data.kind_of?(String)
           sanitize_string(data)
-        elsif data.kind_of?(Hash)
+        elsif data.respond_to?(:to_hash)
           return '[max depth reached]' if depth >= max_depth
           hash = data.to_hash
           new_hash = {}
@@ -34,9 +34,9 @@ module Honeybadger
             end
           end
           new_hash
-        elsif data.kind_of?(Array) || data.kind_of?(Set)
+        elsif data.respond_to?(:to_ary)
           return '[max depth reached]' if depth >= max_depth
-          data.map do |value|
+          data.to_ary.map do |value|
             sanitize(value, depth+1, stack)
           end.compact
         elsif OBJECT_WHITELIST.any? {|c| data.kind_of?(c) }
@@ -65,7 +65,7 @@ module Honeybadger
       attr_reader :max_depth, :filters
 
       def recursive?(data)
-        data.kind_of?(Hash) || data.kind_of?(Array) || data.kind_of?(Set)
+        data.respond_to?(:to_hash) || data.respond_to?(:to_ary)
       end
 
       def filter_key?(key)
