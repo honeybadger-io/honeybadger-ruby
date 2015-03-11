@@ -1,6 +1,7 @@
 # Honeybadger for Ruby
 
 [![Code Climate](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby/badges/gpa.svg)](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby)
+[![Test Coverage](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby/badges/coverage.svg)](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby)
 [![Build Status](https://secure.travis-ci.org/honeybadger-io/honeybadger-ruby.png?branch=master)](http://travis-ci.org/honeybadger-io/honeybadger-ruby)
 [![Gem Version](https://badge.fury.io/rb/honeybadger.png)](http://badge.fury.io/rb/honeybadger)
 
