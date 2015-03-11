@@ -12,10 +12,10 @@ module Honeybadger
         end
       end
 
-      def sanitize(data, depth = 0, stack = Set.new)
+      def sanitize(data, depth = 0, stack = nil)
         if recursive?(data)
-          return '[possible infinite recursion halted]' if stack.include?(data.object_id)
-          stack = stack.dup
+          return '[possible infinite recursion halted]' if stack && stack.include?(data.object_id)
+          stack = stack ? stack.dup : Set.new
           stack << data.object_id
         end
 
