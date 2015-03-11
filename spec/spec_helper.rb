@@ -151,7 +151,7 @@ RSpec.configure do |config|
 end
 
 
-if ENV['TRAVIS']
+if ENV['CIRCLECI']
   require 'codeclimate-test-reporter'
   CodeClimate::TestReporter.start
 elsif !ENV['GUARD']
