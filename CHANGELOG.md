@@ -1,3 +1,7 @@
+* Fail gracefully when honeybadger.yml is empty or invalid.
+
+  *Joshua Wood*
+
 * Handle bad encodings in exception payloads.
 
   *Joshua Wood*

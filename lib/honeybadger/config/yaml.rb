@@ -15,13 +15,25 @@ module Honeybadger
         elsif !@path.readable?
           raise ConfigError, "The configuration file #{@path} is not readable."
         else
-          yaml = YAML.load(ERB.new(@path.read).result)
+          yaml = load_yaml
           yaml.merge!(yaml[env]) if yaml[env].kind_of?(Hash)
           update(dotify_keys(yaml))
         end
       end
 
       private
+
+      def load_yaml
+        yaml = YAML.load(ERB.new(@path.read).result)
+        case yaml
+        when Hash
+          yaml
+        when NilClass, FalseClass
+          {}
+        else
+          raise ConfigError, "The configuration file #{@path} is invalid."
+        end
+      end
 
       def dotify_keys(hash, key_prefix = nil)
         {}.tap do |new_hash|

@@ -77,6 +77,30 @@ logging:
     end
   end
 
+  context "when the YAML content is" do
+    before { allow(path).to receive(:read).and_return(yaml) }
+
+    context "nil" do
+      let(:yaml) { '---' }
+      it { should eq({}) }
+    end
+
+    context "empty" do
+      let(:yaml) { '' }
+      it { should eq({}) }
+    end
+
+    context "invalid" do
+      let(:yaml) { 'foo' }
+      specify { expect { subject }.to raise_error(Honeybadger::Config::ConfigError) }
+    end
+
+    context "valid" do
+      let(:yaml) { 'foo: bar' }
+      it { should eq({ foo: 'bar' }) }
+    end
+  end
+
   context "when an unknown error occurs" do
     before do
       allow(YAML).to receive(:load).and_raise(RuntimeError)
