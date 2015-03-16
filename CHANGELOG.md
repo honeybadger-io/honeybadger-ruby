@@ -1,3 +1,7 @@
+* Fixed a bug introduced in v2.0.8 which applied params filters to backtrace.
+
+  *Joshua Wood*
+
 * Fail gracefully when honeybadger.yml is empty or invalid.
 
   *Joshua Wood*
