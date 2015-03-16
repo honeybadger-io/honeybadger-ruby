@@ -4,7 +4,7 @@ require 'honeybadger/util/sanitizer'
 
 describe Honeybadger::Util::Sanitizer do
   its(:max_depth) { should eq 20 }
-  its(:filters) { should be_empty }
+  its(:filters) { should be_nil }
 
   context "when max_depth option is passed to #initialize" do
     subject { described_class.new(max_depth: 5) }
@@ -111,7 +111,7 @@ describe Honeybadger::Util::Sanitizer do
 
       it "allocates approximately same number of objects as without filters.", if: defined?(AllocationStats) do
         o = AllocationStats.trace { described_class.new.sanitize(original) }
-        expect { subject }.to allocate_under(o.new_allocations.size+6).objects
+        expect { subject }.to allocate_under(o.new_allocations.size+8).objects
       end
     end
   end

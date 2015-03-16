@@ -7,8 +7,11 @@ module Honeybadger
 
       def initialize(opts = {})
         @max_depth = opts.fetch(:max_depth, 20)
-        @filters = Array(opts.fetch(:filters, nil)).collect do |f|
-          f.kind_of?(Regexp) ? f : f.to_s
+
+        if filters = opts.fetch(:filters, nil)
+          @filters = Array(filters).collect do |f|
+            f.kind_of?(Regexp) ? f : f.to_s
+          end
         end
       end
 
@@ -47,6 +50,8 @@ module Honeybadger
       end
 
       def filter_url(url)
+        return url unless filters
+
         filtered_url = url.to_s.dup
         filtered_url.scan(/(?:^|&|\?)([^=?&]+)=([^&]+)/).each do |m|
           next unless filter_key?(m[0])

@@ -136,7 +136,9 @@ module Honeybadger
 
       @opts = opts
       @config = config
-      @sanitizer = Util::Sanitizer.new(filters: config.params_filters)
+
+      @sanitizer = Util::Sanitizer.new
+      @filtered_sanitizer = Util::Sanitizer.new(filters: config.params_filters)
 
       @exception = opts[:exception]
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
@@ -188,9 +190,9 @@ module Honeybadger
           url: sanitized_url,
           component: s(component),
           action: s(action),
-          params: s(params),
-          session: s(session),
-          cgi_data: s(cgi_data),
+          params: f(params),
+          session: f(session),
+          cgi_data: f(cgi_data),
           context: s(context),
           local_variables: s(local_variables)
         },
@@ -237,7 +239,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer
+    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer, :filtered_sanitizer
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
@@ -406,9 +408,13 @@ module Honeybadger
       sanitizer.sanitize(data)
     end
 
+    def f(data)
+      filtered_sanitizer.sanitize(data)
+    end
+
     def sanitized_url
       return nil unless url
-      sanitizer.filter_url(s(url))
+      filtered_sanitizer.filter_url(s(url))
     end
 
     # Internal: Fetch local variables from first frame of backtrace.

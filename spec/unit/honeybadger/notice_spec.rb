@@ -148,6 +148,13 @@ describe Honeybadger::Notice do
     expect(payload['request']['action']).to be_nil
   end
 
+  it "does not filter the backtrace" do
+    notice = build_notice(:config => build_config(:'request.filter_keys' => ['number']), :backtrace => ['foo:1:in `bar\''])
+    json = notice.to_json
+    payload = JSON.parse(json)
+    expect(payload['error']['backtrace'][0]['number']).to eq '1'
+  end
+
   %w(params session cgi_data).each do |var|
     it "does not filter top level #{var}" do
       notice = build_notice(:config => build_config(:'request.filter_keys' => [var]), var.to_sym => {var => 'hello'})
