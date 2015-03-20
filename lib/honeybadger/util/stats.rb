@@ -12,8 +12,8 @@ module Honeybadger
         # From https://github.com/bloopletech/webstats/blob/master/server/data_providers/mem_info.rb
         def memory
           out = {}
-          if HAS_MEM
-            out[:total], out[:free], out[:buffers], out[:cached] = IO.readlines("/proc/meminfo")[0..4].map { |l| l =~ /^.*?\: +(.*?) kB$/; ($1.to_i / 1024.0).to_f }
+          if HAS_MEM && (meminfo = run_meminfo)
+            out[:total], out[:free], out[:buffers], out[:cached] = meminfo[0..4].map { |l| l =~ /^.*?\: +(.*?) kB$/; ($1.to_i / 1024.0).to_f }
             out[:free_total] = out[:free] + out[:buffers] + out[:cached]
           end
           out
@@ -22,8 +22,24 @@ module Honeybadger
         # From https://github.com/bloopletech/webstats/blob/master/server/data_providers/cpu_info.rb
         def load
           out = {}
-          out[:one], out[:five], out[:fifteen] = IO.read("/proc/loadavg").split(' ', 4).map(&:to_f) if HAS_LOAD
+          if HAS_LOAD && (loadavg = run_loadavg)
+            out[:one], out[:five], out[:fifteen] = loadavg.split(' ', 4).map(&:to_f)
+          end
           out
+        end
+        
+        def run_meminfo
+          run { IO.readlines("/proc/meminfo") }
+        end
+        
+        def run_loadavg
+          run { IO.read("/proc/loadavg") }
+        end
+        
+        def run
+          yield
+        rescue Errno::ENFILE
+          # catch issues like 'Too many open files in system'
         end
       end
     end
