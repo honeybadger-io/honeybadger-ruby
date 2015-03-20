@@ -15,7 +15,7 @@ module Honeybadger
           task :deploy, :except => { :no_release => true } do
             rails_env = fetch(:rails_env, 'production')
             honeybadger_env = fetch(:honeybadger_env, fetch(:rails_env, 'production'))
-            local_user = ENV['USER'] || ENV['USERNAME']
+            local_user = fetch(:honeybadger_user, ENV['USER'] || ENV['USERNAME'])
             executable = fetch(:honeybadger, "#{fetch(:bundle_cmd, 'bundle')} exec honeybadger")
             async_notify = fetch(:honeybadger_async_notify, false)
             directory = fetch(:honeybadger_deploy_dir, configuration.current_release)
