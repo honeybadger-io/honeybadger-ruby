@@ -1,4 +1,5 @@
 require 'honeybadger/config'
+require 'honeybadger/backend/base'
 require 'net/http'
 
 describe Honeybadger::Config do
@@ -145,6 +146,14 @@ describe Honeybadger::Config do
 
     before do
       allow(logger).to receive(:debug)
+    end
+
+    it "calls the backend with object (not JSON)" do
+      backend = double('Honeybadger::Backend::Server')
+      response = Honeybadger::Backend::Response.new(201, '{}')
+      allow(instance).to receive(:backend).and_return(backend)
+      expect(backend).to receive(:notify).with(:ping, kind_of(Hash)).and_return(response)
+      instance.ping
     end
 
     context "when connection succeeds" do

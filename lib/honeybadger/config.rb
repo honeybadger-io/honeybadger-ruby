@@ -301,8 +301,8 @@ api_key: '#{self[:api_key]}'
     end
 
     def send_ping
-      payload = ping_payload.to_json
-      debug { sprintf('ping payload=%s', payload.dump) }
+      payload = ping_payload
+      debug { sprintf('ping payload=%s', payload.to_json.dump) }
       response = backend.notify(:ping, payload)
       if response.success?
         debug { sprintf('ping response=%s', response.body.dump) }

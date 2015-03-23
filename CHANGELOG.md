@@ -1,3 +1,7 @@
+* Fix a bug in ping where JSON was double-quoted.
+
+  *Joshua Wood*
+
 * Fixed a bug introduced in v2.0.8 which applied params filters to backtrace.
 
   *Joshua Wood*
