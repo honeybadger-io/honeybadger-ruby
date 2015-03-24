@@ -2,6 +2,10 @@
 
   *Joshua Wood*
 
+* Add support for honeybadger_user with Capistrano 2.
+
+  *Nathan Fixler*
+
 * Fixed a bug introduced in v2.0.8 which applied params filters to backtrace.
 
   *Joshua Wood*
