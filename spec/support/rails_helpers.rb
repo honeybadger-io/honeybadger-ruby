@@ -46,22 +46,4 @@ module RailsHelpers
       file.write(content)
     end
   end
-
-  def install_rails_shim
-    # This must be loaded in application.rb because HB initialization happens
-    # before config/initializers are run
-    file_name = RAILS_ROOT.join('config', 'application.rb')
-    File.open(file_name, 'a') do |file|
-      file.write(<<-CONTENTS)
-require 'sham_rack'
-
-ShamRack.at('api.honeybadger.io', 443).stub.tap do |app|
-  app.register_resource('/v1/ping', %({"features":{"notices":true,"feedback":true}, "limit":null}), 'application/json')
-  app.register_resource('/v1/notices', %({"id":"123456789"}), 'application/json', 201)
-  app.register_resource('/v1/metrics', '', "application/json", 201)
-  app.register_resource('/v1/traces', '', 'application/json', 201)
-end
-      CONTENTS
-    end
-  end
 end
