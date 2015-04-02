@@ -15,10 +15,13 @@ FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
 NULL_LOGGER = Logger.new('/dev/null')
 NULL_LOGGER.level = Logger::Severity::DEBUG
 
-begin
-  require 'binding_of_caller'
-rescue LoadError
-  nil
+# Soft dependencies
+%w(rack binding_of_caller).each do |lib|
+  begin
+    require lib
+  rescue LoadError
+    puts "Excluding specs for #{ lib }"
+  end
 end
 
 begin
@@ -150,10 +153,9 @@ RSpec.configure do |config|
   end
 
   begin
-    require 'rack'
     require 'sham_rack'
   rescue LoadError
-    puts 'Excluding Rack specs.'
+    puts 'Excluding Rack specs: sham_rack is not available.'
     config.exclude_pattern = 'spec/unit/honeybadger/rack/*_spec.rb'
   end
 end
