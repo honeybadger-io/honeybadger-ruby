@@ -50,7 +50,7 @@ module Honeybadger
           :root           => ::Rails.root,
           :env            => ::Rails.env,
           :'config.path'  => ::Rails.root.join('config', 'honeybadger.yml'),
-          :framework_name => "Rails #{::Rails::VERSION::STRING}"
+          :framework      => :rails
         }
       end
 
