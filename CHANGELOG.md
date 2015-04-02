@@ -1,3 +1,7 @@
+* Don't access secrets before Rails initialization.
+
+  *Joshua Wood*
+
 * Fix a bug which introduced a hard-dependency on Rack.
 
   *Joshua Wood*

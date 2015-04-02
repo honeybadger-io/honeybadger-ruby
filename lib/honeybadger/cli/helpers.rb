@@ -50,15 +50,8 @@ module Honeybadger
           :root           => ::Rails.root,
           :env            => ::Rails.env,
           :'config.path'  => ::Rails.root.join('config', 'honeybadger.yml'),
-          :framework_name => "Rails #{::Rails::VERSION::STRING}",
-          :api_key        => rails_secrets_api_key
+          :framework_name => "Rails #{::Rails::VERSION::STRING}"
         }
-      end
-
-      def rails_secrets_api_key
-        if defined?(::Rails.application.secrets)
-          ::Rails.application.secrets.honeybadger_api_key
-        end
       end
 
       def test_exception_class

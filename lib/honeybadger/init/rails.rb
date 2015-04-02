@@ -74,15 +74,8 @@ module Honeybadger
             :env            => ::Rails.env,
             :'config.path'  => ::Rails.root.join('config', 'honeybadger.yml'),
             :logger         => Logging::FormattedLogger.new(::Rails.logger),
-            :framework      => :rails,
-            :api_key        => secrets_api_key
+            :framework      => :rails
           }
-        end
-
-        def secrets_api_key
-          if defined?(::Rails.application.secrets)
-            ::Rails.application.secrets.honeybadger_api_key
-          end
         end
       end
     end
