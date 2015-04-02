@@ -17,6 +17,7 @@ end
 
 appraise 'rack' do
   gem 'rack'
+  gem 'sham_rack', require: false
 end
 
 appraise 'sinatra' do

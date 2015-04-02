@@ -148,6 +148,14 @@ RSpec.configure do |config|
   else
     config.filter_run_excluding framework: ->(v) { v != :ruby }
   end
+
+  begin
+    require 'rack'
+    require 'sham_rack'
+  rescue LoadError
+    puts 'Excluding Rack specs.'
+    config.exclude_pattern = 'spec/unit/honeybadger/rack/*_spec.rb'
+  end
 end
 
 

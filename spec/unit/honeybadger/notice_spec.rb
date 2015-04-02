@@ -5,8 +5,6 @@ require 'honeybadger/config'
 require 'honeybadger/plugins/local_variables'
 require 'timecop'
 
-require 'rack'
-
 describe Honeybadger::Notice do
   let(:callbacks) { Honeybadger::Config::Callbacks.new }
   let(:config) { build_config }
@@ -310,89 +308,91 @@ describe Honeybadger::Notice do
     end
   end
 
-  context "with a rack environment hash" do
-    it "extracts data from a rack environment hash" do
-      url = "https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2"
-      params = {'var' => 'value', 'var2' => 'value2'}
-      env = Rack::MockRequest.env_for(url)
+  describe "Rack features", if: defined?(::Rack) do
+    context "with a rack environment hash" do
+      it "extracts data from a rack environment hash" do
+        url = "https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2"
+        params = {'var' => 'value', 'var2' => 'value2'}
+        env = Rack::MockRequest.env_for(url)
 
-      notice = config.with_request(Rack::Request.new(env)) do
-        build_notice
-      end
+        notice = config.with_request(Rack::Request.new(env)) do
+          build_notice
+        end
 
-      expect(notice.url).to eq url
-      expect(notice.params).to eq params
-      expect(notice.cgi_data['REQUEST_METHOD']).to eq 'GET'
-    end
-
-    it "prefers honeybadger.request.url to default PATH_INFO" do
-      url = 'https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2'
-      env = Rack::MockRequest.env_for(url)
-      env['honeybadger.request.url'] = 'http://foo.com'
-
-      notice = config.with_request(Rack::Request.new(env)) do
-        build_notice
-      end
-
-      expect(notice.url).to eq 'http://foo.com'
-    end
-
-    context "with action_dispatch info" do
-      let(:params) { {'controller' => 'users', 'action' => 'index', 'id' => '7'} }
-
-      it "extracts data from a rack environment hash " do
-        env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
-        notice = config.with_request(Rack::Request.new(env)) { build_notice }
-
+        expect(notice.url).to eq url
         expect(notice.params).to eq params
-        expect(notice.component).to eq params['controller']
-        expect(notice.action).to eq params['action']
+        expect(notice.cgi_data['REQUEST_METHOD']).to eq 'GET'
       end
 
-      it "removes action_dispatch.request.parameters from cgi_data" do
-        env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
+      it "prefers honeybadger.request.url to default PATH_INFO" do
+        url = 'https://subdomain.happylane.com:100/test/file.rb?var=value&var2=value2'
+        env = Rack::MockRequest.env_for(url)
+        env['honeybadger.request.url'] = 'http://foo.com'
+
+        notice = config.with_request(Rack::Request.new(env)) do
+          build_notice
+        end
+
+        expect(notice.url).to eq 'http://foo.com'
+      end
+
+      context "with action_dispatch info" do
+        let(:params) { {'controller' => 'users', 'action' => 'index', 'id' => '7'} }
+
+        it "extracts data from a rack environment hash " do
+          env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
+          notice = config.with_request(Rack::Request.new(env)) { build_notice }
+
+          expect(notice.params).to eq params
+          expect(notice.component).to eq params['controller']
+          expect(notice.action).to eq params['action']
+        end
+
+        it "removes action_dispatch.request.parameters from cgi_data" do
+          env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
+          notice = config.with_request(Rack::Request.new(env)) { build_notice }
+          expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.parameters'
+        end
+
+        it "removes action_dispatch.request.request_parameters from cgi_data" do
+          env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.request_parameters' => params })
+          notice = config.with_request(Rack::Request.new(env)) { build_notice }
+          expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.request_parameters'
+        end
+      end
+
+      it "extracts session data from a rack environment" do
+        session = { 'something' => 'some value' }
+        env = Rack::MockRequest.env_for('/', 'rack.session' => session)
+
         notice = config.with_request(Rack::Request.new(env)) { build_notice }
-        expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.parameters'
+
+        expect(notice.session).to eq session
       end
 
-      it "removes action_dispatch.request.request_parameters from cgi_data" do
-        env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.request_parameters' => params })
-        notice = config.with_request(Rack::Request.new(env)) { build_notice }
-        expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.request_parameters'
+      it "prefers passed session data to rack session data" do
+        session = { 'something' => 'some value' }
+        env = Rack::MockRequest.env_for('/')
+
+        notice = config.with_request(Rack::Request.new(env)) { build_notice(session: session) }
+
+        expect(notice.session).to eq session
       end
-    end
 
-    it "extracts session data from a rack environment" do
-      session = { 'something' => 'some value' }
-      env = Rack::MockRequest.env_for('/', 'rack.session' => session)
-
-      notice = config.with_request(Rack::Request.new(env)) { build_notice }
-
-      expect(notice.session).to eq session
-    end
-
-    it "prefers passed session data to rack session data" do
-      session = { 'something' => 'some value' }
-      env = Rack::MockRequest.env_for('/')
-
-      notice = config.with_request(Rack::Request.new(env)) { build_notice(session: session) }
-
-      expect(notice.session).to eq session
-    end
-
-    if Gem::Version.new(Rack.release) < Gem::Version.new('1.3')
-      it "parses params which are malformed in Rack >= 1.3" do
-        env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
-        expect {
-          config.with_request(Rack::Request.new(env)) { build_notice }
-        }.not_to raise_error
-      end
-    else
-      it "fails gracefully when Rack params cannot be parsed" do
-        env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
-        notice = config.with_request(Rack::Request.new(env)) { build_notice }
-        expect(notice.params.size).to eq 1
-        expect(notice.params[:error]).to match(/Failed to access params/)
+      if defined?(::Rack) && Gem::Version.new(Rack.release) < Gem::Version.new('1.3')
+        it "parses params which are malformed in Rack >= 1.3" do
+          env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
+          expect {
+            config.with_request(Rack::Request.new(env)) { build_notice }
+          }.not_to raise_error
+        end
+      else
+        it "fails gracefully when Rack params cannot be parsed" do
+          env = Rack::MockRequest.env_for('http://www.example.com/explode', :method => 'POST', :input => 'foo=bar&bar=baz%')
+          notice = config.with_request(Rack::Request.new(env)) { build_notice }
+          expect(notice.params.size).to eq 1
+          expect(notice.params[:error]).to match(/Failed to access params/)
+        end
       end
     end
   end
