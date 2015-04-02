@@ -33,7 +33,7 @@ describe Honeybadger::Rack::UserFeedback do
     end
 
     context "a project root is configured" do
-      let(:tmp_dir) { File.expand_path('../../../tmp', __FILE__) }
+      let(:tmp_dir) { TMP_DIR }
       let(:template_dir) { File.join(tmp_dir, 'lib', 'honeybadger', 'templates') }
       let(:template_file) { File.join(template_dir, 'feedback_form.erb') }
 
