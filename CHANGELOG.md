@@ -1,3 +1,7 @@
+* Fix a bug which introduced a hard-dependency on Rack.
+
+  *Joshua Wood*
+
 * Fix a bug in ping where JSON was double-quoted.
 
   *Joshua Wood*
