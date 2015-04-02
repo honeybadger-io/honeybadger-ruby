@@ -1,7 +1,6 @@
 require 'erb'
 require 'uri'
 require 'forwardable'
-require 'rack'
 
 begin
   require 'i18n'

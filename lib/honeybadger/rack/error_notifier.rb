@@ -1,4 +1,4 @@
-require 'rack'
+require 'rack/request'
 require 'honeybadger'
 require 'forwardable'
 
