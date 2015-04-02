@@ -9,12 +9,10 @@ feature "error notifications" do
 
       write_file('test.rb', <<-CONTENTS)
       require 'honeybadger'
-      require 'sham_rack'
+      require 'webmock'
 
-      ShamRack.at("api.honeybadger.io", 443).stub.tap do |app|
-        app.register_resource("/v1/notices", "403 Forbidden", "application/json", 403)
-        app.register_resource("/v1/ping", %({"features":{"notices":true,"feedback":true}, "limit":null}), "application/json")
-      end
+      WebMock::API.stub_request(:post, 'https://api.honeybadger.io/v1/notices').to_return(status: 403, body: '403 Forbidden', headers: { 'Content-Type' => 'application/json' })
+      WebMock::API.stub_request(:post, 'https://api.honeybadger.io/v1/ping').to_return(body: %({"features":{"notices":true,"feedback":true}, "limit":null}), headers: { 'Content-Type' => 'application/json' })
 
       Honeybadger.start
       begin
