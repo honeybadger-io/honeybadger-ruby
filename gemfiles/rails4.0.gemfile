@@ -13,8 +13,8 @@ gem "timecop"
 gem "appraisal"
 gem "aruba"
 gem "simplecov"
-gem "ruby-prof", :platforms => :mri
-gem "allocation_stats", :platforms => [:mri_21, :mri_22]
+gem "ruby-prof", :platforms => :mri, :require => false
+gem "allocation_stats", :platforms => [:mri_21, :mri_22], :require => false
 gem "capistrano", "~> 3.0"
 gem "codeclimate-test-reporter", :require => false, :group => :test
 gem "rails", "~> 4.0.0"
