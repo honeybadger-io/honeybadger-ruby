@@ -8,31 +8,27 @@ module Honeybadger
       def initialize(env = ENV)
         env.each_pair do |k,v|
           next unless k.match(CONFIG_KEY)
-          next if DISALLOWED_KEYS.include?(CONFIG_MAPPING[$1])
-          self[CONFIG_MAPPING[$1] || $1.downcase.to_sym] = cast_value(v)
+          next unless config_key = CONFIG_MAPPING[$1] || $1.downcase.to_sym
+          next if DISALLOWED_KEYS.include?(config_key)
+          self[config_key] = cast_value(v, OPTIONS[config_key][:type])
         end
       end
 
       private
 
-      def cast_value(value)
-        if value.match(ARRAY_VALUES)
-          return value.split(ARRAY_VALUES).map(&method(:cast_value))
-        end
+      def cast_value(value, type = String)
+        v = value.to_s
 
-        case value
-        when /\Atrue\Z/
-          true
-        when /\Afalse\Z/
-          false
-        when /\Anil\Z/
-          nil
-        when /\A\d+\z/
-          value.to_i
-        when /\A\d+\.\d+\z/
-          value.to_f
+        if type == Boolean
+          !!(v =~ /\A(true|t|1)\z/i)
+        elsif type == Array
+          v.split(ARRAY_VALUES).map(&method(:cast_value))
+        elsif type == Integer
+          v.to_i
+        elsif type == Float
+          v.to_f
         else
-          value.to_s
+          v
         end
       end
     end
