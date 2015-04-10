@@ -12,6 +12,8 @@ gem 'appraisal'
 gem 'aruba'
 gem 'simplecov'
 gem 'webmock'
+gem 'pry'
+gem 'pry-byebug'
 
 gem 'ruby-prof', platforms: :mri, require: false
 gem 'allocation_stats', platforms: [:mri_21, :mri_22], require: false
