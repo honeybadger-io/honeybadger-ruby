@@ -356,21 +356,19 @@ module Honeybadger
     end
 
     def extract_source_from_backtrace(backtrace, config, opts)
-      if backtrace.lines.empty?
-        nil
+      return nil if backtrace.lines.empty?
+      
+      # ActionView::Template::Error has its own source_extract method.
+      # If present, use that instead.
+      if opts[:exception].respond_to?(:source_extract)
+        Hash[exception.source_extract.split("\n").map do |line|
+          parts = line.split(': ')
+          [parts[0].strip, parts[1] || '']
+        end]
+      elsif backtrace.application_lines.any?
+        backtrace.application_lines.first.source(config[:'exceptions.source_radius'])
       else
-        # ActionView::Template::Error has its own source_extract method.
-        # If present, use that instead.
-        if opts[:exception].respond_to?(:source_extract)
-          Hash[exception.source_extract.split("\n").map do |line|
-            parts = line.split(': ')
-            [parts[0].strip, parts[1] || '']
-          end]
-        elsif backtrace.application_lines.any?
-          backtrace.application_lines.first.source(config[:'exceptions.source_radius'])
-        else
-          backtrace.lines.first.source(config[:'exceptions.source_radius'])
-        end
+        backtrace.lines.first.source(config[:'exceptions.source_radius'])
       end
     end
 

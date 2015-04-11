@@ -29,8 +29,8 @@ module Helpers
   end
 
   def stub_notice!(*args, &block)
-     stub_notice(*args, &block).tap do |notice|
-       allow(Honeybadger::Notice).to receive(:new).and_return(notice)
+    stub_notice(*args, &block).tap do |notice|
+      allow(Honeybadger::Notice).to receive(:new).and_return(notice)
     end
   end
 end

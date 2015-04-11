@@ -32,18 +32,16 @@ module Honeybadger
     end
 
     def add_query(event)
-      if event.duration < 6
-        ce = clean_event(event)
-        return unless ce.render?
-        query = ce.to_s
-        if @fast_queries[query]
-          @fast_queries[query][:duration] += ce.event.duration
-          @fast_queries[query][:count] += 1
-        else
-          @fast_queries[query] = { :duration => ce.event.duration, :count => 1 }
-        end
+      return add(event) unless event.duration < 6
+
+      ce = clean_event(event)
+      return unless ce.render?
+      query = ce.to_s
+      if @fast_queries[query]
+        @fast_queries[query][:duration] += ce.event.duration
+        @fast_queries[query][:count] += 1
       else
-        add(event)
+        @fast_queries[query] = { :duration => ce.event.duration, :count => 1 }
       end
     end
 

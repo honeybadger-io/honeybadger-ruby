@@ -23,14 +23,12 @@ module Honeybadger
       # in the array. If only a single value is provided in the array, that is
       # returned
       def percentile(threshold)
-        if (count > 1)
-          self.sort!
-          # strip off the top 100-threshold
-          threshold_index = (((100 - threshold).to_f / 100) * count).round
-          self[0..-threshold_index].last
-        else
-          self.first
-        end
+        return self.first unless count > 1
+
+        self.sort!
+        # strip off the top 100-threshold
+        threshold_index = (((100 - threshold).to_f / 100) * count).round
+        self[0..-threshold_index].last
       end
 
       # Calculates the mean squared error of values in the array
