@@ -1,3 +1,7 @@
+* Add exceptions.unwrap to config.
+
+  *Joshua Wood*
+
 * Don't access secrets before Rails initialization.
 
   *Joshua Wood*

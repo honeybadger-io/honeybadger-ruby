@@ -412,6 +412,50 @@ describe Honeybadger::Notice do
     expect(notice.error_message).to eq 'Something very specific went wrong.'
   end
 
+  describe "config[:'exceptions.unwrap']" do
+    class TheCause < RuntimeError; end
+
+    let(:notice) { build_notice(exception: exception, config: config) }
+    let(:exception) { RuntimeError.new('foo') }
+
+    context "when there isn't a cause" do
+      context "and disabled (default)" do
+        it "reports the exception" do
+          expect(notice.error_class).to eq 'RuntimeError'
+        end
+      end
+
+      context "and enabled" do
+        let(:config) { build_config(:'exceptions.unwrap' => true) }
+
+        it "reports the exception" do
+          expect(notice.error_class).to eq 'RuntimeError'
+        end
+      end
+    end
+
+    context "when there is a cause" do
+      before do
+        allow(exception).to receive(:cause).and_return TheCause.new(':trollface:')
+      end
+
+      context "and disabled (default)" do
+        it "reports the exception" do
+          expect(notice.error_class).to eq 'RuntimeError'
+        end
+      end
+
+      context "and enabled" do
+        let(:config) { build_config(:'exceptions.unwrap' => true) }
+
+        it "reports the cause" do
+          expect(notice.error_class).to eq 'TheCause'
+          expect(notice.error_message).to match /trollface/
+        end
+      end
+    end
+  end
+
   describe "#as_json" do
     it "sets the host name" do
       notice = build_notice(config: build_config(hostname: 'foo'))

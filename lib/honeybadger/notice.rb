@@ -140,7 +140,7 @@ module Honeybadger
       @sanitizer = Util::Sanitizer.new
       @filtered_sanitizer = Util::Sanitizer.new(filters: config.params_filters)
 
-      @exception = opts[:exception]
+      @exception = unwrap_exception(opts[:exception])
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
       @error_message = trim_size(1024) do
         exception_attribute(:error_message, 'Notification') do |exception|
@@ -155,7 +155,7 @@ module Honeybadger
 
       @context = construct_context_hash(opts)
 
-      @causes = unwrap_causes(opts[:exception])
+      @causes = unwrap_causes(@exception)
 
       @tags = construct_tags(opts[:tags])
       @tags = construct_tags(context[:tags]) | @tags if context
@@ -262,7 +262,7 @@ module Honeybadger
     #
     # Returns attribute value from args or exception, otherwise default
     def exception_attribute(attribute, default = nil, &block)
-      opts[attribute] || (opts[:exception] && from_exception(attribute, &block)) || default
+      opts[attribute] || (exception && from_exception(attribute, &block)) || default
     end
 
     # Gets a property named +attribute+ from an exception.
@@ -274,12 +274,12 @@ module Honeybadger
     # If no block is given, a method with the same name as +attribute+ will be
     # invoked for the value.
     def from_exception(attribute)
-      return unless opts[:exception]
+      return unless exception
 
       if block_given?
-        yield(opts[:exception])
+        yield(exception)
       else
-        opts[:exception].send(attribute)
+        exception.send(attribute)
       end
     end
 
@@ -357,10 +357,10 @@ module Honeybadger
 
     def extract_source_from_backtrace(backtrace, config, opts)
       return nil if backtrace.lines.empty?
-      
+
       # ActionView::Template::Error has its own source_extract method.
       # If present, use that instead.
-      if opts[:exception].respond_to?(:source_extract)
+      if exception.respond_to?(:source_extract)
         Hash[exception.source_extract.split("\n").map do |line|
           parts = line.split(': ')
           [parts[0].strip, parts[1] || '']
@@ -454,6 +454,17 @@ module Honeybadger
         filters: construct_backtrace_filters(opts),
         config: config
       )
+    end
+
+    # Internal: Unwrap the exception so that original exception is ignored or
+    # reported.
+    #
+    # exception - The exception which was rescued.
+    #
+    # Returns the Exception to report.
+    def unwrap_exception(exception)
+      return exception unless config[:'exceptions.unwrap']
+      exception_cause(exception) || exception
     end
 
     # Internal: Fetch cause from exception.

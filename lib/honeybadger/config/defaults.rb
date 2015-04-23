@@ -183,6 +183,10 @@ module Honeybadger
         description: 'Enable sending local variables. Requires binding_of_caller to be loaded.',
         default: false
       },
+      :'exceptions.unwrap' => {
+        description: 'Reports #original_exception or #cause one level up from rescued exception when available.',
+        default: false
+      },
       :'metrics.enabled' => {
         description: 'Enable sending metrics.',
         default: true
