@@ -436,7 +436,9 @@ describe Honeybadger::Notice do
 
     context "when there is a cause" do
       before do
-        allow(exception).to receive(:cause).and_return TheCause.new(':trollface:')
+        def exception.cause
+          TheCause.new(':trollface:')
+        end
       end
 
       context "and disabled (default)" do
