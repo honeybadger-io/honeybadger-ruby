@@ -16,6 +16,8 @@ module Honeybadger
 
     DEVELOPMENT_ENVIRONMENTS = ['development', 'test', 'cucumber'].map(&:freeze).freeze
 
+    DEFAULT_PATHS = ['honeybadger.yml', 'config/honeybadger.yml'].map(&:freeze).freeze
+
     OPTIONS = {
       api_key: {
         description: 'The API key for your Honeybadger project.',
@@ -79,7 +81,7 @@ module Honeybadger
       },
       :'config.path' => {
         description: 'The path (absolute, or relative from config.root) to the project\'s YAML configuration file.',
-        default: ENV['HONEYBADGER_CONFIG_PATH'] || ['honeybadger.yml', 'config/honeybadger.yml'],
+        default: DEFAULT_PATHS,
         type: String
       },
       :'logging.path' => {
