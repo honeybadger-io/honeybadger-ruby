@@ -1,3 +1,7 @@
+* Use explicit types for config options when casting from ENV.
+
+  *Joshua Wood*
+
 * Add exceptions.unwrap to config.
 
   *Joshua Wood*

@@ -13,14 +13,14 @@ describe Honeybadger::Config do
   describe "#initialize" do
     context "with multiple forms of config" do
       it "overrides config with options" do
-        config = Honeybadger::Config.new(logger: NULL_LOGGER, enabled: false)
-        expect(config[:enabled]).to eq false
+        config = Honeybadger::Config.new(logger: NULL_LOGGER, disabled: true)
+        expect(config[:disabled]).to eq true
       end
 
       it "prefers ENV to options" do
-        ENV['HONEYBADGER_ENABLED'] = 'true'
-        config = Honeybadger::Config.new(logger: NULL_LOGGER, enabled: false)
-        expect(config[:enabled]).to eq true
+        ENV['HONEYBADGER_DISABLED'] = 'true'
+        config = Honeybadger::Config.new(logger: NULL_LOGGER, disabled: false)
+        expect(config[:disabled]).to eq true
       end
 
       it "prefers file to options" do
@@ -103,7 +103,7 @@ describe Honeybadger::Config do
   end
 
   describe "#get" do
-    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, enabled: false, debug: true}.merge!(opts)) }
+    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, disabled: true, debug: true}.merge!(opts)) }
     let(:opts) { {} }
 
     context "when a normal option doesn't exist" do
@@ -138,7 +138,7 @@ describe Honeybadger::Config do
   end
 
   describe "#ping" do
-    let(:instance) { Honeybadger::Config.new(logger: NULL_LOGGER, enabled: false, debug: true) }
+    let(:instance) { Honeybadger::Config.new(logger: NULL_LOGGER, disabled: true, debug: true) }
     let(:logger) { instance.logger }
     let(:body) { {'top' => 'foo'} }
 

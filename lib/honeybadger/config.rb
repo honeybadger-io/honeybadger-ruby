@@ -25,8 +25,6 @@ module Honeybadger
 
     KEY_REPLACEMENT = Regexp.new('[^a-z\d_]', Regexp::IGNORECASE).freeze
 
-    DISALLOWED_KEYS = [:'config.path'].freeze
-
     DOTTED_KEY = Regexp.new('\A([^\.]+)\.(.+)\z').freeze
 
     NOT_BLANK = Regexp.new('\S').freeze
@@ -136,16 +134,16 @@ module Honeybadger
       end
     end
 
-    # Internal: Path to honeybadger.yml configuration file; this should be the root
-    # directory if no path was specified.
+    # Internal: Path to honeybadger.yml configuration file; this should be the
+    # root directory if no path was specified.
     #
     # Returns the Pathname configuration path.
     def config_path
-      locate_absolute_path(Array(self[:'config.path']).first, self[:root])
+      config_paths.first
     end
 
     def config_paths
-      Array(self[:'config.path']).map do |c|
+      Array(ENV['HONEYBADGER_CONFIG_PATH'] || get(:'config.path')).map do |c|
         locate_absolute_path(c, self[:root])
       end
     end

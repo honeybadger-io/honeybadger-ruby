@@ -5,6 +5,8 @@ require 'erb'
 module Honeybadger
   class Config
     class Yaml < ::Hash
+      DISALLOWED_KEYS = [:'config.path'].freeze
+
       def initialize(path, env = 'production')
         @path = path.kind_of?(Pathname) ? path : Pathname.new(path)
 

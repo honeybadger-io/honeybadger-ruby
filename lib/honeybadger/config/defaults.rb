@@ -2,6 +2,8 @@ require 'socket'
 
 module Honeybadger
   class Config
+    class Boolean; end
+
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
                       'ActionController::InvalidAuthenticityToken',
@@ -14,198 +16,248 @@ module Honeybadger
 
     DEVELOPMENT_ENVIRONMENTS = ['development', 'test', 'cucumber'].map(&:freeze).freeze
 
+    DEFAULT_PATHS = ['honeybadger.yml', 'config/honeybadger.yml'].map(&:freeze).freeze
+
     OPTIONS = {
       api_key: {
         description: 'The API key for your Honeybadger project.',
-        default: nil
+        default: nil,
+        type: String
       },
       env: {
         description: 'The current application\'s environment name.',
-        default: ENV['HONEYBADGER_ENV'] || ENV['RACK_ENV']
+        default: ENV['HONEYBADGER_ENV'] || ENV['RACK_ENV'],
+        type: String
       },
       report_data: {
         description: 'Enable/disable reporting of data. Defaults to true for non-development environments.',
-        default: nil
+        default: nil,
+        type: Boolean
       },
       root: {
         description: 'The project\'s absolute root path.',
-        default: Dir.pwd
+        default: Dir.pwd,
+        type: String
       },
       hostname: {
         description: 'The hostname of the current box.',
-        default: Socket.gethostname
+        default: Socket.gethostname,
+        type: String
       },
       backend: {
         description: 'An alternate backend to use for reporting data.',
-        default: nil
+        default: nil,
+        type: String
       },
       debug: {
         description: 'Forces metrics and traces to be reported every 10 seconds rather than 60.',
-        default: false
+        default: false,
+        type: Boolean
       },
       disabled: {
         description: 'Prevents Honeybadger from starting entirely.',
-        default: false
+        default: false,
+        type: Boolean
       },
       development_environments: {
         description: 'Environments which will not report data by default (use report_data to enable/disable explicitly).',
-        default: DEVELOPMENT_ENVIRONMENTS
+        default: DEVELOPMENT_ENVIRONMENTS,
+        type: Array
       },
       :'send_data_at_exit' => {
         description: 'Send remaining data when Ruby exits.',
-        default: true
+        default: true,
+        type: Boolean
       },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
-        default: nil
+        default: nil,
+        type: Array
       },
       :'plugins.skip' => {
         description: 'An optional list of plugins to skip.',
-        default: nil
+        default: nil,
+        type: Array
       },
       :'config.path' => {
         description: 'The path (absolute, or relative from config.root) to the project\'s YAML configuration file.',
-        default: ENV['HONEYBADGER_CONFIG_PATH'] || ['honeybadger.yml', 'config/honeybadger.yml']
+        default: DEFAULT_PATHS,
+        type: String
       },
       :'logging.path' => {
         description: 'The path (absolute, or relative from config.root) to the log file.',
-        default: nil
+        default: nil,
+        type: String
       },
       :'logging.level' => {
         description: 'The log level.',
-        default: 'INFO'
+        default: 'INFO',
+        type: String
       },
       :'logging.debug' => {
         description: 'Override debug logging.',
-        default: nil
+        default: nil,
+        type: Boolean
       },
       :'logging.tty_level' => {
         description: 'Level to log when attached to a terminal (anything < logging.level will always be ignored).',
-        default: 'DEBUG'
+        default: 'DEBUG',
+        type: String
       },
       :'connection.secure' => {
         description: 'Use SSL when sending data.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'connection.host' => {
         description: 'The host to use when sending data.',
-        default: 'api.honeybadger.io'.freeze
+        default: 'api.honeybadger.io'.freeze,
+        type: String
       },
       :'connection.port' => {
         description: 'The port to use when sending data.',
-        default: nil
+        default: nil,
+        type: Integer
       },
       :'connection.system_ssl_cert_chain' => {
         description: 'Use the system\'s SSL certificate chain (if available).',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'connection.http_open_timeout' => {
         description: 'The HTTP open timeout when connecting to the server.',
-        default: 2
+        default: 2,
+        type: Integer
       },
       :'connection.http_read_timeout' => {
         description: 'The HTTP read timeout when connecting to the server.',
-        default: 5
+        default: 5,
+        type: Integer
       },
       :'connection.proxy_host' => {
         description: 'The proxy host to use when sending data.',
-        default: nil
+        default: nil,
+        type: String
       },
       :'connection.proxy_port' => {
         description: 'The proxy port to use when sending data.',
-        default: nil
+        default: nil,
+        type: Integer
       },
       :'connection.proxy_user' => {
         description: 'The proxy user to use when sending data.',
-        default: nil
+        default: nil,
+        type: String
       },
       :'connection.proxy_pass' => {
         description: 'The proxy password to use when sending data.',
-        default: nil
+        default: nil,
+        type: String
       },
       :'request.filter_keys' => {
         description: 'A list of keys to filter when sending request data.',
-        default: ['password'.freeze, 'password_confirmation'.freeze].freeze
+        default: ['password'.freeze, 'password_confirmation'.freeze].freeze,
+        type: Array
       },
       :'request.disable_session' => {
         description: 'Prevent session from being sent with request data.',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'request.disable_params' => {
         description: 'Prevent params from being sent with request data.',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'request.disable_environment' => {
         description: 'Prevent Rack environment from being sent with request data.',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'request.disable_url' => {
         description: 'Prevent url from being sent with request data (Rack environment may still contain it in some cases).',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'user_informer.enabled' => {
         description: 'Enable the UserInformer middleware.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'user_informer.info' => {
         description: 'Replacement string for HTML comment in templates.',
-        default: 'Honeybadger Error {{error_id}}'.freeze
+        default: 'Honeybadger Error {{error_id}}'.freeze,
+        type: String
       },
       :'feedback.enabled' => {
         description: 'Enable the UserFeedback middleware.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'exceptions.enabled' => {
         description: 'Enable automatic reporting of exceptions.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'exceptions.ignore' => {
         description: 'A list of additional exceptions to ignore (includes default ignored exceptions).',
-        default: IGNORE_DEFAULT
+        default: IGNORE_DEFAULT,
+        type: Array
       },
       :'exceptions.ignore_only' => {
         description: 'A list of exceptions to ignore (overrides the default ignored exceptions).',
-        default: [].freeze
+        default: [].freeze,
+        type: Array
       },
       :'exceptions.ignored_user_agents' => {
         description: 'A list of user agents to ignore.',
-        default: [].freeze
+        default: [].freeze,
+        type: Array
       },
       :'exceptions.rescue_rake' => {
         description: 'Enable rescuing exceptions in rake tasks.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'exceptions.source_radius' => {
         description: 'The number of lines before and after the source when reporting snippets.',
-        default: 2
+        default: 2,
+        type: Integer
       },
       :'exceptions.local_variables' => {
         description: 'Enable sending local variables. Requires binding_of_caller to be loaded.',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'exceptions.unwrap' => {
         description: 'Reports #original_exception or #cause one level up from rescued exception when available.',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'metrics.enabled' => {
         description: 'Enable sending metrics.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'metrics.gc_profiler' => {
         description: 'Enable sending GC metrics (GC::Profiler must be enabled)',
-        default: false
+        default: false,
+        type: Boolean
       },
       :'traces.enabled' => {
         description: 'Enable sending traces.',
-        default: true
+        default: true,
+        type: Boolean
       },
       :'traces.threshold' => {
         description: 'The threshold in seconds to send traces.',
-        default: 2000
+        default: 2000,
+        type: Integer
       },
       :'delayed_job.attempt_threshold' => {
         description: 'The number of attempts before notifications will be sent.',
-        default: 0
+        default: 0,
+        type: Integer
       }
     }.freeze
 
