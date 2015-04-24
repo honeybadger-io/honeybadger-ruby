@@ -4,12 +4,19 @@ module Honeybadger
   class Config
     class Boolean; end
 
-    IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
-                      'ActionController::RoutingError',
-                      'ActionController::InvalidAuthenticityToken',
-                      'ActionController::UnknownAction',
-                      'ActionController::UnknownFormat',
+    IGNORE_DEFAULT = ['ActionController::RoutingError',
                       'AbstractController::ActionNotFound',
+                      'ActionController::MethodNotAllowed',
+                      'ActionController::UnknownHttpMethod',
+                      'ActionController::NotImplemented',
+                      'ActionController::UnknownFormat',
+                      'ActionController::InvalidAuthenticityToken',
+                      'ActionController::InvalidCrossOriginRequest',
+                      'ActionDispatch::ParamsParser::ParseError',
+                      'ActionController::BadRequest',
+                      'ActionController::ParameterMissing',
+                      'ActiveRecord::RecordNotFound',
+                      'ActionController::UnknownAction',
                       'CGI::Session::CookieStore::TamperedWithCookie',
                       'Mongoid::Errors::DocumentNotFound',
                       'Sinatra::NotFound'].map(&:freeze).freeze
