@@ -15,13 +15,10 @@ gem 'aruba'
 gem 'simplecov'
 gem 'webmock'
 gem 'pry'
+gem 'pry-byebug', platforms: RUBY2_PLATFORMS
 
 gem 'ruby-prof', platforms: :mri, require: false
-
-platforms *RUBY2_PLATFORMS do
-  gem 'allocation_stats', require: false
-  gem 'pry-byebug'
-end
+gem 'allocation_stats', platforms: RUBY2_PLATFORMS-[:mri_20], require: false
 
 gem 'capistrano', '>= 3.2.0', require: false
 
