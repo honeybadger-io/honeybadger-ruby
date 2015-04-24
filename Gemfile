@@ -1,3 +1,5 @@
+RUBY2_PLATFORMS = Bundler::Dependency::PLATFORM_MAP.keys.grep(/^mri_[^0-1]/)
+
 source 'https://rubygems.org'
 
 gemspec
@@ -13,10 +15,13 @@ gem 'aruba'
 gem 'simplecov'
 gem 'webmock'
 gem 'pry'
-gem 'pry-byebug'
 
 gem 'ruby-prof', platforms: :mri, require: false
-gem 'allocation_stats', platforms: [:mri_21, :mri_22], require: false
+
+platforms *RUBY2_PLATFORMS do
+  gem 'allocation_stats', require: false
+  gem 'pry-byebug'
+end
 
 gem 'capistrano', '>= 3.2.0', require: false
 

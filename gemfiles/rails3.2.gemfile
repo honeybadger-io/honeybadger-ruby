@@ -12,12 +12,17 @@ gem "appraisal"
 gem "aruba"
 gem "simplecov"
 gem "webmock"
+gem "pry"
 gem "ruby-prof", :platforms => :mri, :require => false
-gem "allocation_stats", :platforms => [:mri_21, :mri_22], :require => false
 gem "capistrano", "~> 2.0"
 gem "codeclimate-test-reporter", :require => false, :group => :test
 gem "rails", "~> 3.2.12"
 gem "better_errors", :require => false, :platforms => [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", :require => false
+
+platforms :mri_20, :mri_21, :mri_22 do
+  gem "allocation_stats", :require => false
+  gem "pry-byebug"
+end
 
 gemspec :path => "../"
