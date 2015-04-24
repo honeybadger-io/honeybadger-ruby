@@ -1,3 +1,7 @@
+* Catch Errno::ENFILE when reading system stats.
+
+  *Dmitry Polushkin*
+
 * Use explicit types for config options when casting from ENV.
 
   *Joshua Wood*

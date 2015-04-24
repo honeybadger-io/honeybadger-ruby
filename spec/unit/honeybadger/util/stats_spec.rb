@@ -14,6 +14,14 @@ describe Honeybadger::Util::Stats do
       its(:length) { should eq 5 }
     end
 
+    context "when too many files are open" do
+      before do
+        allow(IO).to receive(:readlines).and_raise Errno::ENFILE
+      end
+
+      it { should be_empty }
+    end
+
     it 'converts KB to MB' do
       expect(Honeybadger::Util::Stats.memory[:total]).to eq 34302.22265625
       expect(Honeybadger::Util::Stats.memory[:free]).to eq 1632.26171875
@@ -48,6 +56,14 @@ describe Honeybadger::Util::Stats do
     describe '.keys' do
       subject { Honeybadger::Util::Stats.load.keys }
       its(:length) { should eq 3 }
+    end
+
+    context "when too many files are open" do
+      before do
+        allow(IO).to receive(:read).and_raise Errno::ENFILE
+      end
+
+      it { should be_empty }
     end
 
     specify { expect(subject[:one]).to eq 22.58 }

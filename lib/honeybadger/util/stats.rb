@@ -27,19 +27,22 @@ module Honeybadger
           end
           out
         end
-        
+
+        private
+
         def run_meminfo
           run { IO.readlines("/proc/meminfo") }
         end
-        
+
         def run_loadavg
           run { IO.read("/proc/loadavg") }
         end
-        
+
         def run
           yield
         rescue Errno::ENFILE
-          # catch issues like 'Too many open files in system'
+          # Catch issues like 'Too many open files in system'
+          nil
         end
       end
     end
