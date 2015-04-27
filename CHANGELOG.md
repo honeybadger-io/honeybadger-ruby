@@ -1,3 +1,7 @@
+* Fix bug when processing source extract for action_view templates.
+
+  *Joshua Wood*
+
 * Don't access secrets before Rails initialization.
 
   *Joshua Wood*
