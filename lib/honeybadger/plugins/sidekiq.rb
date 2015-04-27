@@ -17,15 +17,18 @@ module Honeybadger
         requirement { defined?(::Sidekiq) }
 
         execution do
-          ::Sidekiq.configure_server do |config|
-            config.server_middleware do |chain|
+          ::Sidekiq.configure_server do |sidekiq|
+            sidekiq.server_middleware do |chain|
               chain.add Middleware
             end
           end
 
           if defined?(::Sidekiq::VERSION) && ::Sidekiq::VERSION > '3'
-            ::Sidekiq.configure_server do |config|
-              config.error_handlers << Proc.new {|ex,context| Honeybadger.notify_or_ignore(ex, parameters: context) }
+            ::Sidekiq.configure_server do |sidekiq|
+              sidekiq.error_handlers << lambda {|ex, params|
+                return if params['retry'] && params['retry_count'].to_i < config[:'sidekiq.attempt_threshold'].to_i
+                Honeybadger.notify_or_ignore(ex, parameters: params)
+              }
             end
           end
         end
