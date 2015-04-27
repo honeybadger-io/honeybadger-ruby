@@ -1,3 +1,8 @@
+* Update default ignored exceptions to include the latest Rails rescue
+  responses. (see issue #107)
+
+  *Joshua Wood*
+
 * Fix bug when processing source extract for action_view templates.
 
   *Joshua Wood*
