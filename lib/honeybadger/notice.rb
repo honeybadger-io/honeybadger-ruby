@@ -360,7 +360,7 @@ module Honeybadger
 
       # ActionView::Template::Error has its own source_extract method.
       # If present, use that instead.
-      if exception.respond_to?(:source_extract)
+      if exception.respond_to?(:source_extract) && exception.source_extract
         Hash[exception.source_extract.split("\n").map do |line|
           parts = line.split(': ')
           [parts[0].strip, parts[1] || '']

@@ -519,21 +519,35 @@ describe Honeybadger::Notice do
     end
   end
 
-  it "Uses source extract from view when reporting an ActionView::Template::Error" do
-    # TODO: I would like to stub out a real ActionView::Template::Error, but we're
-    # currently locked at actionpack 2.3.8. Perhaps if one day we upgrade...
-    exception = build_exception
-    def exception.source_extract
-      <<-ERB
+  context "when the error is an ActionView::Template::Error" do
+    it "uses source extract from view" do
+      # TODO: I would like to stub out a real ActionView::Template::Error, but we're
+      # currently locked at actionpack 2.3.8. Perhaps if one day we upgrade...
+      exception = build_exception
+      def exception.source_extract
+        <<-ERB
       1:   <%= current_user.name %>
       2: </div>
       3: 
       4: <div>
-      ERB
-    end
-    notice = build_notice(exception: exception)
+        ERB
+      end
+      notice = build_notice(exception: exception)
 
-    expect(notice.source).to eq({ '1' => '  <%= current_user.name %>', '2' => '</div>', '3' => '', '4' => '<div>'})
+      expect(notice.source).to eq({ '1' => '  <%= current_user.name %>', '2' => '</div>', '3' => '', '4' => '<div>'})
+    end
+
+    context "when there is no source_extract" do
+      it "doesn't send the source" do
+        exception = build_exception
+        def exception.source_extract
+          nil
+        end
+
+        notice = build_notice(exception: exception)
+        expect(notice.source).to eq({})
+      end
+    end
   end
 
   context "with a backtrace" do

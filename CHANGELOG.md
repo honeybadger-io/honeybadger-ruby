@@ -1,3 +1,7 @@
+* Fix bug when processing source extract for action_view templates.
+
+  *Joshua Wood*
+
 * Exceptions with the same type but caused within different delayed jobs are not grouped together. They have their component and action set so that the application class name and excecuted action is displayed in the UI.
 
   *Panos Korros*
