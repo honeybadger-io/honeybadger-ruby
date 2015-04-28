@@ -8,7 +8,7 @@ module Honeybadger
       def initialize(env = ENV)
         env.each_pair do |k,v|
           next unless k.match(CONFIG_KEY)
-          next unless config_key = CONFIG_MAPPING[$1] || $1.downcase.to_sym
+          next unless config_key = CONFIG_MAPPING[$1]
           self[config_key] = cast_value(v, OPTIONS[config_key][:type])
         end
       end
