@@ -90,7 +90,7 @@ RSpec.configure do |config|
     defined?(Honeybadger.config) and
       Honeybadger.config = Honeybadger::Config::Default.new(backend: 'test'.freeze)
 
-    defined?(Honeybadger::Config) and
+    defined?(Honeybadger::Config::Env) and
       ENV.each_pair do |k,v|
       next unless k.match(Honeybadger::Config::Env::CONFIG_KEY)
       ENV.delete(k)
