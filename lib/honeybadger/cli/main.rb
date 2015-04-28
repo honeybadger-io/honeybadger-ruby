@@ -47,6 +47,7 @@ module Honeybadger
           say("Deploy notification for #{payload[:environment]} complete.", :green)
         else
           say("Deploy notification failed: #{response.code}", :red)
+          exit(1)
         end
       rescue => e
         say("An error occurred during deploy notification: #{e}\n\t#{e.backtrace.join("\n\t")}", :red)

@@ -35,7 +35,7 @@ namespace :honeybadger do
         end
 
         within release_path do
-          execute executable, options
+          execute executable, options, raise_on_non_zero_exit: false
         end
 
         info 'Honeybadger notification complete.'
