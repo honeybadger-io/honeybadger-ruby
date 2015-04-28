@@ -16,4 +16,12 @@ describe Honeybadger::Config::Env do
   specify { expect(subject[:'logging.path']).to eq 'log/' }
   specify { expect(subject[:'exceptions.ignore']).to eq ['Foo', 'Bar', 'Baz'] }
   specify { expect(subject[:'exceptions.enabled']).to eq false }
+
+  context "with invalid options" do
+    before do
+      ENV['HONEYBADGER_BAD_OPTION'] = 'log/'
+    end
+
+    specify { expect(subject).not_to have_key(:'bad_option') }
+  end
 end
