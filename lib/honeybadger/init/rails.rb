@@ -30,7 +30,7 @@ module Honeybadger
                 Trace.current.add_query(event) if Trace.current and event.name != 'SCHEMA'
               end
 
-              ActiveSupport::Notifications.subscribe(/^render_(template|action|collection)\.action_view/) do |*args|
+              ActiveSupport::Notifications.subscribe(/^render_(template|partial|action|collection)\.action_view/) do |*args|
                 event = ActiveSupport::Notifications::Event.new(*args)
                 Trace.current.add(event) if Trace.current
               end
