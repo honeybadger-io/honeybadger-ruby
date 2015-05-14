@@ -53,14 +53,6 @@ module Honeybadger
                 event = ActiveSupport::Notifications::Event.new(*args)
                 status = event.payload[:exception] ? 500 : event.payload[:status]
                 Agent.timing("app.request.#{status}", event.duration)
-
-                controller = event.payload[:controller]
-                action = event.payload[:action]
-                if controller && action
-                  Agent.timing("app.controller.#{controller}.#{action}.total", event.duration)
-                  Agent.timing("app.controller.#{controller}.#{action}.view", event.payload[:view_runtime]) if event.payload[:view_runtime]
-                  Agent.timing("app.controller.#{controller}.#{action}.db", event.payload[:db_runtime]) if event.payload[:db_runtime]
-                end
               end
             end
           end
