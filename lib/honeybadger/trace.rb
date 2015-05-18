@@ -1,6 +1,7 @@
 require 'securerandom'
 
 require 'honeybadger/agent'
+require 'honeybadger/util/sanitizer'
 
 module Honeybadger
   class Trace
@@ -45,8 +46,10 @@ module Honeybadger
       end
     end
 
-    def complete(event)
+    def complete(event, config)
       @meta = clean_event(event).to_h
+      @meta[:params] = Util::Sanitizer.new(filters: config.params_filters).sanitize(event.payload[:params]) if event.payload[:params]
+      @meta[:context] = Util::Sanitizer.new.sanitize(Thread.current[:__honeybadger_context]) if Thread.current[:__honeybadger_context]
       @duration = event.duration
       @key = "#{event.payload[:controller]}##{event.payload[:action]}"
       Thread.current[:__hb_trace] = nil
