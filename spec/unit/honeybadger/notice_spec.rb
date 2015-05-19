@@ -701,6 +701,20 @@ describe Honeybadger::Notice do
           expect(notice.local_variables).to eq({})
         end
       end
+
+      context "when instance variables aren't enabled" do
+        it "does not attempt to find them" do
+          expect(notice.instance_vars).to eq({})
+        end
+      end
+
+      context "when instance variables are enabled" do
+        let(:config) { build_config(:'exceptions.instance_variables' => true) }
+
+        it "does not attempt to find them" do
+          expect(notice.instance_vars).to eq({})
+        end
+      end
     end
 
     context "when binding_of_caller is installed" do
@@ -721,6 +735,51 @@ describe Honeybadger::Notice do
       context "when local variables aren't enabled" do
         it "does not attempt to find them" do
           expect(notice.local_variables).to eq({})
+        end
+      end
+
+      context "when instance variables aren't enabled" do
+        it "does not attempt to find them" do
+          expect(notice.instance_vars).to eq({})
+        end
+      end
+
+      context "when instance variables are enabled" do
+        let(:config) { build_config(:'exceptions.instance_variables' => true) }
+
+        it "finds the instance variables from first frame of trace" do
+          expect(notice.instance_vars[:@mock_binding]).to eq mock_binding
+        end
+
+        context "with an application trace" do
+          before do
+            exception.__honeybadger_bindings_stack.unshift(double('Binding', :eval => nil))
+            config[:root] = File.dirname(__FILE__)
+          end
+
+          it "finds the instance variables from first frame of application trace" do
+            expect(notice.instance_vars[:@mock_binding]).to eq mock_binding
+          end
+
+          context "and project_root is a Pathname" do
+            before do
+              config[:root] = Pathname.new(File.dirname(__FILE__))
+            end
+
+            specify { expect { notice }.not_to raise_error }
+          end
+        end
+
+        context "without an exception" do
+          it "assigns empty Hash" do
+            expect(build_notice(:exception => nil).instance_vars).to eq({})
+          end
+        end
+
+        context "without bindings" do
+          it "assigns empty Hash" do
+            expect(build_notice(:exception => RuntimeError.new).instance_vars).to eq({})
+          end
         end
       end
 

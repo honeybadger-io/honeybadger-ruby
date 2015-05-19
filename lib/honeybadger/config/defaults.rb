@@ -236,6 +236,11 @@ module Honeybadger
         default: false,
         type: Boolean
       },
+      :'exceptions.instance_variables' => {
+        description: 'Enable sending instance variables. Requires binding_of_caller to be loaded.',
+        default: false,
+        type: Boolean
+      },
       :'exceptions.unwrap' => {
         description: 'Reports #original_exception or #cause one level up from rescued exception when available.',
         default: false,

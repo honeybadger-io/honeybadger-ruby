@@ -101,6 +101,9 @@ module Honeybadger
     # Public: Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
+    # Public: Instance variables are extracted from first frame of backtrace.
+    attr_reader :instance_vars
+
     # Internal: Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
 
@@ -163,6 +166,7 @@ module Honeybadger
       @stats = Util::Stats.all
 
       @local_variables = local_variables_from_exception(exception, config)
+      @instance_vars = instance_variables_from_exception(exception, config)
 
       @api_key = opts[:api_key] || config[:api_key]
 
@@ -194,7 +198,8 @@ module Honeybadger
           session: f(session),
           cgi_data: f(cgi_data),
           context: s(context),
-          local_variables: s(local_variables)
+          local_variables: s(local_variables),
+          instance_variables: s(instance_vars)
         },
         server: {
           project_root: s(config[:root]),
@@ -419,9 +424,29 @@ module Honeybadger
     #
     # exception - The Exception containing the bindings stack.
     #
-    # Returns a Hash of local variables
+    # Returns a Hash of local variables.
     def local_variables_from_exception(exception, config)
       return {} unless send_local_variables?(config)
+      variables_from_exception(exception, 'local_variables')
+    end
+
+    # Internal: Fetch instance variables from first frame of backtrace.
+    #
+    # exception - The Exception containing the bindings stack.
+    #
+    # Returns a Hash of instnace variables.
+    def instance_variables_from_exception(exception, config)
+      return {} unless send_instance_variables?(config)
+      variables_from_exception(exception, 'instance_variables')
+    end
+
+    # Internal: Fetch a list of variables from first frame of backtrace.
+    #
+    # exception - The Exception containing the bindings stack.
+    # name      - The name of the collection method to eval.
+    #
+    # Returns a Hash of instnace variables.
+    def variables_from_exception(exception, name)
       return {} unless Exception === exception
       return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
       return {} if exception.__honeybadger_bindings_stack.empty?
@@ -432,7 +457,7 @@ module Honeybadger
 
       binding ||= exception.__honeybadger_bindings_stack[0]
 
-      vars = binding.eval('local_variables')
+      vars = binding.eval(name)
       Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
     end
 
@@ -440,7 +465,14 @@ module Honeybadger
     #
     # Returns true to send local_variables
     def send_local_variables?(config)
-      config[:'exceptions.local_variables']
+      !!config[:'exceptions.local_variables']
+    end
+
+    # Internal: Should instance variables be sent?
+    #
+    # Returns true to send instance variables.
+    def send_instance_variables?(config)
+      !!config[:'exceptions.instance_variables']
     end
 
     # Internal: Parse Backtrace from exception backtrace.
