@@ -7,6 +7,7 @@ require 'honeybadger/version'
 require 'honeybadger/backtrace'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
+require 'honeybadger/util/request_payload'
 require 'honeybadger/rack/request_hash'
 
 module Honeybadger
@@ -31,16 +32,6 @@ module Honeybadger
 
   # Internal: Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
-
-  # Internal: default values to use for request data.
-  REQUEST_DEFAULTS = {
-    url: nil,
-    component: nil,
-    action: nil,
-    params: {}.freeze,
-    session: {}.freeze,
-    cgi_data: {}.freeze
-  }.freeze
 
   MAX_EXCEPTION_CAUSES = 5
 
@@ -151,7 +142,7 @@ module Honeybadger
       @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
-      @request = OpenStruct.new(construct_request_hash(config.request, opts, config.excluded_request_keys))
+      @request = construct_request(config, opts)
 
       @context = construct_context_hash(opts)
 
@@ -186,16 +177,10 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: {
-          url: sanitized_url,
-          component: s(component),
-          action: s(action),
-          params: f(params),
-          session: f(session),
-          cgi_data: f(cgi_data),
+        request: @request.to_hash.update({
           context: s(context),
           local_variables: s(local_variables)
-        },
+        }),
         server: {
           project_root: s(config[:root]),
           environment_name: s(config[:env]),
@@ -331,21 +316,18 @@ module Honeybadger
       ].compact | BACKTRACE_FILTERS
     end
 
-    def construct_request_hash(rack_request, opts, excluded_keys = [])
+    # Internal: Construct the request object with data from various sources.
+    #
+    # Returns Request.
+    def construct_request(config, opts)
       request = {}
-      request.merge!(Rack::RequestHash.new(rack_request)) if rack_request
-
+      request.merge!(Rack::RequestHash.new(config.request)) if config.request
+      request.merge!(opts)
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
-
-      REQUEST_DEFAULTS.each do |key, default|
-        request[key] = opts[key] if opts.has_key?(key)
-        request[key] = default if !request[key] || excluded_keys.include?(key)
-      end
-
-      request[:session] = request[:session][:data] if request[:session][:data]
-
-      request
+      request.delete_if {|k,v| v.nil? || config.excluded_request_keys.include?(k) }
+      request[:sanitizer] = filtered_sanitizer
+      Util::RequestPayload.new(request)
     end
 
     def construct_context_hash(opts)
@@ -408,11 +390,6 @@ module Honeybadger
 
     def f(data)
       filtered_sanitizer.sanitize(data)
-    end
-
-    def sanitized_url
-      return nil unless url
-      filtered_sanitizer.filter_url(s(url))
     end
 
     # Internal: Fetch local variables from first frame of backtrace.
