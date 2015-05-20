@@ -265,6 +265,11 @@ module Honeybadger
         description: 'The number of attempts before notifications will be sent.',
         default: 0,
         type: Integer
+      },
+      :'sinatra.enabled' => {
+        description: 'Enable Sinatra auto-initialization.',
+        default: true,
+        type: Boolean
       }
     }.freeze
 

@@ -1,3 +1,9 @@
+* Prevent Sinatra from using the same middleware more than once and add
+  sinatra.enabled setting (default true) to disable auto-initialization
+  of Sinatra.
+
+  *Joshua Wood*
+
 * Update default ignored exceptions to include the latest Rails rescue
   responses. (see issue #107)
 
