@@ -63,7 +63,6 @@ module Honeybadger
       raise e
     ensure
       @meta.merge!(:duration => @duration = 1000.0 * (Time.now - started))
-      @meta[:request] = Util::RequestPayload::DEFAULTS
       Agent.trace(self)
     end
 

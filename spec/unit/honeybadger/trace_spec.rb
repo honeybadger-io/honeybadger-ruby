@@ -13,11 +13,6 @@ describe Honeybadger::Trace do
       expect(Honeybadger::Agent).to receive(:trace).with(trace)
       described_class.instrument('testing', {}){}
     end
-
-    it "includes request data" do
-      described_class.instrument('testing', {}){}
-      expect(trace.meta).to have_key :request
-    end
   end
 
   describe "#complete" do
