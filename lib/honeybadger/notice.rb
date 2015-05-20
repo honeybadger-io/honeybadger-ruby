@@ -1,7 +1,6 @@
 require 'json'
 require 'securerandom'
 require 'forwardable'
-require 'ostruct'
 
 require 'honeybadger/version'
 require 'honeybadger/backtrace'
@@ -69,24 +68,25 @@ module Honeybadger
     attr_reader :source
 
     # Public: CGI variables such as HTTP_METHOD.
-    def_delegator :@request, :cgi_data
+    def cgi_data; @request[:cgi_data]; end
 
     # Public: A hash of parameters from the query string or post body.
-    def_delegator :@request, :params
+    def params; @request[:params]; end
     alias_method :parameters, :params
 
     # Public: The component (if any) which was used in this request. (usually the controller)
-    def_delegator :@request, :component
+    def component; @request[:component]; end
     alias_method :controller, :component
 
     # Public: The action (if any) that was called in this request.
-    def_delegator :@request, :action
+    def action; @request[:action]; end
 
     # Public: A hash of session data from the request.
     def_delegator :@request, :session
+    def session; @request[:session]; end
 
     # Public: The URL at which the error occurred (if any).
-    def_delegator :@request, :url
+    def url; @request[:url]; end
 
     # Public: Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
@@ -140,7 +140,7 @@ module Honeybadger
       @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
-      @request = OpenStruct.new(construct_request_hash(config, opts))
+      @request = construct_request_hash(config, opts)
 
       @context = construct_context_hash(opts)
 
@@ -175,7 +175,7 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: @request.to_h.update({
+        request: @request.update({
           context: s(context),
           local_variables: s(local_variables)
         }),

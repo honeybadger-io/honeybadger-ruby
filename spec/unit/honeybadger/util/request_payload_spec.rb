@@ -51,12 +51,12 @@ describe Honeybadger::Util::RequestPayload do
       described_class.build({ sanitizer: sanitizer, url: 'foo/bar' })
     end
 
-    it "converts #to_h to JSON" do
-      original = subject.to_h
+    it "converts Hash to JSON" do
+      original = subject
       result = JSON.parse(subject.to_json)
 
       expect(result.size).to eq original.size
-      subject.to_h.each_pair do |k,v|
+      subject.each_pair do |k,v|
         expect(result[k.to_s]).to eq v
       end
     end
