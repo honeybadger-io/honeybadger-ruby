@@ -58,6 +58,48 @@ describe "Sidekiq Dependency" do
         Honeybadger::Plugin.instances[:sidekiq].load!(config)
         expect(sidekiq_config.error_handlers).not_to be_empty
       end
+
+      describe "error handler" do
+        let(:exception) { RuntimeError.new('boom') }
+        let(:job_context) { {} }
+
+        before do
+          Honeybadger::Plugin.instances[:sidekiq].load!(config)
+        end
+
+        it "notifies Honeybadger" do
+          expect(Honeybadger).to receive(:notify_or_ignore).with(exception, { parameters: job_context }).once
+          sidekiq_config.error_handlers[0].call(exception, job_context)
+        end
+
+        context "when an attempt threshold is configured" do
+          let(:job_context) { { 'retry_count' => 2, 'retry' => true } }
+          let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'sidekiq.attempt_threshold' => 3) }
+
+          it "doesn't notify Honeybadger" do
+            expect(Honeybadger).not_to receive(:notify_or_ignore)
+            sidekiq_config.error_handlers[0].call(exception, job_context)
+          end
+
+          context "and the retries are exhausted" do
+            let(:job_context) { { 'retry_count' => 2, 'retry' => false } }
+
+            it "notifies Honeybadger" do
+              expect(Honeybadger).to receive(:notify_or_ignore).with(exception, { parameters: job_context }).once
+              sidekiq_config.error_handlers[0].call(exception, job_context)
+            end
+          end
+
+          context "and the retry count meets the threshold" do
+            let(:job_context) { { 'retry_count' => 3, 'retry' => true } }
+
+            it "notifies Honeybadger" do
+              expect(Honeybadger).to receive(:notify_or_ignore).with(exception, { parameters: job_context }).once
+              sidekiq_config.error_handlers[0].call(exception, job_context)
+            end
+          end
+        end
+      end
     end
   end
 end

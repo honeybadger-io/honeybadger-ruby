@@ -266,6 +266,11 @@ module Honeybadger
         default: 0,
         type: Integer
       },
+      :'sidekiq.attempt_threshold' => {
+        description: 'The number of attempts before notifications will be sent.',
+        default: 0,
+        type: Integer
+      },
       :'sinatra.enabled' => {
         description: 'Enable Sinatra auto-initialization.',
         default: true,

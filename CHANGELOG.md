@@ -1,3 +1,8 @@
+* Configure sidekiq.attempt_threshold to suppress notifications until retry
+  threshold is reached.
+
+  *Joshua Wood*
+
 * Prevent Sinatra from using the same middleware more than once and add
   sinatra.enabled setting (default true) to disable auto-initialization
   of Sinatra.
