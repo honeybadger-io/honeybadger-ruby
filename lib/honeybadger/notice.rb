@@ -8,7 +8,6 @@ require 'honeybadger/backtrace'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
 require 'honeybadger/util/request_payload'
-require 'honeybadger/rack/request_hash'
 
 module Honeybadger
   NOTIFIER = {
@@ -320,11 +319,11 @@ module Honeybadger
     # Returns Request.
     def construct_request_hash(config, opts)
       request = {}
-      request.merge!(Rack::RequestHash.new(config.request)) if config.request
+      request.merge!(config.request_hash)
       request.merge!(opts)
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
-      request.delete_if {|k,v| v.nil? || config.excluded_request_keys.include?(k) }
+      request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
       request[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
       Util::RequestPayload.build(request)
     end

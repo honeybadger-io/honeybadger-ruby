@@ -10,6 +10,7 @@ require 'honeybadger/backend'
 require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
 require 'honeybadger/logging'
+require 'honeybadger/rack/request_hash'
 
 module Honeybadger
   class Config
@@ -36,6 +37,8 @@ module Honeybadger
     OVERRIDE = {
       :'exceptions.ignore' => :'exceptions.ignore_only'
     }.freeze
+
+    DEFAULT_REQUEST_PAYLOAD = {}.freeze
 
     def initialize(opts = {})
       l = opts.delete(:logger)
@@ -187,6 +190,11 @@ module Honeybadger
       yield
     ensure
       Thread.current[:__honeybadger_request] = nil
+    end
+
+    def request_hash
+      return DEFAULT_REQUEST_PAYLOAD unless request
+      Rack::RequestHash.new(request)
     end
 
     def params_filters

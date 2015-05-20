@@ -3,7 +3,6 @@ require 'securerandom'
 require 'honeybadger/agent'
 require 'honeybadger/util/sanitizer'
 require 'honeybadger/util/request_payload'
-require 'honeybadger/rack/request_hash'
 
 module Honeybadger
   class Trace
@@ -89,8 +88,8 @@ module Honeybadger
         action: event.payload[:action],
         params: event.payload[:params]
       }
-      h.merge!(Rack::RequestHash.new(config.request)) if config.request
-      h.delete_if {|k,v| v.nil? || config.excluded_request_keys.include?(k) }
+      h.merge!(config.request_hash)
+      h.delete_if {|k,v| config.excluded_request_keys.include?(k) }
       h[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
       Util::RequestPayload.build(h).update({
         context: context_data
