@@ -45,7 +45,7 @@ module Honeybadger
               ActiveSupport::Notifications.subscribe('process_action.action_controller') do |*args|
                 event = ActiveSupport::Notifications::Event.new(*args)
                 if Trace.current && event.payload[:controller] && event.payload[:action]
-                  payload = {}
+                  payload = { source: 'web' }
                   payload[:path] = Util::Sanitizer.new(filters: config.params_filters).filter_url(event.payload[:path]) if event.payload[:path]
                   payload[:request] = request_data(event, config)
                   Trace.current.complete(event, payload)
