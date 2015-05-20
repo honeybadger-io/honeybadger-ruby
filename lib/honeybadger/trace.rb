@@ -92,7 +92,7 @@ module Honeybadger
       h.merge!(Rack::RequestHash.new(config.request)) if config.request
       h.delete_if {|k,v| v.nil? || config.excluded_request_keys.include?(k) }
       h[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
-      Util::RequestPayload.new(h).to_hash.update({
+      Util::RequestPayload.build(h).update({
         context: context_data
       })
     end

@@ -129,7 +129,6 @@ module Honeybadger
       @config = config
 
       @sanitizer = Util::Sanitizer.new
-      @filtered_sanitizer = Util::Sanitizer.new(filters: config.params_filters)
 
       @exception = unwrap_exception(opts[:exception])
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
@@ -142,7 +141,7 @@ module Honeybadger
       @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
-      @request = construct_request(config, opts)
+      @request = OpenStruct.new(construct_request_hash(config, opts))
 
       @context = construct_context_hash(opts)
 
@@ -177,7 +176,7 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: @request.to_hash.update({
+        request: @request.to_h.update({
           context: s(context),
           local_variables: s(local_variables)
         }),
@@ -224,7 +223,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer, :filtered_sanitizer
+    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
@@ -319,15 +318,15 @@ module Honeybadger
     # Internal: Construct the request object with data from various sources.
     #
     # Returns Request.
-    def construct_request(config, opts)
+    def construct_request_hash(config, opts)
       request = {}
       request.merge!(Rack::RequestHash.new(config.request)) if config.request
       request.merge!(opts)
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
       request.delete_if {|k,v| v.nil? || config.excluded_request_keys.include?(k) }
-      request[:sanitizer] = filtered_sanitizer
-      Util::RequestPayload.new(request)
+      request[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
+      Util::RequestPayload.build(request)
     end
 
     def construct_context_hash(opts)
@@ -386,10 +385,6 @@ module Honeybadger
 
     def s(data)
       sanitizer.sanitize(data)
-    end
-
-    def f(data)
-      filtered_sanitizer.sanitize(data)
     end
 
     # Internal: Fetch local variables from first frame of backtrace.
