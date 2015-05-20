@@ -1,8 +1,6 @@
 require 'securerandom'
 
 require 'honeybadger/agent'
-require 'honeybadger/util/sanitizer'
-require 'honeybadger/util/request_payload'
 
 module Honeybadger
   class Trace
@@ -47,10 +45,8 @@ module Honeybadger
       end
     end
 
-    def complete(event, config)
-      @meta = clean_event(event).to_h
-      @meta[:path] = Util::Sanitizer.new(filters: config.params_filters).filter_url(event.payload[:path]) if event.payload[:path]
-      @meta[:request] = request_data(event, config)
+    def complete(event, payload = {})
+      @meta = clean_event(event).to_h.merge(payload)
       @duration = event.duration
       @key = "#{event.payload[:controller]}##{event.payload[:action]}"
       Thread.current[:__hb_trace] = nil
@@ -80,27 +76,6 @@ module Honeybadger
     attr_reader :meta
 
     protected
-
-    def request_data(event, config)
-      h = {
-        url: event.payload[:path],
-        component: event.payload[:controller],
-        action: event.payload[:action],
-        params: event.payload[:params]
-      }
-      h.merge!(config.request_hash)
-      h.delete_if {|k,v| config.excluded_request_keys.include?(k) }
-      h[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
-      Util::RequestPayload.build(h).update({
-        context: context_data
-      })
-    end
-
-    def context_data
-      if Thread.current[:__honeybadger_context]
-        Util::Sanitizer.new.sanitize(Thread.current[:__honeybadger_context])
-      end
-    end
 
     def clean_event(event)
       TraceCleaner.create(event)

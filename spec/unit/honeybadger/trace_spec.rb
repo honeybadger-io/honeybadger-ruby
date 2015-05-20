@@ -23,27 +23,26 @@ describe Honeybadger::Trace do
   describe "#complete" do
     let(:trace) { Honeybadger::Trace.new(:foo) }
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
-    let(:event) { double('ActiveSupport::Notifications::Event', name: 'foo', duration: 1.2, payload: payload) }
+    let(:event) { double('ActiveSupport::Notifications::Event', name: 'process_action.action_controller', duration: 1.2, payload: payload) }
     let(:payload) { {} }
 
     before do
       allow(Honeybadger::Trace).to receive(:new).and_return(trace)
     end
 
-    context "without request data" do
-      it "includes default request data" do
-        trace.complete(event, config)
-        expect(trace.meta).to have_key :request
-        expect(trace.meta[:request][:params]).to eq({})
+    context "when completed with an event payload" do
+      let(:payload) { { foo: 'bar' } }
+
+      it "includes payload's data" do
+        trace.complete(event)
+        expect(trace.meta[:foo]).to eq 'bar'
       end
     end
 
-    context "when payload has request data" do
-      let(:payload) { { params: { foo: 'bar' } } }
-
-      it "includes payload's request data" do
-        trace.complete(event, config)
-        expect(trace.meta[:request][:params]).to eq({ foo: 'bar' })
+    context "when completed with a local payload" do
+      it "includes payload's data" do
+        trace.complete(event, { foo: 'bar' })
+        expect(trace.meta[:foo]).to eq 'bar'
       end
     end
   end
