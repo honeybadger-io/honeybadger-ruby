@@ -38,7 +38,7 @@ module Honeybadger
       :'exceptions.ignore' => :'exceptions.ignore_only'
     }.freeze
 
-    DEFAULT_REQUEST_PAYLOAD = {}.freeze
+    DEFAULT_REQUEST_HASH = {}.freeze
 
     def initialize(opts = {})
       l = opts.delete(:logger)
@@ -193,7 +193,7 @@ module Honeybadger
     end
 
     def request_hash
-      return DEFAULT_REQUEST_PAYLOAD unless request
+      return DEFAULT_REQUEST_HASH unless request
       Rack::RequestHash.new(request)
     end
 
