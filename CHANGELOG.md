@@ -1,3 +1,11 @@
+* Send request data with traces.
+
+  *Joshua Wood*
+
+* Ditch per-controller metrics and add render_partial event to traces.
+
+  *Benjamin Curtis*
+
 * Disable local variables when BetterErrors is detected.
 
   *Joshua Wood*
