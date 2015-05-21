@@ -12,13 +12,24 @@ feature "Installing honeybadger via the cli" do
       end
     end
 
-    scenario "when the configuration file already exists" do
+    scenario "when the configuration file is valid" do
       before { config.write }
 
       it "outputs successful result" do
         assert_cmd('honeybadger deploy -e production')
         expect(all_output).to match /complete/i
         expect(all_output).to match /production/i
+      end
+    end
+
+    scenario "the request fails" do
+      before { config.write }
+      before { set_env('DEBUG_BACKEND_STATUS', '500') }
+
+      it "outputs successful result" do
+        expect(cmd('honeybadger deploy -e production')).to exit_with(1)
+        expect(all_output).not_to match /complete/i
+        expect(all_output).to match /500/i
       end
     end
   end

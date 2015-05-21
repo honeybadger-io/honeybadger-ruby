@@ -31,7 +31,7 @@ module Honeybadger
               logger.info 'DRY RUN: Notification not actually run.'
             else
               result = ''
-              run(notify_options, :once => true, :pty => false) { |ch, stream, data| result << data }
+              run("#{ notify_options }; true", :once => true, :pty => false) { |ch, stream, data| result << data }
             end
             logger.info 'Honeybadger Notification Complete.'
           end
