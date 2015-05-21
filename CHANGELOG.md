@@ -1,3 +1,7 @@
+* Fix a tracing issue with net/http requests.
+
+  *Joshua Wood*
+
 * Send request data with traces.
 
   *Joshua Wood*

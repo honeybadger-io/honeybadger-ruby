@@ -18,6 +18,27 @@ module Honeybadger
       new(SecureRandom.uuid).instrument(key, payload, &block)
     end
 
+    # Internal: Disables event tracing for executed code block.
+    #
+    # block - The code which should not be traced.
+    #
+    # Returns the return value from the block.
+    def self.ignore_events
+      return yield if ignoring_events?
+
+      begin
+        Thread.current[:__hb_ignore_trace_events] = true
+        yield
+      ensure
+        Thread.current[:__hb_ignore_trace_events] = false
+      end
+    end
+
+    # Internal: Is event tracing currently disabled?
+    def self.ignoring_events?
+      !!Thread.current[:__hb_ignore_trace_events]
+    end
+
     def initialize(id)
       @id = id
       @events = []
@@ -27,11 +48,13 @@ module Honeybadger
     end
 
     def add(event)
+      return if ignoring_events?
       ce = clean_event(event)
       @events << ce.to_a if ce.render?
     end
 
     def add_query(event)
+      return if ignoring_events?
       return add(event) unless event.duration < 6
 
       ce = clean_event(event)
@@ -75,6 +98,10 @@ module Honeybadger
     attr_reader :meta
 
     protected
+
+    def ignoring_events?
+      self.class.ignoring_events?
+    end
 
     def clean_event(event)
       TraceCleaner.create(event)

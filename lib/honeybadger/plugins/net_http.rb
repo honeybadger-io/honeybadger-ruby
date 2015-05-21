@@ -1,4 +1,5 @@
 require 'honeybadger/plugin'
+require 'honeybadger/trace'
 
 module Honeybadger
   module Plugins
@@ -18,7 +19,9 @@ module Honeybadger
           end
 
           ActiveSupport::Notifications.instrument("net_http.request", { :uri => uri, :method => request.method }) do
-            request_without_honeybadger(*args, &block)
+            # Disable tracing during #request so that additional calls (i.e.
+            # when connection wasn't started) don't result in double counting.
+            Trace.ignore_events { request_without_honeybadger(*args, &block) }
           end
         end
       end
