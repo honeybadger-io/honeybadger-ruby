@@ -38,6 +38,21 @@ describe "Local variables integration", order: :defined do
         Honeybadger::Plugin.instances[:local_variables].load!(config)
       end
 
+      context "when BetterErrors is detected" do
+        before { Object.const_set(:BetterErrors, Class.new) }
+        after { Object.send(:remove_const, :BetterErrors) }
+
+        it "skips extension" do
+          expect(::Exception).not_to receive(:include)
+          Honeybadger::Plugin.instances[:local_variables].load!(config)
+        end
+
+        it "warns the logger" do
+          expect(config.logger).to receive(:warn).with /better_errors/
+          Honeybadger::Plugin.instances[:local_variables].load!(config)
+        end
+      end
+
       describe Honeybadger::Plugins::LocalVariables::ExceptionExtension do
         subject do
           # Test in isolation rather than installing the plugin globally.

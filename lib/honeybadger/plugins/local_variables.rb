@@ -26,6 +26,15 @@ module Honeybadger
       Plugin.register do
         requirement { config[:'exceptions.local_variables'] }
         requirement { defined?(::BindingOfCaller) }
+        requirement do
+          if res = defined?(::BetterErrors)
+            logger.warn("The local variables feature is incompatible with the " \
+                        "better_errors gem; to remove this warning, set " \
+                        "exceptions.local_variables to false for environments " \
+                        "which load better_errors.")
+          end
+          !res
+        end
         requirement { !::Exception.included_modules.include?(ExceptionExtension) }
 
         execution { ::Exception.send(:include, ExceptionExtension) }
