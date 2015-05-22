@@ -1,4 +1,5 @@
 require 'honeybadger/trace'
+require 'honeybadger/config'
 
 describe Honeybadger::Trace do
   describe "::instrument" do
@@ -11,6 +12,33 @@ describe Honeybadger::Trace do
     it "sends the trace to the agent" do
       expect(Honeybadger::Agent).to receive(:trace).with(trace)
       described_class.instrument('testing', {}){}
+    end
+  end
+
+  describe "#complete" do
+    let(:trace) { Honeybadger::Trace.new(:foo) }
+    let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+    let(:event) { double('ActiveSupport::Notifications::Event', name: 'process_action.action_controller', duration: 1.2, payload: payload) }
+    let(:payload) { {} }
+
+    before do
+      allow(Honeybadger::Trace).to receive(:new).and_return(trace)
+    end
+
+    context "when completed with an event payload" do
+      let(:payload) { { foo: 'bar' } }
+
+      it "includes payload's data" do
+        trace.complete(event)
+        expect(trace.meta[:foo]).to eq 'bar'
+      end
+    end
+
+    context "when completed with a local payload" do
+      it "includes payload's data" do
+        trace.complete(event, { foo: 'bar' })
+        expect(trace.meta[:foo]).to eq 'bar'
+      end
     end
   end
 end

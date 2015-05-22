@@ -334,4 +334,27 @@ describe Honeybadger::Config do
       it { should be_nil }
     end
   end
+
+  describe "#request_hash" do
+    let(:instance) { described_class.new }
+
+    subject { instance.request_hash }
+
+    context "when rack request is not present" do
+      it "returns an empty hash" do
+        expect(subject).to eq({})
+      end
+    end
+
+    context "when rack request is present", if: defined?(::Rack) do
+      before do
+        allow(instance).to receive(:request).and_return(Rack::Request.new(Rack::MockRequest.env_for('/')))
+      end
+
+      it "returns request data from the rack request" do
+        expect(subject[:url]).to eq 'http://example.org/'
+        expect(subject[:cgi_data]['SERVER_NAME']).to eq 'example.org'
+      end
+    end
+  end
 end

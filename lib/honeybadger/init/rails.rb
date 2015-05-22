@@ -1,5 +1,7 @@
 require 'rails'
 require 'yaml'
+require 'honeybadger/util/sanitizer'
+require 'honeybadger/util/request_payload'
 
 module Honeybadger
   module Init
@@ -30,7 +32,7 @@ module Honeybadger
                 Trace.current.add_query(event) if Trace.current and event.name != 'SCHEMA'
               end
 
-              ActiveSupport::Notifications.subscribe(/^render_(template|action|collection)\.action_view/) do |*args|
+              ActiveSupport::Notifications.subscribe(/^render_(template|partial|action|collection)\.action_view/) do |*args|
                 event = ActiveSupport::Notifications::Event.new(*args)
                 Trace.current.add(event) if Trace.current
               end
@@ -43,7 +45,10 @@ module Honeybadger
               ActiveSupport::Notifications.subscribe('process_action.action_controller') do |*args|
                 event = ActiveSupport::Notifications::Event.new(*args)
                 if Trace.current && event.payload[:controller] && event.payload[:action]
-                  Trace.current.complete(event)
+                  payload = { source: 'web' }
+                  payload[:path] = Util::Sanitizer.new(filters: config.params_filters).filter_url(event.payload[:path]) if event.payload[:path]
+                  payload[:request] = request_data(event, config)
+                  Trace.current.complete(event, payload)
                 end
               end
             end
@@ -53,14 +58,6 @@ module Honeybadger
                 event = ActiveSupport::Notifications::Event.new(*args)
                 status = event.payload[:exception] ? 500 : event.payload[:status]
                 Agent.timing("app.request.#{status}", event.duration)
-
-                controller = event.payload[:controller]
-                action = event.payload[:action]
-                if controller && action
-                  Agent.timing("app.controller.#{controller}.#{action}.total", event.duration)
-                  Agent.timing("app.controller.#{controller}.#{action}.view", event.payload[:view_runtime]) if event.payload[:view_runtime]
-                  Agent.timing("app.controller.#{controller}.#{action}.db", event.payload[:db_runtime]) if event.payload[:db_runtime]
-                end
               end
             end
           end
@@ -76,6 +73,27 @@ module Honeybadger
             :logger         => Logging::FormattedLogger.new(::Rails.logger),
             :framework      => :rails
           }
+        end
+
+        def request_data(event, config)
+          h = {
+            url: event.payload[:path],
+            component: event.payload[:controller],
+            action: event.payload[:action],
+            params: event.payload[:params]
+          }
+          h.merge!(config.request_hash)
+          h.delete_if {|k,v| config.excluded_request_keys.include?(k) }
+          h[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
+          Util::RequestPayload.build(h).update({
+            context: context_data
+          })
+        end
+
+        def context_data
+          if Thread.current[:__honeybadger_context]
+            Util::Sanitizer.new.sanitize(Thread.current[:__honeybadger_context])
+          end
         end
       end
     end

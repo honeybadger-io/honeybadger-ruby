@@ -1,13 +1,12 @@
 require 'json'
 require 'securerandom'
 require 'forwardable'
-require 'ostruct'
 
 require 'honeybadger/version'
 require 'honeybadger/backtrace'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
-require 'honeybadger/rack/request_hash'
+require 'honeybadger/util/request_payload'
 
 module Honeybadger
   NOTIFIER = {
@@ -31,16 +30,6 @@ module Honeybadger
 
   # Internal: Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
-
-  # Internal: default values to use for request data.
-  REQUEST_DEFAULTS = {
-    url: nil,
-    component: nil,
-    action: nil,
-    params: {}.freeze,
-    session: {}.freeze,
-    cgi_data: {}.freeze
-  }.freeze
 
   MAX_EXCEPTION_CAUSES = 5
 
@@ -79,24 +68,25 @@ module Honeybadger
     attr_reader :source
 
     # Public: CGI variables such as HTTP_METHOD.
-    def_delegator :@request, :cgi_data
+    def cgi_data; @request[:cgi_data]; end
 
     # Public: A hash of parameters from the query string or post body.
-    def_delegator :@request, :params
+    def params; @request[:params]; end
     alias_method :parameters, :params
 
     # Public: The component (if any) which was used in this request. (usually the controller)
-    def_delegator :@request, :component
+    def component; @request[:component]; end
     alias_method :controller, :component
 
     # Public: The action (if any) that was called in this request.
-    def_delegator :@request, :action
+    def action; @request[:action]; end
 
     # Public: A hash of session data from the request.
     def_delegator :@request, :session
+    def session; @request[:session]; end
 
     # Public: The URL at which the error occurred (if any).
-    def_delegator :@request, :url
+    def url; @request[:url]; end
 
     # Public: Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
@@ -138,7 +128,6 @@ module Honeybadger
       @config = config
 
       @sanitizer = Util::Sanitizer.new
-      @filtered_sanitizer = Util::Sanitizer.new(filters: config.params_filters)
 
       @exception = unwrap_exception(opts[:exception])
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
@@ -151,7 +140,7 @@ module Honeybadger
       @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
-      @request = OpenStruct.new(construct_request_hash(config.request, opts, config.excluded_request_keys))
+      @request = construct_request_hash(config, opts)
 
       @context = construct_context_hash(opts)
 
@@ -186,16 +175,10 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: {
-          url: sanitized_url,
-          component: s(component),
-          action: s(action),
-          params: f(params),
-          session: f(session),
-          cgi_data: f(cgi_data),
+        request: @request.update({
           context: s(context),
           local_variables: s(local_variables)
-        },
+        }),
         server: {
           project_root: s(config[:root]),
           environment_name: s(config[:env]),
@@ -239,7 +222,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer, :filtered_sanitizer
+    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
@@ -331,21 +314,18 @@ module Honeybadger
       ].compact | BACKTRACE_FILTERS
     end
 
-    def construct_request_hash(rack_request, opts, excluded_keys = [])
+    # Internal: Construct the request object with data from various sources.
+    #
+    # Returns Request.
+    def construct_request_hash(config, opts)
       request = {}
-      request.merge!(Rack::RequestHash.new(rack_request)) if rack_request
-
+      request.merge!(config.request_hash)
+      request.merge!(opts)
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
-
-      REQUEST_DEFAULTS.each do |key, default|
-        request[key] = opts[key] if opts.has_key?(key)
-        request[key] = default if !request[key] || excluded_keys.include?(key)
-      end
-
-      request[:session] = request[:session][:data] if request[:session][:data]
-
-      request
+      request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
+      request[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
+      Util::RequestPayload.build(request)
     end
 
     def construct_context_hash(opts)
@@ -404,15 +384,6 @@ module Honeybadger
 
     def s(data)
       sanitizer.sanitize(data)
-    end
-
-    def f(data)
-      filtered_sanitizer.sanitize(data)
-    end
-
-    def sanitized_url
-      return nil unless url
-      filtered_sanitizer.filter_url(s(url))
     end
 
     # Internal: Fetch local variables from first frame of backtrace.
