@@ -11,7 +11,8 @@ module Honeybadger
         action: nil,
         params: {}.freeze,
         session: {}.freeze,
-        cgi_data: {}.freeze
+        cgi_data: {}.freeze,
+        body: nil
       }.freeze
 
       # Internal: allowed keys.
