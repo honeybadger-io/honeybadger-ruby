@@ -131,10 +131,8 @@ module Honeybadger
 
       @exception = unwrap_exception(opts[:exception])
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
-      @error_message = trim_size(1024) do
-        exception_attribute(:error_message, 'Notification') do |exception|
-          "#{exception.class.name}: #{exception.message}"
-        end
+      @error_message = exception_attribute(:error_message, 'Notification') do |exception|
+        "#{exception.class.name}: #{exception.message}"
       end
       @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))
       @source = extract_source_from_backtrace(@backtrace, config, opts)
@@ -283,29 +281,6 @@ module Honeybadger
       end
 
       ignored_class ? @ignore_by_class.call(ignored_class) : config[:'exceptions.ignore'].any?(&@ignore_by_class)
-    end
-
-    # Limit size of string to bytes
-    #
-    # input - The String to be trimmed.
-    # bytes - The Integer bytes to trim.
-    # block - An optional block used in place of input.
-    #
-    # Examples
-    #
-    #   trimmed = trim_size("Honeybadger doesn't care", 3)
-    #
-    #   trimmed = trim_size(3) do
-    #     "Honeybadger doesn't care"
-    #   end
-    #
-    # Returns trimmed String
-    def trim_size(*args, &block)
-      input, bytes = args.first, args.last
-      input = yield if block_given?
-      input = input.dup
-      input = input[0...bytes] if input.respond_to?(:size) && input.size > bytes
-      input
     end
 
     def construct_backtrace_filters(opts)
@@ -464,7 +439,7 @@ module Honeybadger
       while (e = exception_cause(e)) && i < MAX_EXCEPTION_CAUSES
         c << {
           class: e.class.name,
-          message: trim_size(1024) { e.message },
+          message: e.message,
           backtrace: parse_backtrace(e.backtrace || caller)
         }
         i += 1

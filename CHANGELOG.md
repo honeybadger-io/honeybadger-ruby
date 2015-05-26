@@ -1,3 +1,7 @@
+* Trim all sanitized strings to 2k.
+
+  *Joshua Wood*
+
 * Add events to instrumented traces (i.e. in background jobs).
 
   *Joshua Wood*

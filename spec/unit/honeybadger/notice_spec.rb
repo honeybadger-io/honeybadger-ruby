@@ -397,14 +397,6 @@ describe Honeybadger::Notice do
     end
   end
 
-  it "trims error message to 1k" do
-    message = 'asdfghjkl'*200
-    e = StandardError.new(message)
-    notice = build_notice(exception: e)
-    expect(message.bytesize).to be > 1024
-    expect(notice.error_message.bytesize).to eq 1024
-  end
-
   it "prefers notice args to exception attributes" do
     e = RuntimeError.new('Not very helpful')
     notice = build_notice(exception: e, error_class: 'MyClass', error_message: 'Something very specific went wrong.')
@@ -494,6 +486,14 @@ describe Honeybadger::Notice do
       notice = build_notice
       expect(notice.as_json[:error][:backtrace]).to be_a Array
       expect(notice.as_json[:error][:backtrace]).to eq notice.backtrace.to_ary
+    end
+
+    it "trims error message to 2k" do
+      message = 'asdfghjkl'*400
+      e = StandardError.new(message)
+      notice = build_notice(exception: e)
+      expect(message.bytesize).to be > 2048
+      expect(2048...2068).to cover notice.as_json[:error][:message].bytesize
     end
   end
 
