@@ -1,3 +1,7 @@
+* Add events to instrumented traces (i.e. in background jobs).
+
+  *Joshua Wood*
+
 * Restart workers once per hour when shutdown due to 40x.
 
   *Joshua Wood*

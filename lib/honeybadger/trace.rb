@@ -15,7 +15,10 @@ module Honeybadger
     end
 
     def self.instrument(key, payload = {}, &block)
-      new(SecureRandom.uuid).instrument(key, payload, &block)
+      current = self.current
+      self.create(SecureRandom.uuid).instrument(key, payload, &block)
+    ensure
+      Thread.current[:__hb_trace] = current
     end
 
     # Internal: Disables event tracing for executed code block.
