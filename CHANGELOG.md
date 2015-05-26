@@ -1,3 +1,7 @@
+* Send the request body.
+
+  *Joshua Wood*
+
 * Add events to instrumented traces (i.e. in background jobs).
 
   *Joshua Wood*

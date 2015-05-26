@@ -10,9 +10,22 @@ module Honeybadger
         self[:action] = self[:params]['action']
         self[:session] = extract_session(request)
         self[:cgi_data] = extract_cgi_data(request)
+        self[:body] = extract_body(request)
       end
 
       private
+
+      def extract_body(request)
+        return unless request.body
+
+        begin
+          request.body.read
+        ensure
+          request.body.rewind
+        end
+      rescue => e
+        "Error: #{e.message}"
+      end
 
       def extract_url(request)
         request.env['honeybadger.request.url'] || request.url
