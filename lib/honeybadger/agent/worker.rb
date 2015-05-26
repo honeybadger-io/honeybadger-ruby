@@ -40,12 +40,12 @@ module Honeybadger
         @marker = ConditionVariable.new
         @queue = Queue.new(1000)
         @shutdown = false
+        @start_at = nil
       end
 
       def push(obj)
-        if start
-          queue.push(obj)
-        end
+        return false unless start
+        queue.push(obj)
       end
 
       # Internal: Shutdown the worker after sending remaining data.
@@ -76,6 +76,7 @@ module Honeybadger
         mutex.synchronize do
           @shutdown = true
           @pid = nil
+          queue.clear
         end
 
         d { sprintf('killing worker thread feature=%s', feature) }
@@ -101,8 +102,12 @@ module Honeybadger
       end
 
       def start
+        return false unless can_start?
+
         mutex.synchronize do
-          return false if @shutdown
+          @shutdown = false
+          @start_at = nil
+
           return true if thread && thread.alive?
 
           @pid = Process.pid
@@ -116,6 +121,21 @@ module Honeybadger
 
       attr_reader :config, :backend, :feature, :queue, :pid, :mutex, :marker,
         :thread, :throttles
+
+      def can_start?
+        mutex.synchronize do
+          return true unless @shutdown
+          return false unless @start_at
+          Time.now.to_i >= @start_at
+        end
+      end
+
+      def suspend(interval)
+        mutex.synchronize { @start_at = Time.now.to_i + interval }
+
+        # Must be performed last since this may kill the current thread.
+        shutdown!
+      end
 
       def run
         begin
@@ -182,11 +202,11 @@ module Honeybadger
           add_throttle(1.25)
           debug { sprintf('worker applying throttle=1.25 interval=%s feature=%s code=%s', throttle_interval, feature, response.code) }
         when 402
-          warn { sprintf('worker shutting down (payment required) feature=%s code=%s', feature, response.code) }
-          shutdown!
+          warn { sprintf('data will not be reported until next restart (payment required) feature=%s code=%s', feature, response.code) }
+          suspend(3600)
         when 403
-          warn { sprintf('worker shutting down (unauthorized) feature=%s code=%s', feature, response.code) }
-          shutdown!
+          warn { sprintf('data will not be reported until next restart (unauthorized) feature=%s code=%s', feature, response.code) }
+          suspend(3600)
         when 201
           if throttle = del_throttle
             debug { sprintf('worker removing throttle=%s interval=%s feature=%s code=%s', throttle, throttle_interval, feature, response.code) }

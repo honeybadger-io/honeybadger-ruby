@@ -25,7 +25,7 @@ feature "error notifications" do
 
     it "stops the agent" do
       expect(assert_cmd('ruby test.rb')).to run_successfully
-      expect(all_output).to match(/worker shutting down \(unauthorized\)/i)
+      expect(all_output).to match(/unauthorized/i)
     end
   end
 

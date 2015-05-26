@@ -98,8 +98,19 @@ describe Honeybadger::Agent::Worker do
   describe "#push" do
     it "flushes payload to backend" do
       expect(instance.send(:backend)).to receive(:notify).with(feature, obj).and_call_original
-      instance.push(obj)
+      expect(instance.push(obj)).not_to eq false
       instance.flush
+    end
+
+    context "when not started" do
+      before do
+        allow(instance).to receive(:start).and_return false
+      end
+
+      it "rejects push" do
+        expect(instance.send(:queue)).not_to receive(:push)
+        expect(instance.push(obj)).to eq false
+      end
     end
   end
 
@@ -111,6 +122,36 @@ describe Honeybadger::Agent::Worker do
     it "changes the pid to the current pid" do
       allow(Process).to receive(:pid).and_return(101)
       expect { subject.start }.to change(subject, :pid).to(101)
+    end
+
+    context "when shutdown" do
+      before do
+        subject.shutdown
+      end
+
+      it "doesn't start" do
+        expect { subject.start }.not_to change(subject, :thread)
+      end
+    end
+
+    context "when suspended" do
+      before do
+        subject.send(:suspend, 300)
+      end
+
+      context "and restart is in the future" do
+        it "doesn't start" do
+          expect { subject.start }.not_to change(subject, :thread)
+        end
+      end
+
+      context "and restart is in the past" do
+        it "starts the thread" do
+          Timecop.travel(Time.now + 301) do
+            expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
+          end
+        end
+      end
     end
   end
 
@@ -155,6 +196,10 @@ describe Honeybadger::Agent::Worker do
       instance.send(:handle_response, response)
     end
 
+    before do
+      allow(instance).to receive(:suspend).and_return true
+    end
+
     context "when 429" do
       let(:response) { Honeybadger::Backend::Response.new(429) }
 
@@ -167,12 +212,12 @@ describe Honeybadger::Agent::Worker do
       let(:response) { Honeybadger::Backend::Response.new(402) }
 
       it "shuts down the worker" do
-        expect(instance).to receive(:shutdown!)
+        expect(instance).to receive(:suspend)
         handle_response
       end
 
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/worker/)
+        expect(config.logger).to receive(:warn).with(/payment/)
         handle_response
       end
     end
@@ -181,12 +226,12 @@ describe Honeybadger::Agent::Worker do
       let(:response) { Honeybadger::Backend::Response.new(403) }
 
       it "shuts down the worker" do
-        expect(instance).to receive(:shutdown!)
+        expect(instance).to receive(:suspend)
         handle_response
       end
 
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/worker/)
+        expect(config.logger).to receive(:warn).with(/unauthorized/)
         handle_response
       end
     end

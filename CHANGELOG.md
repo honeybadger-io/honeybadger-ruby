@@ -1,3 +1,7 @@
+* Restart workers once per hour when shutdown due to 40x.
+
+  *Joshua Wood*
+
 * Fix a tracing issue with net/http requests.
 
   *Joshua Wood*
