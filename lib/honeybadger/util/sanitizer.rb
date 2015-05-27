@@ -5,6 +5,10 @@ module Honeybadger
 
       FILTERED_REPLACEMENT = '[FILTERED]'.freeze
 
+      TRUNCATION_REPLACEMENT = '[TRUNCATED]'.freeze
+
+      MAX_STRING_SIZE = 2048
+
       def initialize(opts = {})
         @max_depth = opts.fetch(:max_depth, 20)
 
@@ -92,7 +96,7 @@ module Honeybadger
          )
       end
 
-      def sanitize_string(data)
+      def valid_encoding(data)
         return data if valid_encoding?(data)
 
         if data.encoding == Encoding::UTF_8
@@ -100,6 +104,12 @@ module Honeybadger
         else
           data.encode(Encoding::UTF_8, ENCODE_OPTS)
         end
+      end
+
+      def sanitize_string(data)
+        data = valid_encoding(data)
+        return data unless data.respond_to?(:size) && data.size > MAX_STRING_SIZE
+        data[0...MAX_STRING_SIZE] + TRUNCATION_REPLACEMENT
       end
     end
   end
