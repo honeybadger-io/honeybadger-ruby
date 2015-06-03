@@ -25,7 +25,7 @@ module Honeybadger
         @config = config
       end
 
-      def post(endpoint, payload, headers = {})
+      def post(endpoint, payload, headers = nil)
         response = http_connection.post(endpoint, compress(payload.to_json), http_headers(headers))
         debug { sprintf("http method=POST path=%s code=%d", endpoint.dump, response.code) }
         response
