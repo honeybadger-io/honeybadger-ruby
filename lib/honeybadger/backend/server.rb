@@ -40,10 +40,25 @@ module Honeybadger
       # Returns Response.
       def notify(feature, payload)
         ENDPOINTS[feature] or raise(BackendError, "Unknown feature: #{feature}")
-        Response.new(@http.post(ENDPOINTS[feature], payload))
+        Response.new(@http.post(ENDPOINTS[feature], payload, payload_headers(payload)))
       rescue *HTTP_ERRORS => e
         Response.new(:error, nil, "HTTP Error: #{e.class}").tap do |response|
           error { sprintf('http error class=%s message=%s', e.class, e.message.dump) }
+        end
+      end
+
+      private
+
+      # Internal: Construct headers for supported payloads.
+      #
+      # payload - The payload object.
+      #
+      # Returns Hash headers if supported, otherwise nil.
+      def payload_headers(payload)
+        if payload.respond_to?(:api_key) && payload.api_key
+          {
+            'X-API-Key' => payload.api_key
+          }
         end
       end
     end

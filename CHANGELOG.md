@@ -1,3 +1,7 @@
+* Allow API key to be overridden from `Honeybadger.notify`.
+
+  *Joshua Wood*
+
 * Trim all sanitized strings to 2k.
 
   *Joshua Wood*
