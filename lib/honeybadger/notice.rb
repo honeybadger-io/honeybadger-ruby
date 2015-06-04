@@ -91,6 +91,9 @@ module Honeybadger
     # Public: Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
+    # Public: The API key used to deliver this notice.
+    attr_reader :api_key
+
     # Internal: Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
 
@@ -220,7 +223,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :api_key, :now, :pid, :causes, :sanitizer
+    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes, :sanitizer
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
