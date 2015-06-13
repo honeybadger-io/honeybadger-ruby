@@ -16,7 +16,7 @@ module Honeybadger
 
       def call(env)
         status, headers, body = @app.call(env)
-        if env['honeybadger.error_id'] && config[:'user_informer.enabled']
+        if env['honeybadger.error_id']
           new_body = []
           replace  = replacement(env['honeybadger.error_id'])
           body.each do |chunk|
