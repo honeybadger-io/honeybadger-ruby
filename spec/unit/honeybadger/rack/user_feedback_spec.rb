@@ -53,16 +53,6 @@ describe Honeybadger::Rack::UserFeedback do
         end
       end
     end
-
-    context "feedback feature is disabled by customer" do
-      before do
-        config[:'feedback.enabled'] = false
-      end
-
-      it "does not modify the output" do
-        expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
-      end
-    end
   end
 
   context "there is no honeybadger id" do
