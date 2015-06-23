@@ -29,7 +29,7 @@ module Honeybadger
           exit(1)
         end
 
-        cmd = %Q(heroku addons:add deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{rails_env}&deploy[local_username]={{user}}&deploy[revision]={{head}}&api_key=#{api_key}"#{app ? " --app #{app}" : ''})
+        cmd = %Q(heroku addons:create deployhooks:http --url="https://api.honeybadger.io/v1/deploys?deploy[environment]=#{rails_env}&deploy[local_username]={{user}}&deploy[revision]={{head}}&api_key=#{api_key}"#{app ? " --app #{app}" : ''})
 
         say("Running: `#{cmd}`")
         say(run(cmd))
