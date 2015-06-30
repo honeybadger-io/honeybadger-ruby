@@ -141,6 +141,16 @@ describe Honeybadger::Util::Sanitizer do
     end
   end
 
+  describe '#filter_cookies' do
+    let!(:filters) { ["abc", :def, /private/] }
+
+    let!(:cookies) {"abc=123; def=456; ghi=789; private_param=prra"}
+    let(:filtered_cookies) {"abc=[FILTERED]; def=[FILTERED]; ghi=789; private_param=[FILTERED]"}
+    subject { described_class.new(filters: filters).filter_cookies(cookies) }
+
+    it { should eq filtered_cookies }
+  end
+
   def assert_serializes(*keys)
     [File.open(__FILE__), Proc.new { puts "boo!" }, Module.new].each do |object|
       hash = {
