@@ -1,3 +1,8 @@
+* Fix breakage relating to Exceptions containing a :cause attribute which is not
+  itself an Exception.
+
+  *Gabe da Silveira*
+
 * Allow API key to be overridden from `Honeybadger.notify`.
 
   *Joshua Wood*
