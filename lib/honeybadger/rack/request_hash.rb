@@ -46,7 +46,7 @@ module Honeybadger
 
       def cgi_blacklist?(key)
         return true if CGI_BLACKLIST.include?(key)
-        return true unless k.match(CGI_KEY_REGEXP)
+        return true unless key.match(CGI_KEY_REGEXP)
 
         false
       end
