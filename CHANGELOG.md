@@ -162,3 +162,7 @@
 * Don't send error reports when disabled via configuration
 
   *Joshua Wood*
+
+* Support for extracting the correct component & action for Rails Active Jobs (previously all Active Jobs where reported as  'ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper')
+
+  *Panos Korros*

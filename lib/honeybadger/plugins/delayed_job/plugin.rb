@@ -8,9 +8,17 @@ module Honeybadger
         callbacks do |lifecycle|
           lifecycle.around(:invoke_job) do |job, &block|
             begin
-              begin #buildin suport for Delayed::PerformableMethod
-                component = job.payload_object.object.is_a?(Class) ? job.payload_object.object.name : job.payload_object.object.class.name
-                action    = job.payload_object.method_name.to_s
+
+              begin
+                if job.payload_object.class.name == 'ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper'
+                  #buildin support for Rails 4.2 ActiveJob
+                  component = job.payload_object.job_data['job_class']
+                  action = 'perform'
+                else
+                  #buildin support for Delayed::PerformableMethod
+                  component = job.payload_object.object.is_a?(Class) ? job.payload_object.object.name : job.payload_object.object.class.name
+                  action    = job.payload_object.method_name.to_s
+                end
               rescue #fallback to support all other classes
                 component = job.payload_object.class.name
                 action    = 'perform'
