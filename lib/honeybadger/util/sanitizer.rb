@@ -53,6 +53,17 @@ module Honeybadger
         end
       end
 
+      def filter_cookies(request_cookies)
+        return request_cookies unless filters
+
+        parsed_cookies = CGI::Cookie.parse(request_cookies)
+        sanitized_cookies = sanitize(parsed_cookies)
+        sanitized_cookies.map do |k, v|
+          v = v.join(',') if v.is_a?(Array)
+          "#{k}=#{v}"
+        end.join("; ")
+      end
+
       def filter_url(url)
         return url unless filters
 

@@ -5,6 +5,10 @@ class TestSanitizer
     data
   end
 
+  def filter_cookies(string)
+    string
+  end
+
   def filter_url(string)
     string
   end
@@ -49,6 +53,11 @@ describe Honeybadger::Util::RequestPayload do
     it "sanitizes the url key" do
       expect(sanitizer).to receive(:filter_url).with('foo/bar')
       described_class.build({ sanitizer: sanitizer, url: 'foo/bar' })
+    end
+
+    it "sanitizes the request cookies" do
+      expect(sanitizer).to receive(:filter_cookies).with('abc=hello')
+      described_class.build({ sanitizer: sanitizer, cgi_data: { "HTTP_COOKIE" => "abc=hello" } })
     end
 
     it "converts Hash to JSON" do
