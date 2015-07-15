@@ -4,7 +4,7 @@ module Honeybadger
   module Util
     # Internal: Constructs/sanitizes request data for notices and traces.
     module RequestPayload
-      # Internal: default values to use for request data.
+      # Internal: Default values to use for request data.
       DEFAULTS = {
         url: nil,
         component: nil,
@@ -14,8 +14,11 @@ module Honeybadger
         cgi_data: {}.freeze
       }.freeze
 
-      # Internal: allowed keys.
+      # Internal: Allowed keys.
       KEYS = DEFAULTS.keys.freeze
+
+      # Internal: The cgi_data key where the raw Cookie header is stored.
+      HTTP_COOKIE_KEY = 'HTTP_COOKIE'.freeze
 
       def self.build(opts = {})
         sanitizer = opts.fetch(:sanitizer) { Sanitizer.new }
@@ -28,8 +31,8 @@ module Honeybadger
 
         payload[:session] = opts[:session][:data] if opts[:session] && opts[:session][:data]
         payload[:url] = sanitizer.filter_url(payload[:url]) if payload[:url]
-        if payload[:cgi_data]["HTTP_COOKIE"]
-          payload[:cgi_data]["HTTP_COOKIE"] = sanitizer.filter_cookies(payload[:cgi_data]["HTTP_COOKIE"])
+        if payload[:cgi_data][HTTP_COOKIE_KEY]
+          payload[:cgi_data][HTTP_COOKIE_KEY] = sanitizer.filter_cookies(payload[:cgi_data][HTTP_COOKIE_KEY])
         end
 
         payload

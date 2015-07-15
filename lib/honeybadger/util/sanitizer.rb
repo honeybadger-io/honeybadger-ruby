@@ -9,6 +9,10 @@ module Honeybadger
 
       MAX_STRING_SIZE = 2048
 
+      COOKIE_PAIRS = /[;,]\s?/
+      COOKIE_SEP = '='.freeze
+      COOKIE_PAIR_SEP = '; '.freeze
+
       def initialize(opts = {})
         @max_depth = opts.fetch(:max_depth, 20)
 
@@ -53,15 +57,17 @@ module Honeybadger
         end
       end
 
-      def filter_cookies(request_cookies)
-        return request_cookies unless filters
+      def filter_cookies(raw_cookies)
+        return raw_cookies unless filters
 
-        parsed_cookies = CGI::Cookie.parse(request_cookies)
-        sanitized_cookies = sanitize(parsed_cookies)
-        sanitized_cookies.map do |k, v|
-          v = v.join(',') if v.is_a?(Array)
-          "#{k}=#{v}"
-        end.join("; ")
+        cookies = []
+        raw_cookies.split(COOKIE_PAIRS).each do |pair|
+          name, values = pair.split(COOKIE_SEP, 2)
+          values = FILTERED_REPLACEMENT if filter_key?(name)
+          cookies << "#{ name }=#{ values }"
+        end
+
+        cookies.join(COOKIE_PAIR_SEP)
       end
 
       def filter_url(url)
@@ -70,7 +76,7 @@ module Honeybadger
         filtered_url = url.to_s.dup
         filtered_url.scan(/(?:^|&|\?)([^=?&]+)=([^&]+)/).each do |m|
           next unless filter_key?(m[0])
-          filtered_url.gsub!(/#{m[1]}/, '[FILTERED]')
+          filtered_url.gsub!(/#{m[1]}/, FILTERED_REPLACEMENT)
         end
 
         filtered_url

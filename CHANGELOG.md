@@ -1,3 +1,7 @@
+* Filter HTTP_COOKIE in request cgi_data.
+
+  *Sam McTaggart*
+
 * Fix breakage relating to Exceptions containing a :cause attribute which is not
   itself an Exception.
 
