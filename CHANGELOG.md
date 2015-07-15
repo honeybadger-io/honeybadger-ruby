@@ -1,3 +1,7 @@
+* Don't send RAW_POST_DATA.
+
+  *Joshua Wood*
+
 * Filter HTTP_COOKIE in request cgi_data.
 
   *Sam McTaggart*

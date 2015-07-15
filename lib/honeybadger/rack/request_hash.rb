@@ -3,6 +3,9 @@ module Honeybadger
     # Internal: Constructs a request hash from a Rack::Request matching the
     # /v1/notices API specification.
     class RequestHash < ::Hash
+      # Internal
+      CGI_BLACKLIST = ['QUERY_STRING', 'RAW_POST_DATA'].freeze
+
       def initialize(request)
         self[:url] = extract_url(request)
         self[:params] = extract_params(request)
@@ -37,7 +40,14 @@ module Honeybadger
       end
 
       def extract_cgi_data(request)
-        request.env.reject {|k,_| k == 'QUERY_STRING' || !k.match(/\A[A-Z_]+\Z/) }
+        request.env.reject {|k,_| cgi_blacklist?(k) }
+      end
+
+      def cgi_blacklist?(key)
+        return true if CGI_BLACKLIST.include?(key)
+        return true unless k.match(/\A[A-Z_]+\Z/)
+
+        false
       end
     end
   end
