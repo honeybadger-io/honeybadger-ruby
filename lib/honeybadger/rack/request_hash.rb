@@ -5,6 +5,7 @@ module Honeybadger
     class RequestHash < ::Hash
       # Internal
       CGI_BLACKLIST = ['QUERY_STRING', 'RAW_POST_DATA'].freeze
+      CGI_KEY_REGEXP = /\A[A-Z_]+\Z/
 
       def initialize(request)
         self[:url] = extract_url(request)
@@ -45,7 +46,7 @@ module Honeybadger
 
       def cgi_blacklist?(key)
         return true if CGI_BLACKLIST.include?(key)
-        return true unless k.match(/\A[A-Z_]+\Z/)
+        return true unless k.match(CGI_KEY_REGEXP)
 
         false
       end
