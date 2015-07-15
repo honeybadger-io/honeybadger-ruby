@@ -423,11 +423,11 @@ module Honeybadger
     # Returns the Exception cause.
     def exception_cause(exception)
       e = exception
-      if e.respond_to?(:cause) && e.cause
+      if e.respond_to?(:cause) && e.cause && e.cause.is_a?(Exception)
         e.cause
-      elsif e.respond_to?(:original_exception) && e.original_exception
+      elsif e.respond_to?(:original_exception) && e.original_exception && e.original_exception.is_a?(Exception)
         e.original_exception
-      elsif e.respond_to?(:continued_exception) && e.continued_exception
+      elsif e.respond_to?(:continued_exception) && e.continued_exception && e.continued_exception.is_a?(Exception)
         e.continued_exception
       end
     end

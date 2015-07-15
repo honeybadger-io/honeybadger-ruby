@@ -841,6 +841,15 @@ describe Honeybadger::Notice do
           expect(causes.size).to eq 5
         end
       end
+
+      context "when raising #{error_class} with a non-exception cause" do
+        it "includes empty cause in payload" do
+          exception = error_class.new('badgers!')
+          exception.cause = "Some reason you werent expecting"
+          causes = build_notice(exception: exception).as_json[:error][:causes]
+          expect(causes.size).to eq 0
+        end
+      end
     end
   end
 end
