@@ -1,3 +1,11 @@
+* Update heroku cli deprecations.
+
+  *@adamkuipers*
+
+* Don't insert middleware if they're disabled.
+
+  *Bradley Priest*
+
 * Don't send RAW_POST_DATA.
 
   *Joshua Wood*
@@ -10,6 +18,10 @@
   itself an Exception.
 
   *Gabe da Silveira*
+
+* Support for extracting the correct component & action for Rails Active Jobs (previously all Active Jobs where reported as  'ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper')
+
+  *Panos Korros*
 
 * Allow API key to be overridden from `Honeybadger.notify`.
 
@@ -170,7 +182,3 @@
 * Don't send error reports when disabled via configuration
 
   *Joshua Wood*
-
-* Support for extracting the correct component & action for Rails Active Jobs (previously all Active Jobs where reported as  'ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper')
-
-  *Panos Korros*
