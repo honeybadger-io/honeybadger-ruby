@@ -31,7 +31,7 @@ module Honeybadger
         end
 
         if data.kind_of?(String)
-          sanitize_string(data)
+          self.class.sanitize_string(data)
         elsif data.respond_to?(:to_hash)
           return '[max depth reached]' if depth >= max_depth
           hash = data.to_hash
@@ -53,7 +53,7 @@ module Honeybadger
         elsif OBJECT_WHITELIST.any? {|c| data.kind_of?(c) }
           data
         else
-          sanitize_string(data.to_s)
+          self.class.sanitize_string(data.to_s)
         end
       end
 
@@ -82,11 +82,38 @@ module Honeybadger
         filtered_url
       end
 
-      private
-
       VALID_ENCODINGS = [Encoding::UTF_8, Encoding::ISO_8859_1].freeze
       ENCODE_OPTS = { invalid: :replace, undef: :replace, replace: '?'.freeze }.freeze
       UTF8_STRING = ''.freeze
+
+      class << self
+
+        def valid_encoding?(data)
+           data.valid_encoding? && (
+             VALID_ENCODINGS.include?(data.encoding) ||
+             VALID_ENCODINGS.include?(Encoding.compatible?(UTF8_STRING, data))
+           )
+        end
+
+        def valid_encoding(data)
+          return data if valid_encoding?(data)
+
+          if data.encoding == Encoding::UTF_8
+            data.encode(Encoding::UTF_16, ENCODE_OPTS).encode!(Encoding::UTF_8)
+          else
+            data.encode(Encoding::UTF_8, ENCODE_OPTS)
+          end
+        end
+
+        def sanitize_string(data)
+          data = valid_encoding(data)
+          return data unless data.respond_to?(:size) && data.size > MAX_STRING_SIZE
+          data[0...MAX_STRING_SIZE] + TRUNCATION_REPLACEMENT
+        end
+
+      end
+
+      private
 
       attr_reader :max_depth, :filters
 
@@ -104,29 +131,6 @@ module Honeybadger
             key.to_s.eql?(filter.to_s)
           end
         end
-      end
-
-      def valid_encoding?(data)
-         data.valid_encoding? && (
-           VALID_ENCODINGS.include?(data.encoding) ||
-           VALID_ENCODINGS.include?(Encoding.compatible?(UTF8_STRING, data))
-         )
-      end
-
-      def valid_encoding(data)
-        return data if valid_encoding?(data)
-
-        if data.encoding == Encoding::UTF_8
-          data.encode(Encoding::UTF_16, ENCODE_OPTS).encode!(Encoding::UTF_8)
-        else
-          data.encode(Encoding::UTF_8, ENCODE_OPTS)
-        end
-      end
-
-      def sanitize_string(data)
-        data = valid_encoding(data)
-        return data unless data.respond_to?(:size) && data.size > MAX_STRING_SIZE
-        data[0...MAX_STRING_SIZE] + TRUNCATION_REPLACEMENT
       end
     end
   end

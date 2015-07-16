@@ -1,6 +1,7 @@
 require 'securerandom'
 
 require 'honeybadger/agent'
+require 'honeybadger/util/sanitizer'
 
 module Honeybadger
   class Trace
@@ -175,11 +176,11 @@ module Honeybadger
       end
 
       def to_s
-        return "Super long query" if event.payload[:sql].length > 1024
         sql = event.payload[:sql]
         sql = sql.gsub(EscapedQuotes, EmptyReplacement).gsub(SQuotedData, Replacement)
         sql = sql.gsub(DQuotedData, Replacement) unless ::ActiveRecord::Base.connection_pool.spec.config[:adapter] =~ DoubleQuoters
-        sql.gsub(NumericData, Replacement).gsub(Newline, EmptyReplacement).squeeze(' ')
+        sql = sql.gsub(NumericData, Replacement).gsub(Newline, EmptyReplacement).squeeze(' ')
+        Util::Sanitizer.sanitize_string(sql)
       end
     end
 
