@@ -1,3 +1,7 @@
+* Better logging of reason when API requests are denied.
+
+  *Joshua Wood*
+
 * Update heroku cli deprecations.
 
   *@adamkuipers*

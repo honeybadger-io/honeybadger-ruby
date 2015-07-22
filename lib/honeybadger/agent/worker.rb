@@ -202,10 +202,10 @@ module Honeybadger
           add_throttle(1.25)
           debug { sprintf('worker applying throttle=1.25 interval=%s feature=%s code=%s', throttle_interval, feature, response.code) }
         when 402
-          warn { sprintf('data will not be reported until next restart (payment required) feature=%s code=%s', feature, response.code) }
+          warn { sprintf('data will not be reported (payment required) feature=%s code=%s', feature, response.code) }
           suspend(3600)
         when 403
-          warn { sprintf('data will not be reported until next restart (unauthorized) feature=%s code=%s', feature, response.code) }
+          warn { sprintf('data will not be reported feature=%s code=%s message=%s', feature, response.code, response.message.to_s.dump) }
           suspend(3600)
         when 201
           if throttle = del_throttle
