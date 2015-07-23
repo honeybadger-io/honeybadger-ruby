@@ -9,7 +9,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Better logging of reason when API requests are denied.
 
 ## [2.1.1] - 2015-07-15
-## Added
+### Added
 - Update heroku cli deprecations. -@adamkuipers
 - Don't insert middleware if they're disabled. -Bradley Priest
 - Don't send RAW_POST_DATA.
@@ -18,12 +18,12 @@ adheres to [Semantic Versioning](http://semver.org/).
   (previously all Active Jobs where reported as
   'ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper'). -Panos Korros
 
-# Fixed
+### Fixed
 - Fix breakage relating to Exceptions containing a :cause attribute which is not
   itself an Exception. -Gabe da Silveira
 
 ## [2.1.0] - 2015-06-04
-## Added
+### Added
 - Add events to instrumented traces (i.e. in background jobs).
 - Restart workers once per hour when shutdown due to 40x.
 - Send request data with traces.
