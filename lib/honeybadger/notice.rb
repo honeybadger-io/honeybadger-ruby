@@ -163,6 +163,9 @@ module Honeybadger
     #
     # Returns Hash JSON representation of notice
     def as_json(*args)
+      @request[:context] = s(context)
+      @request[:local_variables] = s(local_variables) if local_variables
+
       {
         api_key: s(api_key),
         notifier: NOTIFIER,
@@ -176,10 +179,7 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: @request.update({
-          context: s(context),
-          local_variables: s(local_variables)
-        }),
+        request: @request,
         server: {
           project_root: s(config[:root]),
           environment_name: s(config[:env]),
@@ -370,7 +370,7 @@ module Honeybadger
     #
     # Returns a Hash of local variables
     def local_variables_from_exception(exception, config)
-      return {} unless send_local_variables?(config)
+      return nil unless send_local_variables?(config)
       return {} unless Exception === exception
       return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
       return {} if exception.__honeybadger_bindings_stack.empty?

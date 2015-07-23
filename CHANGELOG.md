@@ -1,3 +1,7 @@
+* Don't send empty local_variables when disabled.
+
+  *Joshua Wood*
+
 * Better logging of reason when API requests are denied.
 
   *Joshua Wood*

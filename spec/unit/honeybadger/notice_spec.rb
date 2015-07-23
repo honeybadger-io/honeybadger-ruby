@@ -637,7 +637,7 @@ describe Honeybadger::Notice do
   end
 
   describe "#to_json" do
-    context "when local variables are not found" do
+    context "when local variables are found" do
       it "sends local_variables in request payload" do
         notice = build_notice
         hash = {'foo' => 'bar'}
@@ -646,10 +646,10 @@ describe Honeybadger::Notice do
       end
     end
 
-    context "when local variables are found" do
-      it "sends local_variables in request payload" do
+    context "when local variables are not found" do
+      it "doesn't send local_variables in request payload" do
         notice = build_notice
-        expect(JSON.parse(notice.to_json)['request']['local_variables']).to eq({})
+        expect(JSON.parse(notice.to_json)['request']).not_to have_key 'local_variables'
       end
     end
 
@@ -690,7 +690,7 @@ describe Honeybadger::Notice do
     context "when binding_of_caller is not installed" do
       context "when local variables aren't enabled" do
         it "does not attempt to find them" do
-          expect(notice.local_variables).to eq({})
+          expect(notice.local_variables).to eq(nil)
         end
       end
 
@@ -720,7 +720,7 @@ describe Honeybadger::Notice do
 
       context "when local variables aren't enabled" do
         it "does not attempt to find them" do
-          expect(notice.local_variables).to eq({})
+          expect(notice.local_variables).to eq(nil)
         end
       end
 
@@ -752,13 +752,13 @@ describe Honeybadger::Notice do
 
         context "without an exception" do
           it "assigns empty Hash" do
-            expect(build_notice(:exception => nil).local_variables).to eq({})
+            expect(build_notice(exception: nil, config: config).local_variables).to eq({})
           end
         end
 
         context "without bindings" do
           it "assigns empty Hash" do
-            expect(build_notice(:exception => RuntimeError.new).local_variables).to eq({})
+            expect(build_notice(exception: RuntimeError.new, config: config).local_variables).to eq({})
           end
         end
       end
