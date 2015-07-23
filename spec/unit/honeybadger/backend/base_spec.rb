@@ -1,6 +1,42 @@
 require 'honeybadger/backend/base'
 require 'honeybadger/config'
 
+describe Honeybadger::Backend::Response do
+  context "when successful" do
+    subject { described_class.new(201) }
+    its(:error) { should be_nil }
+  end
+
+  context "when unsuccessful" do
+    subject { described_class.new(403, body) }
+
+    context "body is missing" do
+      let(:body) { nil }
+      its(:error) { should be_nil }
+    end
+
+    context "body is empty" do
+      let(:body) { "" }
+      its(:error) { should be_nil }
+    end
+
+    context "body is valid JSON" do
+      let(:body) { %({"error":"badgers"}) }
+      its(:error) { should eq "badgers" }
+
+      context "but invalid object" do
+        let(:body) { %([{"error":"badgers"}]) }
+        its(:error) { should be_nil }
+      end
+    end
+
+    context "body is invalid JSON" do
+      let(:body) { %({"error":"badgers") }
+      its(:error) { should be_nil }
+    end
+  end
+end
+
 describe Honeybadger::Backend::Base do
   let(:config) { Honeybadger::Config.new }
 

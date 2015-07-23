@@ -11,7 +11,7 @@ feature "error notifications" do
       require 'honeybadger'
       require 'webmock'
 
-      WebMock::API.stub_request(:post, 'https://api.honeybadger.io/v1/notices').to_return(status: 403, body: '403 Forbidden', headers: { 'Content-Type' => 'application/json' })
+      WebMock::API.stub_request(:post, 'https://api.honeybadger.io/v1/notices').to_return(status: 403, body: '{"error":"unauthorized"}', headers: { 'Content-Type' => 'application/json' })
       WebMock::API.stub_request(:post, 'https://api.honeybadger.io/v1/ping').to_return(body: %({"features":{"notices":true,"feedback":true}, "limit":null}), headers: { 'Content-Type' => 'application/json' })
 
       Honeybadger.start

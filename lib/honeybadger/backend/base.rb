@@ -1,12 +1,15 @@
 require 'forwardable'
 require 'net/http'
+require 'json'
 
 require 'honeybadger/logging'
 
 module Honeybadger
   module Backend
     class Response
-      attr_reader :code, :body, :message
+      NOT_BLANK = /\S/
+
+      attr_reader :code, :body, :message, :error
 
       # Public: Initializes the Response instance.
       #
@@ -27,10 +30,21 @@ module Honeybadger
         end
 
         @success = (200..299).cover?(@code)
+        @error = parse_error(body) unless @success
       end
 
       def success?
         @success
+      end
+
+      private
+
+      def parse_error(body)
+        return unless body =~ NOT_BLANK
+        obj = JSON.parse(body)
+        return obj['error'] if obj.kind_of?(Hash)
+      rescue JSON::ParserError
+        nil
       end
     end
 

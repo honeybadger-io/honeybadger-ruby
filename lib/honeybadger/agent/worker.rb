@@ -205,7 +205,7 @@ module Honeybadger
           warn { sprintf('data will not be reported (payment required) feature=%s code=%s', feature, response.code) }
           suspend(3600)
         when 403
-          warn { sprintf('data will not be reported feature=%s code=%s message=%s', feature, response.code, response.message.to_s.dump) }
+          warn { sprintf('data will not be reported feature=%s code=%s error=%s', feature, response.code, response.error.to_s.dump) }
           suspend(3600)
         when 201
           if throttle = del_throttle

@@ -223,7 +223,7 @@ describe Honeybadger::Agent::Worker do
     end
 
     context "when 403" do
-      let(:response) { Honeybadger::Backend::Response.new(403, nil, 'unauthorized') }
+      let(:response) { Honeybadger::Backend::Response.new(403, %({"error":"unauthorized"})) }
 
       it "shuts down the worker" do
         expect(instance).to receive(:suspend)
