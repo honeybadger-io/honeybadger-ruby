@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
-## [2.1.2][2015-07-24]
+## [2.1.3] - 2015-07-24
 ### Added
 - Don't send empty local_variables in payload when disabled.
 - Better logging of reason when API requests are denied.
@@ -13,6 +13,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## Fixed
 - Missing vendor libs.
+
+## [2.1.2][yanked]
 
 ## [2.1.1] - 2015-07-15
 ### Added

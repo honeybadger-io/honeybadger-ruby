@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
 
   s.files  = Dir['lib/**/*.{rb,erb}']
   s.files += Dir['bin/*']
-  s.files += Dir['vendor/**/lib/**/*.{rb,rake,cap}']
+  s.files += Dir['vendor/**/*.{rb,rake,cap}']
   s.files += Dir['resources/**/*.crt']
   s.files += Dir['*.md']
   s.files += ['LICENSE']
