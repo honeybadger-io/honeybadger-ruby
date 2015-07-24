@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.1.2][2015-07-24]
 ### Added
 - Don't send empty local_variables in payload when disabled.
 - Better logging of reason when API requests are denied.
