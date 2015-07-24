@@ -5,8 +5,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 ### Added
-- Don't send empty local_variables when disabled.
+- Don't send empty local_variables in payload when disabled.
 - Better logging of reason when API requests are denied.
+- Truncate long queries in traces rather than tossing them.
 
 ## [2.1.1] - 2015-07-15
 ### Added
