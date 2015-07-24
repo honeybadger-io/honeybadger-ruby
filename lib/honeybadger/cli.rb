@@ -1,4 +1,4 @@
-$:.unshift(File.expand_path('../../../vendor/thor/lib', __FILE__))
+$:.unshift(File.expand_path('../../../vendor/cli', __FILE__))
 
 require 'thor'
 

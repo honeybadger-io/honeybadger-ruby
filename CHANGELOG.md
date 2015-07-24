@@ -9,6 +9,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Better logging of reason when API requests are denied.
 - Truncate long queries in traces rather than tossing them.
 
+## Fixed
+- Missing vendor libs.
+
 ## [2.1.1] - 2015-07-15
 ### Added
 - Update heroku cli deprecations. -@adamkuipers

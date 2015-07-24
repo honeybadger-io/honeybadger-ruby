@@ -1,5 +1,3 @@
-$:.unshift(File.expand_path('../../../../vendor/inifile/lib', __FILE__))
-
 require 'honeybadger/cli/helpers'
 
 module Honeybadger

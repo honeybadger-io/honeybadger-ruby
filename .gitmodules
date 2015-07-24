@@ -1,6 +1,0 @@
-[submodule "vendor/thor"]
-	path = vendor/thor
-	url = https://github.com/erikhuda/thor.git
-[submodule "vendor/inifile"]
-	path = vendor/inifile
-	url = https://github.com/TwP/inifile.git
