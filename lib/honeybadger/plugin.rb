@@ -2,7 +2,7 @@ require 'forwardable'
 
 module Honeybadger
   class Plugin
-    CALLER_FILE = Regexp.new('\A([^:]+)(?=(:\d+))').freeze
+    CALLER_FILE = Regexp.new('\A(?:\w:)?([^:]+)(?=(:\d+))').freeze
 
     class << self
       @@instances = {}
