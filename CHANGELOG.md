@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+## Fixed
+- Support windows paths when loading plugins. -@aharpervc
 
 ## [2.1.3] - 2015-07-24
 ### Added

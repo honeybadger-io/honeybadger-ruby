@@ -1,6 +1,26 @@
 require 'honeybadger/plugin'
 require 'honeybadger/config'
 
+describe Honeybadger::Plugin::CALLER_FILE do
+  it { should_not match "/foo/bar" }
+  it { should match "/foo/bar:32" }
+  it { should match "D:/foo/bar:32" }
+
+  describe "unix match" do
+    subject { described_class.match("/foo/bar:32") }
+    specify { expect(subject.size).to eq(3) }
+    specify { expect(subject[1]).to eq("/foo/bar") }
+    specify { expect(subject[2]).to eq(":32") }
+  end
+
+  describe "windows match" do
+    subject { described_class.match("D:/foo/bar:32") }
+    specify { expect(subject.size).to eq(3) }
+    specify { expect(subject[1]).to eq("/foo/bar") }
+    specify { expect(subject[2]).to eq(":32") }
+  end
+end
+
 describe Honeybadger::Plugin do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:plugin) { Honeybadger::Plugin.new(:testing) }
