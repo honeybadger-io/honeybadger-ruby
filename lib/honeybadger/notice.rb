@@ -131,6 +131,7 @@ module Honeybadger
       @config = config
 
       @sanitizer = Util::Sanitizer.new
+      @request_sanitizer = Util::Sanitizer.new(filters: config.params_filters)
 
       @exception = unwrap_exception(opts[:exception])
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
@@ -164,7 +165,7 @@ module Honeybadger
     # Returns Hash JSON representation of notice
     def as_json(*args)
       @request[:context] = s(context)
-      @request[:local_variables] = s(local_variables) if local_variables
+      @request[:local_variables] = local_variables if local_variables
 
       {
         api_key: s(api_key),
@@ -223,7 +224,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes, :sanitizer
+    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes, :sanitizer, :request_sanitizer
 
     def ignore_by_origin?
       opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
@@ -302,7 +303,7 @@ module Honeybadger
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
       request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
-      request[:sanitizer] = Util::Sanitizer.new(filters: config.params_filters)
+      request[:sanitizer] = request_sanitizer
       Util::RequestPayload.build(request)
     end
 
@@ -382,7 +383,8 @@ module Honeybadger
       binding ||= exception.__honeybadger_bindings_stack[0]
 
       vars = binding.eval('local_variables')
-      Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
+      result = Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
+      request_sanitizer.sanitize(result)
     end
 
     # Internal: Should local variables be sent?
