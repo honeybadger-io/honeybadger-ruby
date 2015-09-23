@@ -741,6 +741,11 @@ describe Honeybadger::Notice do
             expect(notice.local_variables[:foo]).to eq 'bar'
           end
 
+          it "filters local variable keys" do
+            config[:'request.filter_keys'] = ['foo']
+            expect(notice.local_variables[:foo]).to eq '[FILTERED]'
+          end
+
           context "and project_root is a Pathname" do
             before do
               config[:root] = Pathname.new(File.dirname(__FILE__))
