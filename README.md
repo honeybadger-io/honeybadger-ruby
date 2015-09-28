@@ -56,7 +56,7 @@ gem 'honeybadger'
 
 Tell bundler to install:
 
-```
+```bash
 $ bundle install
 ```
 
@@ -64,7 +64,7 @@ $ bundle install
 
 Next, you'll set the API key for this project.
 
-```shell
+```bash
 $ bundle exec honeybadger install [YOUR API KEY HERE]
 ```
 
@@ -74,7 +74,7 @@ This will generate a `config/honeybadger.yml` file. If you don't like config fil
 
 If your app is deployed to heroku, you can configure Honeybadger on your dynos like so:
 
-```shell
+```bash
 $ bundle exec honeybadger heroku install [YOUR API KEY HERE]
 ```
 
