@@ -27,7 +27,7 @@ When an uncaught exception occurs, Honeybadger will POST the relevant data to th
 
 Rails and Sinatra are supported natively (install/configure the gem and you're done). For vanilla Rack apps, we provide a collection of middleware that must be installed manually.
 
-To use Rails 2.x, you'll need to use an earlier verson of the Honeybadger gem. [Go to version 1.x of the gem docs](https://github.com/honeybadger-io/honeybadger-ruby/blob/1.16-stable/docs/index.md). 
+To use Rails 2.x, you'll need to use an earlier version of the Honeybadger gem. [Go to version 1.x of the gem docs](https://github.com/honeybadger-io/honeybadger-ruby/blob/1.16-stable/docs/index.md). 
 
 Integrating with other libraries/frameworks is simple! [See the documentation](http://rubydoc.info/gems/honeybadger/) to learn about our public API, and see [Contributing](#contributing) to suggest a patch.
 
@@ -81,7 +81,7 @@ $ bundle exec honeybadger heroku install [YOUR API KEY HERE]
 This will automatically add a `HONEYBADGER_API_KEY` environment variable to your
 remote Heroku config and configure deploy notifications.
 
-This step isn't necessary if you're using our [Heroku addon](https://elements.heroku.com/addons/honeybadger).
+This step isn't necessary if you're using our [Heroku add-on](https://elements.heroku.com/addons/honeybadger).
 
 ### 3. Set up your code
 
@@ -94,11 +94,11 @@ You're done! Any rake tasks and job queues that load the Rails environment are a
 All you need to do is to include the honeybadger gem: 
 
 ```ruby
-# Always require sinatra first.
+# Always require Sinatra first.
 require 'sinatra'
 # Then require honeybadger.
 require 'honeybadger'
-# Define your application code *after* sinatra *and* honeybadger:
+# Define your application code *after* Sinatra *and* honeybadger:
 get '/' do
   raise "Sinatra has left the building"
 end
@@ -164,7 +164,7 @@ request:
 
 #### Environments
 
-Environment-specific options can be set by namespacing the options beneath the environment name. For example:
+Environment-specific options can be set by name-spacing the options beneath the environment name. For example:
 
 ```yaml
 ---
@@ -321,7 +321,7 @@ end
 
 ---
 
-### `Honeybadger.exception_filter()`: Programatically ignore exceptions
+### `Honeybadger.exception_filter()`: Programmatically ignore exceptions
 
 This method lets you add a callback that will be run every time an exception is about to be reported to Honeybadger. If your callback returns a falsey value, the exception won't be reported. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Aexception_filter)
 
