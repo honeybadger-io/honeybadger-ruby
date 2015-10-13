@@ -234,7 +234,7 @@ You can use any of the options below in your config file, or in the environment.
 |`connection.proxy_pass`          | String  | The proxy password to use when sending data.<br/>_Default: `nil`_|
 |&nbsp;                           |         ||
 |__REQUEST DATA FILTERING__       |         ||
-|`request.filter_keys`            | Array   |  A list of keys to filter when sending request data. In Rails, this also includes existing params filters.<br/>_Default: `['password', 'password_confirmation']`_|
+|`request.filter_keys`            | Array   |  A list of keys to filter when sending request data. In Rails, this also includes existing params filters.<br/>*Default: `['password', 'password_confirmation']`*|
 |`request.disable_session`        | Boolean | Prevent session from being sent with request data.<br/>_Default: `false`_|
 |`request.disable_params`         | Boolean | Prevent params from being sent with request data.<br/>_Default: `false`_|
 |`request.disable_environment`    | Boolean | Prevent Rack environment from being sent with request data.<br/>_Default: `false`_|
@@ -242,7 +242,7 @@ You can use any of the options below in your config file, or in the environment.
 |&nbsp;                           |         ||
 |__USER INFORMER__                |         ||
 |`user_informer.enabled`          | Boolean | Enable the UserInformer middleware.  The user informer displays information about a Honeybadger error to your end-users when you display a 500 error page. This typically includes the error id which can be used to reference the error inside your Honeybadger account.  [Learn More](http://docs.honeybadger.io/article/48-show-users-a-unique-id-when-they-encounter-an-error)<br/>_Default: `true`_|
-|`user_informer.info`             | String  | Replacement string for HTML comment in templates.<br/>_Default: `'Honeybadger Error {{error_id}}'`_|
+|`user_informer.info`             | String  | Replacement string for HTML comment in templates.<br/>*Default: `'Honeybadger Error {{error_id}}'`*|
 |&nbsp;                           |         ||
 |__USER FEEDBACK__                |         ||
 |`feedback.enabled`               | Boolean | Enable the UserFeedback middleware. Feedback displays a comment form to your-end user when they encounter an error. When the user creates a comment, it is added to the error in Honeybadger, and a notification is sent.  [Learn More](http://docs.honeybadger.io/article/166-how-to-implement-a-custom-feedback-form)<br/>_Default: `true`_|
@@ -251,7 +251,7 @@ You can use any of the options below in your config file, or in the environment.
 |`exceptions.enabled`             | Boolean | Enable automatic reporting of exceptions.<br/>_Default: `true`_|
 |`exceptions.ignore`              | Array   | A list of exception class names to ignore (appends to defaults).<br/>_Default: `['ActiveRecord::RecordNotFound', 'ActionController::RoutingError', 'ActionController::InvalidAuthenticityToken', 'CGI::Session::CookieStore::TamperedWithCookie', 'ActionController::UnknownAction', 'AbstractController::ActionNotFound', 'Mongoid::Errors::DocumentNotFound Sinatra::NotFound']`_|
 |`exceptions.ignore_only`         | Array   | A list of exception class names to ignore (overrides defaults).<br/>_Default: `[]`_|
-|`exceptions.ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
+|`exceptions.` `ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
 |`exceptions.rescue_rake`         | Boolean | Enable rescuing exceptions in rake tasks.<br/>_Default: `true`_|
 |`exceptions.source_radius`       | Integer | The number of lines before and after the source when reporting snippets.<br/>_Default: `2`_|
 |`exceptions.local_variables`     | Boolean | Enable sending local variables. Requires the [binding_of_caller gem](https://rubygems.org/gems/binding_of_caller).<br/>_Default: `false`_|
