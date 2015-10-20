@@ -12,11 +12,8 @@ namespace :honeybadger do
 
         executable = fetch(:honeybadger, :honeybadger)
 
-        revision = fetch(:current_revision) do
-          within(repo_path) do
-            capture("cd #{repo_path} && git rev-parse --short HEAD")
-          end
-        end
+        invoke "#{scm}:set_current_revision"
+        revision = fetch(:current_revision)
 
         options = [
           'deploy',
