@@ -5,6 +5,11 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
+## [2.1.6][unreleased]
+## Fixed
+- Always refresh capistrano revision during deploy notification.
+- Support capistrano-chruby. -Kyle Rippey
+
 ## [2.1.5] - 2015-09-23
 ## Fixed
 - Apply parameter filters to local variables.
