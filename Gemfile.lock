@@ -142,6 +142,7 @@ DEPENDENCIES
   guard
   guard-rspec
   honeybadger!
+  net-ssh (~> 2.9)
   pry
   pry-byebug
   rdoc

@@ -23,3 +23,7 @@ gem 'allocation_stats', platforms: RUBY2_PLATFORMS-[:mri_20], require: false
 gem 'capistrano', '>= 3.2.0', require: false
 
 gem 'codeclimate-test-reporter', require: false, group: :test
+
+# net-ssh >= 3.0 requires Ruby >= 2.0. Need to lock this dependency until we no
+# longer support 1.9.3.
+gem 'net-ssh', '~> 2.9'
