@@ -17,6 +17,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Support capistrano-chruby. -Kyle Rippey
 - Send the wrapped class name for Sidekiq traces when using a wrapper such as
   ActiveJob.
+- Performance tuning for Sidekiq plugin.
 
 ## [2.1.5] - 2015-09-23
 ## Fixed

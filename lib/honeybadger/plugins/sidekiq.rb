@@ -7,8 +7,8 @@ module Honeybadger
       class Middleware
         def call(worker, msg, queue)
           Honeybadger.context.clear!
-          klass = msg['wrapped'] || msg['class']
-          Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'sidekiq', :jid => msg['jid'], :class => klass }) do
+          klass = msg['wrapped'.freeze] || msg['class'.freeze]
+          Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'sidekiq'.freeze, :jid => msg['jid'.freeze], :class => klass }) do
             yield
           end
         end
@@ -27,9 +27,9 @@ module Honeybadger
           if defined?(::Sidekiq::VERSION) && ::Sidekiq::VERSION > '3'
             ::Sidekiq.configure_server do |sidekiq|
               sidekiq.error_handlers << lambda {|ex, params|
-                return if params['retry'] && params['retry_count'].to_i < config[:'sidekiq.attempt_threshold'].to_i
+                return if params['retry'.freeze] && params['retry_count'.freeze].to_i < config[:'sidekiq.attempt_threshold'].to_i
                 opts = {parameters: params}
-                opts[:component] = params['wrapped'] || params['class'] if config[:'sidekiq.use_component']
+                opts[:component] = params['wrapped'.freeze] || params['class'.freeze] if config[:'sidekiq.use_component']
                 Honeybadger.notify_or_ignore(ex, opts)
               }
             end
