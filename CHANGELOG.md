@@ -5,7 +5,13 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
-## [2.1.6][unreleased]
+## [2.2.0][unreleased]
+## Added
+
+- Added a config option to automatically set the component to the class name of the
+  Sidekiq job where an error originated. Causes errors to be grouped by worker
+  in addition to class name/location.
+
 ## Fixed
 - Always refresh capistrano revision during deploy notification.
 - Support capistrano-chruby. -Kyle Rippey
