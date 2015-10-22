@@ -12,7 +12,6 @@ adheres to [Semantic Versioning](http://semver.org/).
   Sidekiq job where an error originated. Causes errors to be grouped by worker
   in addition to class name/location.
 
-## [2.1.6][unreleased]
 ## Fixed
 - Always refresh capistrano revision during deploy notification.
 - Support capistrano-chruby. -Kyle Rippey
