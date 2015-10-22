@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## Fixed
 - Always refresh capistrano revision during deploy notification.
 - Support capistrano-chruby. -Kyle Rippey
+- Send the wrapped class name for Sidekiq traces when using a wrapper such as
+  ActiveJob.
 
 ## [2.1.5] - 2015-09-23
 ## Fixed
