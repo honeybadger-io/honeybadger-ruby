@@ -8,7 +8,7 @@ module Honeybadger
         def call(worker, msg, queue)
           Honeybadger.context.clear!
           klass = msg['wrapped'] || msg['class']
-          Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'sidekiq', :jid => msg['jid'], :class => msg['class'] }) do
+          Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'sidekiq', :jid => msg['jid'], :class => klass }) do
             yield
           end
         end
