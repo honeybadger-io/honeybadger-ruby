@@ -28,7 +28,9 @@ module Honeybadger
             ::Sidekiq.configure_server do |sidekiq|
               sidekiq.error_handlers << lambda {|ex, params|
                 return if params['retry'] && params['retry_count'].to_i < config[:'sidekiq.attempt_threshold'].to_i
-                Honeybadger.notify_or_ignore(ex, parameters: params)
+                opts = {parameters: params}
+                opts[:component] = params['wrapped'] || params['class'] if config[:'sidekiq.use_component']
+                Honeybadger.notify_or_ignore(ex, opts)
               }
             end
           end

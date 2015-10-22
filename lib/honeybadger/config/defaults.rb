@@ -271,6 +271,11 @@ module Honeybadger
         default: 0,
         type: Integer
       },
+      :'sidekiq.use_component' => {
+        description: 'Automatically set the component to the class of the job. Helps with grouping.',
+        default: false,
+        type: Boolean
+      },
       :'sinatra.enabled' => {
         description: 'Enable Sinatra auto-initialization.',
         default: true,
