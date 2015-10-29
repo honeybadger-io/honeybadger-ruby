@@ -263,7 +263,13 @@ You can use any of the options below in your config file, or in the environment.
 |__TRACE REPORTING__              |         ||
 |`traces.enabled`                 | Boolean | Enable sending performance traces for slow actions.<br/>_Default: `true`_|
 |`traces.threshold`               | Integer | The threshold in seconds to send traces.<br/>_Default: `2000`_|
-
+|__SIDEKIQ__                      |         ||
+|`sidekiq.attempt_threshold`      | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
+|`sidekiq.use_component`          | Boolean | Automatically set the component to the class of the job. Helps with grouping.<br/>_Default: `false`_|
+|__DELAYED JOB__                  |         ||
+|`delayed_job.attempt_threshold`  | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
+|__SINATRA__                        |         ||
+|`sinatra.enabled`                | Boolean | Enable Sinatra auto-initialization.<br/>_Default: `true`_|
 
 ## Public Methods 
 
