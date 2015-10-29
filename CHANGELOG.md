@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
-## [2.2.0][unreleased]
+## [2.2.0] - 2015-10-29
 ## Added
 
 - Added a config option to automatically set the component to the class name of the
