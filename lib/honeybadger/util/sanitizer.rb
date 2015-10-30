@@ -76,7 +76,7 @@ module Honeybadger
         filtered_url = url.to_s.dup
         filtered_url.scan(/(?:^|&|\?)([^=?&]+)=([^&]+)/).each do |m|
           next unless filter_key?(m[0])
-          filtered_url.gsub!(/#{m[1]}/, FILTERED_REPLACEMENT)
+          filtered_url.gsub!(/#{Regexp.escape(m[1])}/, FILTERED_REPLACEMENT)
         end
 
         filtered_url
