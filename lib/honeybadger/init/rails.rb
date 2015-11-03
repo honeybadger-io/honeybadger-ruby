@@ -1,7 +1,11 @@
 require 'rails'
 require 'yaml'
+
 require 'honeybadger/util/sanitizer'
 require 'honeybadger/util/request_payload'
+require 'honeybadger/rack/error_notifier'
+require 'honeybadger/rack/user_informer'
+require 'honeybadger/rack/user_feedback'
 
 module Honeybadger
   module Init
@@ -16,9 +20,9 @@ module Honeybadger
           if Honeybadger.start(config)
             if config.feature?(:notices) && config[:'exceptions.enabled']
               ::Rails.application.config.middleware.tap do |middleware|
-                middleware.insert(0, 'Honeybadger::Rack::ErrorNotifier', config)
-                middleware.insert_before('Honeybadger::Rack::ErrorNotifier', 'Honeybadger::Rack::UserInformer', config) if config[:'user_informer.enabled']
-                middleware.insert_before('Honeybadger::Rack::ErrorNotifier', 'Honeybadger::Rack::UserFeedback', config) if config[:'feedback.enabled']
+                middleware.insert(0, Honeybadger::Rack::ErrorNotifier, config)
+                middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer, config) if config[:'user_informer.enabled']
+                middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback, config) if config[:'feedback.enabled']
               end
             end
 
