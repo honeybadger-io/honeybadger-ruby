@@ -114,7 +114,11 @@ module Honeybadger
         eval(<<-CONTROLLER)
         class Honeybadger::TestController < ApplicationController
           # This is to bypass any filters that may prevent access to the action.
-          prepend_before_filter :test_honeybadger
+          if respond_to?(:prepend_before_action)
+            prepend_before_action :test_honeybadger
+          else
+            prepend_before_filter :test_honeybadger
+          end
 
           def test_honeybadger
             puts "Raising '#{test_exception_class.name}' to simulate application failure."
