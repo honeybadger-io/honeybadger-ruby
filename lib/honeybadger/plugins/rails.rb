@@ -9,10 +9,28 @@ module Honeybadger
           base.send(:alias_method, :render_exception, :render_exception_with_honeybadger)
         end
 
-        def render_exception_with_honeybadger(env, exception)
+        # Internal: Adds additional Honeybadger info to Request env when an
+        # exception is rendered in Rails' middleware.
+        #
+        # arg       - The Rack env Hash in Rails 3.0-4.2. After Rails 5 arg is
+        #             an ActionDispatch::Request.
+        # exception - The Exception which was rescued.
+        #
+        # Returns the super value of the middleware's #render_exception()
+        # method.
+        def render_exception_with_honeybadger(arg, exception)
+          if arg.kind_of?(::ActionDispatch::Request)
+            request = arg
+            env = request.env
+          else
+            request = ::Rack::Request.new(arg)
+            env = arg
+          end
+
           env['honeybadger.exception'] = exception
-          env['honeybadger.request.url'] = ::Rack::Request.new(env).url rescue nil
-          render_exception_without_honeybadger(env,exception)
+          env['honeybadger.request.url'] = request.url rescue nil
+
+          render_exception_without_honeybadger(arg, exception)
         end
       end
 
