@@ -131,7 +131,7 @@ describe Honeybadger::Util::Sanitizer do
 
     context 'malformed url' do
       let(:url) { 'http s ! honeybadger' }
-      before { expect { URI.parse(url) }.to raise_error }
+      before { expect { URI.parse(url) }.to raise_error(URI::InvalidURIError) }
       it { should eq url }
     end
 

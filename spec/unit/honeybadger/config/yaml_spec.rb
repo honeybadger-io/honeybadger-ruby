@@ -107,7 +107,7 @@ logging:
     end
 
     it "re-raises the exception" do
-      expect { subject }.to raise_error
+      expect { subject }.to raise_error(RuntimeError)
     end
   end
 end

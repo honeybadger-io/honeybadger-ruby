@@ -20,7 +20,7 @@ describe TestWorker do
         described_class.around_perform_with_honeybadger(1, 2, 3) do
           fail 'foo'
         end
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
 
     it "raises exceptions" do
@@ -28,7 +28,7 @@ describe TestWorker do
         described_class.around_perform_with_honeybadger do
           fail 'foo'
         end
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
   end
 end
