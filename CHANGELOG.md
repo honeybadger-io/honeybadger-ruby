@@ -5,9 +5,11 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
+### Added
+- Rails 5 support.
+
 ## [2.2.0] - 2015-10-29
 ## Added
-
 - Added a config option to automatically set the component to the class name of the
   Sidekiq job where an error originated. Causes errors to be grouped by worker
   in addition to class name/location.
