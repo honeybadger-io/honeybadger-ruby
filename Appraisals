@@ -65,10 +65,18 @@ appraise 'rails4.1' do
   gem 'rack-mini-profiler', require: false
 end
 
-# The latest officially supported Rails release
-appraise 'rails' do
-  gem 'rails', '~> 4.2.0'
+appraise 'rails4.2' do
+  gem 'rails', '~> 4.2.4'
   gem 'capistrano', '~> 3.0'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
+end
+
+# The latest officially supported Rails release
+appraise 'rails' do
+  gem 'rails', github: 'rails/rails'
+  gem 'rack', github: 'rack/rack'
+  gem 'arel', github: 'rails/arel'
+  gem 'capistrano', '~> 3.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
 end
