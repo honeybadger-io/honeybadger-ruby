@@ -1,5 +1,6 @@
-ruby:
-  version: 2.2.3
+machine:
+  ruby:
+    version: 2.2.3
 dependencies:
   pre:
     - git submodule init
