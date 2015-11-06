@@ -7,13 +7,13 @@ namespace :honeybadger do
   task :deploy => :env do
     next if sshkit_outdated?
     if server = fetch(:honeybadger_server)
+      invoke "#{scm}:set_current_revision"
+      revision = fetch(:current_revision)
+
       on server do |host|
         info 'Notifying Honeybadger of deploy.'
 
         executable = fetch(:honeybadger, :honeybadger)
-
-        invoke "#{scm}:set_current_revision"
-        revision = fetch(:current_revision)
 
         options = [
           'deploy',

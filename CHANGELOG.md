@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Rails 5 support.
 
+## Fixed
+- Capistrano 3 `undefined method `verbosity'` bugfix.
+
 ## [2.2.0] - 2015-10-29
 ## Added
 - Added a config option to automatically set the component to the class name of the
