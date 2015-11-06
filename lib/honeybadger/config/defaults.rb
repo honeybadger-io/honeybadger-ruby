@@ -223,7 +223,7 @@ module Honeybadger
       },
       :'exceptions.rescue_rake' => {
         description: 'Enable rescuing exceptions in rake tasks.',
-        default: true,
+        default: !STDOUT.tty?,
         type: Boolean
       },
       :'exceptions.source_radius' => {
