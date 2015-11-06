@@ -1,6 +1,7 @@
 language: ruby
 cache: bundler
 before_install: gem install bundler
+sudo: false
 gemfile:
   - gemfiles/standalone.gemfile
   - gemfiles/binding_of_caller.gemfile
