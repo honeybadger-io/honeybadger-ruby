@@ -1,10 +1,13 @@
+machine:
+  ruby:
+    version: 2.2.3
 dependencies:
   pre:
     - git submodule init
     - git submodule update
     - gem install bundler
   post:
-    - gem install bundler --install-dir=/home/ubuntu/honeybadger-ruby/vendor/bundle/ruby/1.9.1
+    - gem install bundler --install-dir=/home/ubuntu/honeybadger-ruby/vendor/bundle/ruby/2.2.0
     - bundle exec appraisal install
 test:
   override:
