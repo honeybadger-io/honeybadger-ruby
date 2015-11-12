@@ -252,7 +252,7 @@ You can use any of the options below in your config file, or in the environment.
 |`exceptions.ignore`              | Array   | A list of exception class names to ignore (appends to defaults).<br/>_Default: `['ActiveRecord::RecordNotFound', 'ActionController::RoutingError', 'ActionController::InvalidAuthenticityToken', 'CGI::Session::CookieStore::TamperedWithCookie', 'ActionController::UnknownAction', 'AbstractController::ActionNotFound', 'Mongoid::Errors::DocumentNotFound Sinatra::NotFound']`_|
 |`exceptions.ignore_only`         | Array   | A list of exception class names to ignore (overrides defaults).<br/>_Default: `[]`_|
 |`exceptions.` `ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
-|`exceptions.rescue_rake`         | Boolean | Enable rescuing exceptions in rake tasks.<br/>_Default: `true`_|
+|`exceptions.rescue_rake`         | Boolean | Enable rescuing exceptions in rake tasks.<br/>_Default: `true` when run in background; `false` when run in terminal._|
 |`exceptions.source_radius`       | Integer | The number of lines before and after the source when reporting snippets.<br/>_Default: `2`_|
 |`exceptions.local_variables`     | Boolean | Enable sending local variables. Requires the [binding_of_caller gem](https://rubygems.org/gems/binding_of_caller).<br/>_Default: `false`_|
 |&nbsp;                           |         ||
