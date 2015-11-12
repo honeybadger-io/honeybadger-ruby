@@ -15,16 +15,27 @@ feature "Rescuing exceptions in a rake task" do
         set_env('HONEYBADGER_EXCEPTIONS_RESCUE_RAKE', 'false')
       end
 
-      it "reports the exception to Honeybadger" do
+      it "doesn't report the exception to Honeybadger" do
         expect(cmd('rake honeybadger')).to exit_with(1)
         assert_no_notification
       end
     end
 
     context "shell is attached" do
-      it "reports the exception to Honeybadger" do
+      it "doesn't report the exception to Honeybadger" do
         expect(cmd('rake honeybadger_autodetect_from_terminal')).to exit_with(1)
         assert_no_notification
+      end
+
+      context "rake reporting is enabled" do
+        before do
+          set_env('HONEYBADGER_EXCEPTIONS_RESCUE_RAKE', 'true')
+        end
+
+        it "reports the exception to Honeybadger" do
+          expect(cmd('rake honeybadger_autodetect_from_terminal')).to exit_with(1)
+          assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
+        end
       end
     end
   end
