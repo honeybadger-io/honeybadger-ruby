@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## Fixed
 - Capistrano 3 `undefined method `verbosity'` bugfix.
+- Fixed "uninitialized constant Set" error when Set is not previously required.
 
 ## [2.2.0] - 2015-10-29
 ## Added
