@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    honeybadger (2.2.0)
+    honeybadger (2.3.0)
 
 GEM
   remote: https://rubygems.org/

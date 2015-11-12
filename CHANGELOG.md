@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file. See [Keep a
 CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][unreleased]
+## [2.3.0] - 2015-11-12
 
 ### Added
 - Rails 5 support.
