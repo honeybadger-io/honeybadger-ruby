@@ -6,23 +6,26 @@ require 'honeybadger'
 
 # Should catch exception
 task :honeybadger do
-  Honeybadger.start
   stub_tty_output(false)
+  Honeybadger.start
   raise_exception
 end
 
 # Should not catch exception as tty_output is true
 task :honeybadger_autodetect_from_terminal do
-  Honeybadger.start
   stub_tty_output(true)
+  Honeybadger.start
   raise_exception
 end
 
 def stub_tty_output(value)
-  Rake.application.instance_eval do
-    @tty_output_stub = value
-    def tty_output?
-      @tty_output_stub
+  if value
+    def STDOUT.tty?
+      true
+    end
+  else
+    def STDOUT.tty?
+      false
     end
   end
 end

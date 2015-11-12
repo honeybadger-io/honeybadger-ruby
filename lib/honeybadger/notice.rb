@@ -227,7 +227,9 @@ module Honeybadger
     attr_reader :config, :opts, :context, :stats, :now, :pid, :causes, :sanitizer, :request_sanitizer
 
     def ignore_by_origin?
-      opts[:origin] == :rake && !config[:'exceptions.rescue_rake']
+      return false if opts[:origin] != :rake
+      return false if config[:'exceptions.rescue_rake']
+      true
     end
 
     def ignore_by_callbacks?

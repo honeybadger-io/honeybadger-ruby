@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Rails 5 support.
+- Support overriding TTY behavior in rake reporter.
 
 ## Fixed
 - Capistrano 3 `undefined method `verbosity'` bugfix.

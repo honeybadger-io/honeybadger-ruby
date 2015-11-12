@@ -10,12 +10,10 @@ module Honeybadger
     end
 
     def display_error_message_with_honeybadger(ex)
-      if !self.tty_output?
-        Honeybadger.notify_or_ignore(ex, origin: :rake, component: reconstruct_command_line)
-        Honeybadger.context.clear!
-      end
-
+      Honeybadger.notify(ex, origin: :rake, component: reconstruct_command_line)
       display_error_message_without_honeybadger(ex)
+    ensure
+      Honeybadger.context.clear!
     end
 
     def reconstruct_command_line
