@@ -1,3 +1,5 @@
+require 'set'
+
 module Honeybadger
   module Util
     class Sanitizer
