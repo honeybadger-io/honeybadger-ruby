@@ -171,17 +171,28 @@ module Honeybadger
       EmptyReplacement = "".freeze
       DoubleQuoters = /(postgres|sqlite|postgis)/.freeze
 
+      def initialize(event)
+        super
+        @sql = Util::Sanitizer.sanitize_string(event.payload[:sql])
+      end
+
       def render?
-        event.payload[:name] != Schema && !event.payload[:sql].match(SchemaMigrations)
+        event.payload[:name] != Schema && !sql.match(SchemaMigrations)
       end
 
       def to_s
-        sql = event.payload[:sql]
-        sql = sql.gsub(EscapedQuotes, EmptyReplacement).gsub(SQuotedData, Replacement)
-        sql = sql.gsub(DQuotedData, Replacement) unless ::ActiveRecord::Base.connection_pool.spec.config[:adapter] =~ DoubleQuoters
-        sql = sql.gsub(NumericData, Replacement).gsub(Newline, EmptyReplacement).squeeze(' ')
-        Util::Sanitizer.sanitize_string(sql)
+        s = sql.dup
+        s.gsub!(EscapedQuotes, EmptyReplacement)
+        s.gsub!(SQuotedData, Replacement)
+        s.gsub!(DQuotedData, Replacement) unless ::ActiveRecord::Base.connection_pool.spec.config[:adapter] =~ DoubleQuoters
+        s.gsub!(NumericData, Replacement)
+        s.gsub!(Newline, EmptyReplacement)
+        s.squeeze!(' ')
+        s
       end
+
+      private
+        attr_reader :sql
     end
 
     class ActionView < Base

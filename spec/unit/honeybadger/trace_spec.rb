@@ -48,6 +48,7 @@ begin
   require 'active_record'
 
   describe Honeybadger::TraceCleaner::ActiveRecord do
+    let(:sql) { '' }
     let(:event) do
       ::ActiveSupport::Notifications::Event.new(
         'sql.active_record', # name
@@ -56,7 +57,7 @@ begin
         '1',                 # transaction_id
         {                    # payload
           :name => nil,
-          :sql => '',
+          :sql => sql,
           :binds => [],
           :connection_id => 123
         }
@@ -71,6 +72,17 @@ begin
     # `ActiveRecord::Base.connection_config` in rails < 3.1.
     it "safely accesses connection configuration" do
       expect { described_class.new(event).to_s }.not_to raise_error
+    end
+
+    context "bad utf8 chars" do
+      let(:sql) { "SELECT videos.* FROM videos WHERE videos.handle = '\xB2\xCE>\x1A\x8Aa\x1D' LIMIT 1" }
+
+      subject { described_class.new(event) }
+
+      it "sanitizes the chars" do
+        expect { subject.render? }.not_to raise_error
+        expect { subject.to_s }.not_to raise_error
+      end
     end
   end
 rescue LoadError
