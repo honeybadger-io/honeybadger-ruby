@@ -329,7 +329,7 @@ end
 
 ### `Honeybadger.exception_filter()`: Programmatically ignore exceptions
 
-This method lets you add a callback that will be run every time an exception is about to be reported to Honeybadger. If your callback returns a falsey value, the exception won't be reported. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Aexception_filter)
+This method lets you add a callback that will be run every time an exception is about to be reported to Honeybadger. If your callback returns a truthy value, the exception won't be reported. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Aexception_filter)
 
 #### Use this method if:
 
