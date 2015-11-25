@@ -39,7 +39,7 @@ Integrating with other libraries/frameworks is simple! [See the documentation](h
 | Resque        | any           | yes        |
 | Delayed Job   | any           | yes        |
 
-You can integrate honeybadger into any Ruby script by using manual exception notification, which is detailed below. 
+You can integrate honeybadger into any Ruby script via the `Honeybadger.notify` method. 
 
 ## Getting Started
 
