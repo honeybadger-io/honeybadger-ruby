@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.3.2.beta.1] - 2015-12-07
 ## Fixed
 - Be stricter when sanitizing recursive objects (allow only `Hash`, `Array`,
   `Set`).  This fixes a bug where some gems (such as the dropbox gem)
