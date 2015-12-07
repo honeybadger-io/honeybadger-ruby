@@ -476,7 +476,7 @@ en:
 
 ## Changelog
 
-See https://github.com/honeybadger-io/honeybadger-ruby/releases
+See https://github.com/honeybadger-io/honeybadger-ruby/blob/master/CHANGELOG.md
 
 ## Contributing
 
