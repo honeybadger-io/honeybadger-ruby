@@ -24,7 +24,7 @@ module Honeybadger
       end
 
       def sanitize(data, depth = 0, stack = nil)
-        if recursive?(data)
+        if data.kind_of?(Hash) || data.kind_of?(Array) || data.kind_of?(Set)
           return '[possible infinite recursion halted]' if stack && stack.include?(data.object_id)
           stack = stack ? stack.dup : Set.new
           stack << data.object_id
@@ -117,10 +117,6 @@ module Honeybadger
       private
 
       attr_reader :max_depth, :filters
-
-      def recursive?(data)
-        data.kind_of?(Hash) || data.kind_of?(Array) || data.kind_of?(Set)
-      end
 
       def filter_key?(key)
         return false unless filters
