@@ -4,6 +4,10 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+## Fixed
+- Be stricter when sanitizing recursive objects (allow only `Hash`, `Array`,
+  `Set`).  This fixes a bug where some gems (such as the dropbox gem)
+  monkeypatch `#to_hash` on `Array`.
 
 ## [2.3.1] - 2015-11-20
 ## Fixed

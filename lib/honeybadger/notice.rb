@@ -174,7 +174,7 @@ module Honeybadger
           token: id,
           class: s(error_class),
           message: s(error_message),
-          backtrace: s(backtrace),
+          backtrace: s(backtrace.to_a),
           source: s(source),
           fingerprint: s(fingerprint),
           tags: s(tags),
@@ -447,7 +447,7 @@ module Honeybadger
         c << {
           class: e.class.name,
           message: e.message,
-          backtrace: parse_backtrace(e.backtrace || caller)
+          backtrace: parse_backtrace(e.backtrace || caller).to_a
         }
         i += 1
       end

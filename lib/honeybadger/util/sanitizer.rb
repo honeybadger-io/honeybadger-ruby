@@ -3,8 +3,6 @@ require 'set'
 module Honeybadger
   module Util
     class Sanitizer
-      OBJECT_WHITELIST = [Hash, Array, String, Integer, Float, TrueClass, FalseClass, NilClass]
-
       FILTERED_REPLACEMENT = '[FILTERED]'.freeze
 
       TRUNCATION_REPLACEMENT = '[TRUNCATED]'.freeze
@@ -32,9 +30,8 @@ module Honeybadger
           stack << data.object_id
         end
 
-        if data.kind_of?(String)
-          self.class.sanitize_string(data)
-        elsif data.respond_to?(:to_hash)
+        case data
+        when Hash
           return '[max depth reached]' if depth >= max_depth
           hash = data.to_hash
           new_hash = {}
@@ -47,14 +44,16 @@ module Honeybadger
             end
           end
           new_hash
-        elsif data.respond_to?(:to_ary)
+        when Array, Set
           return '[max depth reached]' if depth >= max_depth
-          data.to_ary.map do |value|
+          data.to_a.map do |value|
             sanitize(value, depth+1, stack)
           end.compact
-        elsif OBJECT_WHITELIST.any? {|c| data.kind_of?(c) }
+        when Numeric, TrueClass, FalseClass, NilClass
           data
-        else
+        when String
+          self.class.sanitize_string(data.to_s)
+        else # all other objects:
           self.class.sanitize_string(data.to_s)
         end
       end
@@ -120,7 +119,7 @@ module Honeybadger
       attr_reader :max_depth, :filters
 
       def recursive?(data)
-        data.respond_to?(:to_hash) || data.respond_to?(:to_ary)
+        data.kind_of?(Hash) || data.kind_of?(Array) || data.kind_of?(Set)
       end
 
       def filter_key?(key)
