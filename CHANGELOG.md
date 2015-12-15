@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
-## [2.3.2.beta.1] - 2015-12-07
+## [2.3.2] - 2015-12-15
 ## Fixed
 - Be stricter when sanitizing recursive objects (allow only `Hash`, `Array`,
   `Set`).  This fixes a bug where some gems (such as the dropbox gem)
