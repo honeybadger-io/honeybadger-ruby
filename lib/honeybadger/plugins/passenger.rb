@@ -5,7 +5,7 @@ module Honeybadger
   module Plugins
     module Passenger
       Plugin.register do
-        requirement { defined?(::PhusionPassenger) }
+        requirement { defined?(::PhusionPassenger.on_event) }
 
         execution do
           ::PhusionPassenger.on_event(:starting_worker_process) do |forked|

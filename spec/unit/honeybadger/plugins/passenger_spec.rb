@@ -25,7 +25,7 @@ describe "Passenger integration" do
 
     it "logs installation" do
       allow(shim).to receive(:on_event)
-      expect(config.logger).to receive(:debug).with(/Passenger/i)
+      expect(config.logger).to receive(:debug).with(/load plugin name=passenger/i)
       Honeybadger::Plugin.instances[:passenger].load!(config)
     end
 
@@ -33,6 +33,14 @@ describe "Passenger integration" do
       expect(shim).to receive(:on_event).with(:starting_worker_process)
       expect(shim).to receive(:on_event).with(:stopping_worker_process)
       Honeybadger::Plugin.instances[:passenger].load!(config)
+    end
+
+    context "but not booted" do
+      it "skips passenger hooks" do
+        # shim will fail if it receives any message
+        expect(config.logger).to receive(:debug).with(/skip plugin name=passenger/i)
+        Honeybadger::Plugin.instances[:passenger].load!(config)
+      end
     end
   end
 end
