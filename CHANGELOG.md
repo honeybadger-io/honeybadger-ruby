@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.3.3] - 2016-01-06
 ## Fixed
 - Fixed a bug which caused a Passenger-related error message when booting a
   heroku console.
