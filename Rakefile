@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'appraisal'
 require 'honeybadger/version'
+require_relative 'tools/release'
 
 NAME = Dir['*.gemspec'].first.split('.').first.freeze
 VERSION = Honeybadger::VERSION
@@ -25,6 +26,11 @@ desc 'Alias for spec:unit (default task)'
 task spec: :'spec:unit'
 task test: :spec
 task default: :spec
+
+desc "Bump v#{VERSION} to v#{Release.next_version(VERSION)}"
+task :bump do
+  Release.bump
+end
 
 desc "Create tag v#{VERSION} and build and push #{GEM_FILE} to Rubygems"
 task :release => :build do
