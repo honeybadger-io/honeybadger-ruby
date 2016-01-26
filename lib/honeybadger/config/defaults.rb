@@ -76,6 +76,11 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      max_queue_size: {
+        description: 'Maximum number of items for each worker queue.',
+        default: 1000,
+        type: Integer
+      },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
         default: nil,

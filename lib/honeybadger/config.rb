@@ -192,6 +192,10 @@ module Honeybadger
       Thread.current[:__honeybadger_request] = nil
     end
 
+    def max_queue_size
+      self[:max_queue_size]
+    end
+
     def request_hash
       return DEFAULT_REQUEST_HASH unless request
       Rack::RequestHash.new(request)
