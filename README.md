@@ -33,11 +33,12 @@ Integrating with other libraries/frameworks is simple! [See the documentation](h
 
 ## Supported job queues
 
-| Framework     | Version       | Native?    |
-| ------------- | ------------- |------------|
-| Sidekiq       | any           | yes        |
-| Resque        | any           | yes        |
-| Delayed Job   | any           | yes        |
+| Framework     | Version       | Native?      |
+| ------------- | ------------- | ------------ |
+| Sidekiq       | any           | yes          |
+| Resque        | any           | yes          |
+| Delayed Job   | any           | yes          |
+| Sucker Punch  | any           | yes          |
 
 You can integrate honeybadger into any Ruby script via the `Honeybadger.notify` method. 
 
