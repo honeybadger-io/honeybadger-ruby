@@ -6,18 +6,18 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][unreleased]
 
 ## [2.3.3] - 2016-01-06
-## Fixed
+### Fixed
 - Fixed a bug which caused a Passenger-related error message when booting a
   heroku console.
 
 ## [2.3.2] - 2015-12-15
-## Fixed
+### Fixed
 - Be stricter when sanitizing recursive objects (allow only `Hash`, `Array`,
   `Set`).  This fixes a bug where some gems (such as the dropbox gem)
   monkeypatch `#to_hash` on `Array`.
 
 ## [2.3.1] - 2015-11-20
-## Fixed
+### Fixed
 - Handle invalid utf8 in ActiveRecord SQL queries.
 
 ## [2.3.0] - 2015-11-12
@@ -25,17 +25,17 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Rails 5 support.
 - Support overriding TTY behavior in rake reporter.
 
-## Fixed
+### Fixed
 - Capistrano 3 `undefined method `verbosity'` bugfix.
 - Fixed "uninitialized constant Set" error when Set is not previously required.
 
 ## [2.2.0] - 2015-10-29
-## Added
+### Added
 - Added a config option to automatically set the component to the class name of the
   Sidekiq job where an error originated. Causes errors to be grouped by worker
   in addition to class name/location.
 
-## Fixed
+### Fixed
 - Always refresh capistrano revision during deploy notification.
 - Support capistrano-chruby. -Kyle Rippey
 - Send the wrapped class name for Sidekiq traces when using a wrapper such as
@@ -43,11 +43,11 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Performance tuning for Sidekiq plugin.
 
 ## [2.1.5] - 2015-09-23
-## Fixed
+### Fixed
 - Apply parameter filters to local variables.
 
 ## [2.1.4] - 2015-09-02
-## Fixed
+### Fixed
 - Support windows paths when loading plugins. -@aharpervc
 
 ## [2.1.3] - 2015-07-24
@@ -56,7 +56,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Better logging of reason when API requests are denied.
 - Truncate long queries in traces rather than tossing them.
 
-## Fixed
+### Fixed
 - Missing vendor libs.
 
 ## [2.1.2][yanked]
