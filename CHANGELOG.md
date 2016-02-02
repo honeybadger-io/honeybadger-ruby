@@ -5,6 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
+## [2.4.0] - 2016-02-02
+### Added
+- [Sucker Punch](https://github.com/brandonhilkert/sucker_punch) support
+
 ## [2.3.3] - 2016-01-06
 ### Fixed
 - Fixed a bug which caused a Passenger-related error message when booting a
