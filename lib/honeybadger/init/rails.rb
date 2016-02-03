@@ -26,7 +26,7 @@ module Honeybadger
               end
             end
 
-            if config.feature?(:traces) && config[:'traces.enabled']
+            if config.traces?
               ActiveSupport::Notifications.subscribe('start_processing.action_controller') do |name, started, finished, id, data|
                 Trace.create(id)
               end
@@ -57,7 +57,7 @@ module Honeybadger
               end
             end
 
-            if config.feature?(:metrics) && config[:'metrics.enabled']
+            if config.metrics?
               ActiveSupport::Notifications.subscribe('process_action.action_controller') do |*args|
                 event = ActiveSupport::Notifications::Event.new(*args)
                 status = event.payload[:exception] ? 500 : event.payload[:status]
