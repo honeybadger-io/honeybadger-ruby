@@ -219,6 +219,8 @@ module Honeybadger
     end
 
     def trace(trace)
+      return false unless config.traces?
+
       start
 
       if trace.duration > config[:'traces.threshold']
@@ -233,6 +235,8 @@ module Honeybadger
     end
 
     def timing(*args, &block)
+      return false unless config.metrics?
+
       start
 
       mutex.synchronize { metrics.timing(*args, &block) }
@@ -242,6 +246,8 @@ module Honeybadger
     end
 
     def increment(*args, &block)
+      return false unless config.metrics?
+
       start
 
       mutex.synchronize { metrics.increment(*args, &block) }

@@ -88,6 +88,14 @@ module Honeybadger
       !!features[feature.to_sym]
     end
 
+    def traces?
+      feature?(:traces) && !!self[:'traces.enabled']
+    end
+
+    def metrics?
+      feature?(:metrics) && !!self[:'metrics.enabled']
+    end
+
     def logger
       @logger || Logging::BootLogger.instance
     end

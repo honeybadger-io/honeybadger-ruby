@@ -5,6 +5,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
+### Fixed
+- Never send traces or metrics when disabled by plan or config.
+
 ## [2.4.0] - 2016-02-02
 ### Added
 - [Sucker Punch](https://github.com/brandonhilkert/sucker_punch) support
