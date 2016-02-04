@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+### Added
+- Configuration option max\_queue_size for maximum worker queue size.
 
 ## [2.4.1] - 2016-02-04
 ### Fixed

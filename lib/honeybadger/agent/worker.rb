@@ -38,7 +38,7 @@ module Honeybadger
         @throttles = []
         @mutex = Mutex.new
         @marker = ConditionVariable.new
-        @queue = Queue.new(1000)
+        @queue = Queue.new(config.max_queue_size)
         @shutdown = false
         @start_at = nil
       end
