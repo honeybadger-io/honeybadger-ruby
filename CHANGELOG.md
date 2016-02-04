@@ -5,6 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
+## [2.4.1] - 2016-02-04
 ### Fixed
 - Never send traces or metrics when disabled by plan or config.
 
