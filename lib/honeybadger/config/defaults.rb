@@ -285,6 +285,11 @@ module Honeybadger
         description: 'Enable Sinatra auto-initialization.',
         default: true,
         type: Boolean
+      },
+      :'resque.resque_retry.send_exceptions_when_retrying' => {
+        description: 'Send exceptions when retrying job.',
+        default: true,
+        type: Boolean
       }
     }.freeze
 
