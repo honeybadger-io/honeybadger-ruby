@@ -4,8 +4,12 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.5.0] - 2016-02-19
 ### Added
 - Configuration option max\_queue_size for maximum worker queue size.
+- Add `resque.resque_retry.send_exceptions_when_retrying` config option.
+  -@davidguthu
 
 ## [2.4.1] - 2016-02-04
 ### Fixed
