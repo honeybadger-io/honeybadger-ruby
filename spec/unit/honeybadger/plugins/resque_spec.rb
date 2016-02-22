@@ -4,7 +4,7 @@ require 'honeybadger/agent'
 
 class TestWorker
   extend Honeybadger::Plugins::Resque::Extension
-  def self.payload_class
+  def self.retry_criteria_valid?(e)
   end
 end
 
@@ -66,8 +66,8 @@ describe TestWorker do
             tap {|c| c.const_set(:Plugins, Module.new).
             tap {|c| c.const_set(:Retry, Module.new) } }
         end
-        allow(described_class).to receive(:payload_class).
-          and_return(double('payload_class', retry_criteria_valid?: retry_criteria_valid))
+        allow(described_class).to receive(:retry_criteria_valid?).
+          and_return(retry_criteria_valid)
       end
       after { Object.send(:remove_const, :Resque) }
 

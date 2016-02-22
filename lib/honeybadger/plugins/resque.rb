@@ -12,7 +12,7 @@ module Honeybadger
                 yield
               end
             rescue Exception => e
-              Honeybadger.notify(e, parameters: { job_arguments: args }) if send_exception?(e)
+              Honeybadger.notify(e, parameters: { job_arguments: args }) if send_exception?(e, args)
               raise e
             end
           end
@@ -20,12 +20,17 @@ module Honeybadger
           Honeybadger.context.clear!
         end
 
-        def send_exception?(e)
+        def send_exception?(e, args)
           if defined?(::Resque::Plugins::Retry)
-            if ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying']
-              true
-            else
-              !self.payload_class.retry_criteria_valid?(e)
+            begin
+              if ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying']
+                true
+              else
+                !retry_criteria_valid?(e)
+              end
+            rescue => e
+              Honeybadger.notify(e, parameters: { job_arguments: args })
+              raise e
             end
           else
             true
