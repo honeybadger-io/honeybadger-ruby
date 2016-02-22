@@ -5,6 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
+## [2.5.1] - 2016-02-22
+### Fixed
+- Fix bug in resque-retry logic. -@davidguthu
+
 ## [2.5.0] - 2016-02-19
 ### Added
 - Configuration option max\_queue_size for maximum worker queue size.
