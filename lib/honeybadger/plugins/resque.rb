@@ -21,7 +21,7 @@ module Honeybadger
         end
 
         def send_exception?(e, args)
-          if defined?(::Resque::Plugins::Retry)
+          if respond_to?(:retry_criteria_valid?)
             begin
               if ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying']
                 true
