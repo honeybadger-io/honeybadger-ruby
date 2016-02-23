@@ -21,20 +21,13 @@ module Honeybadger
         end
 
         def send_exception?(e, args)
-          if respond_to?(:retry_criteria_valid?)
-            begin
-              if ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying']
-                true
-              else
-                !retry_criteria_valid?(e)
-              end
-            rescue => e
-              Honeybadger.notify(e, parameters: { job_arguments: args })
-              raise e
-            end
-          else
-            true
-          end
+          return true unless respond_to?(:retry_criteria_valid?)
+          return true if ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying']
+
+          !retry_criteria_valid?(e)
+        rescue => e
+          Honeybadger.notify(e, parameters: { job_arguments: args })
+          raise e
         end
       end
 
