@@ -90,6 +90,10 @@ This step isn't necessary if you're using our [Heroku add-on](https://elements.h
 
 You're done! Any rake tasks and job queues that load the Rails environment are also covered. 
 
+For more info, check out our screencast on getting up and running with Honeybadger and Rails:
+
+[![Using the Honeybadger gem with Rails](https://embed-ssl.wistia.com/deliveries/e1e2133b8f1bec224c57f6677f6bdb11691b3822.jpg?image_play_button=true&image_play_button_color=7b796ae0&image_crop_resized=150x84)](https://honeybadger.wistia.com/medias/l3cmyucx8f)
+
 #### Sinatra
 
 All you need to do is to include the honeybadger gem: 
