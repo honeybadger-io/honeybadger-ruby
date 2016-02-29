@@ -109,6 +109,10 @@ get '/' do
 end
 ```
 
+To see an example of a sinatra implementation, check out this video:
+
+[![Using the Honeybadger gem with Sinatra](https://embed-ssl.wistia.com/deliveries/7c9b6e6831f2288874f24d10eec88116e9f378eb.jpg?image_play_button=true&image_play_button_color=7b796ae0&image_crop_resized=150x84)](https://honeybadger.wistia.com/medias/b2wr5n9fcv)
+
 #### Rack
 
 With rack, you have to do things manually, but it's still just a few lines of code:
