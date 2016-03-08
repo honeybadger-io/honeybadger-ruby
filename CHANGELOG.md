@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+### Fixed
+- Allow plugin names in config to be symbols or strings (#177).
 
 ## [2.5.1] - 2016-02-22
 ### Fixed

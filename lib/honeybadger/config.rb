@@ -255,9 +255,9 @@ api_key: '#{self[:api_key]}'
     end
 
     def load_plugin?(name)
-      return false if Array(self[:'plugins.skip']).include?(name)
-      return true  if self[:plugins].nil?
-      Array(self[:plugins]).include?(name)
+      return false if includes_token?(self[:'plugins.skip'], name)
+      return true unless self[:plugins].kind_of?(Array)
+      includes_token?(self[:plugins], name)
     end
 
     def ping
@@ -307,6 +307,17 @@ api_key: '#{self[:api_key]}'
     end
 
     private
+
+    # Internal: Does collection include the String value or Symbol value?
+    #
+    # obj - The Array object, if present.
+    # value - The value which may exist within Array obj.
+    #
+    # Returns true or false.
+    def includes_token?(obj, value)
+      return false unless obj.kind_of?(Array)
+      obj.map(&:to_sym).include?(value.to_sym)
+    end
 
     def ping_payload
       {
