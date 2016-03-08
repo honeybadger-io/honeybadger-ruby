@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][unreleased]
 ### Fixed
 - Allow plugin names in config to be symbols or strings (#177).
+- Fix bug in resque-retry logic. -@davidguthu
 
 ## [2.5.1] - 2016-02-22
 ### Fixed
