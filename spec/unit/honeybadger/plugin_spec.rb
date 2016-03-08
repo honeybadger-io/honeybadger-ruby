@@ -62,19 +62,19 @@ describe Honeybadger::Plugin do
 
   describe ".load!" do
     it "loads all satisfied instances" do
-      Honeybadger::Plugin.instances.replace({'one' => mock_plugin, 'two' => mock_plugin})
+      Honeybadger::Plugin.instances.replace({:one => mock_plugin, :two => mock_plugin})
       Honeybadger::Plugin.load!(config)
     end
 
     it "skips all unsatisfied instances" do
-      Honeybadger::Plugin.instances.replace({'one' => mock_plugin(false), 'two' => mock_plugin(false)})
+      Honeybadger::Plugin.instances.replace({:one => mock_plugin(false), :two => mock_plugin(false)})
       Honeybadger::Plugin.load!(config)
     end
 
     context "when skipped by configuration" do
       before do
-        config[:plugins] = ['two']
-        Honeybadger::Plugin.instances.replace({'one' => mock_plugin(true, false), 'two' => mock_plugin(true)})
+        config[:plugins] = ['two', :three]
+        Honeybadger::Plugin.instances.replace({:one => mock_plugin(true, false), :two => mock_plugin(true), :three => mock_plugin(true)})
       end
 
       it "skips instances" do
