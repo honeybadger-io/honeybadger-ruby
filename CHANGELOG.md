@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.5.2] - 2016-03-08
 ### Fixed
 - Allow plugin names in config to be symbols or strings (#177).
 - Fix bug in resque-retry logic. -@davidguthu
