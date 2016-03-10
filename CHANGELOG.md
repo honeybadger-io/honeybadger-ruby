@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.5.3] - 2016-03-10
 ### Fixed
 - Squashed a bug where the wrong source extract was sent for some instances of
   `ActionView::Template::Error`.
