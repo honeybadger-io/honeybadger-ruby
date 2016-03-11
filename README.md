@@ -221,6 +221,7 @@ You can use any of the options below in your config file, or in the environment.
 |`hostname`                       | String  | The hostname of the current box.<br/>_Default: `Socket.gethostname`_|
 |`backend`                        | String  | An alternate backend to use for reporting data.<br/>_Default: `nil`_|
 |`debug`                          | Boolean | Forces metrics and traces to be reported every 10 seconds rather than 60, and enables verbose debug logging.<br/>_Default: `false`_|
+|`send_data_at_exit`              | Boolean | Finish sending enqueued exceptions and metrics data before allowing program to exit.<br/>_Default: `true`_|
 |`disabled`                       | Boolean | Prevents Honeybadger from starting entirely.<br/>_Default: `false`_|
 | `config_path`                   | String  | The path of the honeybadger config file. Can only be set via the `$HONEYBADGER_CONFIG_PATH` environment variable |
 |`development_environments`       | Array   | Environments which will not report data by default (use report_data to enable/disable explicitly).<br/>_Default: `["development", "test", "cucumber"]`_|
