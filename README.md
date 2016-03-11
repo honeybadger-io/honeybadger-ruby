@@ -258,7 +258,6 @@ You can use any of the options below in your config file, or in the environment.
 |`feedback.enabled`               | Boolean | Enable the UserFeedback middleware. Feedback displays a comment form to your-end user when they encounter an error. When the user creates a comment, it is added to the error in Honeybadger, and a notification is sent.  [Learn More](http://docs.honeybadger.io/article/166-how-to-implement-a-custom-feedback-form)<br/>_Default: `true`_|
 |&nbsp;                           |         ||
 |__EXCEPTION REPORTING__          |         ||
-|`exceptions.enabled`             | Boolean | Enable automatic reporting of exceptions.<br/>_Default: `true`_|
 |`exceptions.ignore`              | Array   | A list of exception class names to ignore (appends to defaults).<br/>_Default: `['ActiveRecord::RecordNotFound', 'ActionController::RoutingError', 'ActionController::InvalidAuthenticityToken', 'CGI::Session::CookieStore::TamperedWithCookie', 'ActionController::UnknownAction', 'AbstractController::ActionNotFound', 'Mongoid::Errors::DocumentNotFound Sinatra::NotFound']`_|
 |`exceptions.ignore_only`         | Array   | A list of exception class names to ignore (overrides defaults).<br/>_Default: `[]`_|
 |`exceptions.` `ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
