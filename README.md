@@ -146,6 +146,10 @@ run app
 
 There are a few ways to configure the Honeybadger gem. You can use a YAML config file. You can use environment variables. Or you can use a combination of the two. 
 
+We put together a short video highligting a few of the most common configuration options:
+
+[![Advanced Honeybadger Gem Usage](https://embed-ssl.wistia.com/deliveries/5fccf29d2b27d0f7ec62b5b39e2f5d9cd1f6f5b7.jpg?image_play_button=true&image_play_button_color=7b796ae0&image_crop_resized=150x84)](https://honeybadger.wistia.com/medias/vv9qq9x39d)
+
 
 ### YAML Configuration File
 
