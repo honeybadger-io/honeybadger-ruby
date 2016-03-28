@@ -7,7 +7,6 @@ dependencies:
     - git submodule update
     - gem install bundler
   post:
-    - gem install bundler --install-dir=/home/ubuntu/honeybadger-ruby/vendor/bundle/ruby/2.2.0
     - bundle exec appraisal install
 test:
   override:
