@@ -7,7 +7,7 @@ dependencies:
     - git submodule update
     # https://discuss.circleci.com/t/bundler-fails-to-find-appropriate-version-despite-installing-appropriate-version-earlier-in-the-build/2815/23
     - rvm @global do gem uninstall bundler -ax
-    - gem install bundler
+    - gem install bundler -v 1.10.6
     - gem install rubygems-bundler
   post:
     - bundle exec appraisal install
