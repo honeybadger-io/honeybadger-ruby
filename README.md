@@ -171,7 +171,7 @@ Some configuration options are written in YAML as nested hashes. For example, he
 logging:
   path: "/path/to/honeybadger.log" 
 request:
-  filter-keys:
+  filter_keys:
     - "credit_card"
 ```
 
