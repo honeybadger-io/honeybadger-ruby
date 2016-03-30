@@ -5,10 +5,19 @@ dependencies:
   pre:
     - git submodule init
     - git submodule update
-    # https://discuss.circleci.com/t/bundler-fails-to-find-appropriate-version-despite-installing-appropriate-version-earlier-in-the-build/2815/23
+
+    # https://discuss.circleci.com/t/bundler-fails-to-find-appropriate-version-despite-installing-appropriate-version-earlier-in-the-build/2815/32?u=eric
+    - gem -v
     - rvm @global do gem uninstall bundler -ax
-    - gem install bundler -v 1.10.6
+    - rvm install rubygems 2.4.8 --force
+    - gem -v
+
+    # https://discuss.circleci.com/t/bundler-fails-to-find-appropriate-version-despite-installing-appropriate-version-earlier-in-the-build/2815/23
+    - bundle -v
+    - rvm @global do gem uninstall bundler -ax
+    - gem install bundler -v 1.11.2
     - gem install rubygems-bundler
+    - bundle -v
   post:
     - bundle exec appraisal install
     - gem regenerate_binstubs
