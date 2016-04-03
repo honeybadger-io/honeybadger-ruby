@@ -154,6 +154,7 @@ module Honeybadger
           exit_status = $!.status if $!.is_a?(SystemExit)
         end
 
+        notify_at_exit($!)
         stop if config[:'send_data_at_exit']
         self.class.at_exit.call if self.class.at_exit
 
@@ -341,6 +342,14 @@ module Honeybadger
         push(:traces, traces) unless traces.empty?
         init_traces
       end
+    end
+
+    def notify_at_exit(ex)
+      return unless ex
+      return unless config[:'exceptions.notify_at_exit']
+      return if ex.is_a?(SystemExit)
+
+      notice(exception: ex, component: 'at_exit')
     end
   end
 end

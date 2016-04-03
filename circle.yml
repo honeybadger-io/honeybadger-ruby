@@ -5,10 +5,18 @@ dependencies:
   pre:
     - git submodule init
     - git submodule update
-    - gem install bundler
+
+    # https://discuss.circleci.com/t/bundler-fails-to-find-appropriate-version-despite-installing-appropriate-version-earlier-in-the-build/2815/32?u=eric
+    - rvm @global do gem uninstall bundler -ax
+    - rvm install rubygems 2.4.8 --force
+
+    # https://discuss.circleci.com/t/bundler-fails-to-find-appropriate-version-despite-installing-appropriate-version-earlier-in-the-build/2815/23
+    - rvm @global do gem uninstall bundler -ax
+    - gem install bundler -v 1.11.2
+    - gem install rubygems-bundler
   post:
-    - gem install bundler --install-dir=/home/ubuntu/honeybadger-ruby/vendor/bundle/ruby/2.2.0
     - bundle exec appraisal install
+    - gem regenerate_binstubs
 test:
   override:
     - bundle exec appraisal rspec

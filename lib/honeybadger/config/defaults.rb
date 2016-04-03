@@ -227,8 +227,13 @@ module Honeybadger
         type: Array
       },
       :'exceptions.rescue_rake' => {
-        description: 'Enable rescuing exceptions in rake tasks.',
+        description: 'Enable reporting exceptions in rake tasks.',
         default: !STDOUT.tty?,
+        type: Boolean
+      },
+      :'exceptions.notify_at_exit' => {
+        description: 'Report unhandled exception when Ruby crashes (at_exit).',
+        default: true,
         type: Boolean
       },
       :'exceptions.source_radius' => {

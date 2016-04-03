@@ -266,6 +266,7 @@ You can use any of the options below in your config file, or in the environment.
 |`exceptions.ignore_only`         | Array   | A list of exception class names to ignore (overrides defaults).<br/>_Default: `[]`_|
 |`exceptions.` `ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
 |`exceptions.rescue_rake`         | Boolean | Enable rescuing exceptions in rake tasks.<br/>_Default: `true` when run in background; `false` when run in terminal._|
+|`exceptions.notify_at_exit`      | Boolean | Report unhandled exception when Ruby crashes (at\_exit).<br/>_Default: `true`._|
 |`exceptions.source_radius`       | Integer | The number of lines before and after the source when reporting snippets.<br/>_Default: `2`_|
 |`exceptions.local_variables`     | Boolean | Enable sending local variables. Requires the [binding_of_caller gem](https://rubygems.org/gems/binding_of_caller).<br/>_Default: `false`_|
 |`exceptions.unwrap`              | Boolean | Reports #original_exception or #cause one level up from rescued exception when available.<br/>_Default: `false`_|
