@@ -25,6 +25,7 @@ module Honeybadger
                      Net::HTTPHeaderSyntaxError,
                      Net::ProtocolError,
                      Errno::ECONNREFUSED,
+                     OpenSSL::SSL::SSLError,
                      SocketError].freeze
 
       def initialize(config)
