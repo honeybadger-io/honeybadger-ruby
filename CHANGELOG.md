@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Automatically report unhandled exceptions at exit.
 
+### Changed
+- Filter Authorization header (HTTP\_AUTHORIZATION) by default.
+
 ## [2.5.3] - 2016-03-10
 ### Fixed
 - Squashed a bug where the wrong source extract was sent for some instances of

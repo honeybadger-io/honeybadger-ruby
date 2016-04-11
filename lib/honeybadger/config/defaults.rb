@@ -168,7 +168,7 @@ module Honeybadger
       },
       :'request.filter_keys' => {
         description: 'A list of keys to filter when sending request data.',
-        default: ['password'.freeze, 'password_confirmation'.freeze].freeze,
+        default: ['password'.freeze, 'password_confirmation'.freeze, 'HTTP_AUTHORIZATION'.freeze].freeze,
         type: Array
       },
       :'request.disable_session' => {
