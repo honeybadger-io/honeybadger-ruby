@@ -56,6 +56,7 @@ module Honeybadger
 
       def to_a
         mutex.synchronize do
+          begin
           [].tap do |m|
             metrics[:counter].each do |metric, values|
               m << "#{metric} #{values.sum}"
@@ -70,6 +71,9 @@ module Honeybadger
               m << "#{metric} #{values.count}"
             end
             m.compact!
+          end
+          rescue => e
+            puts "HoneyBadger Failed :#{e.message}"
           end
         end
       end
