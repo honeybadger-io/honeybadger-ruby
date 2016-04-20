@@ -18,6 +18,17 @@ describe Honeybadger::Util::Sanitizer do
     its(:filters) { should eq FILTER_ARRAY }
   end
 
+  describe "::sanitize_string" do
+    it "converts to string before sanitizing" do
+      expect(Honeybadger::Util::Sanitizer.sanitize_string(nil)).to eq('')
+    end
+
+    it "returns the String argument when already valid" do
+      foo = "foo"
+      expect(Honeybadger::Util::Sanitizer.sanitize_string(foo)).to be(foo)
+    end
+  end
+
   describe "#sanitize" do
     let(:deep_hash) { {}.tap {|h| 30.times.each {|i| h = h[i.to_s] = {:string => 'string'} }} }
     let(:expected_hash) { {}.tap {|h| max_depth.times.each {|i| h = h[i.to_s] = (i < max_depth-1 ? {:string => 'string'} : '[max depth reached]') }} }

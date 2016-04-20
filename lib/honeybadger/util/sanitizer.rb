@@ -107,7 +107,7 @@ module Honeybadger
         end
 
         def sanitize_string(data)
-          data = valid_encoding(data)
+          data = valid_encoding(data.to_s)
           return data unless data.respond_to?(:size) && data.size > MAX_STRING_SIZE
           data[0...MAX_STRING_SIZE] + TRUNCATION_REPLACEMENT
         end

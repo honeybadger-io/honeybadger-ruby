@@ -10,6 +10,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Filter Authorization header (HTTP\_AUTHORIZATION) by default.
 
+### Fixed
+- Always convert to string when sanitizing strings.
+
 ## [2.5.3] - 2016-03-10
 ### Fixed
 - Squashed a bug where the wrong source extract was sent for some instances of
