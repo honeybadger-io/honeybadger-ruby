@@ -58,6 +58,10 @@ describe Honeybadger do
       expect(Thread.current[:__honeybadger_context]).to eq({foo: :bar, bar: :baz})
     end
 
+    it "gets current context" do
+      expect(described_class.get_context).to eq(c)
+    end
+
     it "clears the context" do
       expect { described_class.context.clear! }.to change { Thread.current[:__honeybadger_context] }.from(c).to(nil)
     end
