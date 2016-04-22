@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [2.6.0] - 2016-04-22
 ### Added
 - Automatically report unhandled exceptions at exit.
 - Add `Honeybadger.get_context` method. -@homanchou
