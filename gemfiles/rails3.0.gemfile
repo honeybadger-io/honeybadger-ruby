@@ -13,9 +13,9 @@ gem "aruba", "~> 0.6.2"
 gem "simplecov"
 gem "webmock"
 gem "pry"
-gem "pry-byebug", :platforms => [:mri_20, :mri_21, :mri_22]
+gem "pry-byebug", :platforms => [:mri_20, :mri_21, :mri_22, :mri_23]
 gem "ruby-prof", :platforms => :mri, :require => false
-gem "allocation_stats", :platforms => [:mri_21, :mri_22], :require => false
+gem "allocation_stats", :platforms => [:mri_21, :mri_22, :mri_23], :require => false
 gem "capistrano", "~> 2.0"
 gem "codeclimate-test-reporter", :require => false, :group => :test
 gem "net-ssh", "~> 2.9"
