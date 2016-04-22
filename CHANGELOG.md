@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][unreleased]
 ### Added
 - Automatically report unhandled exceptions at exit.
+- Add `Honeybadger.get_context` method. -@homanchou
 
 ### Changed
 - Filter Authorization header (HTTP\_AUTHORIZATION) by default.
