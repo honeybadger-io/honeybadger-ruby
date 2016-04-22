@@ -171,6 +171,20 @@ module Honeybadger
     self
   end
 
+
+  # Public: Get global context for the current request.
+  #
+  #
+  # Examples:
+  #
+  #   Honeybadger.context({my_data: 'my value'})
+  #   Honeybadger.get_context #now returns {my_data: 'my value'}
+  #
+  # Returns hash or nil.
+  def get_context
+    Thread.current[:__honeybadger_context]
+  end
+
   # Internal: Clears the global context
   def clear!
     Thread.current[:__honeybadger_context] = nil
