@@ -300,12 +300,12 @@ module Honeybadger
     def work
       flush_metrics if metrics.flush?
       flush_traces if traces.flush?
+      sleep(delay)
     rescue StandardError => e
       error {
         msg = "error in agent thread class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
-    ensure
       sleep(delay)
     end
 
