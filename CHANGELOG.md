@@ -13,6 +13,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Always convert to string when sanitizing strings.
+- Fix potential performance issue due to and `ensure` block. See #186.
 
 ## [2.5.3] - 2016-03-10
 ### Fixed
