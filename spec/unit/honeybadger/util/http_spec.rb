@@ -144,6 +144,14 @@ describe Honeybadger::Util::HTTP do
       expect(http.ca_file).to eq OpenSSL::X509::DEFAULT_CERT_FILE
     end
 
+    it "uses a custom ca bundle if asked to" do
+      config[:'connection.ssl_ca_bundle_path'] = '/test/blargh.crt'
+
+      http = subject.send(:setup_http_connection)
+      expect(http.ca_file).not_to eq config.local_cert_path
+      expect(http.ca_file).to eq '/test/blargh.crt'
+    end
+
     it "uses the default cert (OpenSSL::X509::DEFAULT_CERT_FILE) only if explicitly told to" do
       allow(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(true)
       http = subject.send(:setup_http_connection)
