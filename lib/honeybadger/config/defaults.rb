@@ -136,6 +136,11 @@ module Honeybadger
         default: false,
         type: Boolean
       },
+      :'connection.ssl_ca_bundle_path' => {
+        description: 'Use this ca bundle when establishing secure connections.',
+        default: nil,
+        type: String
+      },
       :'connection.http_open_timeout' => {
         description: 'The HTTP open timeout when connecting to the server.',
         default: 2,

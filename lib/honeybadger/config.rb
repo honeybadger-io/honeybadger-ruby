@@ -162,6 +162,8 @@ module Honeybadger
     def ca_bundle_path
       if self[:'connection.system_ssl_cert_chain'] && File.exist?(OpenSSL::X509::DEFAULT_CERT_FILE)
         OpenSSL::X509::DEFAULT_CERT_FILE
+      elsif self[:'connection.ssl_ca_bundle_path']
+        self[:'connection.ssl_ca_bundle_path']
       else
         local_cert_path
       end
