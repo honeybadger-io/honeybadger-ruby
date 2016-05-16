@@ -4,13 +4,16 @@ source 'https://rubygems.org'
 
 gemspec
 
+group :development do
+  gem 'guard'
+  gem 'guard-rspec'
+end
+
+gem 'appraisal'
 gem 'rdoc'
 gem 'rspec', '>= 3.0'
 gem 'rspec-its'
-gem 'guard'
-gem 'guard-rspec'
 gem 'timecop'
-gem 'appraisal'
 gem 'aruba', '~> 0.6.2'
 gem 'simplecov'
 gem 'webmock'

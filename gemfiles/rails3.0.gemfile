@@ -2,13 +2,11 @@
 
 source "https://rubygems.org"
 
+gem "appraisal"
 gem "rdoc"
 gem "rspec", ">= 3.0"
 gem "rspec-its"
-gem "guard"
-gem "guard-rspec"
 gem "timecop"
-gem "appraisal"
 gem "aruba", "~> 0.6.2"
 gem "simplecov"
 gem "webmock"
@@ -22,5 +20,10 @@ gem "net-ssh", "~> 2.9"
 gem "rails", "~> 3.0.17"
 gem "better_errors", :require => false, :platforms => [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", "~>0.1.31 ", :require => false
+
+group :development do
+  gem "guard"
+  gem "guard-rspec"
+end
 
 gemspec :path => "../"
