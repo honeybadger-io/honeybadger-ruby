@@ -10,7 +10,7 @@ one or all of our helpful founders will assist you!
 Troubleshooting any of these issues will be much easier if you can see what's
 going on with Honeybadger when your app starts. To enable verbose debug logging,
 run your app with the `HONEYBADGER_DEBUG=true` environment variable or add the
-following to your *honeybadger.yml* initializer:
+following to your *honeybadger.yml* file:
 
 ```yml
 debug: true
@@ -20,7 +20,7 @@ By default Honeybadger will log to the default Rails logger or STDOUT outside of
 Rails. When debugging it can be helpful to have a dedicated log file for
 Honeybadger. To enable one, set the
 `HONEYBADGER_LOGGING_PATH=log/honeybadger.log` environment variable or add the
-following to your *honeybadger.yml* initializer:
+following to your *honeybadger.yml* file:
 
 ```yml
 logging:
