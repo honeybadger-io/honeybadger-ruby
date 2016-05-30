@@ -5,6 +5,12 @@ your problem here or in our [support
 documentation](http://docs.honeybadger.io/), email support@honeybadger.io and
 one or all of our helpful founders will assist you!
 
+## Upgrade the gem
+
+Before digging deeper into this guide, **make sure you are on the latest minor
+release of the honeybadger gem** (i.e. 2.x.x). There's a chance you've found a bug
+which has already been fixed!
+
 ## How to enable verbose logging
 
 Troubleshooting any of these issues will be much easier if you can see what's
