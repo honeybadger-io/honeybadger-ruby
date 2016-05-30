@@ -295,12 +295,13 @@ You can use any of the options below in your config file, or in the environment.
 
 Sometimes, default exception data just isn't enough. If you have extra data that will help you in debugging, send it as part of an error's context. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Acontext)
 
+Global context is stored in a thread local variable and automatically reported with any exception which occurrs within the current thread's execution.
+
 #### Use this method if:
 
 * You want to record the current user's id at the time of an exception
 * You need to send raw POST data for use in debugging
 * You have any other metadata you'd like to send with an exception
-
 
 #### Examples:
 
@@ -315,6 +316,7 @@ end
 # Clearing global context:
 Honeybadger.context.clear!
 ```
+
 ---
 
 
