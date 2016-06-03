@@ -8,9 +8,18 @@ module Honeybadger
         def call(worker, msg, queue)
           Honeybadger.context.clear!
           klass = msg['wrapped'.freeze] || msg['class'.freeze]
-          Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'sidekiq'.freeze, :jid => msg['jid'.freeze], :class => klass }) do
-            yield
+          job = "#{klass}#perform"
+          start = Time.now
+          Honeybadger::Trace.instrument(job, { :source => 'sidekiq'.freeze, :jid => msg['jid'.freeze], :class => klass }) do
+            begin
+              yield
+            rescue
+              Agent.increment("app.jobs.#{job}.error", 1)
+              raise
+            end
           end
+          duration = (Time.now - start) * 1000
+          Agent.timing("app.jobs.#{job}", duration)
         end
       end
 
