@@ -76,6 +76,17 @@ they must be raised; check for any `rescue` statements in your app where
 exceptions may be potentially silenced. In Rails, this includes any use of
 `rescue_from` which does not re-raise the exception.
 
+Errors which are handled in a `rescue` block without re-raising must be reported
+to Honeybadger manually:
+
+```ruby
+begin
+  fail 'This error will be handled internally.'
+rescue => e
+  Honeybadger.notify(e)
+end
+```
+
 #### Honeybadger is not started
 
 We currently initialize Rails and Sinatra apps automatically. If you use either
