@@ -35,6 +35,7 @@ describe Honeybadger::Agent::Worker do
       allow(instance.send(:queue)).to receive(:pop).and_raise('fail')
       instance.push(obj)
       instance.flush
+      sleep(0.05)
     end
 
     it "does not raise when shutting down" do

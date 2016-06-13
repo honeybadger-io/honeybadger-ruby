@@ -1,8 +1,5 @@
 # Honeybadger for Ruby
 
-[![Code Climate](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby/badges/gpa.svg)](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby)
-[![Test Coverage](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby/badges/coverage.svg)](https://codeclimate.com/github/honeybadger-io/honeybadger-ruby)
-[![Build Status](https://secure.travis-ci.org/honeybadger-io/honeybadger-ruby.png?branch=master)](http://travis-ci.org/honeybadger-io/honeybadger-ruby)
 [![Gem Version](https://badge.fury.io/rb/honeybadger.png)](http://badge.fury.io/rb/honeybadger)
 
 This is the notifier gem for integrating apps with the :zap: [Honeybadger Exception Notifier for Ruby and Rails](http://honeybadger.io).
@@ -21,7 +18,7 @@ When an uncaught exception occurs, Honeybadger will POST the relevant data to th
 
 | Framework     | Version       | Native?    |
 | ------------- | ------------- |------------|
-| Rails         | >= 3.0        | yes        |
+| Rails         | >= 3.2        | yes        |
 | Sinatra       | >= 1.2.1      | yes        |
 | Rack          | >= 1.0        | middleware |
 
@@ -514,8 +511,9 @@ We're using the [Appraisal](https://github.com/thoughtbot/appraisal) gem to run
 our [RSpec](https://www.relishapp.com/rspec/) test suite against multiple
 versions of [Rails](http://rubyonrails.org/).
 
-* The unit test suite can be run with `rake` (aliased to `rake spec:unit`).
+* The unit test suite can be run with `rake spec:units`.
 * The integration test suite can be run with `rake spec:features`.
+* The combined suite can be run with `rake`.
 
 ### License
 

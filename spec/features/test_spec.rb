@@ -2,10 +2,9 @@ require 'honeybadger'
 
 feature "Running the test cli command" do
   scenario "in a standalone project" do
-    before { set_env('HONEYBADGER_API_KEY', 'asdf') }
-
     it "displays expected debug output" do
-      assert_cmd("honeybadger test")
+      set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
+      expect(run("honeybadger test")).to be_successfully_executed
       expect(all_output).to match /asdf/
       expect(all_output).to match /Starting Honeybadger/
       expect(all_output).to match /HoneybadgerTestingException/
@@ -14,10 +13,8 @@ feature "Running the test cli command" do
     end
 
     context "with invalid configuration" do
-      before { restore_env }
-
       it "displays expected debug output" do
-        assert_cmd("honeybadger test --dry-run")
+        expect(run("honeybadger test --dry-run")).to be_successfully_executed
         expect(all_output).to match /Unable to start Honeybadger/
         expect(all_output).to match /invalid/
       end
@@ -26,26 +23,12 @@ feature "Running the test cli command" do
     context "with the --file option" do
       let(:file) { File.join(current_dir, 'debug.txt') }
 
-      after do
-        FileUtils.rm(file)
-      end
+      after { FileUtils.rm(file) }
 
-      context "and valid config" do
-        before { set_env('HONEYBADGER_API_KEY', 'asdf') }
-
-        it "saves the debug output to file" do
-          assert_cmd("honeybadger test --file debug.txt")
-          expect(all_output).to match /Output written to debug\.txt/
-          expect(File.exist?(file)).to eq true
-        end
-      end
-
-      context "and invalid config" do
-        it "saves the debug output to file" do
-          assert_cmd("honeybadger test --file debug.txt")
-          expect(all_output).to match /Output written to debug\.txt/
-          expect(File.exist?(file)).to eq true
-        end
+      it "saves the debug output to file" do
+        expect(run("honeybadger test --file debug.txt")).to be_successfully_executed
+        expect(all_output).to match /Output written to debug\.txt/
+        expect(File.exist?(file)).to eq true
       end
     end
   end
@@ -55,17 +38,15 @@ feature "Running the test cli command" do
 
     it "displays expected debug output" do
       config.write
-      assert_cmd("honeybadger test")
+      expect(run("honeybadger test")).to be_successfully_executed
       expect(all_output).to match /asdf/
       expect(all_output).to match /Starting Honeybadger/
       expect(all_output).to match /HoneybadgerTestingException/
     end
 
     context "with invalid configuration" do
-      before { restore_env }
-
       it "displays expected debug output" do
-        assert_cmd("honeybadger test --dry-run")
+        expect(run("honeybadger test --dry-run")).to be_successfully_executed
         expect(all_output).to match /Unable to start Honeybadger/
         expect(all_output).to match /invalid/
       end

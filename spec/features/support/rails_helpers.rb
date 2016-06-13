@@ -5,7 +5,7 @@ module RailsHelpers
 
 
         env      = Rack::MockRequest.env_for(#{uri.inspect})
-        response = Testing::Application.call(env)
+        response = RailsApp::Application.call(env)
 
 
         response = response.last if response.last.is_a?(ActionDispatch::Response)
@@ -18,7 +18,7 @@ module RailsHelpers
         end
     SCRIPT
     File.open(File.join(RAILS_ROOT, 'request.rb'), 'w') { |file| file.write(request_script) }
-    assert_cmd("rails runner -e #{environment} request.rb")
+    run_simple("rails runner -e #{environment} request.rb", fail_on_error: true)
   end
 
   def define_action(controller_and_action, definition, metal = false)

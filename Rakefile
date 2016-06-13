@@ -12,18 +12,23 @@ GEMSPEC_FILE = "#{NAME}.gemspec".freeze
 require 'rspec/core/rake_task'
 namespace :spec do
   desc 'Run unit specs'
-  RSpec::Core::RakeTask.new(:unit) do |t|
-    t.pattern = "spec/unit/**/*_spec.rb"
+  RSpec::Core::RakeTask.new(:units) do |t|
+    t.pattern = 'spec/unit/**/*_spec.rb'
+    t.rspec_opts = '--require unit/spec_helper'
   end
 
   desc 'Run feature specs'
   RSpec::Core::RakeTask.new(:features) do |t|
-    t.pattern = "spec/features/**/*_spec.rb"
+    t.pattern = 'spec/features/**/*_spec.rb'
+    t.rspec_opts = '--require features/spec_helper'
   end
+
+  desc 'Runs unit and feature specs'
+  task all: [:units, :features]
 end
 
-desc 'Alias for spec:unit (default task)'
-task spec: :'spec:unit'
+desc 'Alias for spec:all (default task)'
+task spec: :'spec:all'
 task test: :spec
 task default: :spec
 

@@ -1,13 +1,13 @@
 require 'honeybadger/config'
 
 feature "Installing honeybadger via the cli" do
-  RSpec.shared_examples "cli installer" do |expected_output|
+  shared_examples_for "cli installer" do |expected_output|
     let(:config) { Honeybadger::Config.new(:api_key => 'asdf', :'config.path' => config_file) }
 
-    before { set_env('HONEYBADGER_BACKEND', 'debug') }
+    before { set_environment_variable('HONEYBADGER_BACKEND', 'debug') }
 
     it "outputs successful result" do
-      assert_cmd('honeybadger install asdf')
+      expect(run('honeybadger install asdf')).to be_successfully_executed
       expect(all_output).to match /Writing configuration/i
       expect(all_output).to match /Installation complete/i
       expect(all_output).not_to match /heroku/i
@@ -16,19 +16,21 @@ feature "Installing honeybadger via the cli" do
     end
 
     it "creates the configuration file" do
-      expect { assert_cmd('honeybadger install asdf') }.to change { config_file.exist? }.from(false).to(true)
+      expect {
+        run_simple('honeybadger install asdf', fail_on_error: true)
+      }.to change { config_file.exist? }.from(false).to(true)
     end
 
     it "sends a test notification" do
-      set_env('HONEYBADGER_LOGGING_LEVEL', '1')
-      assert_cmd('honeybadger install asdf')
+      set_environment_variable('HONEYBADGER_LOGGING_LEVEL', '1')
+      expect(run('honeybadger install asdf')).to be_successfully_executed
       assert_notification('error' => {'class' => 'HoneybadgerTestingException'})
     end
 
     context "with the --no-test option" do
       it "skips the test notification" do
-        set_env('HONEYBADGER_LOGGING_LEVEL', '1')
-        assert_cmd('honeybadger install asdf --no-test')
+        set_environment_variable('HONEYBADGER_LOGGING_LEVEL', '1')
+        expect(run('honeybadger install asdf --no-test')).to be_successfully_executed
         assert_no_notification
       end
     end
@@ -37,12 +39,14 @@ feature "Installing honeybadger via the cli" do
       before { config.write }
 
       it "does not overwrite existing configuration" do
-        assert_cmd('honeybadger install asdf')
-        expect { assert_cmd('honeybadger install asdf') }.not_to change { config_file.mtime }
+        expect(run('honeybadger install asdf')).to be_successfully_executed
+        expect {
+          run_simple('honeybadger install asdf', fail_on_error: true)
+        }.not_to change { config_file.mtime }
       end
 
       it "outputs successful result" do
-        assert_cmd('honeybadger install asdf')
+        expect(run('honeybadger install asdf')).to be_successfully_executed
         expect(all_output).to match /Installation complete/i
       end
     end
@@ -55,8 +59,8 @@ feature "Installing honeybadger via the cli" do
       end
 
       it "installs capistrano command" do
-        assert_cmd('honeybadger install asdf')
-        assert_cmd('bundle exec cap -T')
+        expect(run('honeybadger install asdf')).to be_successfully_executed
+        expect(run('bundle exec cap -T')).to be_successfully_executed
         expect(all_output).to match(/honeybadger\:deploy/i)
       end
     end

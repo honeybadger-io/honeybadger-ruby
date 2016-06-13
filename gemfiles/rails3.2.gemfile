@@ -7,23 +7,20 @@ gem "rdoc"
 gem "rspec", ">= 3.0"
 gem "rspec-its"
 gem "timecop"
-gem "aruba", "~> 0.6.2"
-gem "simplecov"
+gem "aruba", "~> 0.14"
 gem "webmock"
+gem "guard"
+gem "guard-rspec"
 gem "pry"
 gem "pry-byebug", :platforms => [:mri_20, :mri_21, :mri_22, :mri_23]
 gem "ruby-prof", :platforms => :mri, :require => false
 gem "allocation_stats", :platforms => [:mri_21, :mri_22, :mri_23], :require => false
 gem "capistrano", "~> 2.0"
-gem "codeclimate-test-reporter", :require => false, :group => :test
-gem "net-ssh", "~> 2.9"
+gem "net-ssh", "< 3.0"
+gem "listen", "< 3.1"
+gem "mail", "< 2.6.4"
 gem "rails", "~> 3.2.12"
 gem "better_errors", :require => false, :platforms => [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", :require => false
-
-group :development do
-  gem "guard"
-  gem "guard-rspec"
-end
 
 gemspec :path => "../"

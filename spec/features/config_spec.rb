@@ -2,12 +2,12 @@ require 'honeybadger'
 
 feature "Running the debug cli command" do
   before do
-    set_env('HONEYBADGER_API_KEY', 'asdf')
+    set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
   end
 
   scenario "in a standalone project" do
     it "displays all configuration options" do
-      assert_cmd("honeybadger config")
+      expect(run("honeybadger config")).to be_successfully_executed
       expect(all_output).to match /api_key/
       expect(all_output).to match /asdf/
       expect(all_output).to match /user_informer/
@@ -15,7 +15,7 @@ feature "Running the debug cli command" do
 
     context "with the --no-default option" do
       it "skips default values" do
-        assert_cmd("honeybadger config --no-default")
+        expect(run("honeybadger config --no-default")).to be_successfully_executed
         expect(all_output).to match /api_key/
         expect(all_output).to match /asdf/
         expect(all_output).not_to match /user_informer/
