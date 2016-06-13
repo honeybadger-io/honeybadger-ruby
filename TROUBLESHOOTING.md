@@ -49,6 +49,25 @@ the following in your logs:
 ** [Honeybadger] Unable to start Honeybadger -- api_key is missing or invalid. level=2 pid=18195
 ```
 
+#### Honeybadger is in a development environment
+
+Errors are ignored by default in the "test", "development", and "cucumber"
+environments. To explicitly enable Honeybadger in a development environment, set
+the `HONEYBADGER_REPORT_DATA=true` environment variable or add the following
+configuration to *honeybadger.yml* file (change "development" to the name of the
+environment you want to enable):
+
+```yml
+development:
+  report_data: true
+```
+
+### Is the error ignored by default?
+
+Honeybadger ignores [this list of
+exceptions](https://github.com/honeybadger-io/honeybadger-ruby/blob/master/lib/honeybadger/config/defaults.rb#L7)
+by default.
+
 #### Honeybadger is not started
 
 We currently initialize Rails and Sinatra apps automatically. If you use either
@@ -74,9 +93,9 @@ Honeybadger.start(honeybadger_config)
 
 ## Sidekiq/Resque/ActiveJob/etc.
 
-- See [Honeybadger is not started](#honeybadger-is-not-started)
+- See [Common Issues](#common-issues)
 
-### Is the error ignored by default?
+### If the error is ignored by default
 
 Honeybadger ignores [this list of
 exceptions](https://github.com/honeybadger-io/honeybadger-ruby/blob/master/lib/honeybadger/config/defaults.rb#L7)
