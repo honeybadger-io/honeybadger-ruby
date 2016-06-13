@@ -62,11 +62,19 @@ development:
   report_data: true
 ```
 
-### Is the error ignored by default?
+#### Is the error ignored by default?
 
 Honeybadger ignores [this list of
 exceptions](https://github.com/honeybadger-io/honeybadger-ruby/blob/master/lib/honeybadger/config/defaults.rb#L7)
 by default.
+
+#### Is the error rescued without re-raising?
+
+Honeybadger will automatically report exceptions in many frameworks including
+Rails, Sinatra, Sidekiq, Rake, etc. For exceptions to reported automatically
+they must be raised; check for any `rescue` statements in your app where
+exceptions may be potentially silenced. In Rails, this includes any use of
+`rescue_from` which does not re-raise the exception.
 
 #### Honeybadger is not started
 
