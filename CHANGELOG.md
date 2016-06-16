@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - shoryuken plugin. -@ivanvc
 
+### Fixed
+- Handle `Errno::ENETUNREACH` error when contacting server. -@tank-bohr
+
 ## [2.6.0] - 2016-04-22
 ### Added
 - Automatically report unhandled exceptions at exit.
