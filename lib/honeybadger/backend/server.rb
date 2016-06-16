@@ -20,11 +20,12 @@ module Honeybadger
       HTTP_ERRORS = [Timeout::Error,
                      Errno::EINVAL,
                      Errno::ECONNRESET,
+                     Errno::ECONNREFUSED,
+                     Errno::ENETUNREACH,
                      EOFError,
                      Net::HTTPBadResponse,
                      Net::HTTPHeaderSyntaxError,
                      Net::ProtocolError,
-                     Errno::ECONNREFUSED,
                      OpenSSL::SSL::SSLError,
                      SocketError].freeze
 
