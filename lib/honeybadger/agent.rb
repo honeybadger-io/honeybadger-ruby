@@ -34,7 +34,7 @@ module Honeybadger
 
     private
 
-    def self.load_plugins(config)
+    def self.load_plugins!(config)
       Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
         require plugin
       end
@@ -71,7 +71,7 @@ module Honeybadger
       end
 
       config.logger.info("Starting Honeybadger version #{VERSION}")
-      load_plugins(config)
+      load_plugins!(config)
       @instance = new(config)
 
       true
