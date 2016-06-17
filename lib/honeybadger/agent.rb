@@ -201,12 +201,13 @@ module Honeybadger
       true
     end
 
-    def fork
-      # noop
-    end
+    def notify(exception_or_opts, opts = {})
+      return false unless config.feature?(:notices)
 
-    def notice(opts)
+      opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
+      opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
       opts.merge!(callbacks: self.class.callbacks)
+
       notice = Notice.new(config, opts)
 
       if !opts[:force] && notice.ignore?
@@ -216,22 +217,6 @@ module Honeybadger
         debug { sprintf('notice feature=notices id=%s', notice.id) }
         push(:notices, notice)
         notice.id
-      end
-    end
-
-    def trace(trace)
-      return false unless config.traces?
-
-      start
-
-      if trace.duration > config[:'traces.threshold']
-        debug { sprintf('agent adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
-        mutex.synchronize { traces.push(trace) }
-        flush_traces if traces.flush?
-        true
-      else
-        debug { sprintf('agent discarding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
-        false
       end
     end
 
@@ -257,7 +242,7 @@ module Honeybadger
       true
     end
 
-    # Internal: Flush the workers. See Honeybadger#flush.
+    # Public: Flush the workers. See Honeybadger#flush.
     #
     # block - an option block which is executed before flushing data.
     #
@@ -269,6 +254,28 @@ module Honeybadger
       flush_metrics
       flush_traces
       workers.values.each(&:flush)
+    end
+
+    # Internal
+    def trace(trace)
+      return false unless config.traces?
+
+      start
+
+      if trace.duration > config[:'traces.threshold']
+        debug { sprintf('agent adding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        mutex.synchronize { traces.push(trace) }
+        flush_traces if traces.flush?
+        true
+      else
+        debug { sprintf('agent discarding trace duration=%s feature=traces id=%s', trace.duration.round(2), trace.id) }
+        false
+      end
+    end
+
+    # Deprecated
+    def fork
+      # noop
     end
 
     private
@@ -349,7 +356,7 @@ module Honeybadger
       return unless config[:'exceptions.notify_at_exit']
       return if ex.is_a?(SystemExit)
 
-      notice(exception: ex, component: 'at_exit')
+      notify(ex, component: 'at_exit')
     end
   end
 end

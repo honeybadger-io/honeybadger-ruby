@@ -81,7 +81,7 @@ describe Honeybadger do
       exception = build_exception
       notice = stub_notice!(config)
 
-      expect(instance).to receive(:notice).with(hash_including(exception: exception)).and_call_original
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(exception: exception)).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(exception)
@@ -91,7 +91,7 @@ describe Honeybadger do
       exception = build_exception
       notice = stub_notice!(config)
 
-      expect(instance).to receive(:notice).with(hash_including(error_message: 'uh oh')).and_call_original
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: 'uh oh')).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(error_message: 'uh oh')
@@ -111,7 +111,7 @@ describe Honeybadger do
       notice = stub_notice!
       notice_args = { error_message: 'uh oh' }
 
-      expect(instance).to receive(:notice).with(hash_including(notice_args.merge(exception: exception))).and_call_original
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(notice_args.merge(exception: exception))).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
       Honeybadger.notify(exception, notice_args)
