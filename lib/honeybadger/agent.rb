@@ -207,7 +207,11 @@ module Honeybadger
         false
       else
         debug { sprintf('notice feature=notices id=%s', notice.id) }
-        push(:notices, notice)
+        if opts[:sync]
+          config.backend.notify(:notices, notice)
+        else
+          push(:notices, notice)
+        end
         notice.id
       end
     end
@@ -351,7 +355,7 @@ module Honeybadger
     end
 
     if Agent.config[:'exceptions.notify_at_exit'] && $! && !($!.is_a?(SystemExit))
-      Agent.notify($!, component: 'at_exit')
+      Agent.notify($!, component: 'at_exit', sync: true)
     end
 
     Agent.stop if Agent.config[:'send_data_at_exit']
