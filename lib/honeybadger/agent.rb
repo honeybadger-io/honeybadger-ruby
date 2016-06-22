@@ -72,6 +72,7 @@ module Honeybadger
 
       config.logger.info("Starting Honeybadger version #{VERSION}")
       load_plugins!(config)
+
       @instance = new(config)
 
       true
@@ -80,6 +81,10 @@ module Honeybadger
     def self.stop(*args)
       @instance.stop(*args) if @instance
       @instance = nil
+    end
+
+    def self.notify(*args)
+      self.instance ? self.instance.notify(*args) : false
     end
 
     def self.fork(*args)
@@ -113,7 +118,7 @@ module Honeybadger
     # block - An optional block to execute.
     #
     # Returns Proc callback.
-    def self.at_exit(&block)
+    def self.at_exit
       @at_exit = Proc.new if block_given?
       @at_exit
     end
@@ -147,19 +152,6 @@ module Honeybadger
       init_workers
       init_traces
       init_metrics
-
-      at_exit do
-        # Fix for https://bugs.ruby-lang.org/issues/5218
-        if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' && RUBY_VERSION =~ /1\.9/
-          exit_status = $!.status if $!.is_a?(SystemExit)
-        end
-
-        notify_at_exit($!)
-        stop if config[:'send_data_at_exit']
-        self.class.at_exit.call if self.class.at_exit
-
-        exit(exit_status) if exit_status
-      end
     end
 
     # Internal: Spawn the agent thread. This method is idempotent.
@@ -350,13 +342,22 @@ module Honeybadger
         init_traces
       end
     end
+  end
 
-    def notify_at_exit(ex)
-      return unless ex
-      return unless config[:'exceptions.notify_at_exit']
-      return if ex.is_a?(SystemExit)
-
-      notify(ex, component: 'at_exit')
+  at_exit do
+    # Fix for https://bugs.ruby-lang.org/issues/5218
+    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' && RUBY_VERSION =~ /1\.9/
+      exit_status = $!.status if $!.is_a?(SystemExit)
     end
+
+    if Agent.config[:'exceptions.notify_at_exit'] && $! && !($!.is_a?(SystemExit))
+      Agent.notify($!, component: 'at_exit')
+    end
+
+    Agent.stop if Agent.config[:'send_data_at_exit']
+
+    Agent.at_exit.call if Agent.at_exit
+
+    exit(exit_status) if exit_status
   end
 end
