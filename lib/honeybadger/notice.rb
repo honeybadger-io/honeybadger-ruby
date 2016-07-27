@@ -461,6 +461,9 @@ module Honeybadger
     # doesn't exist in that object, it calls #session *again* on `nil`, which
     # also inherited it from Object, resulting in a SystemStackError.
     #
+    # See https://stackoverflow.com/questions/18202261/include-actiondispatchtestprocess-prevents-guard-from-reloading-properly
+    # for more info.
+    #
     # This method restores the correct #session method on @request and warns
     # the user of the issue.
     #
