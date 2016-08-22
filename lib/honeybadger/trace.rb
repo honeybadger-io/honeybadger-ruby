@@ -205,7 +205,7 @@ module Honeybadger
 
     class ActionController < Base
       def payload
-        event.payload.reject {|k, v| k == :params }
+        event.payload.reject {|k, v| k == :params || k == :headers }
       end
 
       def to_s
