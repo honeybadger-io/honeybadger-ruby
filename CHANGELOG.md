@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Handle `Errno::ENETUNREACH` error when contacting server. -@tank-bohr
+- Remove `ActionDispatch::Http::Headers` from trace payload (fixes `IOError`
+  when JSON encoding traces in Rails 5).
 
 ## [2.6.0] - 2016-04-22
 ### Added
