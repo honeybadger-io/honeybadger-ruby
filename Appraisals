@@ -8,7 +8,8 @@ if RUBY_PLATFORM !~ /java/
 end
 
 appraise 'rack' do
-  gem 'rack'
+  # Old (pre-2.0) Rack, works on all Rubies.
+  gem 'rack', '< 2.0'
   gem 'sham_rack', require: false
 end
 
@@ -48,7 +49,7 @@ appraise 'rails4.2' do
 end
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
-  # The latest officially supported Rails release
+  # The latest officially supported Rails/Rack release
   appraise 'rails5.0' do
     gem 'rails', '~> 5.0.0'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
@@ -66,5 +67,10 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
     # it present when generating a new Rails app), so Rails expects it to be
     # there. See https://github.com/rails/rails/pull/24066
     gem 'listen'
+  end
+
+  appraise 'rack-2' do
+    gem 'rack', '>= 2.0.0'
+    gem 'sham_rack', require: false
   end
 end
