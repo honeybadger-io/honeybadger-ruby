@@ -47,3 +47,6 @@ matrix:
 env:
   global:
     secure: DwQI6QHuRRaMoKvE9rnXmw3U1KLKH6Y1ZTXCcDN34Zkq7QG5KPt195zvL6XPbsefvd2fOHq4es5D6jxgLlEdKB7njhWX8XNMgb/eprz6zTxSAS/ep31zYHEJ3krWSPM6a7fXJOjdYIzXhVl7I0NRDZGy/Sf6LgHIBMpaGVKGc34=
+notifications:
+  slack:
+    secure: FeZure+83NSqi7tPO7u/HZfOBORPyiWzTE7Hl1ddQDHOUtmWxLT82AlkMw+ZRbYms9MLJhitVwLbyFDdF8JOgyLcH0OAd7ZYglo08oPKS6NsupNW+knuXmYv8IJpqSo7kcr2Afs5F/atQEzX7spk3uqCwJOKIOypAJfJ4huZ3vE=
