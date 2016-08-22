@@ -19,6 +19,6 @@ gem "capistrano", ">= 3.2.0", "< 3.5.0", :require => false
 gem "net-ssh", "< 3.0"
 gem "listen", "< 3.1"
 gem "mail", "< 2.6.4"
-gem "delayed_job"
+gem "delayed_job", "< 4.1.2"
 
 gemspec :path => "../"

@@ -19,7 +19,7 @@ appraise 'sinatra' do
 end
 
 appraise 'delayed_job' do
-  gem 'delayed_job'
+  gem 'delayed_job', '< 4.1.2' # See https://github.com/collectiveidea/delayed_job/pull/931
 end
 
 appraise 'rails3.2' do
