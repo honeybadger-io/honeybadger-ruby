@@ -4,10 +4,9 @@ namespace :honeybadger do
   end
 
   desc 'Notify Honeybadger of the deployment.'
-  task :deploy => :env do
+  task :deploy => [:env, :'deploy:set_current_revision'] do
     next if sshkit_outdated?
     if server = fetch(:honeybadger_server)
-      invoke "#{scm}:set_current_revision"
       revision = fetch(:current_revision)
 
       on server do |host|
