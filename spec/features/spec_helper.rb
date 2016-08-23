@@ -12,7 +12,7 @@ RAILS_ROOT = CMD_ROOT.join('current')
 Dir[File.expand_path('../support/**/*.rb', __FILE__)].each {|f| require f}
 
 Aruba.configure do |config|
-  t = RUBY_PLATFORM == 'java' ? 120 : 7
+  t = RUBY_PLATFORM == 'java' ? 120 : 12
   config.working_directory = 'tmp/features'
   config.exit_timeout = t
   config.io_wait_timeout = t
