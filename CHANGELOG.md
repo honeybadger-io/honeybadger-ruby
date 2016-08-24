@@ -11,6 +11,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Handle `Errno::ENETUNREACH` error when contacting server. -@tank-bohr
 - Remove `ActionDispatch::Http::Headers` from trace payload (fixes `IOError`
   when JSON encoding traces in Rails 5).
+- Fix "`invoke("git:set_current_revision")` already invoked" warning in
+  Capistrano 3.6.
 
 ## [2.6.0] - 2016-04-22
 ### Added
