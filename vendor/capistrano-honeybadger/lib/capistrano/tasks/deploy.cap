@@ -71,7 +71,7 @@ end
 
 namespace :deploy do
   task :set_current_revision do
-    # noop -- we just want to make sure this task exists priror to Capistrano
+    # noop -- we just want to make sure this task exists prior to Capistrano
     # 3.2, since we depend on it.
   end
 end
