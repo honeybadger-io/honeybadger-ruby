@@ -7,7 +7,7 @@ if RUBY_PLATFORM !~ /java/
   end
 end
 
-appraise 'rack' do
+appraise 'rack-1' do
   # Old (pre-2.0) Rack, works on all Rubies.
   gem 'rack', '< 2.0'
   gem 'sham_rack', require: false
@@ -69,7 +69,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
     gem 'listen'
   end
 
-  appraise 'rack-2' do
+  appraise 'rack' do
     gem 'rack', '>= 2.0.0'
     gem 'sham_rack', require: false
   end

@@ -9,8 +9,8 @@ gemfile:
   - gemfiles/standalone.gemfile
   - gemfiles/binding_of_caller.gemfile
   - gemfiles/delayed_job.gemfile
+  - gemfiles/rack_1.gemfile
   - gemfiles/rack.gemfile
-  - gemfiles/rack_2.gemfile
   - gemfiles/sinatra.gemfile
   - gemfiles/rails3.2.gemfile
   - gemfiles/rails4.0.gemfile
@@ -34,19 +34,19 @@ matrix:
     - rvm: jruby-19mode
       gemfile: gemfiles/rails.gemfile
     - rvm: jruby-19mode
-      gemfile: gemfiles/rack_2.gemfile
+      gemfile: gemfiles/rack.gemfile
     - rvm: 1.9.3
       gemfile: gemfiles/rails.gemfile
     - rvm: 1.9.3
-      gemfile: gemfiles/rack_2.gemfile
+      gemfile: gemfiles/rack.gemfile
     - rvm: 2.0.0
       gemfile: gemfiles/rails.gemfile
     - rvm: 2.0.0
-      gemfile: gemfiles/rack_2.gemfile
+      gemfile: gemfiles/rack.gemfile
     - rvm: 2.1.10
       gemfile: gemfiles/rails.gemfile
     - rvm: 2.1.10
-      gemfile: gemfiles/rack_2.gemfile
+      gemfile: gemfiles/rack.gemfile
 env:
   global:
     secure: DwQI6QHuRRaMoKvE9rnXmw3U1KLKH6Y1ZTXCcDN34Zkq7QG5KPt195zvL6XPbsefvd2fOHq4es5D6jxgLlEdKB7njhWX8XNMgb/eprz6zTxSAS/ep31zYHEJ3krWSPM6a7fXJOjdYIzXhVl7I0NRDZGy/Sf6LgHIBMpaGVKGc34=
