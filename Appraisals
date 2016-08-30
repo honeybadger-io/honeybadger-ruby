@@ -15,8 +15,6 @@ end
 
 appraise 'sinatra' do
   gem 'sinatra'
-  # Temporary until https://github.com/sinatra/sinatra/pull/907 is released
-  gem 'rack', '~> 1.5.2'
 end
 
 appraise 'delayed_job' do
