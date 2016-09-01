@@ -17,7 +17,7 @@ describe "Net::HTTP Dependency" do
   if defined?(ActiveSupport::Notifications)
     context "when active support notifications are installed" do
       it "installs instrumentation" do
-        expect(Net::HTTP).to receive(:include).with(Honeybadger::Plugins::NetHttp::Instrumentation)
+        expect(Net::HTTP).to receive(:prepend).with(Honeybadger::Plugins::NetHttp::Instrumentation)
         Honeybadger::Plugin.instances[:net_http].load!(config)
       end
 
@@ -27,7 +27,7 @@ describe "Net::HTTP Dependency" do
         end
 
         it "does not install instrumentation" do
-          expect(Net::HTTP).not_to receive(:include).with(Honeybadger::Plugins::NetHttp::Instrumentation)
+          expect(Net::HTTP).not_to receive(:prepend).with(Honeybadger::Plugins::NetHttp::Instrumentation)
           Honeybadger::Plugin.instances[:net_http].load!(config)
         end
       end
@@ -35,7 +35,7 @@ describe "Net::HTTP Dependency" do
   else
     context "when active support notifications are not installed" do
       it "does not install instrumentation" do
-        expect(Net::HTTP).not_to receive(:include).with(Honeybadger::Plugins::NetHttp::Instrumentation)
+        expect(Net::HTTP).not_to receive(:prepend).with(Honeybadger::Plugins::NetHttp::Instrumentation)
         Honeybadger::Plugin.instances[:net_http].load!(config)
       end
     end
