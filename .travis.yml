@@ -18,6 +18,7 @@ gemfile:
   - gemfiles/rails4.1.gemfile
   - gemfiles/rails4.2.gemfile
   - gemfiles/rails.gemfile
+  - gemfiles/rails5.0.gemfile
 rvm:
   - 1.9.3
   - 2.0.0
@@ -29,29 +30,41 @@ matrix:
   fast_finish: true
   allow_failures:
     - rvm: jruby-19mode
+    - rvm: 2.2.5
+      gemfile: gemfiles/rails.gemfile
+    - rvm: 2.3.1
+      gemfile: gemfiles/rails.gemfile
   exclude:
     - rvm: jruby-19mode
       gemfile: gemfiles/binding_of_caller.gemfile
     - rvm: jruby-19mode
       gemfile: gemfiles/rails.gemfile
     - rvm: jruby-19mode
+      gemfile: gemfiles/rails5.0.gemfile
+    - rvm: jruby-19mode
       gemfile: gemfiles/rack.gemfile
     - rvm: jruby-19mode
       gemfile: gemfiles/sinatra.gemfile
     - rvm: 1.9.3
       gemfile: gemfiles/rails.gemfile
     - rvm: 1.9.3
+      gemfile: gemfiles/rails5.0.gemfile
+    - rvm: 1.9.3
       gemfile: gemfiles/rack.gemfile
     - rvm: 1.9.3
       gemfile: gemfiles/sinatra.gemfile
     - rvm: 2.0.0
       gemfile: gemfiles/rails.gemfile
     - rvm: 2.0.0
+      gemfile: gemfiles/rails5.0.gemfile
+    - rvm: 2.0.0
       gemfile: gemfiles/rack.gemfile
     - rvm: 2.0.0
       gemfile: gemfiles/sinatra.gemfile
     - rvm: 2.1.10
       gemfile: gemfiles/rails.gemfile
+    - rvm: 2.1.10
+      gemfile: gemfiles/rails5.0.gemfile
     - rvm: 2.1.10
       gemfile: gemfiles/rack.gemfile
     - rvm: 2.1.10
