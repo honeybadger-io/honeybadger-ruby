@@ -13,8 +13,8 @@ appraise 'rack-1' do
   gem 'sham_rack', require: false
 end
 
-appraise 'sinatra' do
-  gem 'sinatra'
+appraise 'sinatra-1' do
+  gem 'sinatra', '< 2.0'
 end
 
 appraise 'delayed_job' do
@@ -70,5 +70,9 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
   appraise 'rack' do
     gem 'rack', '>= 2.0.0'
     gem 'sham_rack', require: false
+  end
+
+  appraise 'sinatra' do
+    gem 'sinatra', '~> 2.0.0.beta1'
   end
 end
