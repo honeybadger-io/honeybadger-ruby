@@ -12,8 +12,6 @@ module Honeybadger
       ENDPOINTS = {
         ping: '/v1/ping'.freeze,
         notices: '/v1/notices'.freeze,
-        metrics: '/v1/metrics'.freeze,
-        traces: '/v1/traces'.freeze,
         deploys: '/v1/deploys'.freeze
       }.freeze
 

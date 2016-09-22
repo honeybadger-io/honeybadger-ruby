@@ -34,9 +34,7 @@ module Honeybadger
                 :queue         => job.queue
               )
 
-              ::Honeybadger::Trace.instrument("#{job.payload_object.class}#perform", {source: 'delayed_job', jid: job.id, class: job.payload_object.class.name}) do
-                block.call(job)
-              end
+              block.call(job)
             rescue Exception => error
               ::Honeybadger.notify_or_ignore(
                 :component     => component,

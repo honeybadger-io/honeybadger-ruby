@@ -7,10 +7,7 @@ module Honeybadger
       class Middleware
         def call(worker, msg, queue)
           Honeybadger.context.clear!
-          klass = msg['wrapped'.freeze] || msg['class'.freeze]
-          Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'sidekiq'.freeze, :jid => msg['jid'.freeze], :class => klass }) do
-            yield
-          end
+          yield
         end
       end
 

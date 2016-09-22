@@ -8,9 +8,7 @@ module Honeybadger
         def around_perform_with_honeybadger(*args)
           Honeybadger.flush do
             begin
-              Honeybadger::Trace.instrument("#{self.name}#perform", { source: 'resque', class: self.name }) do
-                yield
-              end
+              yield
             rescue Exception => e
               Honeybadger.notify(e, parameters: { job_arguments: args }) if send_exception?(e, args)
               raise e

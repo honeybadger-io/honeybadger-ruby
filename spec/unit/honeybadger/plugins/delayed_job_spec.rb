@@ -1,6 +1,5 @@
 require 'honeybadger/config'
 require 'honeybadger/agent'
-require 'honeybadger/trace'
 
 begin
   require 'delayed_job'
@@ -39,12 +38,6 @@ begin
         before { ExceptionTester.new.delay.send(method_name) }
 
         specify { expect(Delayed::Job.count).to eq 1 }
-
-        it "queues a new trace" do
-          trace = nil
-          expect(Honeybadger::Agent).to receive(:trace).with(kind_of(Honeybadger::Trace)).once
-          worker.work_off
-        end
 
         context "and an exception occurs" do
           let(:method_name) { :will_raise }
