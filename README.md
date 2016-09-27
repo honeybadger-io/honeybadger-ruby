@@ -132,7 +132,6 @@ Honeybadger.start(honeybadger_config)
  
 # And use Honeybadger's rack middleware
 use Honeybadger::Rack::ErrorNotifier, honeybadger_config
-use Honeybadger::Rack::MetricsReporter, honeybadger_config
  
 run app
 ```
@@ -222,8 +221,8 @@ You can use any of the options below in your config file, or in the environment.
 |`root`                           | String  | The project's absolute root path.<br/>_Default: `Dir.pwd`_|
 |`hostname`                       | String  | The hostname of the current box.<br/>_Default: `Socket.gethostname`_|
 |`backend`                        | String  | An alternate backend to use for reporting data.<br/>_Default: `nil`_|
-|`debug`                          | Boolean | Forces metrics and traces to be reported every 10 seconds rather than 60, and enables verbose debug logging.<br/>_Default: `false`_|
-|`send_data_at_exit`              | Boolean | Finish sending enqueued exceptions and metrics data before allowing program to exit.<br/>_Default: `true`_|
+|`debug`                          | Boolean | Enables verbose debug logging.<br/>_Default: `false`_|
+|`send_data_at_exit`              | Boolean | Finish sending enqueued exceptions before allowing program to exit.<br/>_Default: `true`_|
 |`disabled`                       | Boolean | Prevents Honeybadger from starting entirely.<br/>_Default: `false`_|
 | `config_path`                   | String  | The path of the honeybadger config file. Can only be set via the `$HONEYBADGER_CONFIG_PATH` environment variable |
 |`development_environments`       | Array   | Environments which will not report data by default (use report_data to enable/disable explicitly).<br/>_Default: `["development", "test", "cucumber"]`_|
@@ -269,13 +268,6 @@ You can use any of the options below in your config file, or in the environment.
 |`exceptions.local_variables`     | Boolean | Enable sending local variables. Requires the [binding_of_caller gem](https://rubygems.org/gems/binding_of_caller).<br/>_Default: `false`_|
 |`exceptions.unwrap`              | Boolean | Reports #original_exception or #cause one level up from rescued exception when available.<br/>_Default: `false`_|
 |&nbsp;                           |         ||
-|__METRIC REPORTING__             |         ||
-|`metrics.enabled`                | Boolean | Enable sending metrics, such as requests per minute.<br/>_Default: `true`_|
-|`metrics.gc_profiler`            | Boolean | Enable sending GC metrics (GC::Profiler must be enabled)<br/>_Default: `false`_|
-|&nbsp;                           |         ||
-|__TRACE REPORTING__              |         ||
-|`traces.enabled`                 | Boolean | Enable sending performance traces for slow actions.<br/>_Default: `true`_|
-|`traces.threshold`               | Integer | The threshold in seconds to send traces.<br/>_Default: `2000`_|
 |__SIDEKIQ__                      |         ||
 |`sidekiq.attempt_threshold`      | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
 |`sidekiq.use_component`          | Boolean | Automatically set the component to the class of the job. Helps with grouping.<br/>_Default: `false`_|
