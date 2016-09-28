@@ -4,7 +4,7 @@ module Honeybadger
     # /v1/notices API specification.
     class RequestHash < ::Hash
       # Internal
-      CGI_BLACKLIST = ['QUERY_STRING', 'RAW_POST_DATA'].freeze
+      CGI_BLACKLIST = ['QUERY_STRING', 'RAW_POST_DATA', 'ORIGINAL_FULLPATH', 'REQUEST_URI'].freeze
       CGI_KEY_REGEXP = /\A[A-Z_]+\Z/
 
       def initialize(request)
