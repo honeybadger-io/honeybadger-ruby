@@ -64,7 +64,7 @@ module Honeybadger
     # Public: The message from the exception, or a general description of the error.
     attr_reader :error_message
 
-    # Public: Excerpt from source file.
+    # Deprecated: Excerpt from source file.
     attr_reader :source
 
     # Public: CGI variables such as HTTP_METHOD.
@@ -139,7 +139,6 @@ module Honeybadger
         "#{exception.class.name}: #{exception.message}"
       end
       @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))
-      @source = extract_source_from_backtrace(@backtrace, config, opts)
       @fingerprint = construct_fingerprint(opts)
 
       @request = construct_request_hash(config, opts)
@@ -175,7 +174,6 @@ module Honeybadger
           class: s(error_class),
           message: s(error_message),
           backtrace: s(backtrace.to_a),
-          source: s(source),
           fingerprint: s(fingerprint),
           tags: s(tags),
           causes: s(causes)
@@ -316,16 +314,6 @@ module Honeybadger
       context.empty? ? nil : context
     end
 
-    def extract_source_from_backtrace(backtrace, config, opts)
-      return nil if backtrace.lines.empty?
-
-      if backtrace.application_lines.any?
-        backtrace.application_lines.first.source(config[:'exceptions.source_radius'])
-      else
-        backtrace.lines.first.source(config[:'exceptions.source_radius'])
-      end
-    end
-
     def fingerprint_from_opts(opts)
       callback = opts[:fingerprint]
       callback ||= opts[:callbacks] && opts[:callbacks].exception_fingerprint
@@ -398,7 +386,8 @@ module Honeybadger
       Backtrace.parse(
         backtrace,
         filters: construct_backtrace_filters(opts),
-        config: config
+        config: config,
+        source_radius: config[:'exceptions.source_radius']
       )
     end
 

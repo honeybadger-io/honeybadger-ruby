@@ -39,20 +39,22 @@ module Honeybadger
         if filtered_line
           _, file, number, method = unparsed_line.match(INPUT_FORMAT).to_a
           _, *filtered_args = filtered_line.match(INPUT_FORMAT).to_a
-          new(file, number, method, *filtered_args)
+          new(file, number, method, *filtered_args, opts.fetch(:source_radius, 2))
         else
           nil
         end
       end
 
       def initialize(file, number, method, filtered_file = file,
-                     filtered_number = number, filtered_method = method)
+                     filtered_number = number, filtered_method = method,
+                     source_radius = 2)
         self.filtered_file   = filtered_file
         self.filtered_number = filtered_number
         self.filtered_method = filtered_method
         self.file            = file
         self.number          = number
         self.method          = method
+        self.source_radius   = source_radius
       end
 
       # Reconstructs the line in a readable fashion.
@@ -73,15 +75,15 @@ module Honeybadger
         (filtered_file =~ /^\[PROJECT_ROOT\]/i) && !(filtered_file =~ /^\[PROJECT_ROOT\]\/vendor/i)
       end
 
-      # An excerpt from the source file, lazily loaded to preserve
-      # performance.
-      def source(radius = 2)
-        @source ||= get_source(file, number, radius)
+      def source
+        @source ||= get_source(file, number, source_radius)
       end
 
       private
 
       attr_writer :file, :number, :method, :filtered_file, :filtered_number, :filtered_method
+
+      attr_accessor :source_radius
 
       # Open source file and read line(s).
       #
@@ -126,7 +128,7 @@ module Honeybadger
     #
     # Returns array containing backtrace lines.
     def to_ary
-      lines.map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method } }
+      lines.map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method, :source => l.source } }
     end
     alias :to_a :to_ary
 
