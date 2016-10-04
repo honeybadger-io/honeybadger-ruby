@@ -60,7 +60,7 @@ module Honeybadger
       # Internal: Process payload for feature.
       #
       # feature - A Symbol feature name (corresponds to HTTP endpoint). Current
-      #           options are: :notices, :metrics, :traces.
+      #           options are: :notices, :deploys, :ping
       # payload - Any Object responding to #to_json.
       #
       # Examples:

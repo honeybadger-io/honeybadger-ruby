@@ -11,18 +11,15 @@ module Honeybadger
             return
           end
 
-          klass = worker.class.name
           Honeybadger.flush do
-            Honeybadger::Trace.instrument("#{klass}#perform", { :source => 'shoryuken'.freeze, :queue => sqs_msg.queue_name.freeze, :message_id => sqs_msg.data.message_id.freeze, :class => klass }) do
-              begin
-                yield
-              rescue => e
-                receive_count = sqs_msg.attributes['ApproximateReceiveCount'.freeze]
-                if receive_count && ::Honeybadger::Agent.config[:'shoryuken.attempt_threshold'].to_i <= receive_count.to_i
-                  Honeybadger.notify(e, parameters: body)
-                end
-                raise e
+            begin
+              yield
+            rescue => e
+              receive_count = sqs_msg.attributes['ApproximateReceiveCount'.freeze]
+              if receive_count && ::Honeybadger::Agent.config[:'shoryuken.attempt_threshold'].to_i <= receive_count.to_i
+                Honeybadger.notify(e, parameters: body)
               end
+              raise e
             end
           end
         ensure

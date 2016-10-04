@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Support Sinatra 2.0.
 
+### Changed
+- Sunset performance metrics. See
+  http://blog.honeybadger.io/sunsetting-performance-metrics/
+
 ## [2.6.1] - 2016-08-24
 ### Added
 - shoryuken plugin. -@ivanvc

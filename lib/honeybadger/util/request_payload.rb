@@ -2,7 +2,7 @@ require 'honeybadger/util/sanitizer'
 
 module Honeybadger
   module Util
-    # Internal: Constructs/sanitizes request data for notices and traces.
+    # Internal: Constructs/sanitizes request data for notices
     module RequestPayload
       # Internal: Default values to use for request data.
       DEFAULTS = {

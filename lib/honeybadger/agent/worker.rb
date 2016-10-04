@@ -12,7 +12,7 @@ module Honeybadger
 
       include Honeybadger::Logging::Helper
 
-      # Internal: See Agent::Thread
+      # Internal: Sub-class thread so we have a named thread (useful for debugging in Thread.list).
       class Thread < ::Thread; end
 
       # Internal: A queue which enforces a maximum size.
@@ -52,6 +52,8 @@ module Honeybadger
       #
       # Returns true.
       def shutdown
+        d { sprintf('shutting down worker feature=%s', feature) }
+
         mutex.synchronize do
           @shutdown = true
           @pid = nil

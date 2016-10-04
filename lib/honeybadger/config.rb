@@ -30,7 +30,7 @@ module Honeybadger
 
     NOT_BLANK = Regexp.new('\S').freeze
 
-    FEATURES = [:notices, :local_variables, :metrics, :traces].freeze
+    FEATURES = [:notices, :local_variables].freeze
 
     MERGE_DEFAULT = [:'exceptions.ignore'].freeze
 
@@ -86,14 +86,6 @@ module Honeybadger
 
     def feature?(feature)
       !!features[feature.to_sym]
-    end
-
-    def traces?
-      feature?(:traces) && !!self[:'traces.enabled']
-    end
-
-    def metrics?
-      feature?(:metrics) && !!self[:'metrics.enabled']
     end
 
     def logger

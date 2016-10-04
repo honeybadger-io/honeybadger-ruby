@@ -24,7 +24,6 @@ module Honeybadger
             return unless Honeybadger.start(config)
 
             install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier, config) if config.feature?(:notices) && config[:'exceptions.enabled']
-            install_honeybadger_middleware(Honeybadger::Rack::MetricsReporter, config) if config.feature?(:metrics) && config[:'metrics.enabled']
           end
 
           def install_honeybadger_middleware(klass, config)

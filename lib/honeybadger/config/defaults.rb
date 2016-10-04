@@ -256,26 +256,6 @@ module Honeybadger
         default: false,
         type: Boolean
       },
-      :'metrics.enabled' => {
-        description: 'Enable sending metrics.',
-        default: true,
-        type: Boolean
-      },
-      :'metrics.gc_profiler' => {
-        description: 'Enable sending GC metrics (GC::Profiler must be enabled)',
-        default: false,
-        type: Boolean
-      },
-      :'traces.enabled' => {
-        description: 'Enable sending traces.',
-        default: true,
-        type: Boolean
-      },
-      :'traces.threshold' => {
-        description: 'The threshold in seconds to send traces.',
-        default: 2000,
-        type: Integer
-      },
       :'delayed_job.attempt_threshold' => {
         description: 'The number of attempts before notifications will be sent.',
         default: 0,
