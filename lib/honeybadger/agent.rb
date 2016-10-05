@@ -77,6 +77,10 @@ module Honeybadger
       @instance = nil
     end
 
+    def self.notify(*args)
+      self.instance ? self.instance.notify(*args) : false
+    end
+
     def self.fork(*args)
       # noop
     end
@@ -96,7 +100,7 @@ module Honeybadger
     # block - An optional block to execute.
     #
     # Returns Proc callback.
-    def self.at_exit(&block)
+    def self.at_exit
       @at_exit = Proc.new if block_given?
       @at_exit
     end
@@ -125,19 +129,6 @@ module Honeybadger
       end
 
       init_workers
-
-      at_exit do
-        # Fix for https://bugs.ruby-lang.org/issues/5218
-        if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' && RUBY_VERSION =~ /1\.9/
-          exit_status = $!.status if $!.is_a?(SystemExit)
-        end
-
-        notify_at_exit($!)
-        stop if config[:'send_data_at_exit']
-        self.class.at_exit.call if self.class.at_exit
-
-        exit(exit_status) if exit_status
-      end
     end
 
     def stop(force = false)
@@ -148,8 +139,11 @@ module Honeybadger
       true
     end
 
-    def notice(opts)
+    def notify(exception_or_opts, opts = {})
+      opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
+      opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
       opts.merge!(callbacks: self.class.callbacks)
+
       notice = Notice.new(config, opts)
 
       if !opts[:force] && notice.ignore?
@@ -157,7 +151,11 @@ module Honeybadger
         false
       else
         debug { sprintf('notice feature=notices id=%s', notice.id) }
-        push(:notices, notice)
+        if opts[:sync]
+          config.backend.notify(:notices, notice)
+        else
+          push(:notices, notice)
+        end
         notice.id
       end
     end
@@ -193,13 +191,22 @@ module Honeybadger
       @workers = Hash.new(NullWorker.new)
       workers[:notices] = Worker.new(config, :notices)
     end
+  end
 
-    def notify_at_exit(ex)
-      return unless ex
-      return unless config[:'exceptions.notify_at_exit']
-      return if ex.is_a?(SystemExit)
-
-      notice(exception: ex, component: 'at_exit')
+  at_exit do
+    # Fix for https://bugs.ruby-lang.org/issues/5218
+    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' && RUBY_VERSION =~ /1\.9/
+      exit_status = $!.status if $!.is_a?(SystemExit)
     end
+
+    if Agent.config[:'exceptions.notify_at_exit'] && $! && !($!.is_a?(SystemExit))
+      Agent.notify($!, component: 'at_exit', sync: true)
+    end
+
+    Agent.stop if Agent.config[:'send_data_at_exit']
+
+    Agent.at_exit.call if Agent.at_exit
+
+    exit(exit_status) if exit_status
   end
 end
