@@ -26,7 +26,7 @@ module Honeybadger
   #   }) # => true
   #
   # Returns true if started, otherwise false.
-  def start(config = {})
+  def start(config = nil)
     Agent.start(config)
   end
 

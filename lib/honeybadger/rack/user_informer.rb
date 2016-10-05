@@ -1,13 +1,15 @@
 require 'forwardable'
 
+require 'honeybadger/agent'
+
 module Honeybadger
   module Rack
     class UserInformer
       extend Forwardable
 
-      def initialize(app, config)
+      def initialize(app, config = nil)
         @app = app
-        @config = config
+        @config = config || Agent.config
       end
 
       def replacement(with)

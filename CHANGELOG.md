@@ -10,6 +10,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Sunset performance metrics. See
   http://blog.honeybadger.io/sunsetting-performance-metrics/
+-  The `Honeybadger::Config` arguments in `Honeybadger.start` and all Rack
+   middleware are now optional.
 
 ## [2.6.1] - 2016-08-24
 ### Added

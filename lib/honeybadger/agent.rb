@@ -44,12 +44,14 @@ module Honeybadger
       !instance.nil?
     end
 
-    def self.start(config = {})
+    def self.start(config = nil)
       return true if running?
 
-      unless config.kind_of?(Config)
+      if config.kind_of?(Hash)
         config = Config.new(config)
       end
+
+      config ||= self.config
 
       if config[:disabled]
         config.logger.warn('Unable to start Honeybadger -- disabled by configuration.')
@@ -99,18 +101,17 @@ module Honeybadger
       @at_exit
     end
 
-    # Internal: Not for public consumption. :)
+    # Internal: The agent's configuration.
     #
-    # Prefer dependency injection over accessing config directly, but some
-    # cases (such as the delayed_job plugin) necessitate it.
-    #
-    # Returns the Agent's config if running, otherwise default config
+    # Returns the Config.
     def self.config
       if running?
-        instance.send(:config)
-      else
-        @config ||= Config.new
+        return instance.send(:config)
       end
+
+      # This will be used as the default configuration for the agent when it's
+      # started.
+      @config ||= Config.new
     end
 
     attr_reader :workers

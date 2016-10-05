@@ -1,5 +1,6 @@
 require 'honeybadger'
 
+# Deprecated
 module Honeybadger
   module Rack
     class MetricsReporter
