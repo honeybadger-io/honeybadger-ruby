@@ -551,7 +551,7 @@ describe Honeybadger::Notice do
       allow(callbacks).to receive(:backtrace_filter).and_return('foo')
 
       @backtrace_array.each do |line|
-        expect(Honeybadger::Backtrace::Line).to receive(:parse).with(line, {filters: array_including('foo'), config: config})
+        expect(Honeybadger::Backtrace::Line).to receive(:parse).with(line, hash_including({filters: array_including('foo'), config: config}))
       end
 
       build_notice({exception: @exception, callbacks: callbacks, config: config})
@@ -565,43 +565,6 @@ describe Honeybadger::Notice do
 
       notice_from_hash = build_notice(backtrace: @backtrace_array)
       expect(notice_from_hash.backtrace).to eq backtrace # backtrace was not correctly set from a hash
-    end
-
-    context "without application trace" do
-      before(:each) do
-        @string_io = StringIO.new(@source)
-        allow(File).to receive(:exists?)
-        allow(File).to receive(:exists?).with('my/file/backtrace').and_return true
-        allow(File).to receive(:open).with('my/file/backtrace').and_yield @string_io
-      end
-
-      it "includes source extract from backtrace" do
-        backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
-        notice_from_exception = build_notice(exception: @exception, config: config)
-        @string_io.rewind
-
-        expect(notice_from_exception.source).not_to be_empty # Expected backtrace source extract to be found
-        expect(notice_from_exception.source).to eq backtrace.lines.first.source
-      end
-    end
-
-    context 'with an application trace' do
-      before(:each) do
-        config[:root] = 'test/honeybadger/'
-        @string_io = StringIO.new(@source)
-        allow(File).to receive(:exists?)
-        allow(File).to receive(:exists?).with('test/honeybadger/rack_test.rb').and_return true
-        allow(File).to receive(:open).with('test/honeybadger/rack_test.rb').and_yield @string_io
-      end
-
-      it "includes source extract from first line of application trace" do
-        backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
-        notice_from_exception = build_notice(exception: @exception, config: config)
-        @string_io.rewind
-
-        expect(notice_from_exception.source).not_to be_empty # Expected backtrace source extract to be found
-        expect(notice_from_exception.source).to eq backtrace.lines[1].source
-      end
     end
   end
 
@@ -639,6 +602,15 @@ describe Honeybadger::Notice do
       it "converts to utf-8" do
         notice = build_notice(error_message: bad_string)
         expect(JSON.parse(notice.to_json)['error']['message']).to eq 'hello ??mlaut'
+      end
+    end
+
+    it "includes source extracts in backtrace" do
+      notice = build_notice
+      json = JSON.parse(notice.to_json)
+
+      json['error']['backtrace'].each do |line|
+        expect(line['source']).not_to be_empty
       end
     end
   end
