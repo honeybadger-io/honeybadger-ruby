@@ -1,12 +1,3 @@
-require 'forwardable'
-require 'net/http'
-require 'json'
-require 'zlib'
-require 'openssl'
-
-require 'honeybadger/version'
-require 'honeybadger/logging'
-
 module Honeybadger
   module Util
     class HTTP

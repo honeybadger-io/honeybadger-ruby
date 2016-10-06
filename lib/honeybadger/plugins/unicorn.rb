@@ -1,6 +1,3 @@
-require 'honeybadger/plugin'
-require 'honeybadger/agent'
-
 module Honeybadger
   module Plugins
     module Unicorn

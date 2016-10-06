@@ -1,7 +1,3 @@
-require 'erb'
-require 'uri'
-require 'forwardable'
-
 begin
   require 'i18n'
 rescue LoadError

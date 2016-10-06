@@ -1,5 +1,3 @@
-require 'honeybadger/util/request_payload'
-
 class TestSanitizer
   def sanitize(data)
     data

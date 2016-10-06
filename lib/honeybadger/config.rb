@@ -1,16 +1,4 @@
-require 'pathname'
-require 'delegate'
-require 'logger'
-require 'fileutils'
-require 'openssl'
-
-require 'honeybadger/version'
-require 'honeybadger/logging'
-require 'honeybadger/backend'
 require 'honeybadger/config/defaults'
-require 'honeybadger/util/http'
-require 'honeybadger/logging'
-require 'honeybadger/rack/request_hash'
 
 module Honeybadger
   class Config

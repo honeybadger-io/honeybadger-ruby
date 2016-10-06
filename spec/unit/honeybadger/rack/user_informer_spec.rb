@@ -1,6 +1,4 @@
 require 'sham_rack'
-require 'honeybadger/rack/user_informer'
-require 'honeybadger/config'
 
 describe Honeybadger::Rack::UserInformer do
   let(:config) { Honeybadger::Config.new }

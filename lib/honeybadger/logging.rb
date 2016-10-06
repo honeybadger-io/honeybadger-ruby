@@ -1,7 +1,3 @@
-require 'logger'
-require 'singleton'
-require 'delegate'
-
 module Honeybadger
   module Logging
     PREFIX = '** [Honeybadger] '.freeze

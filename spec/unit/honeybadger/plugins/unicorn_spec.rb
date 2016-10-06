@@ -1,5 +1,4 @@
 require 'honeybadger/plugins/unicorn'
-require 'honeybadger/config'
 
 describe "Unicorn integration" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }

@@ -1,6 +1,4 @@
 require 'honeybadger/plugins/resque'
-require 'honeybadger/config'
-require 'honeybadger/agent'
 
 class TestWorker
   extend Honeybadger::Plugins::Resque::Extension

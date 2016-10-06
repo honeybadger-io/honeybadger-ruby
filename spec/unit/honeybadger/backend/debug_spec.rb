@@ -1,6 +1,3 @@
-require 'honeybadger/backend/debug'
-require 'honeybadger/config'
-
 describe Honeybadger::Backend::Debug do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:logger) { config.logger }

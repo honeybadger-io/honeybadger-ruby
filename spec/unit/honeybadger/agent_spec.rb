@@ -1,6 +1,3 @@
-require 'honeybadger/agent'
-require 'timecop'
-
 describe Honeybadger::Agent do
   describe "instance methods" do
     let!(:instance) { described_class.new(config) }

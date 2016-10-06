@@ -1,6 +1,3 @@
-require 'honeybadger/plugin'
-require 'honeybadger/config'
-
 describe Honeybadger::Plugin::CALLER_FILE do
   it { should_not match "/foo/bar" }
   it { should match "/foo/bar:32" }

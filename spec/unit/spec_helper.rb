@@ -2,10 +2,16 @@ require 'logger'
 require 'pathname'
 require 'pry'
 require 'rspec/its'
+require 'timecop'
+require 'stringio'
+require 'net/http'
+require 'thread'
 
 # We don't want this bleeding through in tests. (i.e. from CircleCi)
 ENV['RACK_ENV'] = nil
 ENV['RAILS_ENV'] = nil
+
+require 'honeybadger'
 
 TMP_DIR = Pathname.new(File.expand_path('../../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))

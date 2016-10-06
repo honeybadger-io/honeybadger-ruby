@@ -1,5 +1,3 @@
-require 'honeybadger/config'
-
 describe Honeybadger::Config::Yaml do
   subject { described_class.new(path, env) }
   let(:path) { FIXTURES_PATH.join('honeybadger.yml') }

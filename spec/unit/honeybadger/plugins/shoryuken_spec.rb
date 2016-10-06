@@ -1,5 +1,4 @@
 require 'honeybadger/plugins/shoryuken'
-require 'honeybadger/config'
 
 class TestShoryukenWorker < Honeybadger::Plugins::Shoryuken::Middleware
 end

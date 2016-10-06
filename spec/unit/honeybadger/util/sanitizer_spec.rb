@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require 'honeybadger/util/sanitizer'
-
 describe Honeybadger::Util::Sanitizer do
   its(:max_depth) { should eq 20 }
   its(:filters) { should be_nil }

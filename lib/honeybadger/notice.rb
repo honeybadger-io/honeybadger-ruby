@@ -1,13 +1,3 @@
-require 'json'
-require 'securerandom'
-require 'forwardable'
-
-require 'honeybadger/version'
-require 'honeybadger/backtrace'
-require 'honeybadger/util/stats'
-require 'honeybadger/util/sanitizer'
-require 'honeybadger/util/request_payload'
-
 module Honeybadger
   NOTIFIER = {
     name: 'honeybadger-ruby'.freeze,

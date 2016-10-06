@@ -1,6 +1,3 @@
-require 'honeybadger/plugin'
-require 'honeybadger/backtrace'
-
 module Honeybadger
   module Plugins
     module LocalVariables

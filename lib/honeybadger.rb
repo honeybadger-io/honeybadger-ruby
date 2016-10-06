@@ -1,4 +1,3 @@
-require 'forwardable'
 require 'honeybadger/const'
 
 module Honeybadger

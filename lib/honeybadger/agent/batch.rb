@@ -1,5 +1,3 @@
-require 'securerandom'
-
 module Honeybadger
   class Agent
     class Batch

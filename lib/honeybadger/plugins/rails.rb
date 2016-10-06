@@ -1,5 +1,3 @@
-require 'honeybadger/plugin'
-
 module Honeybadger
   module Plugins
     module Rails
