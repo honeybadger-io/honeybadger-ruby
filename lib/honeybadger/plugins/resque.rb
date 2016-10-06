@@ -61,9 +61,6 @@ module Honeybadger
 
         execution do
           ::Resque::Job.send(:include, Installer)
-          ::Resque.after_fork do |job|
-            Honeybadger::Agent.fork
-          end
         end
       end
     end
