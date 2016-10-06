@@ -76,10 +76,6 @@ module Honeybadger
       @instance = nil
     end
 
-    def self.fork(*args)
-      # noop
-    end
-
     def self.flush(&block)
       if self.instance
         self.instance.flush(&block)
