@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/honeybadger-io/honeybadger-ruby'
   s.license     = 'MIT'
 
-  s.required_ruby_version = '>= 1.9.3'
+  s.required_ruby_version = '>= 2.1.0'
 
   s.rdoc_options << '--markup=tomdoc'
   s.rdoc_options << '--main=README.md'

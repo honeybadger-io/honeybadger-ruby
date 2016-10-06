@@ -11,9 +11,8 @@ When an uncaught exception occurs, Honeybadger will POST the relevant data to th
 
 | Ruby Interpreter  | Supported Version  |
 | ----              | ----               |
-| MRI               | >= 1.9.3          |
-| JRuby             | >= 1.7 (1.9 mode) |
-| Rubinius          | >= 2.0            |
+| MRI               | >= 2.1.0           |
+| Rubinius          | >= 2.0             |
 
 ## Supported web frameworks
 
