@@ -1,5 +1,4 @@
 require 'delayed_job'
-require 'honeybadger'
 
 module Honeybadger
   module Plugins

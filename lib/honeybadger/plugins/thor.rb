@@ -1,6 +1,3 @@
-require 'honeybadger/plugin'
-require 'honeybadger'
-
 module Honeybadger
   module Plugins
     module Thor

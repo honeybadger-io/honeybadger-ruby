@@ -1,10 +1,5 @@
 # encoding: utf-8
 
-require 'honeybadger/notice'
-require 'honeybadger/config'
-require 'honeybadger/plugins/local_variables'
-require 'timecop'
-
 describe Honeybadger::Notice do
   let(:callbacks) { Honeybadger::Config::Callbacks.new }
   let(:config) { build_config }

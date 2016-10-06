@@ -1,6 +1,3 @@
-require 'honeybadger/logging'
-require 'honeybadger/config'
-
 LOG_SEVERITIES = [:debug, :info, :warn, :error, :fatal].freeze
 
 describe Honeybadger::Logging::Base do

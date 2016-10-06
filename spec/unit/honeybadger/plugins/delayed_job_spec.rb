@@ -1,6 +1,3 @@
-require 'honeybadger/config'
-require 'honeybadger/agent'
-
 begin
   require 'delayed_job'
   require 'honeybadger/plugins/delayed_job/plugin'

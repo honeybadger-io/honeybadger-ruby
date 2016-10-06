@@ -1,5 +1,3 @@
-require 'honeybadger/rack/error_notifier'
-
 class BacktracedException < Exception
   attr_accessor :backtrace
   def initialize(opts)

@@ -1,5 +1,3 @@
-require 'forwardable'
-
 module Honeybadger
   module Rack
     class UserInformer

@@ -1,5 +1,3 @@
-require 'honeybadger/rack/request_hash'
-
 describe Honeybadger::Rack::RequestHash, if: defined?(Rack) do
   let(:request) { Rack::Request.new(Rack::MockRequest.env_for('/')) }
   subject { described_class.new(request) }

@@ -1,5 +1,3 @@
-require 'honeybadger/plugin'
-
 module Honeybadger
   Plugin.register do
     requirement { defined?(::Delayed::Plugin) }

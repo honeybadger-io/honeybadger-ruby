@@ -1,5 +1,3 @@
-require 'honeybadger/rack/metrics_reporter'
-
 describe Honeybadger::Rack::MetricsReporter do
   let(:logger) { double(add: true) }
   let(:config) { Honeybadger::Config.new(logger: logger) }

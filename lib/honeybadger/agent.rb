@@ -1,10 +1,3 @@
-require 'forwardable'
-
-require 'honeybadger/version'
-require 'honeybadger/config'
-require 'honeybadger/notice'
-require 'honeybadger/plugin'
-require 'honeybadger/logging'
 module Honeybadger
   # Internal: A broker for the configuration and the workers.
   class Agent

@@ -1,9 +1,3 @@
-require 'forwardable'
-require 'net/http'
-require 'json'
-
-require 'honeybadger/logging'
-
 module Honeybadger
   module Backend
     class Response

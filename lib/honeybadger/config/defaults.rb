@@ -1,5 +1,3 @@
-require 'socket'
-
 module Honeybadger
   class Config
     class Boolean; end

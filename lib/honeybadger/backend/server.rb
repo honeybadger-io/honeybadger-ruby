@@ -1,11 +1,3 @@
-require 'net/http'
-require 'json'
-require 'zlib'
-require 'openssl'
-
-require 'honeybadger/backend/base'
-require 'honeybadger/util/http'
-
 module Honeybadger
   module Backend
     class Server < Base

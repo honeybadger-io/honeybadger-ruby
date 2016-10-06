@@ -1,5 +1,3 @@
-require 'honeybadger/config'
-
 describe Honeybadger::Config::Env do
   before do
     ENV['HONEYBADGER_API_KEY'] = 'asdf'

@@ -1,8 +1,3 @@
-require 'net/http'
-require 'logger'
-require 'honeybadger/util/http'
-require 'honeybadger/config'
-
 describe Honeybadger::Util::HTTP do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, api_key: 'abc123') }
   let(:logger) { config.logger }

@@ -1,6 +1,3 @@
-require 'honeybadger/backend/base'
-require 'honeybadger/config'
-
 describe Honeybadger::Backend::Response do
   context "when successful" do
     subject { described_class.new(201) }

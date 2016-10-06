@@ -1,4 +1,4 @@
-require 'forwardable'
+require 'honeybadger/backend/base'
 
 module Honeybadger
   module Backend
@@ -17,7 +17,6 @@ module Honeybadger
       mapping[backend] or raise(BackendError, "Unable to locate backend: #{backend}")
     end
 
-    autoload :Base, 'honeybadger/backend/base'
     autoload :Server, 'honeybadger/backend/server'
     autoload :Test, 'honeybadger/backend/test'
     autoload :Null, 'honeybadger/backend/null'

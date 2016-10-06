@@ -1,5 +1,3 @@
-require 'honeybadger/util/sanitizer'
-
 module Honeybadger
   module Util
     # Internal: Constructs/sanitizes request data for notices

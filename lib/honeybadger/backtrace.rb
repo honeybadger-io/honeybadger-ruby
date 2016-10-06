@@ -1,5 +1,3 @@
-require 'json'
-
 module Honeybadger
   # Internal: Front end to parsing the backtrace for each notice
   class Backtrace

@@ -1,7 +1,3 @@
-require 'pathname'
-require 'yaml'
-require 'erb'
-
 module Honeybadger
   class Config
     class Yaml < ::Hash

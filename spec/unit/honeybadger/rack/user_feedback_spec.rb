@@ -1,6 +1,4 @@
 require 'sham_rack'
-require 'honeybadger/rack/user_feedback'
-require 'honeybadger/config'
 
 describe Honeybadger::Rack::UserFeedback do
   let(:config) { Honeybadger::Config.new }

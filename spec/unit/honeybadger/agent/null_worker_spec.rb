@@ -1,6 +1,3 @@
-require 'honeybadger/agent/worker'
-require 'honeybadger/agent/null_worker'
-
 describe Honeybadger::Agent::NullWorker do
   [:push, :shutdown, :shutdown!, :flush, :start].each do |method|
     it "responds to #{method}" do

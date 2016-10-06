@@ -1,6 +1,4 @@
 require 'rack/request'
-require 'honeybadger'
-require 'forwardable'
 
 module Honeybadger
   module Rack

@@ -1,7 +1,3 @@
-require 'honeybadger/config'
-require 'honeybadger/backend/base'
-require 'net/http'
-
 describe Honeybadger::Config do
   it { should_not be_valid }
 

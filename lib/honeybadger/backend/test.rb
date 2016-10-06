@@ -1,5 +1,3 @@
-require 'honeybadger/backend/null'
-
 module Honeybadger
   module Backend
     class Test < Null

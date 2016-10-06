@@ -1,8 +1,3 @@
-require 'stringio'
-require 'honeybadger/backtrace'
-require 'honeybadger/config'
-require 'honeybadger/notice'
-
 describe Honeybadger::Backtrace do
   let(:config) { Honeybadger::Config.new }
 
