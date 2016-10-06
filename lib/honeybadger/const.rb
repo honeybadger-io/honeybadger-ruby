@@ -18,7 +18,7 @@ module Honeybadger
 
   module Util
     autoload :Sanitizer, 'honeybadger/util/sanitizer'
-    autoload :RequestSanitizer, 'honeybadger/util/request_sanitizer'
+    autoload :RequestPayload, 'honeybadger/util/request_payload'
     autoload :Stats, 'honeybadger/util/stats'
     autoload :HTTP, 'honeybadger/util/http'
   end
