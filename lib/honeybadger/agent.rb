@@ -90,6 +90,10 @@ module Honeybadger
       end
     end
 
+    def self.notify(exception_or_opts, opts = {})
+      self.instance ? self.instance.notify(exception_or_opts, opts) : false
+    end
+
     # Internal: Callback to perform after agent has been stopped at_exit.
     #
     # block - An optional block to execute.
@@ -148,7 +152,10 @@ module Honeybadger
       true
     end
 
-    def notice(opts)
+    def notify(exception_or_opts, opts)
+      opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
+      opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
+
       opts.merge!(callbacks: self.class.callbacks)
       notice = Notice.new(config, opts)
 
@@ -199,7 +206,7 @@ module Honeybadger
       return unless config[:'exceptions.notify_at_exit']
       return if ex.is_a?(SystemExit)
 
-      notice(exception: ex, component: 'at_exit')
+      notify(ex, component: 'at_exit')
     end
   end
 end

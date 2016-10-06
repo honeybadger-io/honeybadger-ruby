@@ -69,9 +69,7 @@ module Honeybadger
   # Returns a String UUID reference to the notice within Honeybadger or false
   # when ignored.
   def notify(exception_or_opts, opts = {})
-    opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
-    opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
-    Agent.instance ? Agent.instance.notice(opts) : false
+    Agent.notify(exception_or_opts, opts)
   end
 
   # Deprecated: Legacy support.
