@@ -22,7 +22,6 @@ module Honeybadger
 
     # Config subclasses have circular dependencies, so they must be loaded
     # after constants are defined.
-    autoload :Callbacks, 'honeybadger/config/callbacks'
     autoload :Env, 'honeybadger/config/env'
     autoload :Yaml, 'honeybadger/config/yaml'
     autoload :Ruby, 'honeybadger/config/ruby'

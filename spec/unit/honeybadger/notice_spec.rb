@@ -6,7 +6,6 @@ require 'honeybadger/plugins/local_variables'
 require 'timecop'
 
 describe Honeybadger::Notice do
-  let(:callbacks) { Honeybadger::Config::Callbacks.new }
   let(:config) { build_config }
 
   def build_config(opts = {})
@@ -192,10 +191,11 @@ describe Honeybadger::Notice do
 
   describe "#ignore?" do
     it "does not ignore an exception not matching ignore filters" do
-      callbacks.exception_filter {|n| false }
+      config = build_config(:'exceptions.ignore' => ['Argument'])
+      config.exception_filter {|n| false }
       notice = build_notice(error_class: 'ArgumentError',
-                            config: build_config(:'exceptions.ignore' => ['Argument']),
-                            callbacks: callbacks)
+                            config: config,
+                            callbacks: config)
       expect(notice.ignore?).to eq false
     end
 
@@ -225,9 +225,10 @@ describe Honeybadger::Notice do
     end
 
     it "ignores an exception with a matching filter" do
-      callbacks.exception_filter {|n| n.error_class == 'ArgumentError' }
+      config = build_config
+      config.exception_filter {|n| n.error_class == 'ArgumentError' }
       notice = build_notice(error_class: 'ArgumentError',
-                            callbacks: callbacks)
+                            callbacks: config)
       expect(notice.ignore?).to eq true
     end
 
@@ -237,7 +238,8 @@ describe Honeybadger::Notice do
     end
 
     it "does not raise with default callbacks" do
-      notice = build_notice(callbacks: callbacks)
+      config = build_config
+      notice = build_notice(callbacks: config)
       expect { notice.ignore? }.not_to raise_error
     end
 
@@ -549,19 +551,19 @@ describe Honeybadger::Notice do
     end
 
     it "passes its backtrace filters for parsing" do
-      allow(callbacks).to receive(:backtrace_filter).and_return('foo')
+      allow(config).to receive(:backtrace_filter).and_return('foo')
       expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(filters: array_including('foo'))).and_return(double(lines: []))
-      build_notice({exception: @exception, callbacks: callbacks})
+      build_notice({exception: @exception, callbacks: config})
     end
 
     it "passes backtrace line filters for parsing" do
-      allow(callbacks).to receive(:backtrace_filter).and_return('foo')
+      allow(config).to receive(:backtrace_filter).and_return('foo')
 
       @backtrace_array.each do |line|
         expect(Honeybadger::Backtrace::Line).to receive(:parse).with(line, hash_including({filters: array_including('foo'), config: config}))
       end
 
-      build_notice({exception: @exception, callbacks: callbacks, config: config})
+      build_notice({exception: @exception, callbacks: config, config: config})
     end
 
     it "accepts a backtrace from an exception or hash" do
