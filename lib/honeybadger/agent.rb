@@ -16,78 +16,64 @@ module Honeybadger
     autoload :Worker, 'honeybadger/agent/worker'
     autoload :NullWorker, 'honeybadger/agent/worker'
 
-    class << self
-      extend Forwardable
-
-      def_delegators :callbacks, :exception_filter, :exception_fingerprint, :backtrace_filter
-
-      def callbacks
-        @callbacks ||= Config::Callbacks.new
-      end
-    end
-
-    private
-
-    def self.load_plugins!(config)
+    def self.load_plugins!
       Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
         require plugin
       end
-      Plugin.load!(config)
+      Plugin.load!(self.config)
     end
-
-    public
 
     def self.instance
       @instance
     end
 
-    def self.running?
-      !instance.nil?
+    def self.instance=(instance)
+      @instance = instance
     end
 
+    # Deprecated
+    def self.running?
+      true
+    end
+
+    # Deprecated
     def self.start(config = {})
-      return true if running?
+      # return true if running?
 
-      unless config.kind_of?(Config)
-        config = Config.new(config)
-      end
+      # unless config.kind_of?(Config)
+      #   config = Config.new(config)
+      # end
 
-      if config[:disabled]
-        config.logger.warn('Unable to start Honeybadger -- disabled by configuration.')
-        return false
-      elsif !config.valid?
-        config.logger.warn('Unable to start Honeybadger -- api_key is missing or invalid.')
-        return false
-      end
+      # if config[:disabled]
+      #   config.logger.warn('Unable to start Honeybadger -- disabled by configuration.')
+      #   return false
+      # elsif !config.valid?
+      #   config.logger.warn('Unable to start Honeybadger -- api_key is missing or invalid.')
+      #   return false
+      # end
 
-      unless config.ping
-        config.logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
-      end
+      # unless config.ping
+      #   config.logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
+      # end
 
-      config.logger.info("Starting Honeybadger version #{VERSION}")
-      load_plugins!(config)
-      @instance = new(config)
+      # config.logger.info("Starting Honeybadger version #{VERSION}")
+      # load_plugins!(config)
+      # @instance = new(config)
 
       true
     end
 
+    # Deprecated
     def self.stop(*args)
-      @instance.stop(*args) if @instance
-      @instance = nil
+      true
     end
 
     def self.flush(&block)
-      if self.instance
-        self.instance.flush(&block)
-      elsif !block_given?
-        false
-      else
-        yield
-      end
+      self.instance.flush(&block)
     end
 
     def self.notify(exception_or_opts, opts = {})
-      self.instance ? self.instance.notify(exception_or_opts, opts) : false
+      self.instance.notify(exception_or_opts, opts)
     end
 
     # Internal: Callback to perform after agent has been stopped at_exit.
@@ -107,11 +93,7 @@ module Honeybadger
     #
     # Returns the Agent's config if running, otherwise default config
     def self.config
-      if running?
-        instance.send(:config)
-      else
-        @config ||= Config.new
-      end
+      instance.config
     end
 
     attr_reader :workers
@@ -152,7 +134,7 @@ module Honeybadger
       opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
       opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
 
-      opts.merge!(callbacks: self.class.callbacks)
+      opts.merge!(callbacks: config)
       notice = Notice.new(config, opts)
 
       if !opts[:force] && notice.ignore?
@@ -177,9 +159,20 @@ module Honeybadger
       workers.values.each(&:flush)
     end
 
+    attr_reader :config
+    def_delegators :config, :init!, :configure
+
+    def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
+
+    class << self
+      extend Forwardable
+
+      def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
+    end
+
     private
 
-    attr_reader :config, :mutex
+    attr_reader :mutex
 
     def push(feature, object)
       unless config.feature?(feature)
@@ -204,5 +197,7 @@ module Honeybadger
 
       notify(ex, component: 'at_exit')
     end
+
+    @instance = new(Config.new)
   end
 end

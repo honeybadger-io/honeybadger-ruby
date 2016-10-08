@@ -10,36 +10,37 @@ describe Honeybadger::Config do
   specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
   specify { expect(subject[:debug]).to eq false }
 
-  describe "#initialize" do
+  describe "#init!" do
+    it "returns the config object" do
+      config = Honeybadger::Config.new(logger: NULL_LOGGER)
+      expect(config.init!).to eq(config)
+    end
+
     context "with multiple forms of config" do
       it "overrides config with options" do
-        config = Honeybadger::Config.new(logger: NULL_LOGGER, disabled: true)
+        config = Honeybadger::Config.new(logger: NULL_LOGGER)
+        config.init!(disabled: true)
         expect(config[:disabled]).to eq true
       end
 
       it "prefers ENV to options" do
         ENV['HONEYBADGER_DISABLED'] = 'true'
-        config = Honeybadger::Config.new(logger: NULL_LOGGER, disabled: false)
+        config = Honeybadger::Config.new(logger: NULL_LOGGER)
+        config.init!(disabled: false)
         expect(config[:disabled]).to eq true
       end
 
       it "prefers file to options" do
-        config = Honeybadger::Config.new(logger: NULL_LOGGER, :'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
+        config = Honeybadger::Config.new(logger: NULL_LOGGER)
+        config.init!(:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
         expect(config[:api_key]).to eq 'zxcv'
       end
 
       it "prefers ENV to file" do
         ENV['HONEYBADGER_API_KEY'] = 'foo'
-        config = Honeybadger::Config.new(logger: NULL_LOGGER, :'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
-        expect(config[:api_key]).to eq 'foo'
-      end
-    end
-
-    context "when options include logger" do
-      it "overrides configured logger" do
-        expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/)
         config = Honeybadger::Config.new(logger: NULL_LOGGER)
-        config.logger.error('foo')
+        config.init!(:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
+        expect(config[:api_key]).to eq 'foo'
       end
     end
 
@@ -50,53 +51,65 @@ describe Honeybadger::Config do
 
       it "creates a log file" do
         expect(log_file.exist?).to eq false
-        Honeybadger::Config.new(:'logging.path' => log_file)
+        Honeybadger::Config.new.init!(:'logging.path' => log_file)
         expect(log_file.exist?).to eq true
+      end
+    end
+
+    context "when options include logger" do
+      it "overrides configured logger" do
+        allow(NULL_LOGGER).to receive(:add)
+        expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/)
+        config = Honeybadger::Config.new.init!(logger: NULL_LOGGER)
+        config.logger.error('foo')
       end
     end
 
     context "when the config path is defined" do
       let(:config_file) { TMP_DIR.join('honeybadger.yml') }
+      let(:instance) { Honeybadger::Config.new(:'config.path' => config_file) }
 
       before { File.write(config_file, '') }
       after { File.unlink(config_file) }
 
-      def build_instance
-        Honeybadger::Config.new(logger: NULL_LOGGER, :'config.path' => config_file)
+      def init_instance
+        instance.init!
       end
 
       context "when a config error occurrs while loading file" do
         before do
+          allow(instance.default_logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
         end
 
         it "does not raise an exception" do
-          expect { build_instance }.not_to raise_error
+          expect { init_instance }.not_to raise_error
         end
 
-        it "logs the error message to the boot logger" do
-          expect(Honeybadger::Logging::BootLogger.instance).to receive(:error).with(/ouch/)
-          build_instance
+        it "logs the error message to the default logger" do
+          expect(instance.default_logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
+          init_instance
         end
       end
 
       context "when a generic error occurrs while loading file" do
         before do
+          allow(instance.default_logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
         end
 
         it "does not raise an exception" do
-          expect { build_instance }.not_to raise_error
+          expect { init_instance }.not_to raise_error
         end
 
-        it "logs the error message to the boot logger" do
-          expect(Honeybadger::Logging::BootLogger.instance).to receive(:error).with(/ouch/)
-          build_instance
+        it "logs the error message to the default logger" do
+          expect(instance.default_logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
+          init_instance
         end
 
         it "logs the backtrace to the boot logger" do
-          expect(Honeybadger::Logging::BootLogger.instance).to receive(:error).with(/config_spec\.rb/)
-          build_instance
+          expect(instance.default_logger).to receive(:add).with(Logger::Severity::ERROR, /config_spec\.rb/)
+          init_instance
         end
       end
     end

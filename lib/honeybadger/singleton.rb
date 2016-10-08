@@ -1,3 +1,5 @@
+require 'honeybadger/agent'
+
 module Honeybadger
   extend self
 
@@ -217,8 +219,11 @@ module Honeybadger
     Agent.flush(&block)
   end
 
-  def configure(*args)
-    warn('UPGRADE WARNING: Honeybadger.configure was removed in v2.0 and has no effect. Please upgrade: https://www.honeybadger.io/s/gem-upgrade')
-    nil
+  def config
+    Agent.config
+  end
+
+  def configure(&block)
+    Agent.instance.configure(&block)
   end
 end

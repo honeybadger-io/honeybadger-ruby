@@ -1,8 +1,10 @@
 require 'honeybadger/config'
 
-feature "Installing honeybadger via the cli" do
+feature "CLI deploy command" do
   shared_examples_for "cli deployer" do
-    let(:config) { Honeybadger::Config.new(:api_key => 'asdf', :'config.path' => config_file) }
+    let(:config) { Honeybadger::Config.load(:api_key => 'asdf') }
+
+    before { config.load_yaml!(config_file) }
 
     scenario "when the configuration is invalid" do
       it "outputs failed result" do

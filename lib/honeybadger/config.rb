@@ -23,6 +23,7 @@ module Honeybadger
     autoload :Callbacks, 'honeybadger/config/callbacks'
     autoload :Env, 'honeybadger/config/env'
     autoload :Yaml, 'honeybadger/config/yaml'
+    autoload :Ruby, 'honeybadger/config/ruby'
 
     KEY_REPLACEMENT = Regexp.new('[^a-z\d_]', Regexp::IGNORECASE).freeze
 
@@ -32,6 +33,7 @@ module Honeybadger
 
     FEATURES = [:notices, :local_variables].freeze
 
+    # TODO: Ditch merge default and override features.
     MERGE_DEFAULT = [:'exceptions.ignore'].freeze
 
     OVERRIDE = {
@@ -41,45 +43,89 @@ module Honeybadger
     DEFAULT_REQUEST_HASH = {}.freeze
 
     def initialize(opts = {})
-      l = opts.delete(:logger)
-
-      @values = opts
-
-      priority = {}
-      priority.update(opts)
-      load_config_from_disk {|yml| priority.update(yml) }
-      priority.update(Env.new(ENV))
-      update(merge_defaults!(priority))
-
-      @logger = Logging::ConfigLogger.new(self, build_logger(l))
-      Logging::BootLogger.instance.flush(@logger)
+      @ruby = opts
+      @env = {}
+      @yaml = {}
+      @framework = {}
 
       @features = Hash[FEATURES.map{|f| [f, true] }]
     end
 
-    def_delegators :@values, :update
+    def init!(opts = {})
+      self.framework = opts
+      self.env = Env.new(ENV)
+      load_config_from_disk {|yml| self.yaml = yml }
+      init_logging!
+      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
+      self
+    end
+
+    # TODO: Refactor
+    def load_yaml!(path = nil)
+    end
+
+    def configure
+      ruby_config = Ruby.new
+      yield(ruby_config)
+      self.ruby = ruby.merge(ruby_config)
+      self
+    end
+
+    # TODO
+    def backtrace_filter(&block)
+      @backtrace_filter = Proc.new if block_given?
+      @backtrace_filter
+    end
+
+    def exception_filter(&block)
+      @exception_filter = Proc.new if block_given?
+      @exception_filter
+    end
+
+    def exception_fingerprint
+      @exception_fingerprint = Proc.new if block_given?
+      @exception_fingerprint
+    end
+
+    attr_accessor :ruby, :env, :yaml, :framework
+    def_delegators :ruby, :update
 
     attr_reader :features
 
     def get(key)
-      key = key.to_sym
-      if OVERRIDE.has_key?(key) && @values.has_key?(OVERRIDE[key])
-        @values[OVERRIDE[key]]
-      elsif @values.has_key?(key)
-        @values[key]
-      else
-        DEFAULTS[key]
+      [:@ruby, :@env, :@yaml, :@framework].each do |var|
+        source = instance_variable_get(var)
+        if OVERRIDE.has_key?(key) && source.has_key?(OVERRIDE[key])
+          return source[OVERRIDE[key]]
+        end
       end
+
+      [:@ruby, :@env, :@yaml, :@framework].each do |var|
+        source = instance_variable_get(var)
+        if source.has_key?(key)
+          if MERGE_DEFAULT.include?(key) && source[key].kind_of?(Array)
+            return DEFAULTS[key] | source[key]
+          end
+          return source[key]
+        end
+      end
+
+      DEFAULTS[key]
     end
     alias [] :get
 
     def set(key, value)
-      @values[key] = value
+      ruby[key] = value
     end
     alias []= :set
 
     def to_hash(defaults = false)
-      hash = defaults ? DEFAULTS.merge(@values) : @values
+      hash = [:@ruby, :@env, :@yaml, :@framework].reverse.reduce({}) do |a,e|
+        a.merge!(instance_variable_get(e))
+      end
+
+      hash = DEFAULTS.merge(hash) if defaults
+
       undotify_keys(hash.select {|k,v| DEFAULTS.has_key?(k) })
     end
     alias :to_h :to_hash
@@ -88,8 +134,24 @@ module Honeybadger
       !!features[feature.to_sym]
     end
 
+    def default_logger
+      return @default_logger if @default_logger
+
+      logger = Logger.new($stdout)
+      logger.formatter = lambda do |severity, datetime, progname, msg|
+        "#{msg}\n"
+      end
+      logger.level = log_level
+
+      @default_logger = Logging::FormattedLogger.new(logger)
+    end
+
+    def get_logger
+      get(:logger) || default_logger
+    end
+
     def logger
-      @logger || Logging::BootLogger.instance
+      @logger ||= Logging::ConfigLogger.new(self)
     end
 
     def backend
@@ -349,22 +411,13 @@ api_key: '#{self[:api_key]}'
       end
     end
 
-    def build_logger(default = nil)
-      if path = log_path
-        FileUtils.mkdir_p(path.dirname) unless path.dirname.writable?
-        Logger.new(path).tap do |logger|
-          logger.level = log_level
-          logger.formatter = Logger::Formatter.new
-        end
-      elsif self[:'logging.path'] != 'STDOUT' && default
-        default
-      else
-        logger = Logger.new($stdout)
+    def init_logging!
+      return if self.ruby[:logger]
+      return unless path = log_path
+      FileUtils.mkdir_p(path.dirname) unless path.dirname.writable?
+      self.ruby[:logger] = Logger.new(path).tap do |logger|
         logger.level = log_level
-        logger.formatter = lambda do |severity, datetime, progname, msg|
-          "#{msg}\n"
-        end
-        Logging::FormattedLogger.new(logger)
+        logger.formatter = Logger::Formatter.new
       end
     end
 
@@ -400,21 +453,6 @@ api_key: '#{self[:api_key]}'
 
     def symbolize_keys(hash)
       Hash[hash.map {|k,v| [k.to_sym, v] }]
-    end
-
-    # Internal: Merges supplied config options with defaults.
-    #
-    # config - The Hash config options to merge.
-    #
-    # Returns the updated Hash config with merged values.
-    def merge_defaults!(config)
-      MERGE_DEFAULT.each do |option|
-        if config[option].kind_of?(Array)
-          config[option] = (DEFAULTS[option] | config[option])
-        end
-      end
-
-      config
     end
   end
 end
