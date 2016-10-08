@@ -5,6 +5,8 @@ require 'honeybadger/config'
 require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
+require 'honeybadger/agent/worker'
+require 'honeybadger/agent/null_worker'
 
 module Honeybadger
   # Internal: A broker for the configuration and the workers.
@@ -12,9 +14,6 @@ module Honeybadger
     extend Forwardable
 
     include Logging::Helper
-
-    autoload :Worker, 'honeybadger/agent/worker'
-    autoload :NullWorker, 'honeybadger/agent/worker'
 
     def self.load_plugins!
       Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
