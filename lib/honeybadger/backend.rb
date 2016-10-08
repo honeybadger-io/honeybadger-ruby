@@ -1,5 +1,11 @@
 require 'forwardable'
 
+require 'honeybadger/backend/base'
+require 'honeybadger/backend/server'
+require 'honeybadger/backend/test'
+require 'honeybadger/backend/null'
+require 'honeybadger/backend/debug'
+
 module Honeybadger
   module Backend
     class BackendError < StandardError; end
@@ -16,11 +22,5 @@ module Honeybadger
     def self.for(backend)
       mapping[backend] or raise(BackendError, "Unable to locate backend: #{backend}")
     end
-
-    autoload :Base, 'honeybadger/backend/base'
-    autoload :Server, 'honeybadger/backend/server'
-    autoload :Test, 'honeybadger/backend/test'
-    autoload :Null, 'honeybadger/backend/null'
-    autoload :Debug, 'honeybadger/backend/debug'
   end
 end
