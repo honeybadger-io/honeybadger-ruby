@@ -151,11 +151,6 @@ describe Honeybadger do
   end
 
   describe "#configure" do
-    it "warns that an upgrade is required" do
-      expect(Honeybadger).to receive(:warn).with(/upgrade/)
-      Honeybadger.configure do |config|
-        config.api_key = 'asdf'
-      end
-    end
+    it "configures the singleton"
   end
 end

@@ -48,7 +48,7 @@ describe Honeybadger::Logging::ConfigLogger do
   let(:logger) { Logger.new('/dev/null') }
   let(:tty_level) { 'ERROR' }
 
-  subject { described_class.new(config, logger) }
+  subject { described_class.new(config) }
 
   LOG_SEVERITIES.each do |severity|
     it { should respond_to severity }

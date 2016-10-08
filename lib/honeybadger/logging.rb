@@ -107,18 +107,17 @@ module Honeybadger
       end
     end
 
-    class ConfigLogger < StandardLogger
+    class ConfigLogger < Base
       LOCATE_CALLER_LOCATION = Regexp.new("#{Regexp.escape(__FILE__)}").freeze
       CALLER_LOCATION = Regexp.new("#{Regexp.escape(File.expand_path('../../../', __FILE__))}/(.*)").freeze
 
       INFO_SUPPLEMENT = ' level=%s pid=%s'.freeze
       DEBUG_SUPPLEMENT = ' at=%s'.freeze
 
-      def initialize(config, logger = Logger.new('/dev/null'))
+      def initialize(config)
         @config = config
         @tty = STDOUT.tty?
         @tty_level = @config.log_level(:'logging.tty_level')
-        super(logger)
       end
 
       def add(severity, msg)
@@ -128,17 +127,27 @@ module Honeybadger
         # the info level if the debug config option is on.
         if severity == Logger::Severity::DEBUG
           return true if suppress_debug?
-          super(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
+          logger.add(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
         else
-          super(severity, supplement(msg, severity))
+          logger.add(severity, supplement(msg, severity))
         end
       end
 
+      def level
+        logger.level
+      end
+
       def debug?
-        @config.log_debug?
+        config.log_debug?
       end
 
       private
+
+      attr_reader :config
+
+      def logger
+        config.get_logger
+      end
 
       def suppress_debug?
         !debug?

@@ -43,8 +43,7 @@ RSpec.configure do |config|
   config.include Helpers
 
   config.before(:each) do
-    defined?(Honeybadger.config) and
-      Honeybadger.config = Honeybadger::Config::Default.new(backend: 'test'.freeze)
+    Honeybadger::Agent.instance = Honeybadger::Agent.new(Honeybadger::Config.new(backend: :null, logger: NULL_LOGGER))
 
     defined?(Honeybadger::Config::Env) and
       ENV.each_pair do |k,v|
