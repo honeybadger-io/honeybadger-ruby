@@ -57,7 +57,7 @@ module Honeybadger
         type: String
       },
       debug: {
-        description: 'Forces metrics and traces to be reported every 10 seconds rather than 60.',
+        description: 'Enables debug logging.',
         default: false,
         type: Boolean
       },
