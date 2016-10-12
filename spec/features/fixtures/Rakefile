@@ -2,19 +2,18 @@
 #
 require 'rake'
 require 'rubygems'
-require 'honeybadger'
 
 # Should catch exception
 task :honeybadger do
   stub_tty_output(false)
-  Honeybadger.start
+  require 'honeybadger'
   raise_exception
 end
 
 # Should not catch exception as tty_output is true
 task :honeybadger_autodetect_from_terminal do
   stub_tty_output(true)
-  Honeybadger.start
+  require 'honeybadger'
   raise_exception
 end
 

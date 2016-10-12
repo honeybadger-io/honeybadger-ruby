@@ -1,10 +1,6 @@
-require 'honeybadger/cli/helpers'
-
 module Honeybadger
   module CLI
     class Heroku < Thor
-      include Helpers
-
       class_option :app, aliases: :'-a', type: :string, default: nil, desc: 'Specify optional Heroku APP'
 
       desc 'install_deploy_notification', 'Install Heroku deploy notifications addon'
@@ -37,19 +33,10 @@ module Honeybadger
       def install(api_key)
         say("Installing Honeybadger #{VERSION} for Heroku")
 
-        load_rails(verbose: true)
-
-        ENV['HONEYBADGER_LOGGING_LEVEL']     = '2'
-        ENV['HONEYBADGER_LOGGING_TTY_LEVEL'] = '0'
-        ENV['HONEYBADGER_LOGGING_PATH']      = 'STDOUT'
-        ENV['HONEYBADGER_REPORT_DATA']       = 'true'
-
-        ENV['HONEYBADGER_API_KEY'] = api_key
-
         app = options[:app] || detect_heroku_app(false)
         say("Adding config HONEYBADGER_API_KEY=#{api_key} to Heroku.", :magenta)
         unless write_heroku_env({'HONEYBADGER_API_KEY' => api_key}, app)
-          say('Unable to update heroku config. Do you need to specify an app name?', :red)
+          say('Unable to update heroku config. You may need to specify an app name with --app APP', :red)
           exit(1)
         end
 
@@ -59,14 +46,6 @@ module Honeybadger
         else
           say('Skipping deploy notification installation: we were unable to determine the environment name from your Heroku app.', :yellow)
           say("To install manually, try `honeybadger heroku install_deploy_notification#{app ? " -a #{app}" : ""} -k #{api_key} --environment ENVIRONMENT`", :yellow)
-        end
-
-        config = Config.new(rails_framework_opts)
-        Honeybadger.start(config) unless load_rails_env(verbose: true)
-        say('Sending test notice')
-        unless Agent.instance && send_test(false)
-          say("Honeybadger is installed, but failed to send a test notice. Try `HONEYBADGER_API_KEY=#{api_key} honeybadger test`.", :red)
-          exit(1)
         end
 
         say("Installation complete. Happy 'badgering!", :green)
