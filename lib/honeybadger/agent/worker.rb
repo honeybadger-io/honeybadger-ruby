@@ -34,7 +34,6 @@ module Honeybadger
       def initialize(config, feature)
         @config = config
         @feature = feature
-        @backend = config.backend
         @throttles = []
         @mutex = Mutex.new
         @marker = ConditionVariable.new
@@ -121,8 +120,10 @@ module Honeybadger
 
       private
 
-      attr_reader :config, :backend, :feature, :queue, :pid, :mutex, :marker,
+      attr_reader :config, :feature, :queue, :pid, :mutex, :marker,
         :thread, :throttles
+
+      def_delegator :config, :backend
 
       def can_start?
         mutex.synchronize do

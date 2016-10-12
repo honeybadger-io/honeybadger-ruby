@@ -155,8 +155,17 @@ module Honeybadger
       @logger ||= Logging::ConfigLogger.new(self)
     end
 
+    def backend_name
+      (self[:backend] || default_backend).to_sym
+    end
+
+    def backend_class
+      Backend.for(backend_name)
+    end
+
     def backend
-      Backend.for((self[:backend] || default_backend).to_sym).new(self)
+      @backend = nil unless @backend.kind_of?(backend_class)
+      @backend ||= backend_class.new(self)
     end
 
     def dev?
