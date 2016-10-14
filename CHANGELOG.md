@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Sunset performance metrics. See
   http://blog.honeybadger.io/sunsetting-performance-metrics/
-- Backtraces are now limited to a maximum of 200 lines.
+- Backtraces are now limited to a maximum of 1000 lines.
 
 ## [2.6.1] - 2016-08-24
 ### Added

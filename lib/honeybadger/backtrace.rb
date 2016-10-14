@@ -128,7 +128,7 @@ module Honeybadger
     #
     # Returns array containing backtrace lines.
     def to_ary
-      lines.take(200).map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method, :source => l.source } }
+      lines.take(1000).map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method, :source => l.source } }
     end
     alias :to_a :to_ary
 
