@@ -17,5 +17,6 @@ gem "capistrano"
 gem "ruby-prof", :platforms => :mri, :require => false
 gem "allocation_stats", :platforms => :mri, :require => false
 gem "sinatra", "~> 2.0.0.beta1"
+gem "rack-test"
 
 gemspec :path => "../"

@@ -1,3 +1,5 @@
+require 'honeybadger/ruby'
+
 # Patch Rake::Application to handle errors with Honeybadger
 module Honeybadger
   module RakeHandler

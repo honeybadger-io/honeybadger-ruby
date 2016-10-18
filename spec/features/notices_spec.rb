@@ -30,28 +30,4 @@ feature "error notifications" do
       expect(all_output).to match(/unauthorized/i)
     end
   end
-
-  scenario "an unhandled exception occurs in a Sinatra app", framework: :sinatra do
-    let(:url) { 'http://example.com:123/test/failure?param=value' }
-
-    before do
-      set_environment_variable('HONEYBADGER_LOGGING_LEVEL', '0')
-    end
-
-    before do
-      FileUtils.cp(FIXTURES_PATH.join('sinatra.rb'), REQUEST_FILE)
-      File.open(REQUEST_FILE, 'a') do |file|
-        file.puts "env = Rack::MockRequest.env_for(#{url.inspect})"
-        file.puts 'status, headers, body = app.call(env)'
-        file.puts 'puts "HTTP #{status}"'
-        file.puts 'headers.each { |key, value| puts "#{key}: #{value}"}'
-        file.puts 'body.each { |part| print part }'
-      end
-    end
-
-    it "reports the exception to Honeybadger" do
-      expect(run('ruby request.rb')).to be_successfully_executed
-      assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Sinatra has left the building'}, 'request' => {'url' => url})
-    end
-  end
 end

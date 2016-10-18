@@ -15,6 +15,7 @@ end
 
 appraise 'sinatra-1' do
   gem 'sinatra', '< 2.0'
+  gem 'rack-test'
 end
 
 appraise 'delayed_job' do
@@ -81,5 +82,6 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
 
   appraise 'sinatra' do
     gem 'sinatra', '~> 2.0.0.beta1'
+    gem 'rack-test'
   end
 end
