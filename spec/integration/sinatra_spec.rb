@@ -1,12 +1,12 @@
 begin
   require 'sinatra/base'
-  SINATRA = true
+  SINATRA_PRESENT = true
 rescue LoadError
-  SINATRA = false
+  SINATRA_PRESENT = false
   puts 'Skipping Sinatra integration specs.'
 end
 
-if SINATRA
+if SINATRA_PRESENT
   ENV['RACK_ENV'] = 'test'
 
   require_relative 'support/sinatra/app'
