@@ -1,12 +1,12 @@
 begin
   require 'rails'
-  RAILS = true
+  RAILS_PRESENT = true
 rescue LoadError
-  RAILS = false
+  RAILS_PRESENT = false
   puts 'Skipping Rails integration specs.'
 end
 
-if RAILS
+if RAILS_PRESENT
   require_relative 'support/rails/app'
   require 'honeybadger/init/rails'
   require 'rspec/rails'
