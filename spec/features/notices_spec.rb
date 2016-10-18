@@ -31,44 +31,6 @@ feature "error notifications" do
     end
   end
 
-  scenario "an unhandled exception occurs in a Rails controller", framework: :rails do
-    let(:url) { 'http://example.com:123/test/index?param=value' }
-
-    before do
-      set_environment_variable('SECRET_KEY_BASE', 'sekret')
-      set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
-      set_environment_variable('HONEYBADGER_LOGGING_LEVEL', '0')
-    end
-
-    before do
-      define_action('TestController#index', <<-ACTION)
-      session[:value] = "test"
-      raise RuntimeError, "some message"
-      ACTION
-
-      define_route('/test/index', 'test#index')
-    end
-
-    it "reports the exception to Honeybadger" do
-      perform_request(url)
-      assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'}, 'request' => {'url' => url})
-      expect(all_output).not_to match /honeybadger.io\/s\/adtp/
-    end
-
-    context "and ActionDispatch::Test process has been included globally" do
-      before do
-        write_file('config/initializers/adtp.rb', 'include ActionDispatch::TestProcess')
-      end
-
-      it "reports the exception to Honeybadger" do
-        perform_request(url)
-        assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: some message'}, 'request' => {'url' => url})
-        expect(all_output).to match /honeybadger.io\/s\/adtp/
-      end
-    end
-  end
-
-
   scenario "an unhandled exception occurs in a Sinatra app", framework: :sinatra do
     let(:url) { 'http://example.com:123/test/failure?param=value' }
 

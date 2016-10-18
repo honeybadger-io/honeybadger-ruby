@@ -26,24 +26,29 @@ appraise 'rails3.2' do
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'capistrano', '~> 2.0'
+  gem 'rspec-rails'
+  gem 'test-unit', '~> 3.0'
 end
 
 appraise 'rails4.0' do
   gem 'rails', '~> 4.0.0'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
 end
 
 appraise 'rails4.1' do
   gem 'rails', '~> 4.1.4'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
 end
 
 appraise 'rails4.2' do
   gem 'rails', '~> 4.2.4'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
 end
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
@@ -52,6 +57,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
     gem 'rails', '~> 5.0.0'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
+    gem 'rspec-rails'
   end
 
   appraise 'rails' do
@@ -60,6 +66,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
     gem 'arel', github: 'rails/arel'
     gem 'capistrano', '~> 3.0'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    gem 'rspec-rails'
 
     # Listen is a soft-dependency in Rails 5. Guard requires listen (which makes
     # it present when generating a new Rails app), so Rails expects it to be

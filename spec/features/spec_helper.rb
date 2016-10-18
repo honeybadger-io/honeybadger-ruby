@@ -33,7 +33,6 @@ RSpec.configure do |config|
 
   config.include Aruba::Api
   config.include CommandLine
-  config.include RailsHelpers, framework: :rails
 
   config.before(:each) do
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')

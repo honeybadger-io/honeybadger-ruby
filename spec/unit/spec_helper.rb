@@ -42,9 +42,11 @@ RSpec.configure do |config|
 
   config.include Helpers
 
-  config.before(:each) do
+  config.before(:all) do
     Honeybadger::Agent.instance = Honeybadger::Agent.new(Honeybadger::Config.new(backend: :null, logger: NULL_LOGGER))
+  end
 
+  config.before(:each) do
     defined?(Honeybadger::Config::Env) and
       ENV.each_pair do |k,v|
       next unless k.match(Honeybadger::Config::Env::CONFIG_KEY)
