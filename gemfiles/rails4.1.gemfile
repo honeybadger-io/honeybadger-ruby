@@ -12,16 +12,13 @@ gem "webmock"
 gem "guard"
 gem "guard-rspec"
 gem "pry"
-gem "pry-byebug", :platforms => [:mri_20, :mri_21, :mri_22, :mri_23]
+gem "pry-byebug", :platforms => :mri
+gem "capistrano"
 gem "ruby-prof", :platforms => :mri, :require => false
-gem "allocation_stats", :platforms => [:mri_21, :mri_22, :mri_23], :require => false
-gem "capistrano", ">= 3.2.0", "< 3.5.0", :require => false
-gem "net-ssh", "< 3.0"
-gem "listen", "< 3.1"
-gem "mail", "< 2.6.4"
-gem "addressable", "~> 2.4.0"
+gem "allocation_stats", :platforms => :mri, :require => false
 gem "rails", "~> 4.1.4"
 gem "better_errors", :require => false, :platforms => [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", :require => false
+gem "rspec-rails"
 
 gemspec :path => "../"

@@ -17,6 +17,12 @@ namespace :spec do
     t.rspec_opts = '--require unit/spec_helper'
   end
 
+  desc 'Run integration specs'
+  RSpec::Core::RakeTask.new(:integrations) do |t|
+    t.pattern = 'spec/integration/**/*_spec.rb'
+    t.rspec_opts = '--require unit/spec_helper'
+  end
+
   desc 'Run feature specs'
   RSpec::Core::RakeTask.new(:features) do |t|
     t.pattern = 'spec/features/**/*_spec.rb'
@@ -24,7 +30,7 @@ namespace :spec do
   end
 
   desc 'Runs unit and feature specs'
-  task all: [:units, :features]
+  task all: [:units, :integrations, :features]
 end
 
 desc 'Alias for spec:all (default task)'
