@@ -1,11 +1,7 @@
 require 'rails'
 require 'yaml'
 
-require 'honeybadger/util/sanitizer'
-require 'honeybadger/util/request_payload'
-require 'honeybadger/rack/error_notifier'
-require 'honeybadger/rack/user_informer'
-require 'honeybadger/rack/user_feedback'
+require 'honeybadger/ruby'
 
 module Honeybadger
   module Init

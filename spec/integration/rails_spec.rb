@@ -18,7 +18,7 @@ if RAILS
 
     before(:each) do
       Honeybadger.configure do |config|
-        config.api_key = 'asdf'
+        config.api_key = 'gem testing'
         config.backend = 'test'
       end
     end

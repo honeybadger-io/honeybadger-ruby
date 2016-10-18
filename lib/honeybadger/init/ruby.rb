@@ -1,3 +1,5 @@
+require 'honeybadger/ruby'
+
 Honeybadger::Agent.instance.init!({
   framework: :ruby,
   env: ENV['RUBY_ENV']

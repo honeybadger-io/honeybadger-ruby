@@ -1,6 +1,3 @@
-require 'honeybadger/const'
-require 'honeybadger/singleton'
-
 if defined?(::Rails::Railtie)
   require 'honeybadger/init/rails'
 elsif defined?(Sinatra::Base)

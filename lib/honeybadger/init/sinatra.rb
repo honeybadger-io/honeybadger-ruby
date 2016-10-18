@@ -1,3 +1,5 @@
+require 'honeybadger/ruby'
+
 module Honeybadger
   module Init
     module Sinatra
@@ -20,7 +22,8 @@ module Honeybadger
             Honeybadger::Agent.instance.init!(honeybadger_config(self))
             Honeybadger::Agent.load_plugins!
 
-            return unless Honeybadger.config[:'sinatra.enabled']
+            config = Honeybadger.config
+            return unless config[:'sinatra.enabled']
 
             install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier, config) if config.feature?(:notices) && config[:'exceptions.enabled']
           end
