@@ -7,7 +7,7 @@ rescue LoadError
 end
 
 if RAILS_PRESENT
-  require_relative 'support/rails/app'
+  require_relative 'rails/app'
   require 'honeybadger/init/rails'
   require 'rspec/rails'
 

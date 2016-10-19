@@ -1,4 +1,4 @@
-require 'honeybadger'
+require 'honeybadger/ruby'
 
 RSpec::Matchers.define :define do |expected|
   match do |actual|

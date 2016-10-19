@@ -9,7 +9,7 @@ end
 if SINATRA_PRESENT
   ENV['RACK_ENV'] = 'test'
 
-  require_relative 'support/sinatra/app'
+  require_relative 'sinatra/app'
   require 'honeybadger/init/sinatra'
   require 'rack/test'
 
