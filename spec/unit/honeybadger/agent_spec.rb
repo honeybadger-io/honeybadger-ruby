@@ -2,6 +2,14 @@ require 'honeybadger/agent'
 require 'timecop'
 
 describe Honeybadger::Agent do
+  NULL_BLOCK = Proc.new{}.freeze
+
+  describe "class methods" do
+    subject { described_class }
+
+    its(:instance) { should be_a(Honeybadger::Agent) }
+  end
+
   describe "instance methods" do
     let!(:instance) { described_class.new(config) }
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
@@ -86,47 +94,22 @@ describe Honeybadger::Agent do
         end
       end
     end
-  end
 
-  describe 'class methods' do
-    NULL_BLOCK = Proc.new{}.freeze
-
-    subject { described_class }
-
-    its(:instance) { should be_a(Honeybadger::Agent) }
-
-    describe "::flush" do
-      let(:block) { nil }
-
-      subject { described_class.flush(&block) }
-
-      let(:instance) { double('Honeybadger::Agent', flush: :flush) }
-
-      before do
-        allow(described_class).to receive(:instance).and_return(instance)
-      end
-
-      it "delegates to instance" do
-        expect(instance).to receive(:flush)
-        expect(described_class.flush).to eq :flush
-      end
-    end
-
-    describe "::exception_filter" do
+    describe "#exception_filter" do
       it "configures the exception_filter callback" do
-        expect { described_class.exception_filter(&NULL_BLOCK) }.to change(described_class.config, :exception_filter).from(nil).to(NULL_BLOCK)
+        expect { instance.exception_filter(&NULL_BLOCK) }.to change(instance.config, :exception_filter).from(nil).to(NULL_BLOCK)
       end
     end
 
-    describe "::exception_fingerprint" do
+    describe "#exception_fingerprint" do
       it "configures the exception_fingerprint callback" do
-        expect { described_class.exception_fingerprint(&NULL_BLOCK) }.to change(described_class.config, :exception_fingerprint).from(nil).to(NULL_BLOCK)
+        expect { instance.exception_fingerprint(&NULL_BLOCK) }.to change(instance.config, :exception_fingerprint).from(nil).to(NULL_BLOCK)
       end
     end
 
-    describe "::backtrace_filter" do
+    describe "#backtrace_filter" do
       it "configures the backtrace_filter callback" do
-        expect { described_class.backtrace_filter(&NULL_BLOCK) }.to change(described_class.config, :backtrace_filter).from(nil).to(NULL_BLOCK)
+        expect { instance.backtrace_filter(&NULL_BLOCK) }.to change(instance.config, :backtrace_filter).from(nil).to(NULL_BLOCK)
       end
     end
   end

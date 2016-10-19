@@ -4,11 +4,16 @@ require 'pry'
 require 'rspec/its'
 require 'aruba/rspec'
 
-require 'honeybadger/ruby'
+# Never transmit data.
+ENV['HONEYBADGER_BACKEND'] = 'null'
 
 # We don't want this bleeding through in tests. (i.e. from CircleCi)
 ENV['RACK_ENV'] = nil
 ENV['RAILS_ENV'] = nil
+
+require 'honeybadger/ruby'
+
+Dir[File.expand_path('../support/**/*.rb', __FILE__)].each {|f| require f}
 
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
@@ -38,7 +43,6 @@ rescue LoadError
   nil
 end
 
-Dir[File.expand_path('../support/**/*.rb', __FILE__)].each {|f| require f}
 
 RSpec.configure do |config|
   Kernel.srand config.seed
@@ -62,10 +66,6 @@ RSpec.configure do |config|
   end
 
   config.include Helpers
-
-  config.before(:all) do
-    Honeybadger::Agent.instance = Honeybadger::Agent.new(Honeybadger::Config.new(backend: :null, logger: NULL_LOGGER))
-  end
 
   config.before(:each) do
     defined?(Honeybadger::Config::Env) and

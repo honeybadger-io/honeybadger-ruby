@@ -19,29 +19,24 @@ describe Honeybadger do
     it { should define(:UserInformer) }
   end
 
-  describe "delegated methods" do
-    method_and_args = {
-      start: nil,
-      stop: nil,
-      exception_filter: nil,
-      exception_fingerprint: nil,
-      backtrace_filter: nil,
-      flush: nil
-    }
+  it "delegates ::exception_filter to config" do
+    expect(Honeybadger.config).to receive(:exception_filter)
+    Honeybadger.exception_filter {}
+  end
 
-    method_and_args.keys.each do |method|
-      it "delegates ##{method} to Agent" do
-        args = Array(method_and_args[method])
+  it "delegates ::backtrace_filter to config" do
+    expect(Honeybadger.config).to receive(:backtrace_filter)
+    Honeybadger.backtrace_filter {}
+  end
 
-        if args.any?
-          expect(Honeybadger::Agent).to receive(method).with(*args)
-        else
-          expect(Honeybadger::Agent).to receive(method)
-        end
+  it "delegates ::exception_fingerprint to config" do
+    expect(Honeybadger.config).to receive(:exception_fingerprint)
+    Honeybadger.exception_fingerprint {}
+  end
 
-        described_class.send(method, *args)
-      end
-    end
+  it "delegates ::flush to agent instance" do
+    expect(Honeybadger::Agent.instance).to receive(:flush)
+    Honeybadger.flush
   end
 
   describe "#context" do
