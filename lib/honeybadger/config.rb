@@ -32,7 +32,7 @@ module Honeybadger
 
     NOT_BLANK = Regexp.new('\S').freeze
 
-    FEATURES = [:notices, :local_variables].freeze
+    FEATURES = [:notices].freeze
 
     # TODO: Ditch merge default and override features.
     MERGE_DEFAULT = [:'exceptions.ignore'].freeze
