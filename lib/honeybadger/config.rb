@@ -52,9 +52,9 @@ module Honeybadger
       @features = Hash[FEATURES.map{|f| [f, true] }]
     end
 
-    def init!(opts = {})
+    def init!(opts = {}, env = ENV)
       self.framework = opts
-      self.env = Env.new(ENV)
+      self.env = Env.new(env)
       load_config_from_disk {|yml| self.yaml = yml }
       init_logging!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))

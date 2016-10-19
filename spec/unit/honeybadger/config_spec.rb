@@ -11,6 +11,8 @@ describe Honeybadger::Config do
   specify { expect(subject[:debug]).to eq false }
 
   describe "#init!" do
+    let(:env) { {} }
+
     it "returns the config object" do
       config = Honeybadger::Config.new(logger: NULL_LOGGER)
       expect(config.init!).to eq(config)
@@ -24,9 +26,9 @@ describe Honeybadger::Config do
       end
 
       it "prefers ENV to options" do
-        ENV['HONEYBADGER_DISABLED'] = 'true'
+        env['HONEYBADGER_DISABLED'] = 'true'
         config = Honeybadger::Config.new(logger: NULL_LOGGER)
-        config.init!(disabled: false)
+        config.init!({disabled: false}, env)
         expect(config[:disabled]).to eq true
       end
 
@@ -37,9 +39,9 @@ describe Honeybadger::Config do
       end
 
       it "prefers ENV to file" do
-        ENV['HONEYBADGER_API_KEY'] = 'foo'
+        env['HONEYBADGER_API_KEY'] = 'foo'
         config = Honeybadger::Config.new(logger: NULL_LOGGER)
-        config.init!(:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
+        config.init!({:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar'}, env)
         expect(config[:api_key]).to eq 'foo'
       end
     end

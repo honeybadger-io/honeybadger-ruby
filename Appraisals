@@ -10,7 +10,6 @@ end
 appraise 'rack-1' do
   # Old (pre-2.0) Rack, works on all Rubies.
   gem 'rack', '< 2.0'
-  gem 'sham_rack', require: false
 end
 
 appraise 'sinatra-1' do
@@ -77,7 +76,6 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
 
   appraise 'rack' do
     gem 'rack', '>= 2.0.0'
-    gem 'sham_rack', require: false
   end
 
   appraise 'sinatra' do

@@ -18,6 +18,5 @@ gem "allocation_stats", :platforms => :mri, :require => false
 gem "capistrano"
 gem "rake"
 gem "rack", ">= 2.0.0"
-gem "sham_rack", :require => false
 
 gemspec :path => "../"

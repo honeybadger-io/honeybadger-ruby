@@ -1,4 +1,3 @@
-require 'sham_rack'
 require 'honeybadger/rack/user_feedback'
 require 'honeybadger/config'
 
@@ -11,15 +10,11 @@ describe Honeybadger::Rack::UserFeedback do
     end
   end
   let(:informer_app) { Honeybadger::Rack::UserFeedback.new(main_app, config) }
-  let(:response) { Net::HTTP.get_response(URI.parse("http://example.com/")) }
-
-  before do
-    ShamRack.mount(informer_app, "example.com")
-  end
+  let(:result) { informer_app.call({}) }
 
   context "feedback feature is disabled by ping" do
     it "does not modify the output" do
-      expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
+      expect(result[2][0]).to eq '<!-- HONEYBADGER FEEDBACK -->'
     end
   end
 
@@ -28,8 +23,8 @@ describe Honeybadger::Rack::UserFeedback do
 
     it "modifies output" do
       rendered_length = informer_app.render_form(1).size
-      expect(response.body).to match(/honeybadger_feedback_token/)
-      expect(response["Content-Length"].to_i).to eq rendered_length
+      expect(result[2][0]).to match(/honeybadger_feedback_token/)
+      expect(result[1]["Content-Length"].to_i).to eq rendered_length
     end
 
     context "a project root is configured" do
@@ -49,7 +44,7 @@ describe Honeybadger::Rack::UserFeedback do
         end
 
         it "renders with custom template" do
-          expect(response.body).to match(/custom feedback form/)
+          expect(result[2][0]).to match(/custom feedback form/)
         end
       end
     end
@@ -57,7 +52,7 @@ describe Honeybadger::Rack::UserFeedback do
 
   context "there is no honeybadger id" do
     it "does not modify the output" do
-      expect(response.body).to eq '<!-- HONEYBADGER FEEDBACK -->'
+      expect(result[2][0]).to eq '<!-- HONEYBADGER FEEDBACK -->'
     end
   end
 end

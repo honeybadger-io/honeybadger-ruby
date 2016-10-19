@@ -1,4 +1,3 @@
-require 'sham_rack'
 require 'honeybadger/rack/user_informer'
 require 'honeybadger/config'
 
@@ -12,11 +11,10 @@ describe Honeybadger::Rack::UserInformer do
     end
     informer_app = Honeybadger::Rack::UserInformer.new(main_app, config)
 
-    ShamRack.mount(informer_app, "example.com")
+    result = informer_app.call({})
 
-    response = Net::HTTP.get_response(URI.parse("http://example.com/"))
-    expect(response.body).to eq 'Honeybadger Error 1'
-    expect(response["Content-Length"].to_i).to eq 19
+    expect(result[2][0]).to eq 'Honeybadger Error 1'
+    expect(result[1]["Content-Length"].to_i).to eq 19
   end
 
   it 'does not modify output if there is no honeybadger id' do
@@ -25,10 +23,10 @@ describe Honeybadger::Rack::UserInformer do
     end
     informer_app = Honeybadger::Rack::UserInformer.new(main_app, config)
 
-    ShamRack.mount(informer_app, "example.com")
+    result = informer_app.call({})
 
     response = Net::HTTP.get_response(URI.parse("http://example.com/"))
-    expect(response.body).to eq '<!-- HONEYBADGER ERROR -->'
+    expect(result[2][0]).to eq '<!-- HONEYBADGER ERROR -->'
   end
 end
 
