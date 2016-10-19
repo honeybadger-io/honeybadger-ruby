@@ -1,7 +1,6 @@
-require 'pathname'
 require 'json'
 
-module CommandLine
+module FeatureHelpers
   # These override some deprecated Aruba helpers which are still useful to us.
   def all_output
     all_commands.map { |c| c.output }.join("\n")
