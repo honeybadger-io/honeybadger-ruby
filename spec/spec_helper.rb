@@ -54,7 +54,7 @@ RSpec.configure do |config|
   config.alias_example_group_to :scenario
 
   config.include Aruba::Api, type: :feature
-  config.include CommandLine, type: :feature
+  config.include FeatureHelpers, type: :feature
 
   config.before(:each, type: :feature) do
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')
