@@ -14,7 +14,9 @@ gem 'guard-rspec'
 gem 'pry'
 gem 'pry-byebug', platforms: :mri
 
-gem 'capistrano'
-
 gem 'ruby-prof', platforms: :mri, require: false
 gem 'allocation_stats', platforms: :mri, require: false
+
+# Required by feature specs.
+gem 'capistrano'
+gem 'rake'

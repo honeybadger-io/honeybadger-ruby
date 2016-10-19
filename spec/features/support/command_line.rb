@@ -10,12 +10,6 @@ module CommandLine
     expand_path('.')
   end
 
-  def capify
-    unless run_simple('bundle exec cap install .', fail_on_error: false)
-      run_simple('bundle exec capify .', fail_on_error: true)
-    end
-  end
-
   def assert_no_notification
     expect(all_output).not_to match(/notifying debug backend of feature=notices/)
   end

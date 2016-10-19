@@ -13,9 +13,10 @@ gem "guard"
 gem "guard-rspec"
 gem "pry"
 gem "pry-byebug", :platforms => :mri
-gem "capistrano"
 gem "ruby-prof", :platforms => :mri, :require => false
 gem "allocation_stats", :platforms => :mri, :require => false
+gem "capistrano"
+gem "rake"
 gem "rails", "~> 4.0.0"
 gem "better_errors", :require => false, :platforms => [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", :require => false

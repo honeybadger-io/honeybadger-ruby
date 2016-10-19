@@ -1,0 +1,8 @@
+if respond_to?(:namespace) # cap2 differentiator
+  load 'deploy'
+else
+  require 'capistrano/setup'
+  require 'capistrano/deploy'
+end
+
+require 'capistrano/honeybadger'
