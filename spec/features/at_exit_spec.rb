@@ -11,7 +11,7 @@ feature "Rescuing exceptions at exit" do
     assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: badgers!'})
   end
 
-  context "rake reporting is disabled" do
+  context "at_exit is disabled" do
     before do
       set_environment_variable('HONEYBADGER_EXCEPTIONS_NOTIFY_AT_EXIT', 'false')
     end
