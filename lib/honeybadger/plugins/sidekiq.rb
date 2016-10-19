@@ -1,5 +1,5 @@
 require 'honeybadger/plugin'
-require 'honeybadger'
+require 'honeybadger/ruby'
 
 module Honeybadger
   module Plugins
