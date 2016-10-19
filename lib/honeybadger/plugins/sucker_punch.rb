@@ -1,4 +1,5 @@
 require 'honeybadger/plugin'
+require 'honeybadger/ruby'
 
 module Honeybadger
   Plugin.register do

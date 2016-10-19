@@ -1,5 +1,3 @@
-require 'honeybadger'
-
 module Honeybadger
   module Rack
     class MetricsReporter
