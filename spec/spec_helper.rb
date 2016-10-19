@@ -2,15 +2,25 @@ require 'logger'
 require 'pathname'
 require 'pry'
 require 'rspec/its'
+require 'aruba/rspec'
+
+require 'honeybadger/ruby'
 
 # We don't want this bleeding through in tests. (i.e. from CircleCi)
 ENV['RACK_ENV'] = nil
 ENV['RAILS_ENV'] = nil
 
-TMP_DIR = Pathname.new(File.expand_path('../../../tmp', __FILE__))
+TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
 NULL_LOGGER = Logger.new('/dev/null')
 NULL_LOGGER.level = Logger::Severity::DEBUG
+
+Aruba.configure do |config|
+  t = RUBY_PLATFORM == 'java' ? 120 : 12
+  config.working_directory = 'tmp/features'
+  config.exit_timeout = t
+  config.io_wait_timeout = t
+end
 
 # Soft dependencies
 %w(rack binding_of_caller).each do |lib|
@@ -38,6 +48,17 @@ RSpec.configure do |config|
 
   if config.files_to_run.one?
     config.default_formatter = 'doc'
+  end
+
+  config.alias_example_group_to :feature, type: :feature
+  config.alias_example_group_to :scenario
+
+  config.include Aruba::Api, type: :feature
+  config.include CommandLine, type: :feature
+
+  config.before(:each, type: :feature) do
+    set_environment_variable('HONEYBADGER_BACKEND', 'debug')
+    set_environment_variable('HONEYBADGER_LOGGING_PATH', 'STDOUT')
   end
 
   config.include Helpers
