@@ -76,9 +76,6 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    defined?(Honeybadger.worker) && Honeybadger.worker and
-      Honeybadger.worker.stop
-
     Thread.current[:__honeybadger_context] = nil
   end
 
