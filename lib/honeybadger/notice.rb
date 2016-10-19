@@ -88,9 +88,6 @@ module Honeybadger
     # Public: The URL at which the error occurred (if any).
     def url; @request[:url]; end
 
-    # Public: Local variables are extracted from first frame of backtrace.
-    attr_reader :local_variables
-
     # Public: The API key used to deliver this notice.
     attr_reader :api_key
 
@@ -151,8 +148,6 @@ module Honeybadger
 
       @stats = Util::Stats.all
 
-      @local_variables = local_variables_from_exception(exception, config)
-
       @api_key = opts[:api_key] || config[:api_key]
 
       monkey_patch_action_dispatch_test_process!
@@ -166,7 +161,6 @@ module Honeybadger
     # Returns Hash JSON representation of notice
     def as_json(*args)
       @request[:context] = s(context)
-      @request[:local_variables] = local_variables if local_variables
 
       {
         api_key: s(api_key),
@@ -348,47 +342,6 @@ module Honeybadger
 
     def s(data)
       sanitizer.sanitize(data)
-    end
-
-    # Internal: Fetch local variables from first frame of backtrace.
-    #
-    # exception - The Exception containing the bindings stack.
-    #
-    # Returns a Hash of local variables
-    def local_variables_from_exception(exception, config)
-      return nil unless send_local_variables?(config)
-      return {} unless Exception === exception
-      return {} unless exception.respond_to?(:__honeybadger_bindings_stack)
-      return {} if exception.__honeybadger_bindings_stack.empty?
-
-      if config[:root]
-        binding = exception.__honeybadger_bindings_stack.find { |b| b.eval('__FILE__') =~ /^#{Regexp.escape(config[:root].to_s)}/ }
-      end
-
-      binding ||= exception.__honeybadger_bindings_stack[0]
-
-      vars = binding.eval('local_variables')
-      results =
-        vars.inject([]) { |acc, arg|
-          begin
-            result = binding.eval(arg.to_s)
-            acc << [arg, result]
-          rescue NameError
-            # Do Nothing
-          end
-
-          acc
-        }
-
-      result_hash = Hash[results]
-      request_sanitizer.sanitize(result_hash)
-    end
-
-    # Internal: Should local variables be sent?
-    #
-    # Returns true to send local_variables
-    def send_local_variables?(config)
-      config[:'exceptions.local_variables']
     end
 
     # Internal: Parse Backtrace from exception backtrace.
