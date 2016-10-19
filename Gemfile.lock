@@ -148,6 +148,7 @@ DEPENDENCIES
   honeybadger!
   pry
   pry-byebug
+  rake
   rdoc
   rspec (>= 3.0)
   rspec-its

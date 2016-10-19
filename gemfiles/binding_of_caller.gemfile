@@ -13,9 +13,10 @@ gem "guard"
 gem "guard-rspec"
 gem "pry"
 gem "pry-byebug", :platforms => :mri
-gem "capistrano"
 gem "ruby-prof", :platforms => :mri, :require => false
 gem "allocation_stats", :platforms => :mri, :require => false
+gem "capistrano"
+gem "rake"
 gem "binding_of_caller"
 
 gemspec :path => "../"
