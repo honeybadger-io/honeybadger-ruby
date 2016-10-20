@@ -38,16 +38,6 @@ module Honeybadger
       self.instance.notify(exception_or_opts, opts)
     end
 
-    # Internal: Callback to perform after agent has been stopped at_exit.
-    #
-    # block - An optional block to execute.
-    #
-    # Returns Proc callback.
-    def self.at_exit(&block)
-      @at_exit = Proc.new if block_given?
-      @at_exit
-    end
-
     # Internal: Not for public consumption. :)
     #
     # Prefer dependency injection over accessing config directly, but some
@@ -88,7 +78,6 @@ module Honeybadger
       at_exit do
         notify_at_exit($!)
         stop if config[:'send_data_at_exit']
-        self.class.at_exit.call if self.class.at_exit
       end
     end
 
