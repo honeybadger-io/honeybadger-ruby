@@ -61,10 +61,6 @@ module Honeybadger
       self
     end
 
-    # TODO: Refactor
-    def load_yaml!(path = nil)
-    end
-
     def configure
       ruby_config = Ruby.new
       yield(ruby_config)
@@ -72,7 +68,6 @@ module Honeybadger
       self
     end
 
-    # TODO
     def backtrace_filter(&block)
       @backtrace_filter = Proc.new if block_given?
       @backtrace_filter

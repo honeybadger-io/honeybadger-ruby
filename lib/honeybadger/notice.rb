@@ -227,9 +227,8 @@ module Honeybadger
     end
 
     def ignore_by_callbacks?
-      opts[:callbacks] &&
-        opts[:callbacks].exception_filter &&
-        opts[:callbacks].exception_filter.call(self)
+      config.exception_filter &&
+        config.exception_filter.call(self)
     end
 
     # Gets a property named "attribute" of an exception, either from
@@ -285,7 +284,7 @@ module Honeybadger
 
     def construct_backtrace_filters(opts)
       [
-        opts[:callbacks] ? opts[:callbacks].backtrace_filter : nil
+        config.backtrace_filter
       ].compact | BACKTRACE_FILTERS
     end
 
@@ -312,7 +311,7 @@ module Honeybadger
 
     def fingerprint_from_opts(opts)
       callback = opts[:fingerprint]
-      callback ||= opts[:callbacks] && opts[:callbacks].exception_fingerprint
+      callback ||= config.exception_fingerprint
 
       if callback.respond_to?(:call)
         callback.call(self)

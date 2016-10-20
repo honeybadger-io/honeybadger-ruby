@@ -227,7 +227,7 @@ describe Honeybadger::Notice do
       config = build_config
       config.exception_filter {|n| n.error_class == 'ArgumentError' }
       notice = build_notice(error_class: 'ArgumentError',
-                            callbacks: config)
+                            config: config)
       expect(notice.ignore?).to eq true
     end
 
@@ -552,7 +552,7 @@ describe Honeybadger::Notice do
     it "passes its backtrace filters for parsing" do
       allow(config).to receive(:backtrace_filter).and_return('foo')
       expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(filters: array_including('foo'))).and_return(double(lines: []))
-      build_notice({exception: @exception, callbacks: config})
+      build_notice({exception: @exception, config: config})
     end
 
     it "passes backtrace line filters for parsing" do
