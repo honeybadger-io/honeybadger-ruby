@@ -61,18 +61,18 @@ module Honeybadger
     end
 
     def backtrace_filter(&block)
-      @backtrace_filter = Proc.new if block_given?
-      @backtrace_filter
+      self[:backtrace_filter] = Proc.new if block_given?
+      self[:backtrace_filter]
     end
 
     def exception_filter(&block)
-      @exception_filter = Proc.new if block_given?
-      @exception_filter
+      self[:exception_filter] = Proc.new if block_given?
+      self[:exception_filter]
     end
 
     def exception_fingerprint
-      @exception_fingerprint = Proc.new if block_given?
-      @exception_fingerprint
+      self[:exception_fingerprint] = Proc.new if block_given?
+      self[:exception_fingerprint]
     end
 
     attr_accessor :ruby, :env, :yaml, :framework
