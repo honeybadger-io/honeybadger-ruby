@@ -30,43 +30,6 @@ module Honeybadger
       @instance = instance
     end
 
-    # Deprecated
-    def self.running?
-      true
-    end
-
-    # Deprecated
-    def self.start(config = {})
-      # return true if running?
-
-      # unless config.kind_of?(Config)
-      #   config = Config.new(config)
-      # end
-
-      # if config[:disabled]
-      #   config.logger.warn('Unable to start Honeybadger -- disabled by configuration.')
-      #   return false
-      # elsif !config.valid?
-      #   config.logger.warn('Unable to start Honeybadger -- api_key is missing or invalid.')
-      #   return false
-      # end
-
-      # unless config.ping
-      #   config.logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
-      # end
-
-      # config.logger.info("Starting Honeybadger version #{VERSION}")
-      # load_plugins!(config)
-      # @instance = new(config)
-
-      true
-    end
-
-    # Deprecated
-    def self.stop(*args)
-      true
-    end
-
     def self.flush(&block)
       self.instance.flush(&block)
     end
@@ -93,6 +56,21 @@ module Honeybadger
     # Returns the Agent's config if running, otherwise default config
     def self.config
       instance.config
+    end
+
+    # Deprecated
+    def self.running?
+      true
+    end
+
+    # Deprecated
+    def self.start(config = {})
+      true
+    end
+
+    # Deprecated
+    def self.stop(*args)
+      true
     end
 
     attr_reader :workers

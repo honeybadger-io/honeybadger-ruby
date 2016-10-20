@@ -58,6 +58,9 @@ module Honeybadger
       load_config_from_disk {|yml| self.yaml = yml }
       init_logging!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
+      if valid? && !ping
+        logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
+      end
       self
     end
 
