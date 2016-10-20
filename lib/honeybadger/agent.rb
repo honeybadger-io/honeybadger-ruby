@@ -76,7 +76,6 @@ module Honeybadger
       init_workers
 
       at_exit do
-        notify_at_exit($!)
         stop if config[:'send_data_at_exit']
       end
     end
@@ -102,7 +101,11 @@ module Honeybadger
         false
       else
         debug { sprintf('notice feature=notices id=%s', notice.id) }
-        push(:notices, notice)
+        if opts[:sync]
+          config.backend.notify(:notices, notice)
+        else
+          push(:notices, notice)
+        end
         notice.id
       end
     end
@@ -144,14 +147,6 @@ module Honeybadger
     def init_workers
       @workers = Hash.new(NullWorker.new)
       workers[:notices] = Worker.new(config, :notices)
-    end
-
-    def notify_at_exit(ex)
-      return unless ex
-      return unless config[:'exceptions.notify_at_exit']
-      return if ex.is_a?(SystemExit)
-
-      notify(ex, component: 'at_exit')
     end
 
     @instance = new(Config.new)

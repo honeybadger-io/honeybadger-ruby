@@ -9,3 +9,9 @@ end
 if defined?(Rake.application)
   require 'honeybadger/init/rake'
 end
+
+at_exit do
+  if $! && !$!.is_a?(SystemExit) && Honeybadger.config[:'exceptions.notify_at_exit']
+    Honeybadger.notify($!, component: 'at_exit', sync: true)
+  end
+end
