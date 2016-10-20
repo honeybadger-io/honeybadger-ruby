@@ -108,6 +108,8 @@ module Honeybadger
     end
 
     def notify(exception_or_opts, opts)
+      return false if config.disabled?
+
       opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
       opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
 
@@ -151,10 +153,6 @@ module Honeybadger
     attr_reader :mutex
 
     def push(feature, object)
-      unless config.feature?(feature)
-        debug { sprintf('agent dropping feature=%s reason=ping', feature) }
-        return false
-      end
 
       workers[feature].push(object)
 

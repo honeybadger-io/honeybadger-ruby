@@ -16,7 +16,7 @@ module Honeybadger
           Honeybadger::Agent.load_plugins!
 
           config = Honeybadger.config
-          if config.feature?(:notices) && config[:'exceptions.enabled']
+          if config[:'exceptions.enabled']
             ::Rails.application.config.middleware.tap do |middleware|
               middleware.insert(0, Honeybadger::Rack::ErrorNotifier, config)
               middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer, config) if config[:'user_informer.enabled']

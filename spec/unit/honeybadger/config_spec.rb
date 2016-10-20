@@ -185,15 +185,6 @@ describe Honeybadger::Config do
         expect(logger).to receive(:debug).with(/ping response/i)
         instance.ping
       end
-
-      context "when body contains features" do
-        let(:features) { {'foo' => 'bar'} }
-        let(:body) { {features: features} }
-
-        it "assigns the features" do
-          expect { instance.ping }.to change { instance.features }.to({:foo => 'bar'})
-        end
-      end
     end
 
     context "when connection fails" do
@@ -305,26 +296,6 @@ describe Honeybadger::Config do
         before { subject[:report_data] = true }
         its(:default_backend) { should eq :server }
       end
-    end
-  end
-
-  describe "#feature?" do
-    let(:instance) { described_class.new }
-
-    subject { instance.feature?(:notice) }
-
-    before do
-      instance.features.merge!(notice: state)
-    end
-
-    context "when feature is active" do
-      let(:state) { true }
-      it { should eq true }
-    end
-
-    context "when feature is inactive" do
-      let(:state) { false }
-      it { should eq false }
     end
   end
 
