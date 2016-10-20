@@ -34,27 +34,6 @@ describe Honeybadger::Agent do
       end
     end
 
-    describe "#push" do
-      subject { instance.send(:push, :foo, obj) }
-      let(:obj) { double() }
-
-      context "when disabled by ping" do
-        before { config.features[:foo] = false }
-
-        it { should eq false }
-
-        it "logs debug output" do
-          expect(config.logger).to receive(:debug).with(/dropping feature=foo/i)
-          subject
-        end
-
-        it "does not push to worker" do
-          expect(instance.workers[:foo]).not_to receive(:push)
-          subject
-        end
-      end
-    end
-
     describe "#flush" do
       subject { instance.flush(&block) }
 

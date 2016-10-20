@@ -25,7 +25,7 @@ module Honeybadger
             config = Honeybadger.config
             return unless config[:'sinatra.enabled']
 
-            install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier, config) if config.feature?(:notices) && config[:'exceptions.enabled']
+            install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier, config) if config[:'exceptions.enabled']
           end
 
           def install_honeybadger_middleware(klass, config)

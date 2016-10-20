@@ -32,8 +32,6 @@ module Honeybadger
 
     NOT_BLANK = Regexp.new('\S').freeze
 
-    FEATURES = [:notices].freeze
-
     # TODO: Ditch merge default and override features.
     MERGE_DEFAULT = [:'exceptions.ignore'].freeze
 
@@ -48,8 +46,6 @@ module Honeybadger
       @env = {}
       @yaml = {}
       @framework = {}
-
-      @features = Hash[FEATURES.map{|f| [f, true] }]
     end
 
     def init!(opts = {}, env = ENV)
@@ -89,8 +85,6 @@ module Honeybadger
     attr_accessor :ruby, :env, :yaml, :framework
     def_delegators :ruby, :update
 
-    attr_reader :features
-
     def get(key)
       [:@ruby, :@env, :@yaml, :@framework].each do |var|
         source = instance_variable_get(var)
@@ -129,8 +123,8 @@ module Honeybadger
     end
     alias :to_h :to_hash
 
-    def feature?(feature)
-      !!features[feature.to_sym]
+    def disabled?
+      !!self[:disabled]
     end
 
     def default_logger
@@ -326,7 +320,6 @@ api_key: '#{self[:api_key]}'
 
     def ping
       if result = send_ping
-        @features = symbolize_keys(result['features']) if result['features']
         return true
       end
 
@@ -457,10 +450,6 @@ api_key: '#{self[:api_key]}'
           end
         end
       end
-    end
-
-    def symbolize_keys(hash)
-      Hash[hash.map {|k,v| [k.to_sym, v] }]
     end
   end
 end
