@@ -223,7 +223,7 @@ module Honeybadger
       },
       :'exceptions.ignore_only' => {
         description: 'A list of exceptions to ignore (overrides the default ignored exceptions).',
-        default: [].freeze,
+        default: nil,
         type: Array
       },
       :'exceptions.ignored_user_agents' => {
