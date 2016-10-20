@@ -133,7 +133,6 @@ module Honeybadger
       opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
       opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
 
-      opts.merge!(callbacks: config)
       notice = Notice.new(config, opts)
 
       if !opts[:force] && notice.ignore?
