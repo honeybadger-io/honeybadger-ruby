@@ -5,9 +5,9 @@ module Honeybadger
     class UserInformer
       extend Forwardable
 
-      def initialize(app, config)
+      def initialize(app, config = nil)
         @app = app
-        @config = config
+        @config = config || Honeybadger.config
       end
 
       def replacement(with)
