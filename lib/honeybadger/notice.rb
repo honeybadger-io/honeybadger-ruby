@@ -279,7 +279,7 @@ module Honeybadger
         end
       end
 
-      ignored_class ? @ignore_by_class.call(ignored_class) : config[:'exceptions.ignore'].any?(&@ignore_by_class)
+      ignored_class ? @ignore_by_class.call(ignored_class) : config.ignored_classes.any?(&@ignore_by_class)
     end
 
     def construct_backtrace_filters(opts)

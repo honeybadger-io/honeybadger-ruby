@@ -134,20 +134,21 @@ describe Honeybadger::Config do
         expect(instance.get(:development_environments)).to eq ['foo']
       end
     end
+  end
 
-    context "when a merge option exists" do
-      let(:opts) { { :'exceptions.ignore' => ['foo']} }
+  describe "#ignored_classes" do
+    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, disabled: true, debug: true}.merge!(opts)) }
+    let(:opts) { { :'exceptions.ignore' => ['foo']} }
 
-      it 'returns the option value plus defaults' do
-        expect(instance.get(:'exceptions.ignore')).to eq (Honeybadger::Config::DEFAULTS[:'exceptions.ignore'] | ['foo'])
-      end
+    it "returns the exceptions.ignore option value plus defaults" do
+      expect(instance.ignored_classes).to eq(Honeybadger::Config::DEFAULTS[:'exceptions.ignore'] | ['foo'])
     end
 
-    context "when an override exists" do
-      let(:opts) { { :'exceptions.ignore_only' => ['bar']} }
+    context "when exceptions.ignore_only is configured" do
+      let(:opts) { { :'exceptions.ignore' => ['foo'], :'exceptions.ignore_only' => ['bar']} }
 
       it "returns the override" do
-        expect(instance.get(:'exceptions.ignore')).to eq ['bar']
+        expect(instance.ignored_classes).to eq(['bar'])
       end
     end
   end

@@ -32,13 +32,6 @@ module Honeybadger
 
     NOT_BLANK = Regexp.new('\S').freeze
 
-    # TODO: Ditch merge default and override features.
-    MERGE_DEFAULT = [:'exceptions.ignore'].freeze
-
-    OVERRIDE = {
-      :'exceptions.ignore' => :'exceptions.ignore_only'
-    }.freeze
-
     DEFAULT_REQUEST_HASH = {}.freeze
 
     def initialize(opts = {})
@@ -88,17 +81,7 @@ module Honeybadger
     def get(key)
       [:@ruby, :@env, :@yaml, :@framework].each do |var|
         source = instance_variable_get(var)
-        if OVERRIDE.has_key?(key) && source.has_key?(OVERRIDE[key])
-          return source[OVERRIDE[key]]
-        end
-      end
-
-      [:@ruby, :@env, :@yaml, :@framework].each do |var|
-        source = instance_variable_get(var)
         if source.has_key?(key)
-          if MERGE_DEFAULT.include?(key) && source[key].kind_of?(Array)
-            return DEFAULTS[key] | source[key]
-          end
           return source[key]
         end
       end
@@ -189,6 +172,14 @@ module Honeybadger
     def log_debug?
       return debug? if self[:'logging.debug'].nil?
       !!self[:'logging.debug']
+    end
+
+    def ignored_classes
+      ignore_only = get(:'exceptions.ignore_only')
+      return ignore_only if ignore_only
+      return DEFAULTS[:'exceptions.ignore'] unless ignore = get(:'exceptions.ignore')
+
+      DEFAULTS[:'exceptions.ignore'] | Array(ignore)
     end
 
     # Internal: Optional path to honeybadger.log log file. If nil, STDOUT will be used
