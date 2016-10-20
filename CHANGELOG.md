@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [2.7.0] - 2016-10-20
 ### Added
 - Support Sinatra 2.0.
+- Source snippets are now sent for every line of the backtrace.
 
 ### Changed
 - Sunset performance metrics. See
