@@ -116,26 +116,20 @@ With rack, you have to do things manually, but it's still just a few lines of co
 
 ```ruby
 require 'rack'
- 
+
 # Load the gem
-require 'honeybadger'
- 
+require 'honeybadger/ruby'
+
 # Write your app
 app = Rack::Builder.app do
   run lambda { |env| raise "Rack down" }
 end
- 
-# Configure and start Honeybadger
-honeybadger_config = Honeybadger::Config.new(env: ENV['RACK_ENV'])
-Honeybadger.start(honeybadger_config)
- 
-# And use Honeybadger's rack middleware
-use Honeybadger::Rack::ErrorNotifier, honeybadger_config
- 
+
+# Use Honeybadger's rack middleware
+use Honeybadger::Rack::ErrorNotifier
+
 run app
 ```
-
-
 
 
 ## Advanced Configuration
