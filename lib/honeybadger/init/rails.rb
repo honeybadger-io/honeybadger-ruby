@@ -18,9 +18,9 @@ module Honeybadger
           config = Honeybadger.config
           if config[:'exceptions.enabled']
             ::Rails.application.config.middleware.tap do |middleware|
-              middleware.insert(0, Honeybadger::Rack::ErrorNotifier, config)
-              middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer, config) if config[:'user_informer.enabled']
-              middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback, config) if config[:'feedback.enabled']
+              middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
+              middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer) if config[:'user_informer.enabled']
+              middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback) if config[:'feedback.enabled']
             end
           end
         end

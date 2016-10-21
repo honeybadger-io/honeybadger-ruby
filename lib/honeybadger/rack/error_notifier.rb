@@ -22,9 +22,9 @@ module Honeybadger
     class ErrorNotifier
       extend Forwardable
 
-      def initialize(app, config = nil)
+      def initialize(app, agent = nil)
         @app = app
-        @config = config || Honeybadger.config
+        @agent = agent.kind_of?(Agent) ? agent : Honeybadger::Agent.instance
       end
 
       def call(env)
@@ -50,8 +50,9 @@ module Honeybadger
 
       private
 
-      attr_reader :config
-      def_delegator :@config, :logger
+      attr_reader :agent
+      def_delegator :agent, :config
+      def_delegator :config, :logger
 
       def ignored_user_agent?(env)
         true if config[:'exceptions.ignored_user_agents'].
@@ -61,7 +62,7 @@ module Honeybadger
 
       def notify_honeybadger(exception, env)
         return if ignored_user_agent?(env)
-        Honeybadger.notify_or_ignore(exception)
+        agent.notify(exception)
       end
 
       def framework_exception(env)

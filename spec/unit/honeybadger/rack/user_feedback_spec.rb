@@ -2,14 +2,15 @@ require 'honeybadger/rack/user_feedback'
 require 'honeybadger/config'
 
 describe Honeybadger::Rack::UserFeedback do
-  let(:config) { Honeybadger::Config.new }
+  let(:agent) { Honeybadger::Agent.new }
+  let(:config) { agent.config }
   let(:main_app) do
     lambda do |env|
       env['honeybadger.error_id'] = honeybadger_id if defined?(honeybadger_id)
       [200, {}, ["<!-- HONEYBADGER FEEDBACK -->"]]
     end
   end
-  let(:informer_app) { Honeybadger::Rack::UserFeedback.new(main_app, config) }
+  let(:informer_app) { Honeybadger::Rack::UserFeedback.new(main_app, agent) }
   let(:result) { informer_app.call({}) }
 
   context "feedback feature is disabled by ping" do

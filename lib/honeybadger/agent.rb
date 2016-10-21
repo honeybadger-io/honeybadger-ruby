@@ -65,18 +65,18 @@ module Honeybadger
 
     attr_reader :workers
 
-    def initialize(config)
-      @config = config
+    def initialize(config = nil)
+      @config = config || Config.new
       @mutex = Mutex.new
 
-      unless config.backend.kind_of?(Backend::Server)
+      unless @config.backend.kind_of?(Backend::Server)
         warn('Initializing development backend: data will not be reported.')
       end
 
       init_workers
 
       at_exit do
-        stop if config[:'send_data_at_exit']
+        stop if @config[:'send_data_at_exit']
       end
     end
 
@@ -88,7 +88,7 @@ module Honeybadger
       true
     end
 
-    def notify(exception_or_opts, opts)
+    def notify(exception_or_opts, opts = {})
       return false if config.disabled?
 
       opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
