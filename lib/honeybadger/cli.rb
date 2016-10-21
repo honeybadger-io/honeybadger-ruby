@@ -2,7 +2,6 @@ $:.unshift(File.expand_path('../../../vendor/cli', __FILE__))
 
 require 'thor'
 
-require 'honeybadger/cli/heroku'
 require 'honeybadger/cli/main'
 
 module Honeybadger
