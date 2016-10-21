@@ -66,8 +66,11 @@ module Honeybadger
     attr_reader :workers
 
     def initialize(config = nil)
-      @config = config || Config.new
       @mutex = Mutex.new
+
+      @config = config if config.kind_of?(Config)
+      @config = Config.new(config) if config.kind_of?(Hash)
+      @config ||= Config.new
 
       unless @config.backend.kind_of?(Backend::Server)
         warn('Initializing development backend: data will not be reported.')
