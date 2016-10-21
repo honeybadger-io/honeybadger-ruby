@@ -14,7 +14,8 @@ module Honeybadger
 
           def honeybadger_config(app)
             {
-              api_key: defined?(honeybadger_api_key) ? honeybadger_api_key : nil
+              api_key: defined?(honeybadger_api_key) ? honeybadger_api_key : nil,
+              framework: :sinatra
             }
           end
 
