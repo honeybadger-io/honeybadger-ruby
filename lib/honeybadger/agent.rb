@@ -77,10 +77,6 @@ module Honeybadger
       end
 
       init_workers
-
-      at_exit do
-        stop if @config[:'send_data_at_exit']
-      end
     end
 
     def stop(force = false)
