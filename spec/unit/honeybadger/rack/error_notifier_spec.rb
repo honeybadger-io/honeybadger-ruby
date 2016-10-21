@@ -19,12 +19,13 @@ def build_exception(opts = {})
 end
 
 describe Honeybadger::Rack::ErrorNotifier do
-  let(:config) { Honeybadger::Config.new }
+  let(:agent) { Honeybadger::Agent.new }
+  let(:config) { agent.config }
 
   it "calls the upstream app with the environment" do
     environment = { 'key' => 'value' }
     app = lambda { |env| ['response', {}, env] }
-    stack = Honeybadger::Rack::ErrorNotifier.new(app, config)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
 
     response = stack.call(environment)
 
@@ -32,7 +33,7 @@ describe Honeybadger::Rack::ErrorNotifier do
   end
 
   it "delivers an exception raised while calling an upstream app" do
-    allow(Honeybadger).to receive(:notify_or_ignore)
+    allow(agent).to receive(:notify)
 
     exception = build_exception
     environment = { 'key' => 'value' }
@@ -40,10 +41,10 @@ describe Honeybadger::Rack::ErrorNotifier do
       raise exception
     end
 
-    expect(Honeybadger).to receive(:notify_or_ignore).with(exception)
+    expect(agent).to receive(:notify).with(exception)
 
     begin
-      stack = Honeybadger::Rack::ErrorNotifier.new(app, config)
+      stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
       stack.call(environment)
     rescue Exception => raised
       expect(raised).to eq exception
@@ -53,7 +54,7 @@ describe Honeybadger::Rack::ErrorNotifier do
   end
 
   it "delivers an exception in rack.exception" do
-    allow(Honeybadger).to receive(:notify_or_ignore)
+    allow(agent).to receive(:notify)
     exception = build_exception
     environment = { 'key' => 'value' }
 
@@ -62,9 +63,9 @@ describe Honeybadger::Rack::ErrorNotifier do
       env['rack.exception'] = exception
       response
     end
-    stack = Honeybadger::Rack::ErrorNotifier.new(app, config)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
 
-    expect(Honeybadger).to receive(:notify_or_ignore).with(exception)
+    expect(agent).to receive(:notify).with(exception)
 
     actual_response = stack.call(environment)
 
@@ -72,7 +73,7 @@ describe Honeybadger::Rack::ErrorNotifier do
   end
 
   it "delivers an exception in sinatra.error" do
-    allow(Honeybadger).to receive(:notify_or_ignore)
+    allow(agent).to receive(:notify)
     exception = build_exception
     environment = { 'key' => 'value' }
 
@@ -81,9 +82,9 @@ describe Honeybadger::Rack::ErrorNotifier do
       env['sinatra.error'] = exception
       response
     end
-    stack = Honeybadger::Rack::ErrorNotifier.new(app, config)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
 
-    expect(Honeybadger).to receive(:notify_or_ignore).with(exception)
+    expect(agent).to receive(:notify).with(exception)
 
     actual_response = stack.call(environment)
 
@@ -95,7 +96,7 @@ describe Honeybadger::Rack::ErrorNotifier do
     expect(Thread.current[:__honeybadger_context]).to eq({foo: :bar})
 
     app = lambda { |env| ['response', {}, env] }
-    stack = Honeybadger::Rack::ErrorNotifier.new(app, config)
+    stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
 
     stack.call({})
 

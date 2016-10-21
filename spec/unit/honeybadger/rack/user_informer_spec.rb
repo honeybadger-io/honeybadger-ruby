@@ -2,14 +2,15 @@ require 'honeybadger/rack/user_informer'
 require 'honeybadger/config'
 
 describe Honeybadger::Rack::UserInformer do
-  let(:config) { Honeybadger::Config.new }
+  let(:agent) { Honeybadger::Agent.new }
+  let(:config) { agent.config }
 
   it 'modifies output if there is a honeybadger id' do
     main_app = lambda do |env|
       env['honeybadger.error_id'] = 1
       [200, {}, ["<!-- HONEYBADGER ERROR -->"]]
     end
-    informer_app = Honeybadger::Rack::UserInformer.new(main_app, config)
+    informer_app = Honeybadger::Rack::UserInformer.new(main_app, agent)
 
     result = informer_app.call({})
 
@@ -21,7 +22,7 @@ describe Honeybadger::Rack::UserInformer do
     main_app = lambda do |env|
       [200, {}, ["<!-- HONEYBADGER ERROR -->"]]
     end
-    informer_app = Honeybadger::Rack::UserInformer.new(main_app, config)
+    informer_app = Honeybadger::Rack::UserInformer.new(main_app, agent)
 
     result = informer_app.call({})
 
