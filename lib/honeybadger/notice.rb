@@ -376,8 +376,20 @@ module Honeybadger
       binding ||= exception.__honeybadger_bindings_stack[0]
 
       vars = binding.eval('local_variables')
-      result = Hash[vars.map {|arg| [arg, binding.eval(arg.to_s)]}]
-      request_sanitizer.sanitize(result)
+      results =
+        vars.inject([]) { |acc, arg|
+          begin
+            result = binding.eval(arg.to_s)
+            acc << [arg, result]
+          rescue NameError
+            # Do Nothing
+          end
+
+          acc
+        }
+
+      result_hash = Hash[results]
+      request_sanitizer.sanitize(result_hash)
     end
 
     # Internal: Should local variables be sent?
