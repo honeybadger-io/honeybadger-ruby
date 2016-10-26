@@ -1,6 +1,7 @@
 require 'honeybadger/cli/heroku'
 require 'honeybadger/cli/exec'
 require 'honeybadger/config'
+require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
 require 'honeybadger/util/stats'
 require 'honeybadger/version'
@@ -128,7 +129,8 @@ module Honeybadger
         config = Config.new(logger: Logger.new('/dev/null'))
         config.set(:api_key, fetch_value(options, 'api_key')) if options.has_key?('api_key')
         config.init!({
-          framework: :cli
+          framework: :cli,
+          :'config.path' => ["#{ENV['HOME']}/honeybadger.yml"] | Config::DEFAULT_PATHS
         })
         config
       end
