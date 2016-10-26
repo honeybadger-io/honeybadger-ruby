@@ -1,4 +1,5 @@
 require 'honeybadger/cli/heroku'
+require 'honeybadger/cli/exec'
 require 'honeybadger/config'
 require 'honeybadger/util/http'
 require 'honeybadger/util/stats'
@@ -8,17 +9,17 @@ require 'logger'
 
 module Honeybadger
   module CLI
+    NOTIFIER = {
+      name: 'honeybadger-ruby (cli)'.freeze,
+      url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
+      version: VERSION,
+      language: nil
+    }.freeze
+
     class Main < Thor
       DEFAULT_ENV = ENV['HONEYBADGER_ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV']
       DEFAULT_USERNAME = ENV['USER'] || ENV['USERNAME']
       NOT_BLANK = /\S/
-
-      NOTIFIER = {
-        name: 'honeybadger-ruby (cli)'.freeze,
-        url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
-        version: VERSION,
-        language: nil
-      }.freeze
 
       desc 'deploy', 'Notify Honeybadger of deployment'
       option :environment, required: true, aliases: :'-e', type: :string, default: DEFAULT_ENV, desc: 'Environment of the deploy (i.e. "production", "staging")'
@@ -90,6 +91,23 @@ module Honeybadger
         end
       end
 
+      desc 'exec', 'Execute a command. If the exit status is not 0, report the result to Honeybadger'
+      option :api_key, required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
+      option :quiet,   required: false, aliases: :'-q', default: false, type: :boolean, desc: 'Suppress all output unless Honeybdager notification fails.'
+      def exec(*args)
+        config = build_config(options)
+
+        if config.get(:api_key).to_s !~ NOT_BLANK
+          say("No value provided for required options '--api-key'")
+          return
+        end
+
+        Exec.new(options, args, config).run
+      rescue => e
+        log_error(e)
+        exit(1)
+      end
+
       desc 'heroku SUBCOMMAND ...ARGS', 'Manage Honeybadger on Heroku'
       subcommand 'heroku', Heroku
 
@@ -106,6 +124,58 @@ module Honeybadger
           framework: :cli
         })
         config
+      end
+
+      def log_error(e)
+        case e
+        when *Util::HTTP::ERRORS
+          say(<<-MSG, :red)
+!! --- Failed to notify Honeybadger ------------------------------------------- !!
+
+- What happened?
+
+  We encountered an HTTP error while contacting our service. Issues like this are
+  usually temporary.
+
+- Error details
+
+  #{e.class}: #{e.message}\n    at #{e.backtrace && e.backtrace.first}
+
+- What can I do?
+
+  - Retry the command.
+  - If you continue to see this message, email us at support@honeybadger.io
+    (don't forget to attach this output!)
+
+!! --- End -------------------------------------------------------------------- !!
+MSG
+        else
+          say(<<-MSG, :red)
+!! --- Honeybadger command failed --------------------------------------------- !!
+
+- What did you try to do?
+
+  You tried to execute the following command:
+  `honeybadger #{ARGV.join(' ')}`
+
+- What actually happend?
+
+  We encountered a Ruby exception and were forced to cancel your request.
+
+- Error details
+
+  #{e.class}: #{e.message}
+    #{e.backtrace && e.backtrace.join("\n    ")}
+
+- What can I do?
+
+  - Retry the command.
+  - If you continue to see this message, email us at support@honeybadger.io
+    (don't forget to attach this output!)
+
+!! --- End -------------------------------------------------------------------- !!
+MSG
+        end
       end
     end
   end

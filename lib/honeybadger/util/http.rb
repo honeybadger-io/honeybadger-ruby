@@ -21,6 +21,18 @@ module Honeybadger
         'User-Agent'.freeze => "HB-Ruby #{VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}".freeze
       }.freeze
 
+      ERRORS = [Timeout::Error,
+                Errno::EINVAL,
+                Errno::ECONNRESET,
+                Errno::ECONNREFUSED,
+                Errno::ENETUNREACH,
+                EOFError,
+                Net::HTTPBadResponse,
+                Net::HTTPHeaderSyntaxError,
+                Net::ProtocolError,
+                OpenSSL::SSL::SSLError,
+                SocketError].freeze
+
       def initialize(config)
         @config = config
       end

@@ -15,17 +15,7 @@ module Honeybadger
         deploys: '/v1/deploys'.freeze
       }.freeze
 
-      HTTP_ERRORS = [Timeout::Error,
-                     Errno::EINVAL,
-                     Errno::ECONNRESET,
-                     Errno::ECONNREFUSED,
-                     Errno::ENETUNREACH,
-                     EOFError,
-                     Net::HTTPBadResponse,
-                     Net::HTTPHeaderSyntaxError,
-                     Net::ProtocolError,
-                     OpenSSL::SSL::SSLError,
-                     SocketError].freeze
+      HTTP_ERRORS = Util::HTTP::ERRORS
 
       def initialize(config)
         @http = Util::HTTP.new(config)
