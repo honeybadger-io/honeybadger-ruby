@@ -9,6 +9,8 @@ require 'logger'
 
 module Honeybadger
   module CLI
+    BLANK = /\A\s*\z/
+
     NOTIFIER = {
       name: 'honeybadger-ruby (cli)'.freeze,
       url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
@@ -19,7 +21,6 @@ module Honeybadger
     class Main < Thor
       DEFAULT_ENV = ENV['HONEYBADGER_ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV']
       DEFAULT_USERNAME = ENV['USER'] || ENV['USERNAME']
-      NOT_BLANK = /\S/
 
       desc 'deploy', 'Notify Honeybadger of deployment'
       option :environment, required: true, aliases: :'-e', type: :string, default: DEFAULT_ENV, desc: 'Environment of the deploy (i.e. "production", "staging")'
@@ -30,7 +31,7 @@ module Honeybadger
       def deploy
         config = build_config(options)
 
-        if config.get(:api_key).to_s !~ NOT_BLANK
+        if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
           return
         end
@@ -64,7 +65,7 @@ module Honeybadger
         config = build_config(options)
         config.set(:env, fetch_value(options, 'env')) if options.has_key?('env')
 
-        if config.get(:api_key).to_s !~ NOT_BLANK
+        if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
           return
         end
@@ -103,7 +104,7 @@ module Honeybadger
       def exec(*args)
         config = build_config(options)
 
-        if config.get(:api_key).to_s !~ NOT_BLANK
+        if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
           return
         end

@@ -120,7 +120,7 @@ MSG
           code: code,
           stdout: stdout,
           stderr: stderr,
-          success: status.success?
+          success: status.success? && stderr =~ BLANK
         )
       rescue Errno::EACCES, Errno::ENOEXEC
         OpenStruct.new(
