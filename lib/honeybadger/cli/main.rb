@@ -50,6 +50,9 @@ module Honeybadger
           say("Invalid response from server: #{result.code}", :red)
           exit(1)
         end
+      rescue => e
+        log_error(e)
+        exit(1)
       end
 
       desc 'notify', 'Notify Honeybadger of an error'
@@ -89,6 +92,9 @@ module Honeybadger
           say("Invalid response from server: #{result.code}", :red)
           exit(1)
         end
+      rescue => e
+        log_error(e)
+        exit(1)
       end
 
       desc 'exec', 'Execute a command. If the exit status is not 0, report the result to Honeybadger'
