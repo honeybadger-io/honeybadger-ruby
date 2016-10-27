@@ -8,7 +8,6 @@ require 'honeybadger/util/http'
 require 'honeybadger/version'
 require 'logger'
 
-
 module Honeybadger
   module CLI
     BLANK = /\A\s*\z/
