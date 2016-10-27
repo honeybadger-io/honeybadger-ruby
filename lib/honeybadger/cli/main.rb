@@ -27,9 +27,9 @@ module Honeybadger
       class_option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
 
       desc 'deploy', 'Notify Honeybadger of deployment'
-      option :repository, required: true, aliases: :'-r', type: :string, desc: 'The address of your repository'
-      option :revision,   required: true, aliases: :'-s', type: :string, desc: 'The revision/sha that is being deployed'
-      option :user,       required: true, aliases: :'-u', type: :string, default: DEFAULT_USERNAME, desc: 'The local user who is deploying'
+      option :repository, required: true, type: :string, aliases: :'-r', desc: 'The address of your repository'
+      option :revision,   required: true, type: :string, aliases: :'-s', desc: 'The revision/sha that is being deployed'
+      option :user,       required: true, type: :string, aliases: :'-u', default: DEFAULT_USERNAME, desc: 'The local user who is deploying'
       def deploy
         config = build_config(options)
 
@@ -45,8 +45,8 @@ module Honeybadger
       end
 
       desc 'notify', 'Notify Honeybadger of an error'
-      option :class,   type: :string, required: true, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
-      option :message, type: :string, required: true, aliases: :'-m', desc: 'The error message.'
+      option :class,   required: true, type: :string, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
+      option :message, required: true, type: :string, aliases: :'-m', desc: 'The error message.'
       def notify
         config = build_config(options)
         config.set(:env, fetch_value(options, 'env')) if options.has_key?('env')
@@ -63,7 +63,7 @@ module Honeybadger
       end
 
       desc 'exec', 'Execute a command. If the exit status is not 0, report the result to Honeybadger'
-      option :quiet,   required: false, aliases: :'-q', default: false, type: :boolean, desc: 'Suppress all output unless Honeybdager notification fails.'
+      option :quiet, required: false, type: :boolean, aliases: :'-q', default: false, desc: 'Suppress all output unless Honeybdager notification fails.'
       def exec(*args)
         config = build_config(options)
 
