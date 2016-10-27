@@ -1,9 +1,10 @@
-require 'honeybadger/cli/heroku'
+require 'honeybadger/cli/deploy'
 require 'honeybadger/cli/exec'
+require 'honeybadger/cli/heroku'
+require 'honeybadger/cli/notify'
 require 'honeybadger/config'
 require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
-require 'honeybadger/util/stats'
 require 'honeybadger/version'
 require 'logger'
 
@@ -37,21 +38,7 @@ module Honeybadger
           return
         end
 
-        payload = {
-          environment: options[:environment],
-          revision: options[:revision],
-          repository: options[:repository],
-          local_username: options[:user]
-        }
-
-        http = Util::HTTP.new(config)
-        result = http.post('/v1/deploys', payload)
-        if result.code == '201'
-          say("Deploy notification complete.", :green)
-        else
-          say("Invalid response from server: #{result.code}", :red)
-          exit(1)
-        end
+        Deploy.new(options, [], config).run
       rescue => e
         log_error(e)
         exit(1)
@@ -71,29 +58,7 @@ module Honeybadger
           return
         end
 
-        payload = {
-          api_key: config.get(:api_key),
-          notifier: NOTIFIER,
-          error: {
-            class: options['class'],
-            message: options['message']
-          },
-          server: {
-            project_root: Dir.pwd,
-            environment_name: config.get(:env),
-            time: Time.now,
-            stats: Util::Stats.all
-          }
-        }
-
-        http = Util::HTTP.new(config)
-        result = http.post('/v1/notices', payload)
-        if result.code == '201'
-          say("Error notification complete.", :green)
-        else
-          say("Invalid response from server: #{result.code}", :red)
-          exit(1)
-        end
+        Notify.new(options, [], config).run
       rescue => e
         log_error(e)
         exit(1)
