@@ -21,15 +21,15 @@ module Honeybadger
     }.freeze
 
     class Main < Thor
-      DEFAULT_ENV = ENV['HONEYBADGER_ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV']
       DEFAULT_USERNAME = ENV['USER'] || ENV['USERNAME']
 
+      class_option :api_key,     required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
+      class_option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
+
       desc 'deploy', 'Notify Honeybadger of deployment'
-      option :environment, required: true, aliases: :'-e', type: :string, default: DEFAULT_ENV, desc: 'Environment of the deploy (i.e. "production", "staging")'
-      option :revision, required: true, aliases: :'-s', type: :string, desc: 'The revision/sha that is being deployed'
       option :repository, required: true, aliases: :'-r', type: :string, desc: 'The address of your repository'
-      option :user, required: true, aliases: :'-u', type: :string, default: DEFAULT_USERNAME, desc: 'The local user who is deploying'
-      option :api_key, required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
+      option :revision,   required: true, aliases: :'-s', type: :string, desc: 'The revision/sha that is being deployed'
+      option :user,       required: true, aliases: :'-u', type: :string, default: DEFAULT_USERNAME, desc: 'The local user who is deploying'
       def deploy
         config = build_config(options)
 
@@ -47,8 +47,6 @@ module Honeybadger
       desc 'notify', 'Notify Honeybadger of an error'
       option :class,   type: :string, required: true, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
       option :message, type: :string, required: true, aliases: :'-m', desc: 'The error message.'
-      option :api_key, type: :string, required: false, aliases: :'-k', desc: 'Api key of your Honeybadger application'
-      option :env,     type: :string, required: false, aliases: :'-e', desc: 'Environment this command is being executed in (i.e. "production", "staging")'
       def notify
         config = build_config(options)
         config.set(:env, fetch_value(options, 'env')) if options.has_key?('env')
@@ -65,7 +63,6 @@ module Honeybadger
       end
 
       desc 'exec', 'Execute a command. If the exit status is not 0, report the result to Honeybadger'
-      option :api_key, required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
       option :quiet,   required: false, aliases: :'-q', default: false, type: :boolean, desc: 'Suppress all output unless Honeybdager notification fails.'
       def exec(*args)
         config = build_config(options)
