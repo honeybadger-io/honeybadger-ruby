@@ -11,6 +11,13 @@ module Honeybadger
 
       attr_reader :code, :body, :message, :error
 
+      FRIENDLY_ERRORS = {
+        429 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
+        503 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
+        402 => "The project owner's billing information has expired (or the trial has ended).\nPlease check your payment details or email support@honeybadger.io for help.".freeze,
+        403 => "The API key is invalid. Please check your API key and try again.".freeze
+      }.freeze
+
       # Public: Initializes the Response instance.
       #
       # response - With 1 argument Net::HTTPResponse, the code, body, and
@@ -35,6 +42,10 @@ module Honeybadger
 
       def success?
         @success
+      end
+
+      def error_message
+        FRIENDLY_ERRORS[code] || message
       end
 
       private
