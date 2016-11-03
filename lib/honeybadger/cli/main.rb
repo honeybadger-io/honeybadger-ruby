@@ -22,8 +22,6 @@ module Honeybadger
     }.freeze
 
     class Main < Thor
-      DEFAULT_USERNAME = ENV['USER'] || ENV['USERNAME']
-
       def self.project_options
         option :api_key,     required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
         option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
@@ -51,7 +49,7 @@ module Honeybadger
       project_options
       option :repository, required: true, type: :string, aliases: :'-r', desc: 'The address of your repository'
       option :revision,   required: true, type: :string, aliases: :'-s', desc: 'The revision/sha that is being deployed'
-      option :user,       required: true, type: :string, aliases: :'-u', default: DEFAULT_USERNAME, desc: 'The local user who is deploying'
+      option :user,       required: true, type: :string, aliases: :'-u', default: ENV['USER'] || ENV['USERNAME'], desc: 'The local user who is deploying'
       def deploy
         config = build_config(options)
 
