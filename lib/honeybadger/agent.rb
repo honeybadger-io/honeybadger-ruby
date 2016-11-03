@@ -95,6 +95,11 @@ module Honeybadger
 
       notice = Notice.new(config, opts)
 
+      unless notice.api_key =~ NOT_BLANK
+        error { sprintf('Unable to send error report: API key is missing. id=%s', notice.id) }
+        return false
+      end
+
       if !opts[:force] && notice.ignore?
         debug { sprintf('ignore notice feature=notices id=%s', notice.id) }
         false

@@ -63,7 +63,7 @@ describe Honeybadger do
   end
 
   describe "#notify" do
-    let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
     let(:instance) { Honeybadger::Agent.new(config) }
     let(:worker) { double('Honeybadger::Worker') }
 
@@ -93,7 +93,7 @@ describe Honeybadger do
     end
 
     it "does not pass the hash as an exception when sending a notice for it" do
-      notice = stub_notice!
+      notice = stub_notice!(config)
 
       expect(Honeybadger::Notice).to receive(:new).with(anything, hash_excluding(:exception))
       expect(worker).to receive(:push).with(notice)
@@ -103,7 +103,7 @@ describe Honeybadger do
 
     it "creates and sends a notice for an exception and hash" do
       exception = build_exception
-      notice = stub_notice!
+      notice = stub_notice!(config)
       notice_args = { error_message: 'uh oh' }
 
       expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(notice_args.merge(exception: exception))).and_return(notice)
@@ -114,7 +114,7 @@ describe Honeybadger do
 
     it "does not deliver an ignored exception when notifying implicitly" do
       exception = build_exception
-      notice = stub_notice!
+      notice = stub_notice!(config)
       allow(notice).to receive(:ignore?).and_return(true)
 
       expect(worker).not_to receive(:push)
@@ -124,7 +124,7 @@ describe Honeybadger do
 
     it "delivers an ignored exception when notifying implicitly with :force option" do
       exception = build_exception
-      notice = stub_notice!
+      notice = stub_notice!(config)
       allow(notice).to receive(:ignore?).and_return(true)
 
       expect(worker).to receive(:push)
