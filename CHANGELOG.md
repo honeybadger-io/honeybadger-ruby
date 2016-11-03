@@ -15,6 +15,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Fixed an error when accessing notice request data from `exception_fingerprint`
   callback.
 
+## [3.0.0][unreleased]
+
 ## [2.7.0] - 2016-10-20
 ### Added
 - Support Sinatra 2.0.
