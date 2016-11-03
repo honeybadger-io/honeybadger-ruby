@@ -134,6 +134,7 @@ module Honeybadger
 - What can I do?
 
   - Retry the command.
+  - Make sure you can connect to api.honeybadger.io (`ping api.honeybadger.io`).
   - If you continue to see this message, email us at support@honeybadger.io
     (don't forget to attach this output!)
 
