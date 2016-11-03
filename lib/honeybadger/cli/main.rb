@@ -24,8 +24,10 @@ module Honeybadger
     class Main < Thor
       DEFAULT_USERNAME = ENV['USER'] || ENV['USERNAME']
 
-      class_option :api_key,     required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
-      class_option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
+      def self.project_options
+        option :api_key,     required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
+        option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
+      end
 
       desc 'install API_KEY', 'Install Honeybadger into a new project'
       def install(api_key)
@@ -46,6 +48,7 @@ module Honeybadger
       end
 
       desc 'deploy', 'Notify Honeybadger of deployment'
+      project_options
       option :repository, required: true, type: :string, aliases: :'-r', desc: 'The address of your repository'
       option :revision,   required: true, type: :string, aliases: :'-s', desc: 'The revision/sha that is being deployed'
       option :user,       required: true, type: :string, aliases: :'-u', default: DEFAULT_USERNAME, desc: 'The local user who is deploying'
@@ -64,6 +67,7 @@ module Honeybadger
       end
 
       desc 'notify', 'Notify Honeybadger of an error'
+      project_options
       option :class,   required: true, type: :string, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
       option :message, required: true, type: :string, aliases: :'-m', desc: 'The error message.'
       def notify
@@ -82,6 +86,7 @@ module Honeybadger
       end
 
       desc 'exec', 'Execute a command. If the exit status is not 0, report the result to Honeybadger'
+      project_options
       option :quiet, required: false, type: :boolean, aliases: :'-q', default: false, desc: 'Suppress all output unless Honeybdager notification fails.'
       def exec(*args)
         config = build_config(options)
