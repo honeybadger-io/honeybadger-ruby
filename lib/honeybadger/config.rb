@@ -138,7 +138,12 @@ module Honeybadger
       Backend.for(backend_name)
     end
 
+    def backend=(backend)
+      @ruby_backend = backend
+    end
+
     def backend
+      return @ruby_backend if @ruby_backend
       @backend = nil unless @backend.kind_of?(backend_class)
       @backend ||= backend_class.new(self)
     end
