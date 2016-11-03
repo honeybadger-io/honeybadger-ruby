@@ -1,7 +1,9 @@
 require 'honeybadger/cli/deploy'
 require 'honeybadger/cli/exec'
 require 'honeybadger/cli/heroku'
+require 'honeybadger/cli/install'
 require 'honeybadger/cli/notify'
+require 'honeybadger/cli/test'
 require 'honeybadger/config'
 require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
@@ -24,6 +26,24 @@ module Honeybadger
 
       class_option :api_key,     required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
       class_option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
+
+      desc 'install API_KEY', 'Install Honeybadger into a new project'
+      def install(api_key)
+        Install.new(options, api_key).run
+      rescue => e
+        log_error(e)
+        exit(1)
+      end
+
+      desc 'test', 'Send a test notification from Honeybadger'
+      option :dry_run, type: :boolean, aliases: :'-d', default: false, desc: 'Skip sending data to Honeybadger'
+      option :file,    type: :string,  aliases: :'-f', default: nil, desc: 'Write the output to FILE'
+      def test
+        Test.new(options).run
+      rescue => e
+        log_error(e)
+        exit(1)
+      end
 
       desc 'deploy', 'Notify Honeybadger of deployment'
       option :repository, required: true, type: :string, aliases: :'-r', desc: 'The address of your repository'
