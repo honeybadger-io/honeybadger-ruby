@@ -272,30 +272,30 @@ describe Honeybadger::Config do
   end
 
   describe "#default_backend" do
-    its(:default_backend) { should eq :server }
+    its(:default_backend) { should be_a Honeybadger::Backend::Server }
 
     context "when disabled explicitly" do
       before { subject[:report_data] = false }
-      its(:default_backend) { should eq :null }
+      its(:default_backend) { should be_a Honeybadger::Backend::Null }
     end
 
     context "when environment is not a development environment" do
       before { subject[:env] = 'production' }
-      its(:default_backend) { should eq :server }
+      its(:default_backend) { should be_a Honeybadger::Backend::Server }
 
       context "when disabled explicitly" do
         before { subject[:report_data] = false }
-        its(:default_backend) { should eq :null }
+        its(:default_backend) { should be_a Honeybadger::Backend::Null }
       end
     end
 
     context "when environment is a development environment" do
       before { subject[:env] = 'development' }
-      its(:default_backend) { should eq :null }
+      its(:default_backend) { should be_a Honeybadger::Backend::Null }
 
       context "when enabled explicitly" do
         before { subject[:report_data] = true }
-        its(:default_backend) { should eq :server }
+        its(:default_backend) { should be_a Honeybadger::Backend::Server }
       end
     end
   end

@@ -46,6 +46,7 @@ module Honeybadger
       self.env = Env.new(env)
       load_config_from_disk {|yml| self.yaml = yml }
       init_logging!
+      init_backend!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
       if valid? && !ping
         logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
@@ -57,6 +58,7 @@ module Honeybadger
       ruby_config = Ruby.new
       yield(ruby_config)
       self.ruby = ruby.merge(ruby_config)
+      init_backend!
       self
     end
 
@@ -130,22 +132,9 @@ module Honeybadger
       @logger ||= Logging::ConfigLogger.new(self)
     end
 
-    def backend_name
-      (self[:backend] || default_backend).to_sym
-    end
-
-    def backend_class
-      Backend.for(backend_name)
-    end
-
-    def backend=(backend)
-      @ruby_backend = backend
-    end
-
     def backend
-      return @ruby_backend if @ruby_backend
-      @backend = nil unless @backend.kind_of?(backend_class)
-      @backend ||= backend_class.new(self)
+      init_backend! unless @backend
+      @backend
     end
 
     def dev?
@@ -156,14 +145,6 @@ module Honeybadger
       return true if self[:report_data]
       return false if self[:report_data] == false
       !self[:env] || !dev?
-    end
-
-    def default_backend
-      if public?
-        :server
-      else
-        :null
-      end
     end
 
     def valid?
@@ -360,6 +341,33 @@ api_key: '#{self[:api_key]}'
     end
 
     private
+
+    def default_backend
+      return Backend::Server.new(self) if public?
+      Backend::Null.new(self)
+    end
+
+    def init_backend!
+      if self[:backend].is_a?(String) || self[:backend].is_a?(Symbol)
+        @backend = Backend.for(self[:backend].to_sym).new(self)
+        return
+      end
+
+      if ruby[:backend].respond_to?(:notify)
+        @backend = ruby[:backend]
+        return
+      end
+
+      if ruby[:backend]
+        logger.warn(sprintf('Unknown backend: %p; default will be used. Backend must respond to #notify', self[:backend]))
+      end
+
+      @backend = default_backend
+
+      unless @backend.kind_of?(Backend::Server)
+        logger.warn('Initializing development backend: data will not be reported.')
+      end
+    end
 
     # Internal: Does collection include the String value or Symbol value?
     #
