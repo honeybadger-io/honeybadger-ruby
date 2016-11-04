@@ -35,16 +35,16 @@ module Honeybadger
     DEFAULT_REQUEST_HASH = {}.freeze
 
     def initialize(opts = {})
-      @ruby = opts
-      @env = {}
-      @yaml = {}
-      @framework = {}
+      @ruby = opts.freeze
+      @env = {}.freeze
+      @yaml = {}.freeze
+      @framework = {}.freeze
     end
 
     def init!(opts = {}, env = ENV)
-      self.framework = opts
-      self.env = Env.new(env)
-      load_config_from_disk {|yml| self.yaml = yml }
+      self.framework = opts.freeze
+      self.env = Env.new(env).freeze
+      load_config_from_disk {|yaml| self.yaml = yaml.freeze }
       init_logging!
       init_backend!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
@@ -57,7 +57,7 @@ module Honeybadger
     def configure
       ruby_config = Ruby.new
       yield(ruby_config)
-      self.ruby = ruby.merge(ruby_config)
+      self.ruby = ruby.merge(ruby_config).freeze
       init_backend!
       self
     end
@@ -78,7 +78,6 @@ module Honeybadger
     end
 
     attr_accessor :ruby, :env, :yaml, :framework
-    def_delegators :ruby, :update
 
     def get(key)
       [:@ruby, :@env, :@yaml, :@framework].each do |var|
@@ -93,7 +92,7 @@ module Honeybadger
     alias [] :get
 
     def set(key, value)
-      ruby[key] = value
+      self.ruby = ruby.merge(key => value).freeze
     end
     alias []= :set
 
@@ -403,7 +402,7 @@ module Honeybadger
       return if self.ruby[:logger]
       return unless path = log_path
       FileUtils.mkdir_p(path.dirname) unless path.dirname.writable?
-      self.ruby[:logger] = Logger.new(path).tap do |logger|
+      self[:logger] = Logger.new(path).tap do |logger|
         logger.level = log_level
         logger.formatter = Logger::Formatter.new
       end
