@@ -72,10 +72,6 @@ module Honeybadger
       @config = Config.new(config) if config.kind_of?(Hash)
       @config ||= Config.new
 
-      unless @config.backend.kind_of?(Backend::Server)
-        warn('Initializing development backend: data will not be reported.')
-      end
-
       init_workers
     end
 
