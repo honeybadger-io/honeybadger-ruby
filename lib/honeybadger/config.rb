@@ -261,23 +261,6 @@ module Honeybadger
       end
     end
 
-    def write
-      path = config_path
-
-      if path.exist?
-        raise ConfigError, "The configuration file #{path} already exists."
-      elsif !path.dirname.writable?
-        raise ConfigError, "The configuration path #{path.dirname} is not writable."
-      end
-
-      File.open(path, 'w+') do |file|
-        file.write(<<-CONFIG)
----
-api_key: '#{self[:api_key]}'
-                   CONFIG
-      end
-    end
-
     def log_level(key = :'logging.level')
       case self[key].to_s
       when /\A(0|debug)\z/i then Logger::DEBUG
