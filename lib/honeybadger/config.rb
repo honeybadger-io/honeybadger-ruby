@@ -46,8 +46,9 @@ module Honeybadger
       self.env = Env.new(env).freeze
       load_config_from_disk {|yaml| self.yaml = yaml.freeze }
       init_logging!
-      init_backend!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
+      init_backend!
+      logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
       if valid? && !ping
         logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
       end
@@ -345,10 +346,6 @@ module Honeybadger
       end
 
       @backend = default_backend
-
-      unless @backend.kind_of?(Backend::Server)
-        logger.warn('Initializing development backend: data will not be reported.')
-      end
     end
 
     # Internal: Does collection include the String value or Symbol value?
