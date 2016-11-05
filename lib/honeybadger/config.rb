@@ -46,8 +46,8 @@ module Honeybadger
       self.env = Env.new(env).freeze
       load_config_from_disk {|yaml| self.yaml = yaml.freeze }
       init_logging!
-      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
       init_backend!
+      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
       logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
       if valid? && !ping
         logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
@@ -59,7 +59,7 @@ module Honeybadger
       ruby_config = Ruby.new
       yield(ruby_config)
       self.ruby = ruby.merge(ruby_config).freeze
-      init_backend!
+      @logging = @backend = nil
       self
     end
 
@@ -94,6 +94,7 @@ module Honeybadger
 
     def set(key, value)
       self.ruby = ruby.merge(key => value).freeze
+      @logging = @backend = nil
     end
     alias []= :set
 
@@ -112,24 +113,9 @@ module Honeybadger
       !!self[:disabled]
     end
 
-    def default_logger
-      return @default_logger if @default_logger
-
-      logger = Logger.new($stdout)
-      logger.formatter = lambda do |severity, datetime, progname, msg|
-        "#{msg}\n"
-      end
-      logger.level = log_level
-
-      @default_logger = Logging::FormattedLogger.new(logger)
-    end
-
-    def get_logger
-      get(:logger) || default_logger
-    end
-
     def logger
-      @logger ||= Logging::ConfigLogger.new(self)
+      init_logging! unless @logger
+      @logger
     end
 
     def backend
@@ -168,14 +154,13 @@ module Honeybadger
       DEFAULTS[:'exceptions.ignore'] | Array(ignore)
     end
 
-    # Internal: Optional path to honeybadger.log log file. If nil, STDOUT will be used
-    # instead.
+    # Internal: Optional path to honeybadger.log log file.
     #
     # Returns the Pathname log path if a log path was specified.
     def log_path
-      if self[:'logging.path'] && self[:'logging.path'] != 'STDOUT'
-        locate_absolute_path(self[:'logging.path'], self[:root])
-      end
+      return if log_stdout?
+      return if !self[:'logging.path']
+      locate_absolute_path(self[:'logging.path'], self[:root])
     end
 
     # Internal: Path to honeybadger.yml configuration file; this should be the
@@ -348,6 +333,45 @@ module Honeybadger
       @backend = default_backend
     end
 
+    def build_stdout_logger
+      logger = Logger.new($stdout)
+      logger.formatter = lambda do |severity, datetime, progname, msg|
+        "#{msg}\n"
+      end
+      logger.level = log_level
+      Logging::FormattedLogger.new(logger)
+    end
+
+    def build_file_logger(path)
+      Logger.new(path).tap do |logger|
+        logger.level = log_level
+        logger.formatter = Logger::Formatter.new
+      end
+    end
+
+    def log_stdout?
+      self[:'logging.path'] && self[:'logging.path'].to_s.downcase == 'stdout'
+    end
+
+    def build_logger
+      return ruby[:logger] if ruby[:logger]
+
+      return build_stdout_logger if log_stdout?
+
+      if path = log_path
+        FileUtils.mkdir_p(path.dirname) unless path.dirname.writable?
+        return build_file_logger(path)
+      end
+
+      return @framework[:logger] if @framework[:logger]
+
+      Logger.new('/dev/null')
+    end
+
+    def init_logging!
+      @logger = Logging::ConfigLogger.new(self, build_logger)
+    end
+
     # Internal: Does collection include the String value or Symbol value?
     #
     # obj - The Array object, if present.
@@ -392,16 +416,6 @@ module Honeybadger
         path
       else
         Pathname.new(root.to_s).join(path.to_s)
-      end
-    end
-
-    def init_logging!
-      return if self.ruby[:logger]
-      return unless path = log_path
-      FileUtils.mkdir_p(path.dirname) unless path.dirname.writable?
-      self[:logger] = Logger.new(path).tap do |logger|
-        logger.level = log_level
-        logger.formatter = Logger::Formatter.new
       end
     end
 
