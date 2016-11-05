@@ -80,7 +80,7 @@ describe Honeybadger::Config do
 
       context "when a config error occurrs while loading file" do
         before do
-          allow(instance.default_logger).to receive(:add)
+          allow(instance.logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
         end
 
@@ -89,14 +89,14 @@ describe Honeybadger::Config do
         end
 
         it "logs the error message to the default logger" do
-          expect(instance.default_logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
+          expect(instance.logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
           init_instance
         end
       end
 
       context "when a generic error occurrs while loading file" do
         before do
-          allow(instance.default_logger).to receive(:add)
+          allow(instance.logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
         end
 
@@ -105,12 +105,12 @@ describe Honeybadger::Config do
         end
 
         it "logs the error message to the default logger" do
-          expect(instance.default_logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
+          expect(instance.logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
           init_instance
         end
 
         it "logs the backtrace to the boot logger" do
-          expect(instance.default_logger).to receive(:add).with(Logger::Severity::ERROR, /config_spec\.rb/)
+          expect(instance.logger).to receive(:add).with(Logger::Severity::ERROR, /config_spec\.rb/)
           init_instance
         end
       end

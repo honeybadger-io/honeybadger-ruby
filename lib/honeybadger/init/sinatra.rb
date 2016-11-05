@@ -1,3 +1,4 @@
+require 'sinatra/base'
 require 'honeybadger/ruby'
 
 module Honeybadger
@@ -15,7 +16,8 @@ module Honeybadger
           def honeybadger_config(app)
             {
               api_key: defined?(honeybadger_api_key) ? honeybadger_api_key : nil,
-              framework: :sinatra
+              framework: :sinatra,
+              :'logging.path' => 'STDOUT'
             }
           end
 

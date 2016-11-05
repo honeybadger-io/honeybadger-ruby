@@ -44,11 +44,11 @@ describe Honeybadger::Logging::FormattedLogger do
 end
 
 describe Honeybadger::Logging::ConfigLogger do
-  let(:config) { Honeybadger::Config.new(logger: logger, debug: true, :'logging.tty_level' => tty_level) }
+  let(:config) { Honeybadger::Config.new(debug: true, :'logging.tty_level' => tty_level) }
   let(:logger) { Logger.new('/dev/null') }
   let(:tty_level) { 'ERROR' }
 
-  subject { described_class.new(config) }
+  subject { described_class.new(config, logger) }
 
   LOG_SEVERITIES.each do |severity|
     it { should respond_to severity }
