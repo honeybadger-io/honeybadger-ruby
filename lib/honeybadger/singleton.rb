@@ -3,30 +3,6 @@ require 'honeybadger/agent'
 module Honeybadger
   extend self
 
-  # Public: Starts the Honeybadger service.
-  #
-  # opts - The Hash options used to initialize Honeybadger. Accepts config
-  #        keys in addition to the listed options. Order of precedence for
-  #        config is: 0) ENV, 2) config on disk, 3) opts. (default: {})
-  #        :logger - An alternate Logger to use. (optional)
-  #
-  # Examples:
-  #
-  #   ENV['HONEYBADGER_API_KEY'] # => 'asdf'
-  #
-  #   Honeybadger.start # => true
-  #
-  #   Honeybadger.start({
-  #     :root          => ::Rails.root,
-  #     :'config.path' => 'config/',
-  #     :logger        => Honeybadger::Logging::FormattedLogger.new(::Rails.logger)
-  #   }) # => true
-  #
-  # Returns true if started, otherwise false.
-  def start(config = {})
-    Agent.start(config)
-  end
-
   # Public: Stops the Honeybadger service.
   #
   # Examples:
@@ -214,6 +190,11 @@ module Honeybadger
   end
 
   def configure(&block)
-    Agent.instance.configure(&block)
+    Agent.configure(&block)
+  end
+
+  # Deprecated
+  def start(config = {})
+    Agent.start(config)
   end
 end
