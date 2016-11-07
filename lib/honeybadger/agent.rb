@@ -45,7 +45,7 @@ module Honeybadger
       extend Forwardable
 
       def_delegators :instance, :config, :notify, :context, :get_context, :flush, :stop
-      def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
+      def_delegators :config, :configure, :exception_filter, :exception_fingerprint, :backtrace_filter
     end
 
     def initialize(config = nil)
