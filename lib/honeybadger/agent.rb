@@ -31,32 +31,6 @@ module Honeybadger
       @instance = instance
     end
 
-    def self.flush(&block)
-      self.instance.flush(&block)
-    end
-
-    def self.notify(exception_or_opts, opts = {})
-      self.instance.notify(exception_or_opts, opts)
-    end
-
-    def self.context(hash = nil)
-      self.instance.context(hash)
-    end
-
-    def self.get_context
-      self.instance.get_context
-    end
-
-    # Internal: Not for public consumption. :)
-    #
-    # Prefer dependency injection over accessing config directly, but some
-    # cases (such as the delayed_job plugin) necessitate it.
-    #
-    # Returns the Agent's config if running, otherwise default config
-    def self.config
-      instance.config
-    end
-
     # Deprecated
     def self.running?
       true
@@ -67,11 +41,12 @@ module Honeybadger
       true
     end
 
-    def self.stop(*args)
-      instance.stop(*args)
-    end
+    class << self
+      extend Forwardable
 
-    attr_reader :worker
+      def_delegators :instance, :config, :notify, :context, :get_context, :flush, :stop
+      def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
+    end
 
     def initialize(config = nil)
       @config = config if config.kind_of?(Config)
@@ -83,10 +58,11 @@ module Honeybadger
       init_worker
     end
 
-    def stop(force = false)
-      worker.send(force ? :shutdown! : :shutdown)
-      true
-    end
+    attr_reader :worker
+
+    attr_reader :config
+    def_delegators :config, :init!, :configure
+    def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
 
     def notify(exception_or_opts, opts = {})
       return false if config.disabled?
@@ -142,22 +118,16 @@ module Honeybadger
       worker.flush
     end
 
+    def stop(force = false)
+      worker.send(force ? :shutdown! : :shutdown)
+      true
+    end
+
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
       yield
     ensure
       context_manager.set_rack_env(nil)
-    end
-
-    attr_reader :config
-    def_delegators :config, :init!, :configure
-
-    def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
-
-    class << self
-      extend Forwardable
-
-      def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
     end
 
     private
