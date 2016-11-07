@@ -14,5 +14,5 @@ at_exit do
   if $! && !$!.is_a?(SystemExit) && Honeybadger.config[:'exceptions.notify_at_exit']
     Honeybadger.notify($!, component: 'at_exit', sync: true)
   end
-  Honeybadger::Agent.instance.stop if Honeybadger.config[:'send_data_at_exit']
+  Honeybadger::Agent.stop if Honeybadger.config[:'send_data_at_exit']
 end

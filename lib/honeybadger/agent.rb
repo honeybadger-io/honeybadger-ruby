@@ -67,9 +67,8 @@ module Honeybadger
       true
     end
 
-    # Deprecated
     def self.stop(*args)
-      true
+      instance.stop(*args)
     end
 
     attr_reader :worker
