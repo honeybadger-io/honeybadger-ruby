@@ -202,7 +202,7 @@ describe Honeybadger::Config do
     end
   end
 
-  describe "#framework" do
+  describe "#detected_framework" do
     constants = [:Rails, :Sinatra, :Rack]
     constants_backup = {}
 
@@ -222,13 +222,13 @@ describe Honeybadger::Config do
     end
 
     context "by default" do
-      its(:framework) { should eq :ruby }
+      its(:detected_framework) { should eq :ruby }
     end
 
     context "framework is configured" do
       before { subject[:framework] = 'rack' }
 
-      its(:framework) { should eq :rack }
+      its(:detected_framework) { should eq :rack }
     end
 
     context "Rails is installed" do
@@ -242,7 +242,7 @@ describe Honeybadger::Config do
 
       after { Object.send(:remove_const, :Rails) }
 
-      its(:framework) { should eq :rails }
+      its(:detected_framework) { should eq :rails }
       its(:framework_name) { should match /Rails 4\.1\.5/ }
     end
 
@@ -255,7 +255,7 @@ describe Honeybadger::Config do
 
       after { Object.send(:remove_const, :Sinatra) }
 
-      its(:framework) { should eq :sinatra }
+      its(:detected_framework) { should eq :sinatra }
       its(:framework_name) { should match /Sinatra 1\.4\.5/ }
     end
 
@@ -266,7 +266,7 @@ describe Honeybadger::Config do
 
       after { Object.send(:remove_const, :Rack) }
 
-      its(:framework) { should eq :rack }
+      its(:detected_framework) { should eq :rack }
       its(:framework_name) { should match /Rack 1\.0/ }
     end
   end

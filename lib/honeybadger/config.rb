@@ -41,6 +41,8 @@ module Honeybadger
       @framework = {}.freeze
     end
 
+    attr_accessor :ruby, :env, :yaml, :framework
+
     def init!(opts = {}, env = ENV)
       self.framework = opts.freeze
       self.env = Env.new(env).freeze
@@ -78,8 +80,6 @@ module Honeybadger
       self[:exception_fingerprint]
     end
 
-    attr_accessor :ruby, :env, :yaml, :framework
-
     def get(key)
       [:@ruby, :@env, :@yaml, :@framework].each do |var|
         source = instance_variable_get(var)
@@ -109,10 +109,6 @@ module Honeybadger
     end
     alias :to_h :to_hash
 
-    def disabled?
-      !!self[:disabled]
-    end
-
     def logger
       init_logging! unless @logger
       @logger
@@ -121,6 +117,23 @@ module Honeybadger
     def backend
       init_backend! unless @backend
       @backend
+    end
+
+    def request
+      Thread.current[:__honeybadger_request]
+    end
+
+    def with_request(request, &block)
+      Thread.current[:__honeybadger_request] = request
+      yield
+    ensure
+      Thread.current[:__honeybadger_request] = nil
+    end
+
+    # Internal Helpers
+
+    def disabled?
+      !!self[:disabled]
     end
 
     def dev?
@@ -154,29 +167,6 @@ module Honeybadger
       DEFAULTS[:'exceptions.ignore'] | Array(ignore)
     end
 
-    # Internal: Optional path to honeybadger.log log file.
-    #
-    # Returns the Pathname log path if a log path was specified.
-    def log_path
-      return if log_stdout?
-      return if !self[:'logging.path']
-      locate_absolute_path(self[:'logging.path'], self[:root])
-    end
-
-    # Internal: Path to honeybadger.yml configuration file; this should be the
-    # root directory if no path was specified.
-    #
-    # Returns the Pathname configuration path.
-    def config_path
-      config_paths.first
-    end
-
-    def config_paths
-      Array(ENV['HONEYBADGER_CONFIG_PATH'] || get(:'config.path')).map do |c|
-        locate_absolute_path(c, self[:root])
-      end
-    end
-
     def ca_bundle_path
       if self[:'connection.system_ssl_cert_chain'] && File.exist?(OpenSSL::X509::DEFAULT_CERT_FILE)
         OpenSSL::X509::DEFAULT_CERT_FILE
@@ -207,17 +197,6 @@ module Honeybadger
       else
         'http'
       end
-    end
-
-    def request
-      Thread.current[:__honeybadger_request]
-    end
-
-    def with_request(request, &block)
-      Thread.current[:__honeybadger_request] = request
-      yield
-    ensure
-      Thread.current[:__honeybadger_request] = nil
     end
 
     def max_queue_size
@@ -263,6 +242,19 @@ module Honeybadger
       includes_token?(self[:plugins], name)
     end
 
+    # Internal: Match the project root.
+    #
+    # Returns Regexp matching the project root in a file string.
+    def root_regexp
+      return @root_regexp if @root_regexp
+      return nil if @no_root
+
+      root = get(:root).to_s
+      @no_root = true and return nil unless root =~ NOT_BLANK
+
+      @root_regexp = Regexp.new("^#{ Regexp.escape(root) }")
+    end
+
     def ping
       if result = send_ping
         return true
@@ -271,7 +263,7 @@ module Honeybadger
       false
     end
 
-    def framework
+    def detected_framework
       if self[:framework] =~ NOT_BLANK
         self[:framework].to_sym
       elsif defined?(::Rails::VERSION) && ::Rails::VERSION::STRING > '3.0'
@@ -286,7 +278,7 @@ module Honeybadger
     end
 
     def framework_name
-      case framework
+      case detected_framework
       when :rails then "Rails #{::Rails::VERSION::STRING}"
       when :sinatra then "Sinatra #{::Sinatra::VERSION}"
       when :rack then "Rack #{::Rack.release}"
@@ -295,20 +287,30 @@ module Honeybadger
       end
     end
 
-    # Internal: Match the project root.
+    private
+
+    # Internal: Optional path to honeybadger.log log file.
     #
-    # Returns Regexp matching the project root in a file string.
-    def root_regexp
-      return @root_regexp if @root_regexp
-      return nil if @no_root
-
-      root = get(:root).to_s
-      @no_root = true and return nil unless root =~ NOT_BLANK
-
-      @root_regexp = Regexp.new("^#{ Regexp.escape(root) }")
+    # Returns the Pathname log path if a log path was specified.
+    def log_path
+      return if log_stdout?
+      return if !self[:'logging.path']
+      locate_absolute_path(self[:'logging.path'], self[:root])
     end
 
-    private
+    # Internal: Path to honeybadger.yml configuration file; this should be the
+    # root directory if no path was specified.
+    #
+    # Returns the Pathname configuration path.
+    def config_path
+      config_paths.first
+    end
+
+    def config_paths
+      Array(ENV['HONEYBADGER_CONFIG_PATH'] || get(:'config.path')).map do |c|
+        locate_absolute_path(c, self[:root])
+      end
+    end
 
     def default_backend
       return Backend::Server.new(self) if public?
@@ -363,7 +365,7 @@ module Honeybadger
         return build_file_logger(path)
       end
 
-      return @framework[:logger] if @framework[:logger]
+      return framework[:logger] if framework[:logger]
 
       Logger.new('/dev/null')
     end
