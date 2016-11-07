@@ -34,34 +34,6 @@ module Honeybadger
         end
       end
 
-      module ControllerMethods
-        def honeybadger_request_data
-          warn('#honeybadger_request_data has been deprecated and has no effect.')
-          {}
-        end
-
-        def notify_honeybadger(*args, &block)
-          warn('#notify_honeybadger has been deprecated; please use `Honeybadger.notify`.')
-          Honeybadger.notify(*args, &block)
-        end
-
-        def notify_honeybadger_or_ignore(*args, &block)
-          warn('#notify_honeybadger_or_ignore has been deprecated; please use `Honeybadger.notify`.')
-          Honeybadger.notify(*args, &block)
-        end
-      end
-
-      Plugin.register :rails_controller_methods do
-        requirement { defined?(::Rails) }
-
-        execution do
-          ActiveSupport.on_load(:action_controller) do
-            # Lazily load action_controller methods
-            include ::Honeybadger::Plugins::Rails::ControllerMethods
-          end
-        end
-      end
-
       Plugin.register :rails_exceptions_catcher do
         requirement { defined?(::Rails) }
 
