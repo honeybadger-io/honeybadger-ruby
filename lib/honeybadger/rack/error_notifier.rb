@@ -28,7 +28,7 @@ module Honeybadger
       end
 
       def call(env)
-        config.with_request(::Rack::Request.new(env)) do
+        agent.with_rack_env(env) do
           begin
             env['honeybadger.config'] = config
             response = @app.call(env)

@@ -88,6 +88,7 @@ module Honeybadger
 
       opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
       opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
+      opts.merge!(rack_env: rack_env) if rack_env
 
       notice = Notice.new(config, opts)
 
@@ -120,6 +121,17 @@ module Honeybadger
       yield
     ensure
       workers.values.each(&:flush)
+    end
+
+    def rack_env
+      Thread.current[:__honeybadger_rack_env]
+    end
+
+    def with_rack_env(rack_env, &block)
+      Thread.current[:__honeybadger_rack_env] = rack_env
+      yield
+    ensure
+      Thread.current[:__honeybadger_rack_env] = nil
     end
 
     attr_reader :config

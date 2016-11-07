@@ -4,6 +4,7 @@ require 'forwardable'
 
 require 'honeybadger/version'
 require 'honeybadger/backtrace'
+require 'honeybadger/rack/request_hash'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
 require 'honeybadger/util/request_payload'
@@ -127,8 +128,10 @@ module Honeybadger
       @opts = opts
       @config = config
 
+      @rack_env = opts.fetch(:rack_env, nil)
+
       @sanitizer = Util::Sanitizer.new
-      @request_sanitizer = Util::Sanitizer.new(filters: config.params_filters)
+      @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
 
       @exception = unwrap_exception(opts[:exception])
       @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
@@ -218,7 +221,8 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes, :sanitizer, :request_sanitizer
+    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes,
+      :sanitizer, :request_sanitizer, :rack_env
 
     def ignore_by_origin?
       return false if opts[:origin] != :rake
@@ -288,12 +292,17 @@ module Honeybadger
       ].compact | BACKTRACE_FILTERS
     end
 
+    def request_hash
+      return {} unless rack_env
+      Rack::RequestHash.from_env(rack_env)
+    end
+
     # Internal: Construct the request object with data from various sources.
     #
     # Returns Request.
     def construct_request_hash(config, opts)
       request = {}
-      request.merge!(config.request_hash)
+      request.merge!(request_hash)
       request.merge!(opts)
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
@@ -401,6 +410,14 @@ module Honeybadger
       end
 
       c
+    end
+
+    def params_filters
+      config.params_filters + rails_params_filters
+    end
+
+    def rails_params_filters
+      rack_env && rack_env['action_dispatch.parameter_filter'] or []
     end
 
     # Internal: This is how much Honeybadger cares about Rails developers. :)
