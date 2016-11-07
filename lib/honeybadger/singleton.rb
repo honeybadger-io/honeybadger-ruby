@@ -3,17 +3,6 @@ require 'honeybadger/agent'
 module Honeybadger
   extend self
 
-  # Public: Stops the Honeybadger service.
-  #
-  # Examples:
-  #
-  #   Honeybadger.stop # => nil
-  #
-  # Returns nothing
-  def stop
-    Agent.stop
-  end
-
   # Public: Send an exception to Honeybadger. Does not report ignored
   # exceptions by default.
   #
@@ -183,6 +172,17 @@ module Honeybadger
   # false if Honeybadger isn't running.
   def flush(&block)
     Agent.flush(&block)
+  end
+
+  # Public: Stops the Honeybadger service.
+  #
+  # Examples:
+  #
+  #   Honeybadger.stop # => nil
+  #
+  # Returns nothing
+  def stop
+    Agent.stop
   end
 
   def config
