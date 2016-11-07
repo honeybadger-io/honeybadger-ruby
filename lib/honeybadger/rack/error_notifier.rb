@@ -45,7 +45,7 @@ module Honeybadger
           response
         end
       ensure
-        Honeybadger.context.clear!
+        agent.context.clear!
       end
 
       private
