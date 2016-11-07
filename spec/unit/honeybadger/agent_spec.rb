@@ -23,14 +23,10 @@ describe Honeybadger::Agent do
     after { instance.stop(true) }
 
     describe "#initialize" do
-      describe "#workers" do
-        subject { instance.workers }
+      describe "#worker" do
+        subject { instance.worker }
 
-        it { should be_a Hash }
-
-        it "initializes a worker for each feature" do
-          expect(subject[:notices]).to be_a Honeybadger::Agent::Worker
-        end
+        it { should be_a Honeybadger::Agent::Worker }
       end
     end
 
@@ -41,8 +37,8 @@ describe Honeybadger::Agent do
         let(:block) { nil }
         it { should eq true }
 
-        it "flushes workers" do
-          expect(instance.workers[:notices]).to receive(:flush)
+        it "flushes worker" do
+          expect(instance.worker).to receive(:flush)
           subject
         end
       end
@@ -58,8 +54,8 @@ describe Honeybadger::Agent do
           subject
         end
 
-        it "flushes workers" do
-          expect(instance.workers[:notices]).to receive(:flush)
+        it "flushes worker" do
+          expect(instance.worker).to receive(:flush)
           subject
         end
       end
@@ -67,8 +63,8 @@ describe Honeybadger::Agent do
       context "when an exception occurs" do
         let(:block) { Proc.new { fail 'oops' } }
 
-        it "flushes workers" do
-          expect(instance.workers[:notices]).to receive(:flush)
+        it "flushes worker" do
+          expect(instance.worker).to receive(:flush)
           expect { subject }.to raise_error /oops/
         end
       end

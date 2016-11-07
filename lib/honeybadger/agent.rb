@@ -10,7 +10,7 @@ require 'honeybadger/agent/worker'
 require 'honeybadger/agent/null_worker'
 
 module Honeybadger
-  # Internal: A broker for the configuration and the workers.
+  # Internal: A broker for the configuration and the worker.
   class Agent
     extend Forwardable
 
@@ -72,7 +72,7 @@ module Honeybadger
       true
     end
 
-    attr_reader :workers
+    attr_reader :worker
 
     def initialize(config = nil)
       @config = config if config.kind_of?(Config)
@@ -81,14 +81,11 @@ module Honeybadger
 
       @context_manager = ContextManager.current
 
-      init_workers
+      init_worker
     end
 
     def stop(force = false)
-      workers.each_pair do |key, worker|
-        worker.send(force ? :shutdown! : :shutdown)
-      end
-
+      worker.send(force ? :shutdown! : :shutdown)
       true
     end
 
@@ -115,7 +112,7 @@ module Honeybadger
         if opts[:sync]
           config.backend.notify(:notices, notice)
         else
-          push(:notices, notice)
+          push(notice)
         end
         notice.id
       end
@@ -134,7 +131,7 @@ module Honeybadger
       context_manager.clear!
     end
 
-    # Public: Flush the workers. See Honeybadger#flush.
+    # Public: Flush the worker. See Honeybadger#flush.
     #
     # block - an option block which is executed before flushing data.
     #
@@ -143,7 +140,7 @@ module Honeybadger
       return true unless block_given?
       yield
     ensure
-      workers.values.each(&:flush)
+      worker.flush
     end
 
     def with_rack_env(rack_env, &block)
@@ -168,16 +165,13 @@ module Honeybadger
 
     attr_reader :context_manager
 
-    def push(feature, object)
-
-      workers[feature].push(object)
-
+    def push(object)
+      worker.push(object)
       true
     end
 
-    def init_workers
-      @workers = Hash.new(NullWorker.new)
-      workers[:notices] = Worker.new(config, :notices)
+    def init_worker
+      @worker = Worker.new(config, :notices)
     end
 
     @instance = new(Config.new)
