@@ -45,7 +45,7 @@ begin
           after { worker.work_off }
 
           it "notifies Honeybadger" do
-            expect(Honeybadger).to receive(:notify_or_ignore)
+            expect(Honeybadger).to receive(:notify)
           end
         end
 
@@ -56,7 +56,7 @@ begin
           after { ::Honeybadger::Agent.config[:'delayed_job.attempt_threshold'] = 0 }
 
           it "does not notify Honeybadger on first occurence" do
-            expect(Honeybadger).not_to receive(:notify_or_ignore)
+            expect(Honeybadger).not_to receive(:notify)
             worker.work_off
           end
         end

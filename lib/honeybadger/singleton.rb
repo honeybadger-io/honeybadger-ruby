@@ -39,9 +39,6 @@ module Honeybadger
     Agent.notify(exception_or_opts, opts)
   end
 
-  # Deprecated: Legacy support.
-  alias_method :notify_or_ignore, :notify
-
   # Public: Callback to ignore exceptions.
   #
   # See public API documentation for Honeybadger::Notice for available attributes.
