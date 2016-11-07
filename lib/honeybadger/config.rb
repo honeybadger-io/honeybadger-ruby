@@ -10,7 +10,6 @@ require 'honeybadger/backend'
 require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
 require 'honeybadger/logging'
-require 'honeybadger/rack/request_hash'
 
 module Honeybadger
   class Config
@@ -31,8 +30,6 @@ module Honeybadger
     DOTTED_KEY = Regexp.new('\A([^\.]+)\.(.+)\z').freeze
 
     NOT_BLANK = Regexp.new('\S').freeze
-
-    DEFAULT_REQUEST_HASH = {}.freeze
 
     def initialize(opts = {})
       @ruby = opts.freeze
@@ -119,17 +116,6 @@ module Honeybadger
       @backend
     end
 
-    def request
-      Thread.current[:__honeybadger_request]
-    end
-
-    def with_request(request, &block)
-      Thread.current[:__honeybadger_request] = request
-      yield
-    ensure
-      Thread.current[:__honeybadger_request] = nil
-    end
-
     # Internal Helpers
 
     def disabled?
@@ -203,17 +189,8 @@ module Honeybadger
       self[:max_queue_size]
     end
 
-    def request_hash
-      return DEFAULT_REQUEST_HASH unless request
-      Rack::RequestHash.new(request)
-    end
-
     def params_filters
-      self[:'request.filter_keys'] + rails_params_filters
-    end
-
-    def rails_params_filters
-      request && request.env['action_dispatch.parameter_filter'] or []
+      Array(self[:'request.filter_keys'])
     end
 
     def excluded_request_keys

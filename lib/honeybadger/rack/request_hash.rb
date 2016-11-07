@@ -7,6 +7,11 @@ module Honeybadger
       CGI_BLACKLIST = ['QUERY_STRING', 'RAW_POST_DATA', 'ORIGINAL_FULLPATH', 'REQUEST_URI'].freeze
       CGI_KEY_REGEXP = /\A[A-Z_]+\Z/
 
+      def self.from_env(env)
+        return {} unless defined?(::Rack::Request)
+        new(::Rack::Request.new(env))
+      end
+
       def initialize(request)
         self[:url] = extract_url(request)
         self[:params] = extract_params(request)
