@@ -36,7 +36,7 @@ module Honeybadger
 
               block.call(job)
             rescue Exception => error
-              ::Honeybadger.notify_or_ignore(
+              ::Honeybadger.notify(
                 :component     => component,
                 :action        => action,
                 :error_class   => error.class.name,

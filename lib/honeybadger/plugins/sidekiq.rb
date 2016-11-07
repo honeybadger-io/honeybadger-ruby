@@ -27,7 +27,7 @@ module Honeybadger
                 return if params['retry'.freeze] && params['retry_count'.freeze].to_i < config[:'sidekiq.attempt_threshold'].to_i
                 opts = {parameters: params}
                 opts[:component] = params['wrapped'.freeze] || params['class'.freeze] if config[:'sidekiq.use_component']
-                Honeybadger.notify_or_ignore(ex, opts)
+                Honeybadger.notify(ex, opts)
               }
             end
           end

@@ -68,7 +68,7 @@ describe "Sidekiq Dependency" do
         end
 
         it "notifies Honeybadger" do
-          expect(Honeybadger).to receive(:notify_or_ignore).with(exception, { parameters: job_context }).once
+          expect(Honeybadger).to receive(:notify).with(exception, { parameters: job_context }).once
           sidekiq_config.error_handlers[0].call(exception, job_context)
         end
 
@@ -77,7 +77,7 @@ describe "Sidekiq Dependency" do
           let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'sidekiq.attempt_threshold' => 3) }
 
           it "doesn't notify Honeybadger" do
-            expect(Honeybadger).not_to receive(:notify_or_ignore)
+            expect(Honeybadger).not_to receive(:notify)
             sidekiq_config.error_handlers[0].call(exception, job_context)
           end
 
@@ -85,7 +85,7 @@ describe "Sidekiq Dependency" do
             let(:job_context) { { 'retry_count' => 2, 'retry' => false } }
 
             it "notifies Honeybadger" do
-              expect(Honeybadger).to receive(:notify_or_ignore).with(exception, { parameters: job_context }).once
+              expect(Honeybadger).to receive(:notify).with(exception, { parameters: job_context }).once
               sidekiq_config.error_handlers[0].call(exception, job_context)
             end
           end
@@ -94,7 +94,7 @@ describe "Sidekiq Dependency" do
             let(:job_context) { { 'retry_count' => 3, 'retry' => true } }
 
             it "notifies Honeybadger" do
-              expect(Honeybadger).to receive(:notify_or_ignore).with(exception, { parameters: job_context }).once
+              expect(Honeybadger).to receive(:notify).with(exception, { parameters: job_context }).once
               sidekiq_config.error_handlers[0].call(exception, job_context)
             end
           end

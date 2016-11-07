@@ -16,7 +16,7 @@ module Honeybadger
       def invoke_command_with_honeybadger(*args)
         invoke_command_without_honeybadger(*args)
       rescue Exception => e
-        Honeybadger.notify_or_ignore(e)
+        Honeybadger.notify(e)
         raise
       end
     end
