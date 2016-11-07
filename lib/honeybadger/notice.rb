@@ -313,7 +313,7 @@ module Honeybadger
 
     def construct_context_hash(opts)
       context = {}
-      context.merge!(Thread.current[:__honeybadger_context]) if Thread.current[:__honeybadger_context]
+      context.merge!(opts[:global_context]) if opts[:global_context]
       context.merge!(opts[:context]) if opts[:context]
       context.empty? ? nil : context
     end

@@ -93,13 +93,13 @@ describe Honeybadger::Rack::ErrorNotifier do
 
   it "clears context after app is called" do
     Honeybadger.context(foo: :bar)
-    expect(Thread.current[:__honeybadger_context]).to eq({foo: :bar})
+    expect(Honeybadger.get_context).to eq({foo: :bar})
 
     app = lambda { |env| ['response', {}, env] }
     stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
 
     stack.call({})
 
-    expect(Thread.current[:__honeybadger_context]).to be_nil
+    expect(Honeybadger.get_context).to be_nil
   end
 end

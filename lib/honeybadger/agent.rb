@@ -2,6 +2,7 @@ require 'forwardable'
 
 require 'honeybadger/version'
 require 'honeybadger/config'
+require 'honeybadger/context_manager'
 require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
@@ -38,6 +39,14 @@ module Honeybadger
       self.instance.notify(exception_or_opts, opts)
     end
 
+    def self.context(hash = nil)
+      self.instance.context(hash)
+    end
+
+    def self.get_context
+      self.instance.get_context
+    end
+
     # Internal: Not for public consumption. :)
     #
     # Prefer dependency injection over accessing config directly, but some
@@ -66,11 +75,11 @@ module Honeybadger
     attr_reader :workers
 
     def initialize(config = nil)
-      @mutex = Mutex.new
-
       @config = config if config.kind_of?(Config)
       @config = Config.new(config) if config.kind_of?(Hash)
       @config ||= Config.new
+
+      @context_manager = ContextManager.current
 
       init_workers
     end
@@ -88,7 +97,8 @@ module Honeybadger
 
       opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
       opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
-      opts.merge!(rack_env: rack_env) if rack_env
+      opts.merge!(rack_env: context_manager.get_rack_env)
+      opts.merge!(global_context: context_manager.get_context)
 
       notice = Notice.new(config, opts)
 
@@ -111,7 +121,20 @@ module Honeybadger
       end
     end
 
-    # Internal: Flush the workers. See Honeybadger#flush.
+    def context(hash = nil)
+      context_manager.set_context(hash) unless hash.nil?
+      self
+    end
+
+    def get_context
+      context_manager.get_context
+    end
+
+    def clear!
+      context_manager.clear!
+    end
+
+    # Public: Flush the workers. See Honeybadger#flush.
     #
     # block - an option block which is executed before flushing data.
     #
@@ -124,14 +147,14 @@ module Honeybadger
     end
 
     def rack_env
-      Thread.current[:__honeybadger_rack_env]
+      context_manager.get_rack_env
     end
 
     def with_rack_env(rack_env, &block)
-      Thread.current[:__honeybadger_rack_env] = rack_env
+      context_manager.set_rack_env(rack_env)
       yield
     ensure
-      Thread.current[:__honeybadger_rack_env] = nil
+      context_manager.set_rack_env(nil)
     end
 
     attr_reader :config
@@ -147,7 +170,7 @@ module Honeybadger
 
     private
 
-    attr_reader :mutex
+    attr_reader :context_manager
 
     def push(feature, object)
 
