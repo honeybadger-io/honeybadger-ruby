@@ -158,12 +158,7 @@ module Honeybadger
   #
   # Returns self so that method calls can be chained.
   def context(hash = nil)
-    unless hash.nil?
-      Thread.current[:__honeybadger_context] ||= {}
-      Thread.current[:__honeybadger_context].merge!(hash)
-    end
-
-    self
+    Agent.context(hash)
   end
 
 
@@ -177,12 +172,7 @@ module Honeybadger
   #
   # Returns hash or nil.
   def get_context
-    Thread.current[:__honeybadger_context]
-  end
-
-  # Internal: Clears the global context
-  def clear!
-    Thread.current[:__honeybadger_context] = nil
+    Agent.get_context
   end
 
   # Public: Flushes all data from workers before returning. This is most useful

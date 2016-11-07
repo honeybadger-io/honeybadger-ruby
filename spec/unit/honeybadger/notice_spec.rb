@@ -280,20 +280,20 @@ describe Honeybadger::Notice do
 
   describe "#context" do
     it "merges context from args with context from Honeybadger#context" do
-      Thread.current[:__honeybadger_context] = {'one' => 'two', 'foo' => 'bar'}
-      notice = build_notice(:context => {'three' => 'four', 'foo' => 'baz'})
+      global_context = {'one' => 'two', 'foo' => 'bar'}
+      notice = build_notice(global_context: global_context, context: {'three' => 'four', 'foo' => 'baz'})
       expect(notice[:request][:context]).to eq({'one' => 'two', 'three' => 'four', 'foo' => 'baz'})
     end
 
     it "doesn't mutate global context" do
-      Thread.current[:__honeybadger_context] = {'one' => 'two'}
-      expect { build_notice(:context => {'foo' => 'bar'}) }.not_to change { Thread.current[:__honeybadger_context] }
+      global_context = {'one' => 'two'}
+      expect { build_notice(global_context: global_context, context: {'foo' => 'bar'}) }.not_to change { Thread.current[:__honeybadger_context] }
     end
 
     it "doesn't mutate local context" do
-      Thread.current[:__honeybadger_context] = {'one' => 'two'}
+      global_context = {'one' => 'two'}
       hash = {'foo' => 'bar'}
-      expect { build_notice(:context => hash) }.not_to change { hash }
+      expect { build_notice(global_context: global_context, context: hash) }.not_to change { hash }
     end
 
     it "returns nil context when context is not set" do
@@ -302,8 +302,8 @@ describe Honeybadger::Notice do
     end
 
     it "allows falsey values in context" do
-      Thread.current[:__honeybadger_context] = {:debuga => true, :debugb => false}
-      notice = build_notice
+      global_context = {:debuga => true, :debugb => false}
+      notice = build_notice(global_context: global_context)
       hash = JSON.parse(notice.to_json)
       expect(hash['request']['context']).to eq({'debuga' => true, 'debugb' => false})
     end
