@@ -69,7 +69,7 @@ describe Honeybadger do
 
     before do
       allow(Honeybadger::Agent).to receive(:instance).and_return(instance)
-      allow(instance).to receive(:workers).and_return({notices: worker})
+      allow(instance).to receive(:worker).and_return(worker)
     end
 
     it "creates and send a notice for an exception" do
