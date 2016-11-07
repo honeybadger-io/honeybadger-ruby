@@ -146,10 +146,6 @@ module Honeybadger
       workers.values.each(&:flush)
     end
 
-    def rack_env
-      context_manager.get_rack_env
-    end
-
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
       yield
