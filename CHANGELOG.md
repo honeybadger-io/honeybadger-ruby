@@ -29,6 +29,8 @@ adheres to [Semantic Versioning](http://semver.org/).
   (Use it to report failures in cron!) See `honeybadger help exec`.
 - Use `honeybadger notify` from the command line to report custom errors to
   Honeybadger. See `honeybadger help notify`.
+- ~/honeybadger.yml is now a default config path for the CLI and standalone-ruby
+  installations.
 
 ### Changed
 - `Honeybadger.start` has been deprecated and has no effect.

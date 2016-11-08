@@ -23,7 +23,7 @@ module Honeybadger
 
     DEVELOPMENT_ENVIRONMENTS = ['development', 'test', 'cucumber'].map(&:freeze).freeze
 
-    DEFAULT_PATHS = ['honeybadger.yml', 'config/honeybadger.yml'].map(&:freeze).freeze
+    DEFAULT_PATHS = ['honeybadger.yml', 'config/honeybadger.yml', "#{ENV['HOME']}/honeybadger.yml"].map(&:freeze).freeze
 
     OPTIONS = {
       api_key: {
