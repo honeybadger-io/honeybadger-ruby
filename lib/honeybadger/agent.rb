@@ -6,7 +6,7 @@ require 'honeybadger/context_manager'
 require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
-require 'honeybadger/agent/worker'
+require 'honeybadger/worker'
 
 module Honeybadger
   # Internal: A broker for the configuration and the worker.

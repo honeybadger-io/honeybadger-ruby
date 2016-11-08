@@ -1,12 +1,12 @@
 require 'timecop'
 require 'thread'
 
-require 'honeybadger/agent/worker'
+require 'honeybadger/worker'
 require 'honeybadger/config'
 require 'honeybadger/backend'
 require 'honeybadger/notice'
 
-describe Honeybadger::Agent::Worker do
+describe Honeybadger::Worker do
   let(:instance) { described_class.new(config, feature) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
   let(:feature) { :badgers }
@@ -16,7 +16,7 @@ describe Honeybadger::Agent::Worker do
 
   after do
     Thread.list.each do |thread|
-      next unless thread.kind_of?(Honeybadger::Agent::Worker::Thread)
+      next unless thread.kind_of?(Honeybadger::Worker::Thread)
       Thread.kill(thread)
     end
   end
