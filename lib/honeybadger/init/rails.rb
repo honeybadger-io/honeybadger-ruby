@@ -11,30 +11,21 @@ module Honeybadger
           load 'honeybadger/tasks.rb'
         end
 
-        initializer 'honeybadger.install' do
-          Honeybadger::Agent.instance.init!(local_config)
-          Honeybadger::Agent.load_plugins!
-
-          config = Honeybadger.config
-          if config[:'exceptions.enabled']
-            ::Rails.application.config.middleware.tap do |middleware|
-              middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
-              middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer) if config[:'user_informer.enabled']
-              middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback) if config[:'feedback.enabled']
-            end
-          end
+        initializer 'honeybadger.install_middleware' do |app|
+          app.config.middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
+          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer)
+          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback)
         end
 
-        private
-
-        def local_config
-          {
+        config.after_initialize do
+          Honeybadger::Agent.instance.init!({
             :root           => ::Rails.root.to_s,
             :env            => ::Rails.env,
             :'config.path'  => ::Rails.root.join('config', 'honeybadger.yml'),
             :logger         => Logging::FormattedLogger.new(::Rails.logger),
             :framework      => :rails
-          }
+          })
+          Honeybadger::Agent.load_plugins!
         end
       end
     end
