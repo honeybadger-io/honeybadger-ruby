@@ -214,7 +214,7 @@ module Honeybadger
     end
 
     def load_plugin?(name)
-      return false if includes_token?(self[:'plugins.skip'], name)
+      return false if includes_token?(self[:'skipped_plugins'], name)
       return true unless self[:plugins].kind_of?(Array)
       includes_token?(self[:plugins], name)
     end
