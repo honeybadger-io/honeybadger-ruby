@@ -26,7 +26,7 @@ describe Honeybadger::Agent do
       describe "#worker" do
         subject { instance.worker }
 
-        it { should be_a Honeybadger::Agent::Worker }
+        it { should be_a Honeybadger::Worker }
       end
     end
 
