@@ -25,12 +25,7 @@ module Honeybadger
         elsif setter?(m)
           return hash.send(:[]=, key(m).to_sym, args[0])
         elsif getter?(m)
-          k = key(m).to_sym
-          if hash.has_key?(k)
-            return hash[k]
-          else
-            return config[k]
-          end
+          return get(key(m))
         end
 
         super
@@ -61,6 +56,12 @@ module Honeybadger
         parts.compact!
         parts.join('.')
       end
+
+      def get(key)
+        k = key.to_sym
+        return hash[k] if hash.has_key?(k)
+        config.get(k)
+      end
     end
 
     class Ruby < Mash
@@ -68,8 +69,31 @@ module Honeybadger
         hash[:logger] = logger
       end
 
+      def logger
+        get(:logger)
+      end
+
       def backend=(backend)
         hash[:backend] = backend
+      end
+
+      def backend
+        get(:backend)
+      end
+
+      def backtrace_filter(&block)
+        hash[:backtrace_filter] = Proc.new if block_given?
+        get(:backtrace_filter)
+      end
+
+      def exception_filter(&block)
+        hash[:exception_filter] = Proc.new if block_given?
+        get(:exception_filter)
+      end
+
+      def exception_fingerprint
+        hash[:exception_fingerprint] = Proc.new if block_given?
+        get(:exception_fingerprint)
       end
     end
   end
