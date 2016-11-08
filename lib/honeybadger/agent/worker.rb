@@ -2,7 +2,6 @@ require 'forwardable'
 require 'net/http'
 
 require 'honeybadger/logging'
-require 'honeybadger/agent/null_worker'
 
 module Honeybadger
   class Agent

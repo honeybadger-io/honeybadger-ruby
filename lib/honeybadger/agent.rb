@@ -7,7 +7,6 @@ require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/agent/worker'
-require 'honeybadger/agent/null_worker'
 
 module Honeybadger
   # Internal: A broker for the configuration and the worker.
