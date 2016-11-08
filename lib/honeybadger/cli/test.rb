@@ -213,6 +213,6 @@ MSG
 
         ::Rails.application.call(env)
       end
+    end
   end
-end
 end
