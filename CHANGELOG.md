@@ -12,6 +12,51 @@ adheres to [Semantic Versioning](http://semver.org/).
   callback.
 
 ## [3.0.0][unreleased]
+### Added
+- You may now require 'honeybadger/ruby' instead of 'honeybadger' to get the
+  agent without the integrations (no railtie, plugins or monkey patching).
+- You can now create multiple instances of the Honeybadger agent with different
+  configurations (many classes in the library can be composed).
+- `Honeybadger.configure` works again -- use it to configure the library from
+  Ruby! (we still default to honeybadger.yml in our installer)
+- Our test suite is now leaner and meaner (which means we can add new features
+  faster). Reduced typical build times from up to 2 minutes to 20 seconds.
+- We've rebuilt the CLI from scratch. The new CLI features super verbose error
+  messages with (hopefully) helpful suggestions, some new commands, and better
+  framework detection in the `install` and `test` commands.
+- Use `honeybadger exec your_command` from the command line to report the error
+  when the command fails due to a non-zero exit status or standard error output.
+  (Use it to report failures in cron!) See `honeybadger help exec`.
+- Use `honeybadger notify` from the command line to report custom errors to
+  Honeybadger. See `honeybadger help notify`.
+
+### Changed
+- `Honeybadger.start` has been deprecated and has no effect.
+- We've changed some of the underlying code of the library. If you depend on
+  internal APIs (such as thread local variable names or any functions not marked
+  public in the code comments) then you may need to update your code. If you are
+  developing 3rd-party integrations with our gem [let us
+  know](https://github.com/honeybadger-io/honeybadger-ruby/issues) so that we can
+  work with you to build the public APIs you need.
+- All Rack middleware no longer require an argument (which used to be a
+  `Honeybadger::Config` instance) when using them. They now default to the
+  global agent and accept an optional argument which expects an alternate
+  `Honeybadger::Agent` instance.
+
+### Removed
+- Ruby 1.9.3 and 2.0.x are no longer supported.
+- `Honeybadger.notify_or_ignore` has been removed. Use `Honeybadger.notify(e)`
+  and `Honeybadger.notify(e, force: true)` (to skip ignore filters).
+- The CLI command `honeybadger config` has been removed.
+- The local variables feature has been removed. It depended on the
+  `binding_of_caller` gem which does not support new versions of Ruby and has
+  serious performance implications in production. This is something that we will
+  continue to research for future versions of the honeybadger gem. (If you have
+  implementation ideas,
+  [let us know](https://github.com/honeybadger-io/honeybadger-ruby/issues)).
+- All deprecated Rails controller methods (from version 1.x) have been removed.
+- The deprecated `Honeybadger::Rack::MetricsReporter` middleware has been
+  removed.
 
 ## [2.7.0] - 2016-10-20
 ### Added
