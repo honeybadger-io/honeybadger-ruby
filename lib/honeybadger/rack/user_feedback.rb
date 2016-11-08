@@ -25,6 +25,7 @@ module Honeybadger
       end
 
       def call(env)
+        return @app.call(env) unless config[:'feedback.enabled']
         status, headers, body = @app.call(env)
         if env['honeybadger.error_id'] && form = render_form(env['honeybadger.error_id'])
           new_body = []
