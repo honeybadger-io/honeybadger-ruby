@@ -46,7 +46,7 @@ module Honeybadger
       load_config_from_disk {|yaml| self.yaml = yaml.freeze }
       init_logging!
       init_backend!
-      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, framework))
+      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
       logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
       if valid? && !ping
         logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
@@ -55,7 +55,7 @@ module Honeybadger
     end
 
     def configure
-      ruby_config = Ruby.new
+      ruby_config = Ruby.new(self)
       yield(ruby_config)
       self.ruby = ruby.merge(ruby_config).freeze
       @logging = @backend = nil
