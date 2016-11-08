@@ -104,7 +104,7 @@ module Honeybadger
 
       undotify_keys(hash.select {|k,v| DEFAULTS.has_key?(k) })
     end
-    alias :to_h :to_hash
+    alias to_h to_hash
 
     def logger
       init_logging! unless @logger
@@ -422,7 +422,7 @@ module Honeybadger
             new_hash[$1] ||= {}
             new_hash[$1] = undotify_keys(new_hash[$1].merge({$2 => v}))
           else
-            new_hash[k] = v
+            new_hash[k.to_s] = v
           end
         end
       end
