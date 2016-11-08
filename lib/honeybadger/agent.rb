@@ -47,14 +47,23 @@ module Honeybadger
       def_delegators :config, :configure, :exception_filter, :exception_fingerprint, :backtrace_filter
     end
 
-    def initialize(config = nil)
-      @config = config if config.kind_of?(Config)
-      @config = Config.new(config) if config.kind_of?(Hash)
-      @config ||= Config.new
+    def initialize(opts = {})
+      if opts.kind_of?(Config)
+        @config = opts
+        opts = {}
+      end
 
-      @context_manager = ContextManager.current
+      @context = opts.delete(:context)
+      @context ||= ContextManager.new if opts.delete(:local_context)
+
+      @config ||= Config.new(opts)
 
       init_worker
+    end
+
+    def context_manager
+      return @context if @context
+      ContextManager.current
     end
 
     attr_reader :worker
@@ -130,8 +139,6 @@ module Honeybadger
     end
 
     private
-
-    attr_reader :context_manager
 
     def push(object)
       worker.push(object)
