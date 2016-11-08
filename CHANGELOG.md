@@ -48,6 +48,7 @@ adheres to [Semantic Versioning](http://semver.org/).
   `Honeybadger::Config` instance) when using them. They now default to the
   global agent and accept an optional argument which expects an alternate
   `Honeybadger::Agent` instance.
+- The *plugins.skip* config option has been renamed to *skipped_plugins*.
 
 ### Removed
 - Ruby 1.9.3 and 2.0.x are no longer supported.

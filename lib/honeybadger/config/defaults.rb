@@ -86,7 +86,7 @@ module Honeybadger
         default: nil,
         type: Array
       },
-      :'plugins.skip' => {
+      :'skipped_plugins' => {
         description: 'An optional list of plugins to skip.',
         default: nil,
         type: Array
