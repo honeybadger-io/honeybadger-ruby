@@ -119,11 +119,6 @@ module Honeybadger
       context_manager.clear!
     end
 
-    # Public: Flush the worker. See Honeybadger#flush.
-    #
-    # block - an option block which is executed before flushing data.
-    #
-    # Returns value from block if block is given, otherwise true.
     def flush
       return true unless block_given?
       yield
@@ -144,13 +139,10 @@ module Honeybadger
     end
 
     attr_reader :config
-    def_delegators :config, :configure, :exception_filter,
+    def_delegators :config, :init!, :configure, :exception_filter,
       :exception_fingerprint, :backtrace_filter
 
     # Internal
-
-    def_delegators :config, :init!
-
     attr_reader :worker
 
     private
