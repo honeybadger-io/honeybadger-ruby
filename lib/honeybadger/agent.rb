@@ -9,7 +9,33 @@ require 'honeybadger/logging'
 require 'honeybadger/worker'
 
 module Honeybadger
-  # Internal: A broker for the configuration and the worker.
+  # Public: The Honeybadger agent contains all the methods for interacting with
+  # the Honeybadger service. It can be used to send notifications to multiple
+  # projects in large apps.
+  #
+  # Context is global by default, meaning agents created via
+  # `Honeybadger::Agent.new` will share context (added via
+  # `Honeybadger.context` or `Honeybadger::Agent#context`) with other agents.
+  # This also includes the Rack environment when using the Honeybadger rack
+  # middleware.
+  #
+  # Example
+  #
+  #   # Standard usage:
+  #   OtherBadger = Honeybadger::Agent.new
+  #
+  #   # With local context:
+  #   OtherBadger = Honeybadger::Agent.new(local_context: true)
+  #
+  #   OtherBadger.configure do |config|
+  #     config.api_key = 'project api key'
+  #   end
+  #
+  #   begin
+  #     # Risky operation
+  #   rescue => e
+  #     OtherBadger.notify(e)
+  #   end
   class Agent
     extend Forwardable
 
