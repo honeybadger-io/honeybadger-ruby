@@ -87,17 +87,6 @@ module Honeybadger
       init_worker
     end
 
-    def context_manager
-      return @context if @context
-      ContextManager.current
-    end
-
-    attr_reader :worker
-
-    attr_reader :config
-    def_delegators :config, :init!, :configure
-    def_delegators :config, :exception_filter, :exception_fingerprint, :backtrace_filter
-
     def notify(exception_or_opts, opts = {})
       return false if config.disabled?
 
@@ -164,7 +153,22 @@ module Honeybadger
       context_manager.set_rack_env(nil)
     end
 
+    attr_reader :config
+    def_delegators :config, :configure, :exception_filter,
+      :exception_fingerprint, :backtrace_filter
+
+    # Internal
+
+    def_delegators :config, :init!
+
+    attr_reader :worker
+
     private
+
+    def context_manager
+      return @context if @context
+      ContextManager.current
+    end
 
     def push(object)
       worker.push(object)
