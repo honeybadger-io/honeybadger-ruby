@@ -229,7 +229,21 @@ module Honeybadger
     end
 
     attr_reader :config
-    def_delegators :config, :init!, :configure
+
+    # Public: Configure the Honeybadger agent via Ruby.
+    #
+    # block - The configuration block.
+    #
+    # Examples:
+    #
+    #   Honeybadger.configure do |config|
+    #     config.api_key = 'project api key'
+    #     config.exceptions.ignore += [CustomError]
+    #   end
+    #
+    # Yields configuration object.
+    # Returns nothing.
+    def_delegator :config, :configure
 
     # Public: Callback to ignore exceptions.
     #
@@ -314,6 +328,9 @@ module Honeybadger
 
     # Internal
     attr_reader :worker
+
+    # Internal
+    def_delegators :config, :init!
 
     private
 
