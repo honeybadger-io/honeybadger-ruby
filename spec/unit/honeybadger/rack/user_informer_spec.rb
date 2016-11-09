@@ -26,7 +26,6 @@ describe Honeybadger::Rack::UserInformer do
 
     result = informer_app.call({})
 
-    response = Net::HTTP.get_response(URI.parse("http://example.com/"))
     expect(result[2][0]).to eq '<!-- HONEYBADGER ERROR -->'
   end
 end
