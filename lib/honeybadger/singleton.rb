@@ -8,9 +8,16 @@ module Honeybadger
   extend Forwardable
   extend self
 
-  def_delegators :'Agent.instance', :config, :configure, :notify, :context,
-    :get_context, :flush, :stop, :with_rack_env, :exception_filter,
+  def_delegators :'Agent.instance', :init!, :config, :configure, :notify,
+    :context, :get_context, :flush, :stop, :with_rack_env, :exception_filter,
     :exception_fingerprint, :backtrace_filter
+
+  def load_plugins!
+    Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
+      require plugin
+    end
+    Plugin.load!(self.config)
+  end
 
   # Deprecated
   def start(config = {})

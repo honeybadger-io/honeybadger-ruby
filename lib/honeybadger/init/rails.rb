@@ -18,14 +18,14 @@ module Honeybadger
         end
 
         config.after_initialize do
-          Honeybadger::Agent.instance.init!({
+          Honeybadger.init!({
             :root           => ::Rails.root.to_s,
             :env            => ::Rails.env,
             :'config.path'  => ::Rails.root.join('config', 'honeybadger.yml'),
             :logger         => Logging::FormattedLogger.new(::Rails.logger),
             :framework      => :rails
           })
-          Honeybadger::Agent.load_plugins!
+          Honeybadger.load_plugins!
         end
       end
     end
