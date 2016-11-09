@@ -20,17 +20,17 @@ describe Honeybadger do
   end
 
   it "delegates ::exception_filter to agent config" do
-    expect(Honeybadger::Agent.config).to receive(:exception_filter)
+    expect(Honeybadger.config).to receive(:exception_filter)
     Honeybadger.exception_filter {}
   end
 
   it "delegates ::backtrace_filter to agent config" do
-    expect(Honeybadger::Agent.config).to receive(:backtrace_filter)
+    expect(Honeybadger.config).to receive(:backtrace_filter)
     Honeybadger.backtrace_filter {}
   end
 
   it "delegates ::exception_fingerprint to agent config" do
-    expect(Honeybadger::Agent.config).to receive(:exception_fingerprint)
+    expect(Honeybadger.config).to receive(:exception_fingerprint)
     Honeybadger.exception_fingerprint {}
   end
 

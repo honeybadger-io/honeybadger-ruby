@@ -45,7 +45,7 @@ module Honeybadger
       Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
         require plugin
       end
-      Plugin.load!(self.config)
+      Plugin.load!(self.instance.config)
     end
 
     def self.instance
@@ -54,13 +54,6 @@ module Honeybadger
 
     def self.instance=(instance)
       @instance = instance
-    end
-
-    class << self
-      extend Forwardable
-
-      def_delegators :instance, :config, :notify, :context, :get_context, :flush, :stop, :with_rack_env
-      def_delegators :config, :configure, :exception_filter, :exception_fingerprint, :backtrace_filter
     end
 
     def initialize(opts = {})

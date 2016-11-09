@@ -14,7 +14,7 @@ module Honeybadger
 
           ::PhusionPassenger.on_event(:stopping_worker_process) do
             logger.debug('Stopping passenger worker process')
-            Honeybadger::Agent.stop
+            Honeybadger.stop
           end
         end
       end

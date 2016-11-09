@@ -42,7 +42,7 @@ module Honeybadger
                 :error_class   => error.class.name,
                 :error_message => "#{ error.class.name }: #{ error.message }",
                 :backtrace     => error.backtrace
-              ) if job.attempts.to_i >= ::Honeybadger::Agent.config[:'delayed_job.attempt_threshold'].to_i
+              ) if job.attempts.to_i >= ::Honeybadger.config[:'delayed_job.attempt_threshold'].to_i
               raise error
             ensure
               ::Honeybadger.context.clear!
