@@ -41,13 +41,6 @@ module Honeybadger
 
     include Logging::Helper
 
-    def self.load_plugins!
-      Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
-        require plugin
-      end
-      Plugin.load!(self.instance.config)
-    end
-
     def self.instance
       @instance
     end

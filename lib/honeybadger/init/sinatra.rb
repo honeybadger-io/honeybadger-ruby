@@ -22,8 +22,8 @@ module Honeybadger
           end
 
           def install_honeybadger
-            Honeybadger::Agent.instance.init!(honeybadger_config(self))
-            Honeybadger::Agent.load_plugins!
+            Honeybadger.init!(honeybadger_config(self))
+            Honeybadger.load_plugins!
 
             config = Honeybadger.config
             return unless config[:'sinatra.enabled']
