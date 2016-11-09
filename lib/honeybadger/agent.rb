@@ -56,16 +56,6 @@ module Honeybadger
       @instance = instance
     end
 
-    # Deprecated
-    def self.running?
-      true
-    end
-
-    # Deprecated
-    def self.start(config = {})
-      true
-    end
-
     class << self
       extend Forwardable
 

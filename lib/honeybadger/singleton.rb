@@ -192,6 +192,6 @@ module Honeybadger
 
   # Deprecated
   def start(config = {})
-    Agent.start(config)
+    true
   end
 end
