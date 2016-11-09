@@ -16,7 +16,7 @@ module Honeybadger
               yield
             rescue => e
               receive_count = sqs_msg.attributes['ApproximateReceiveCount'.freeze]
-              if receive_count && ::Honeybadger::Agent.config[:'shoryuken.attempt_threshold'].to_i <= receive_count.to_i
+              if receive_count && ::Honeybadger.config[:'shoryuken.attempt_threshold'].to_i <= receive_count.to_i
                 Honeybadger.notify(e, parameters: body)
               end
               raise e

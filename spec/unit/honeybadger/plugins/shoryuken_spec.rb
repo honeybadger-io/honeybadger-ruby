@@ -75,8 +75,8 @@ describe TestShoryukenWorker do
     end
 
     context "when an attempt threshold is configured" do
-      before { ::Honeybadger::Agent.config[:'shoryuken.attempt_threshold'] = 2 }
-      after { ::Honeybadger::Agent.config[:'shoryuken.attempt_threshold'] = 0 }
+      before { ::Honeybadger.config[:'shoryuken.attempt_threshold'] = 2 }
+      after { ::Honeybadger.config[:'shoryuken.attempt_threshold'] = 0 }
 
       include_examples "doesn't notify Honeybadger"
 

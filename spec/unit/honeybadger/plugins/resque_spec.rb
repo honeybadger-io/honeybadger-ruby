@@ -52,14 +52,14 @@ describe TestWorker do
   describe "::around_perform_with_honeybadger" do
     describe "with worker not extending Resque::Plugins::Retry" do
       context "when send exceptions on retry enabled" do
-        before { ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying'] = true }
+        before { ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying'] = true }
         it_behaves_like "clears the context"
         it_behaves_like "reports exceptions"
         it_behaves_like "raises exceptions"
       end
 
       context "when send exceptions on retry disabled" do
-        before { ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying'] = false }
+        before { ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying'] = false }
         it_behaves_like "clears the context"
         it_behaves_like "reports exceptions"
         it_behaves_like "raises exceptions"
@@ -79,7 +79,7 @@ describe TestWorker do
       end
 
       context "when send exceptions on retry enabled" do
-        before { ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying'] = true }
+        before { ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying'] = true }
 
         context "with retry criteria invalid" do
           it_behaves_like "clears the context"
@@ -96,7 +96,7 @@ describe TestWorker do
       end
 
       context "when send exceptions on retry disabled" do
-        before { ::Honeybadger::Agent.config[:'resque.resque_retry.send_exceptions_when_retrying'] = false }
+        before { ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying'] = false }
 
         context "with retry criteria invalid" do
           it_behaves_like "clears the context"
