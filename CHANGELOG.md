@@ -51,12 +51,6 @@ adheres to [Semantic Versioning](http://semver.org/).
 - `Honeybadger.notify_or_ignore` has been removed. Use `Honeybadger.notify(e)`
   and `Honeybadger.notify(e, force: true)` (to skip ignore filters).
 - The CLI command `honeybadger config` has been removed.
-- The local variables feature has been removed. It depended on the
-  `binding_of_caller` gem which does not support new versions of Ruby and has
-  serious performance implications in production. This is something that we will
-  continue to research for future versions of the honeybadger gem. (If you have
-  implementation ideas,
-  [let us know](https://github.com/honeybadger-io/honeybadger-ruby/issues)).
 - All deprecated Rails controller methods (from version 1.x) have been removed.
 - The deprecated `Honeybadger::Rack::MetricsReporter` middleware has been
   removed.

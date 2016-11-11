@@ -246,6 +246,11 @@ module Honeybadger
         default: 2,
         type: Integer
       },
+      :'exceptions.local_variables' => {
+        description: 'Enable sending local variables. Requires binding_of_caller to be loaded.',
+        default: false,
+        type: Boolean
+      },
       :'exceptions.unwrap' => {
         description: 'Reports #original_exception or #cause one level up from rescued exception when available.',
         default: false,

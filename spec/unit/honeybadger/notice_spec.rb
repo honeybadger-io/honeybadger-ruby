@@ -2,6 +2,7 @@
 
 require 'honeybadger/notice'
 require 'honeybadger/config'
+require 'honeybadger/plugins/local_variables'
 require 'timecop'
 
 describe Honeybadger::Notice do
@@ -571,6 +572,22 @@ describe Honeybadger::Notice do
   end
 
   describe "#to_json" do
+    context "when local variables are found" do
+      it "sends local_variables in request payload" do
+        notice = build_notice
+        hash = {'foo' => 'bar'}
+        allow(notice).to receive(:local_variables).and_return(hash)
+        expect(JSON.parse(notice.to_json)['request']['local_variables']).to eq(hash)
+      end
+    end
+
+    context "when local variables are not found" do
+      it "doesn't send local_variables in request payload" do
+        notice = build_notice
+        expect(JSON.parse(notice.to_json)['request']).not_to have_key 'local_variables'
+      end
+    end
+
     context "when bad encodings exist in payload" do
       let(:bad_string) { 'hello ümlaut'.force_encoding('BINARY') }
       let(:invalid) { (100..1000).to_a.pack('c*').force_encoding('utf-8') }
@@ -597,6 +614,102 @@ describe Honeybadger::Notice do
 
       json['error']['backtrace'].each do |line|
         expect(line['source']).not_to be_empty
+      end
+    end
+  end
+
+  describe "#local_variables", order: :defined do
+    let(:notice) { build_notice(exception: exception, config: config) }
+    let(:mock_binding) { @mock_binding }
+    let(:exception) do
+      foo = 'bar'
+      begin
+        @mock_binding = binding
+        fail 'oops'
+      rescue
+        $!
+      end
+    end
+
+    context "when binding_of_caller is not installed" do
+      context "when local variables aren't enabled" do
+        it "does not attempt to find them" do
+          expect(notice.local_variables).to eq(nil)
+        end
+      end
+
+      context "when local variables are enabled" do
+        let(:config) { build_config(:'exceptions.local_variables' => true) }
+
+        it "does not attempt to find them" do
+          expect(notice.local_variables).to eq({})
+        end
+      end
+    end
+
+    context "when binding_of_caller is installed" do
+      before do
+        exception.instance_eval do
+          def __honeybadger_bindings_stack
+            @__honeybadger_bindings_stack
+          end
+
+          def __honeybadger_bindings_stack=(val)
+            @__honeybadger_bindings_stack = val
+          end
+        end
+
+        exception.__honeybadger_bindings_stack = [@mock_binding]
+      end
+
+      context "when local variables aren't enabled" do
+        it "does not attempt to find them" do
+          expect(notice.local_variables).to eq(nil)
+        end
+      end
+
+      context "when local variables are enabled" do
+        let(:config) { build_config(:'exceptions.local_variables' => true) }
+
+        it "finds the local variables from first frame of trace" do
+          expect(notice.local_variables[:foo]).to eq 'bar'
+        end
+
+        context "with an application trace" do
+          before do
+            exception.__honeybadger_bindings_stack.unshift(double('Binding', :eval => nil))
+            config[:root] = File.dirname(__FILE__)
+          end
+
+          it "finds the local variables from first frame of application trace" do
+            expect(notice.local_variables[:foo]).to eq 'bar'
+          end
+
+          it "filters local variable keys" do
+            config[:'request.filter_keys'] = ['foo']
+            expect(notice.local_variables[:foo]).to eq '[FILTERED]'
+          end
+
+          context "and project_root is a Pathname" do
+            before do
+              config[:root] = Pathname.new(File.dirname(__FILE__))
+            end
+
+            specify { expect { notice }.not_to raise_error }
+          end
+        end
+
+        context "without an exception" do
+          it "assigns empty Hash" do
+            expect(build_notice(exception: nil, config: config).local_variables).to eq({})
+          end
+        end
+
+        context "without bindings" do
+          it "assigns empty Hash" do
+            expect(build_notice(exception: RuntimeError.new, config: config).local_variables).to eq({})
+          end
+        end
       end
     end
   end
