@@ -26,3 +26,4 @@ gem 'capistrano', '>= 3.2.0', '< 3.5.0', require: false
 gem 'net-ssh', '< 3.0'
 gem 'listen', '< 3.1'
 gem 'mail', '< 2.6.4'
+gem 'addressable', '~> 2.4.0'
