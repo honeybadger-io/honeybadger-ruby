@@ -67,14 +67,14 @@ module Honeybadger
               say(<<-MSG, :red)
 !! --- Honeybadger test failed ------------------------------------------------ !!
 
-The error notifier is installed, but #{host} responded with an error:
+The error notifier is installed, but we encountered an error:
 
   #{response.code.kind_of?(Integer) ? "(#{response.code}) " : nil}#{response.error_message}
 
 To fix this issue, please try the following:
 
   - Make sure the gem is configured properly.
-  - Retry executing `honeybadger test` a few times.
+  - Retry executing this command a few times.
   - Make sure you can connect to #{host} (`ping #{host}`).
   - Email support@honeybadger.io for help. Include as much debug info as you
     can for a faster resolution!
@@ -84,7 +84,8 @@ MSG
               exit(1)
             end
 
-            say("Honeybadger notification succeeded: https://hb.io/n/#{JSON.parse(response.body)['id']}", :green)
+            say(generate_success_message(response), :green)
+
             exit(0)
           end
 
@@ -212,6 +213,51 @@ MSG
         env = ::Rack::MockRequest.env_for("http#{ ssl ? 's' : nil }://www.example.com/verify", 'REMOTE_ADDR' => '127.0.0.1')
 
         ::Rails.application.call(env)
+      end
+
+      def generate_success_message(response)
+        notice_id = JSON.parse(response.body)['id']
+        notice_url = "https://app.honeybadger.io/notice/#{notice_id}"
+
+        unless options[:install]
+          return "⚡ Success: #{notice_url}"
+        end
+
+        <<-MSG
+⚡ --- Honeybadger is installed! -----------------------------------------------
+
+Good news: You're one deploy away from seeing all of your exceptions in
+Honeybadger. For now, we've generated a test exception for you:
+
+  #{notice_url}
+
+Optional steps:
+
+  - Show a feedback form on your error page:
+    http://docs.honeybadger.io/lib/ruby.html#collecting-user-feedback
+  - Show a UUID or link to Honeybadger on your error page:
+    http://docs.honeybadger.io/lib/ruby.html#displaying-error-id
+  - Track deployments (if you're using Capistrano, we already did this):
+    http://docs.honeybadger.io/lib/ruby.html#deployment-tracking
+
+If you ever need help:
+
+  - Read the gem troubleshooting guide: https://git.io/vXCYp
+  - Check out our documentation: http://docs.honeybadger.io/
+  - Email the founders: support@honeybadger.io
+
+Most people don't realize that Honeybadger is a small, bootstrapped company. We
+really couldn't do this without you. Thank you for allowing us to do what we
+love: making developers awesome.
+
+Happy 'badgering!
+
+Sincerely,
+Ben, Josh and Starr
+https://www.honeybadger.io/about/
+
+⚡ --- End --------------------------------------------------------------------
+MSG
       end
     end
   end
