@@ -2,19 +2,19 @@
 
 source "https://rubygems.org"
 
-gem "appraisal"
-gem "rdoc"
-gem "rspec", ">= 3.0"
-gem "rspec-its"
-gem "timecop"
+gem "allocation_stats", :platforms => :mri, :require => false
+gem "appraisal", "~> 2.1"
 gem "aruba", "~> 0.14"
-gem "webmock"
 gem "guard"
 gem "guard-rspec"
 gem "pry"
 gem "pry-byebug", :platforms => :mri
+gem "rdoc"
+gem "rspec", "~> 3.0"
+gem "rspec-its"
 gem "ruby-prof", :platforms => :mri, :require => false
-gem "allocation_stats", :platforms => :mri, :require => false
+gem "timecop"
+gem "webmock"
 gem "capistrano"
 gem "rake"
 gem "sinatra", "< 2.0"
