@@ -32,9 +32,7 @@ module Honeybadger
         ENDPOINTS[feature] or raise(BackendError, "Unknown feature: #{feature}")
         Response.new(@http.post(ENDPOINTS[feature], payload, payload_headers(payload)))
       rescue *HTTP_ERRORS => e
-        Response.new(:error, nil, "HTTP Error: #{e.class}").tap do |response|
-          error { sprintf('http error class=%s message=%s', e.class, e.message.dump) }
-        end
+        Response.new(:error, nil, "HTTP Error: #{e.class}")
       end
 
       private

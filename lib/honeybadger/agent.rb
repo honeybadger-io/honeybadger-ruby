@@ -112,16 +112,18 @@ module Honeybadger
 
       if !opts[:force] && notice.ignore?
         debug { sprintf('ignore notice feature=notices id=%s', notice.id) }
-        false
-      else
-        debug { sprintf('notice feature=notices id=%s', notice.id) }
-        if opts[:sync]
-          config.backend.notify(:notices, notice)
-        else
-          push(notice)
-        end
-        notice.id
+        return false
       end
+
+      info { sprintf('Reporting error id=%s', notice.id) }
+
+      if opts[:sync]
+        send_now(notice)
+      else
+        push(notice)
+      end
+
+      notice.id
     end
 
     # Public: Save global context for the current request.
@@ -330,8 +332,13 @@ module Honeybadger
       true
     end
 
+    def send_now(object)
+      worker.send_now(object)
+      true
+    end
+
     def init_worker
-      @worker = Worker.new(config, :notices)
+      @worker = Worker.new(config)
     end
 
     @instance = new(Config.new)
