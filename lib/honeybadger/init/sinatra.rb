@@ -16,6 +16,7 @@ module Honeybadger
           def honeybadger_config(app)
             {
               api_key: defined?(honeybadger_api_key) ? honeybadger_api_key : nil,
+              env: ENV['APP_ENV'] || ENV['RACK_ENV'],
               framework: :sinatra,
               :'logging.path' => 'STDOUT'
             }
