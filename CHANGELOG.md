@@ -5,13 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [2.7.1] - 2016-11-16
-### Fixed
-- Fix a Sinatra bug where `RACK_ENV` default was not used as default env.
-- Fixed an error when accessing notice request data from `exception_fingerprint`
-  callback.
-
-## [3.0.0][unreleased]
+## [3.0.0] - unreleased
 ### Added
 - You may now require 'honeybadger/ruby' instead of 'honeybadger' to get the
   agent without the integrations (no railtie, plugins or monkey patching).
@@ -54,6 +48,12 @@ adheres to [Semantic Versioning](http://semver.org/).
 - All deprecated Rails controller methods (from version 1.x) have been removed.
 - The deprecated `Honeybadger::Rack::MetricsReporter` middleware has been
   removed.
+
+## [2.7.1] - 2016-11-16
+### Fixed
+- Fix a Sinatra bug where `RACK_ENV` default was not used as default env.
+- Fixed an error when accessing notice request data from `exception_fingerprint`
+  callback.
 
 ## [2.7.0] - 2016-10-20
 ### Added
