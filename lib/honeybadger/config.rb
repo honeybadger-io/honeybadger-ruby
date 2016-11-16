@@ -106,6 +106,8 @@ module Honeybadger
     end
     alias to_h to_hash
 
+    # Internal Helpers
+
     def logger
       init_logging! unless @logger
       @logger
@@ -116,7 +118,9 @@ module Honeybadger
       @backend
     end
 
-    # Internal Helpers
+    def backend=(backend)
+      @backend = backend
+    end
 
     def disabled?
       !!self[:disabled]
