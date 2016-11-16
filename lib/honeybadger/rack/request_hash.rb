@@ -2,54 +2,52 @@ module Honeybadger
   module Rack
     # Internal: Constructs a request hash from a Rack::Request matching the
     # /v1/notices API specification.
-    class RequestHash < ::Hash
+    module RequestHash
       # Internal
       CGI_BLACKLIST = ['QUERY_STRING', 'RAW_POST_DATA', 'ORIGINAL_FULLPATH', 'REQUEST_URI'].freeze
       CGI_KEY_REGEXP = /\A[A-Z_]+\Z/
 
       def self.from_env(env)
         return {} unless defined?(::Rack::Request)
-        new(::Rack::Request.new(env))
+
+        hash, request = {}, ::Rack::Request.new(env)
+
+        hash[:url] = extract_url(request)
+        hash[:params] = extract_params(request)
+        hash[:component] = hash[:params]['controller']
+        hash[:action] = hash[:params]['action']
+        hash[:session] = extract_session(request)
+        hash[:cgi_data] = extract_cgi_data(request)
+
+        hash
       end
 
-      def initialize(request)
-        self[:url] = extract_url(request)
-        self[:params] = extract_params(request)
-        self[:component] = self[:params]['controller']
-        self[:action] = self[:params]['action']
-        self[:session] = extract_session(request)
-        self[:cgi_data] = extract_cgi_data(request)
-      end
-
-      private
-
-      def extract_url(request)
+      def self.extract_url(request)
         request.env['honeybadger.request.url'] || request.url
       rescue => e
-        # TODO: Log these errors
-        "Error: #{e.message}"
+        "Failed to access URL -- #{e}"
       end
 
-      def extract_params(request)
+      def self.extract_params(request)
         (request.env['action_dispatch.request.parameters'] || request.params).to_hash || {}
       rescue => e
-        { error: "Failed to access params -- #{e.message}" }
+        { error: "Failed to access params -- #{e}" }
       end
 
-      def extract_session(request)
+      def self.extract_session(request)
         request.session.to_hash
       rescue => e
         # Rails raises ArgumentError when `config.secret_token` is missing, and
         # ActionDispatch::Session::SessionRestoreError when the session can't be
         # restored.
-        { error: "Failed to access session data -- #{e.message}" }
+        { error: "Failed to access session data -- #{e}" }
       end
 
-      def extract_cgi_data(request)
+      def self.extract_cgi_data(request)
         request.env.reject {|k,_| cgi_blacklist?(k) }
       end
 
-      def cgi_blacklist?(key)
+      def self.cgi_blacklist?(key)
         return true if CGI_BLACKLIST.include?(key)
         return true unless key.match(CGI_KEY_REGEXP)
 
