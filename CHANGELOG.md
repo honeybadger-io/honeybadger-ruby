@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Fix a Sinatra bug where `RACK_ENV` default was not used as default env.
+- Fixed an error when accessing notice request data from `exception_fingerprint`
+  callback.
 
 ## [2.7.0] - 2016-10-20
 ### Added

@@ -517,6 +517,13 @@ describe Honeybadger::Notice do
       notice = build_notice({fingerprint: double(to_s: 'foo')})
       expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
+
+    context "fingerprint is a callback which accesses notice" do
+      it "can access request information" do
+        notice = build_notice({params: { key: 'foo' }, fingerprint: lambda {|n| n[:params][:key] }})
+        expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      end
+    end
   end
 
   context "with a backtrace" do

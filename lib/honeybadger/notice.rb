@@ -139,7 +139,6 @@ module Honeybadger
         "#{exception.class.name}: #{exception.message}"
       end
       @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))
-      @fingerprint = construct_fingerprint(opts)
 
       @request = construct_request_hash(config, opts)
 
@@ -157,6 +156,9 @@ module Honeybadger
       @api_key = opts[:api_key] || config[:api_key]
 
       monkey_patch_action_dispatch_test_process!
+
+      # Fingerprint must be calculated last since callback operates on `self`.
+      @fingerprint = construct_fingerprint(opts)
     end
 
     # Internal: Template used to create JSON payload
