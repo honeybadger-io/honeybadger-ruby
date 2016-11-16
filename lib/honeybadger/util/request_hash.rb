@@ -1,5 +1,5 @@
 module Honeybadger
-  module Rack
+  module Util
     # Internal: Constructs a request hash from a Rack::Request matching the
     # /v1/notices API specification.
     module RequestHash

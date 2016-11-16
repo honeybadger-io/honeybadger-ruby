@@ -4,9 +4,9 @@ require 'forwardable'
 
 require 'honeybadger/version'
 require 'honeybadger/backtrace'
-require 'honeybadger/rack/request_hash'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
+require 'honeybadger/util/request_hash'
 require 'honeybadger/util/request_payload'
 
 module Honeybadger
@@ -300,7 +300,7 @@ module Honeybadger
 
     def request_hash
       return {} unless rack_env
-      Rack::RequestHash.from_env(rack_env)
+      Util::RequestHash.from_env(rack_env)
     end
 
     # Internal: Construct the request object with data from various sources.
