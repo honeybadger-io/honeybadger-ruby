@@ -162,6 +162,8 @@ MSG
 
 # What can I do?
 
+  - If you're calling the `install` or `test` command in a Rails app, make sure
+    you can boot the Rails console: `bundle exec rails console`.
   - Retry the command.
   - If you continue to see this message, email us at support@honeybadger.io
     (don't forget to attach this output!)
