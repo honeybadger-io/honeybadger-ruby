@@ -137,6 +137,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable (~> 2.4.0)
   allocation_stats
   appraisal
   aruba (~> 0.14)
@@ -157,4 +158,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.13.4
+   1.13.6
