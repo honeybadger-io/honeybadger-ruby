@@ -124,16 +124,16 @@ module Honeybadger
           say(<<-MSG, :red)
 !! --- Failed to notify Honeybadger ------------------------------------------- !!
 
-- What happened?
+# What happened?
 
   We encountered an HTTP error while contacting our service. Issues like this are
   usually temporary.
 
-- Error details
+# Error details
 
   #{e.class}: #{e.message}\n    at #{e.backtrace && e.backtrace.first}
 
-- What can I do?
+# What can I do?
 
   - Retry the command.
   - Make sure you can connect to api.honeybadger.io (`ping api.honeybadger.io`).
@@ -146,21 +146,21 @@ MSG
           say(<<-MSG, :red)
 !! --- Honeybadger command failed --------------------------------------------- !!
 
-- What did you try to do?
+# What did you try to do?
 
   You tried to execute the following command:
   `honeybadger #{ARGV.join(' ')}`
 
-- What actually happend?
+# What actually happend?
 
   We encountered a Ruby exception and were forced to cancel your request.
 
-- Error details
+# Error details
 
   #{e.class}: #{e.message}
     #{e.backtrace && e.backtrace.join("\n    ")}
 
-- What can I do?
+# What can I do?
 
   - Retry the command.
   - If you continue to see this message, email us at support@honeybadger.io
