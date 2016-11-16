@@ -62,12 +62,12 @@ module Honeybadger
       self
     end
 
-    def backtrace_filter(&block)
+    def backtrace_filter
       self[:backtrace_filter] = Proc.new if block_given?
       self[:backtrace_filter]
     end
 
-    def exception_filter(&block)
+    def exception_filter
       self[:exception_filter] = Proc.new if block_given?
       self[:exception_filter]
     end
