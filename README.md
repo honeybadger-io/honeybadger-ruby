@@ -118,7 +118,7 @@ With rack, you have to do things manually, but it's still just a few lines of co
 require 'rack'
 
 # Load the gem
-require 'honeybadger/ruby'
+require 'honeybadger'
 
 # Write your app
 app = Rack::Builder.app do
