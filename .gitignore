@@ -3,5 +3,6 @@ doc/
 gemfiles/*.lock
 coverage/
 pkg/
+Gemfile.lock
 .rbenv-vars
 java.hprof.txt
