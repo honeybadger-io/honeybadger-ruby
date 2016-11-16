@@ -119,7 +119,8 @@ module Honeybadger
     end
 
     def backend=(backend)
-      @backend = backend
+      set(:backend, backend)
+      @backend = nil
     end
 
     def disabled?
