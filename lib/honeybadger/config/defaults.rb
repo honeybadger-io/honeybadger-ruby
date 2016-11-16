@@ -33,7 +33,7 @@ module Honeybadger
       },
       env: {
         description: 'The current application\'s environment name.',
-        default: ENV['HONEYBADGER_ENV'] || ENV['RACK_ENV'] || ENV['APP_ENV'],
+        default: nil,
         type: String
       },
       report_data: {
