@@ -1,21 +1,23 @@
 module Honeybadger
   class Config
-    class Env < ::Hash
+    module Env
       CONFIG_KEY = /\AHONEYBADGER_(.+)\Z/.freeze
       CONFIG_MAPPING = Hash[DEFAULTS.keys.map {|k| [k.to_s.upcase.gsub(KEY_REPLACEMENT, '_'), k] }].freeze
       ARRAY_VALUES = Regexp.new('\s*,\s*').freeze
 
-      def initialize(env = ENV)
+      def self.new(env = ENV)
+        hash = {}
+
         env.each_pair do |k,v|
           next unless k.match(CONFIG_KEY)
           next unless config_key = CONFIG_MAPPING[$1]
-          self[config_key] = cast_value(v, OPTIONS[config_key][:type])
+          hash[config_key] = cast_value(v, OPTIONS[config_key][:type])
         end
+
+        hash
       end
 
-      private
-
-      def cast_value(value, type = String)
+      def self.cast_value(value, type = String)
         v = value.to_s
 
         if type == Boolean
