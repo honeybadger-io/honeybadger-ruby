@@ -7,9 +7,8 @@ require 'honeybadger/backend'
 require 'honeybadger/notice'
 
 describe Honeybadger::Worker do
-  let(:instance) { described_class.new(config, feature) }
+  let(:instance) { described_class.new(config) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
-  let(:feature) { :badgers }
   let(:obj) { double('Badger', id: :foo, to_json: '{}') }
 
   subject { instance }
@@ -89,7 +88,7 @@ describe Honeybadger::Worker do
 
   describe "#push" do
     it "flushes payload to backend" do
-      expect(instance.send(:backend)).to receive(:notify).with(feature, obj).and_call_original
+      expect(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_call_original
       expect(instance.push(obj)).not_to eq false
       instance.flush
     end
@@ -185,7 +184,7 @@ describe Honeybadger::Worker do
 
   describe "#handle_response" do
     def handle_response
-      instance.send(:handle_response, response)
+      instance.send(:handle_response, obj, response)
     end
 
     before do
@@ -223,7 +222,7 @@ describe Honeybadger::Worker do
       end
 
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/unauthorized/)
+        expect(config.logger).to receive(:warn).with(/invalid/)
         handle_response
       end
     end
@@ -255,7 +254,16 @@ describe Honeybadger::Worker do
       let(:response) { Honeybadger::Backend::Response.new(418) }
 
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/worker/)
+        expect(config.logger).to receive(:warn).with(/failed/)
+        handle_response
+      end
+    end
+
+    context "when error" do
+      let(:response) { Honeybadger::Backend::Response.new(:error, nil, 'test error message') }
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/test error message/)
         handle_response
       end
     end

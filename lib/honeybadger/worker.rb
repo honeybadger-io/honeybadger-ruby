@@ -22,16 +22,15 @@ module Honeybadger
         super()
       end
 
-      def push(obj)
+      def push(msg)
         super unless size == max_size
       end
     end
 
     SHUTDOWN = :__hb_worker_shutdown!
 
-    def initialize(config, feature)
+    def initialize(config)
       @config = config
-      @feature = feature
       @throttles = []
       @mutex = Mutex.new
       @marker = ConditionVariable.new
@@ -40,16 +39,20 @@ module Honeybadger
       @start_at = nil
     end
 
-    def push(obj)
+    def push(msg)
       return false unless start
-      queue.push(obj)
+      queue.push(msg)
+    end
+
+    def send_now(msg)
+      handle_response(msg, notify_backend(msg))
     end
 
     # Internal: Shutdown the worker after sending remaining data.
     #
     # Returns true.
     def shutdown
-      d { sprintf('shutting down worker feature=%s', feature) }
+      d { 'shutting down worker' }
 
       mutex.synchronize do
         @shutdown = true
@@ -78,7 +81,7 @@ module Honeybadger
         queue.clear
       end
 
-      d { sprintf('killing worker thread feature=%s', feature) }
+      d { 'killing worker thread' }
 
       if thread
         Thread.kill(thread)
@@ -118,7 +121,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :feature, :queue, :pid, :mutex, :marker,
+    attr_reader :config, :queue, :pid, :mutex, :marker,
       :thread, :throttles
 
     def_delegator :config, :backend
@@ -140,33 +143,33 @@ module Honeybadger
 
     def run
       begin
-        d { sprintf('worker started feature=%s', feature) }
+        d { 'worker started' }
         loop do
           case msg = queue.pop
           when SHUTDOWN then break
           when ConditionVariable then signal_marker(msg)
-          else process(msg)
+          else work(msg)
           end
         end
       ensure
-        d { sprintf('stopping worker feature=%s', feature) }
+        d { 'stopping worker' }
       end
     rescue Exception => e
       error {
-        msg = "error in worker thread (shutting down) feature=%s class=%s message=%s\n\t%s"
-        sprintf(msg, feature, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
+        msg = "error in worker thread (shutting down) class=%s message=%s\n\t%s"
+        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
     ensure
       release_marker
     end
 
-    def process(msg)
-      handle_response(notify_backend(msg))
+    def work(msg)
+      send_now(msg)
       sleep(throttle_interval)
     rescue StandardError => e
       error {
-        msg = "error in worker thread feature=%s class=%s message=%s\n\t%s"
-        sprintf(msg, feature, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
+        msg = "Error in worker thread class=%s message=%s\n\t%s"
+        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
       sleep(1)
     end
@@ -179,8 +182,8 @@ module Honeybadger
     end
 
     def notify_backend(payload)
-      debug { sprintf('worker notifying backend feature=%s id=%s', feature, payload.id) }
-      backend.notify(feature, payload)
+      debug { sprintf('worker notifying backend id=%s', payload.id) }
+      backend.notify(:notices, payload)
     end
 
     def add_throttle(t)
@@ -195,27 +198,29 @@ module Honeybadger
       end
     end
 
-    def handle_response(response)
-      debug { sprintf('worker response feature=%s code=%s message=%s', feature, response.code, response.message.to_s.dump) }
+    def handle_response(msg, response)
+      debug { sprintf('worker response code=%s message=%s', response.code, response.message.to_s.dump) }
 
       case response.code
       when 429, 503
+        warn { sprintf('Error report failed: project is sending too many errors. id=%s code=%s throttle=1.25 interval=%s', msg.id, throttle_interval, response.code) }
         add_throttle(1.25)
-        debug { sprintf('worker applying throttle=1.25 interval=%s feature=%s code=%s', throttle_interval, feature, response.code) }
       when 402
-        warn { sprintf('data will not be reported (payment required) feature=%s code=%s', feature, response.code) }
+        warn { sprintf('Error report failed: payment is required. id=%s code=%s', msg.id, response.code) }
         suspend(3600)
       when 403
-        warn { sprintf('data will not be reported feature=%s code=%s error=%s', feature, response.code, response.error.to_s.dump) }
+        warn { sprintf('Error report failed: API key is invalid. id=%s code=%s', msg.id, response.code) }
         suspend(3600)
       when 201
         if throttle = del_throttle
-          debug { sprintf('worker removing throttle=%s interval=%s feature=%s code=%s', throttle, throttle_interval, feature, response.code) }
+          info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s throttle=%s interval=%s', msg.id, msg.id, response.code, throttle_interval, response.code) }
+        else
+          info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s', msg.id, msg.id, response.code) }
         end
       when :error
-        # Error logged by backend.
+        warn { sprintf('Error report failed: an unknown error occurred. code=%s error=%s', response.code, response.message.to_s.dump) }
       else
-        warn { sprintf('worker unknown response feature=%s code=%s', feature, response.code) }
+        warn { sprintf('Error report failed: unknown response from server. code=%s', response.code) }
       end
     end
 

@@ -410,11 +410,11 @@ module Honeybadger
         end
       end
     rescue ConfigError => e
-      error("error while loading config from disk: #{e}")
+      error("Error loading config from disk: #{e}")
       nil
     rescue StandardError => e
       error {
-        msg = "error while loading config from disk class=%s message=%s\n\t%s"
+        msg = "Error loading config from disk. class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
       nil
