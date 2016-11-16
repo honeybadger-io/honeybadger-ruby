@@ -61,16 +61,7 @@ CONFIG
           end
         end
 
-        at_exit do
-          # This is a trick to say something after the completion of the test
-          # command, which will `exit(0)` for success or `exit(1)` for failure.
-          # If the test was successful after installation, wish the user luck.
-          if $!.nil? || $!.is_a?(SystemExit) && $!.success?
-            say("⚡  Installation complete. Happy 'badgering!", :green)
-          end
-        end
-
-        Test.new({}.freeze).run
+        Test.new({install: true}.freeze).run
       end
 
       private
