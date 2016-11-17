@@ -66,8 +66,12 @@ module Honeybadger
 
       desc 'notify', 'Notify Honeybadger of an error'
       project_options
-      option :class,   required: true, type: :string, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
-      option :message, required: true, type: :string, aliases: :'-m', desc: 'The error message.'
+      option :class,     required: true, type: :string, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
+      option :message,   required: true, type: :string, aliases: :'-m', desc: 'The error message.'
+      option :component, required: false, type: :string, aliases: :'-C', desc: 'The component.'
+      option :action,    required: false, type: :string, aliases: :'-a', desc: 'The action.'
+      option :url,       required: false, type: :string, aliases: :'-u', desc: 'The URL.'
+      option :tags,      required: false, type: :string, aliases: :'-t', desc: 'The tags.'
       def notify
         config = build_config(options)
         config.set(:env, fetch_value(options, 'env')) if options.has_key?('env')

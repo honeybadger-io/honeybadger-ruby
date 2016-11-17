@@ -1,3 +1,4 @@
+require 'digest'
 require 'forwardable'
 require 'honeybadger/cli/main'
 require 'honeybadger/util/http'
@@ -23,6 +24,7 @@ module Honeybadger
             class: options['class'],
             message: options['message']
           },
+          request: {},
           server: {
             project_root: Dir.pwd,
             environment_name: config.get(:env),
@@ -30,6 +32,14 @@ module Honeybadger
             stats: Util::Stats.all
           }
         }
+
+        payload[:error][:fingerprint] = Digest::SHA1.hexdigest(options[:fingerprint]) if options.has_key?(:fingerprint)
+        payload[:error][:tags] = options[:tags].to_s.strip.split(',').map(&:strip) if options.has_key?(:tags)
+
+        payload[:request][:component] = options[:component] if options.has_key?(:component)
+        payload[:request][:action] = options[:action] if options.has_key?(:action)
+        payload[:request][:url] = options[:url] if options.has_key?(:url)
+        payload.delete(:request) if payload.request.empty?
 
         http = Util::HTTP.new(config)
         result = http.post('/v1/notices', payload)
