@@ -7,7 +7,7 @@ rescue LoadError
 end
 
 if RAILS_PRESENT
-  require_relative 'rails/app'
+  require FIXTURES_PATH.join('rails', 'config', 'application.rb')
   require 'honeybadger/init/rails'
   require 'rspec/rails'
 

@@ -30,7 +30,11 @@ class RailsApp < Rails::Application
   end
 end
 
-class RailsController < ActionController::Base
+# Required for install command.
+class ApplicationController < ActionController::Base
+end
+
+class RailsController < ApplicationController
   def runtime_error
     raise 'exception raised from test Rails app in honeybadger gem test suite'
   end

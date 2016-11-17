@@ -7,7 +7,7 @@ rescue LoadError
 end
 
 if SINATRA_PRESENT
-  require_relative 'sinatra/app'
+  require FIXTURES_PATH.join('sinatra', 'app.rb')
   require 'honeybadger/init/sinatra'
   require 'rack/test'
 

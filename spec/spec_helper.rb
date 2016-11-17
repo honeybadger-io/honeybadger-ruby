@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'logger'
 require 'pathname'
 require 'pry'
@@ -69,5 +70,20 @@ RSpec.configure do |config|
   rescue LoadError
     puts 'Excluding specs which depend on Rack.'
     config.exclude_pattern = 'spec/unit/honeybadger/rack/*_spec.rb'
+  end
+
+  config.before(:each, framework: :rails) do
+    FileUtils.cp_r(FIXTURES_PATH.join('rails'), current_dir)
+    cd('rails')
+  end
+
+  if ENV['BUNDLE_GEMFILE'] =~ /rails/
+    config.filter_run_excluding framework: ->(v) { !v || v != :rails }
+  elsif ENV['BUNDLE_GEMFILE'] =~ /sinatra/
+    config.filter_run_excluding framework: ->(v) { !v || v != :sinatra }
+  elsif ENV['BUNDLE_GEMFILE'] =~ /rake/
+    config.filter_run_excluding framework: ->(v) { !v || v != :rake }
+  else
+    config.filter_run_excluding framework: ->(v) { !v || v != :ruby }
   end
 end
