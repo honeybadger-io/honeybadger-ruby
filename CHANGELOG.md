@@ -39,6 +39,10 @@ adheres to [Semantic Versioning](http://semver.org/).
   global agent and accept an optional argument which expects an alternate
   `Honeybadger::Agent` instance.
 - The *plugins.skip* config option has been renamed to *skipped_plugins*.
+- The *sidekiq.use_component* config option is now `true` by default. To get the
+  old behavior, set it to `false`. When enabled, the Sidekiq plugin will
+  automatically set the component to the class of the job, which helps with
+  grouping.
 
 ### Removed
 - Ruby 1.9.3 and 2.0.x are no longer supported.
