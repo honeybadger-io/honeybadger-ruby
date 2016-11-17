@@ -268,7 +268,7 @@ module Honeybadger
       },
       :'sidekiq.use_component' => {
         description: 'Automatically set the component to the class of the job. Helps with grouping.',
-        default: false,
+        default: true,
         type: Boolean
       },
       :'sinatra.enabled' => {
