@@ -4,7 +4,7 @@ require 'honeybadger/version'
 
 module Release
   CHANGELOG_FILE    = 'CHANGELOG.md'.freeze
-  CHANGELOG_HEADING = '## [Unreleased][unreleased]'
+  CHANGELOG_HEADING = '## [Unreleased]'
   EXIT_CMD          = 'bundle update honeybadger && git add -p'
   VERSION_FILE      = 'lib/honeybadger/version.rb'
 
