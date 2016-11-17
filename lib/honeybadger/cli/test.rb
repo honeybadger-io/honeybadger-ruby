@@ -40,16 +40,18 @@ module Honeybadger
         require 'honeybadger/ruby'
 
         begin
-          require 'rails'
           require File.join(Dir.pwd, 'config', 'application.rb')
+          raise LoadError unless defined?(::Rails)
+          require 'honeybadger/init/rails'
           Rails.application.initialize!
+          say("Detected Rails #{Rails::VERSION::STRING}")
         rescue LoadError
           require 'honeybadger/init/ruby'
         end
 
         if Honeybadger.config.get(:api_key).to_s =~ BLANK
           say("Unable to send test: Honeybadger API key is missing.", :red)
-          return
+          exit(1)
         end
 
         Honeybadger.config.set(:report_data, !options[:dry_run])

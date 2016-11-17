@@ -36,10 +36,10 @@ module Honeybadger
 
           if path.exist?
             say("The configuration file #{config_path} already exists.", :red)
-            return
+            exit(1)
           elsif !path.dirname.writable?
             say("The configuration path #{config_path.dirname} is not writable.", :red)
-            return
+            exit(1)
           end
 
           File.open(path, 'w+') do |file|
