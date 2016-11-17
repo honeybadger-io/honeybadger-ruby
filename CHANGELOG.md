@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.7.1] - 2016-11-16
 ### Fixed
 - Fix a Sinatra bug where `RACK_ENV` default was not used as default env.
 - Fixed an error when accessing notice request data from `exception_fingerprint`
