@@ -33,13 +33,14 @@ module Honeybadger
           }
         }
 
-        payload[:error][:fingerprint] = Digest::SHA1.hexdigest(options[:fingerprint]) if options.has_key?(:fingerprint)
-        payload[:error][:tags] = options[:tags].to_s.strip.split(',').map(&:strip) if options.has_key?(:tags)
+        payload[:error][:fingerprint] = Digest::SHA1.hexdigest(options['fingerprint']) if option?('fingerprint')
+        payload[:error][:tags] = options['tags'].to_s.strip.split(',').map(&:strip) if option?('tags')
 
-        payload[:request][:component] = options[:component] if options.has_key?(:component)
-        payload[:request][:action] = options[:action] if options.has_key?(:action)
-        payload[:request][:url] = options[:url] if options.has_key?(:url)
-        payload.delete(:request) if payload.request.empty?
+        payload[:request][:component] = options['component'] if option?('component')
+        payload[:request][:action] = options['action'] if option?('action')
+        payload[:request][:url] = options['url'] if option?('url')
+
+        payload.delete(:request) if payload[:request].empty?
 
         http = Util::HTTP.new(config)
         result = http.post('/v1/notices', payload)
@@ -56,6 +57,10 @@ module Honeybadger
       attr_reader :options, :args, :config
 
       def_delegator :@shell, :say
+
+      def option?(key)
+        options.has_key?(key) && options[key] != key
+      end
     end
   end
 end

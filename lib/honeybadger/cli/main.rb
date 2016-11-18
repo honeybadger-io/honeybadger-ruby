@@ -66,15 +66,15 @@ module Honeybadger
 
       desc 'notify', 'Notify Honeybadger of an error'
       project_options
-      option :class,     required: true, type: :string, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
-      option :message,   required: true, type: :string, aliases: :'-m', desc: 'The error message.'
-      option :component, required: false, type: :string, aliases: :'-C', desc: 'The component.'
-      option :action,    required: false, type: :string, aliases: :'-a', desc: 'The action.'
-      option :url,       required: false, type: :string, aliases: :'-u', desc: 'The URL.'
-      option :tags,      required: false, type: :string, aliases: :'-t', desc: 'The tags.'
+      option :class,       required: true, type: :string, aliases: :'-c', default: 'CLI Notification', desc: 'The class name of the error. (Default: CLI Notification)'
+      option :message,     required: true, type: :string, aliases: :'-m', desc: 'The error message.'
+      option :action,      required: false, type: :string, aliases: :'-a', desc: 'The action.'
+      option :component,   required: false, type: :string, aliases: :'-C', desc: 'The component.'
+      option :fingerprint, required: false, type: :string, aliases: :'-f', desc: 'The component.'
+      option :tags,        required: false, type: :string, aliases: :'-t', desc: 'The tags.'
+      option :url,         required: false, type: :string, aliases: :'-u', desc: 'The URL.'
       def notify
         config = build_config(options)
-        config.set(:env, fetch_value(options, 'env')) if options.has_key?('env')
 
         if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
@@ -116,6 +116,7 @@ module Honeybadger
       def build_config(options)
         config = Config.new(logger: Logger.new('/dev/null'))
         config.set(:api_key, fetch_value(options, 'api_key')) if options.has_key?('api_key')
+        config.set(:env, fetch_value(options, 'environment')) if options.has_key?('environment')
         config.init!({
           framework: :cli
         })
