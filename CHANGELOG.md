@@ -43,6 +43,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   old behavior, set it to `false`. When enabled, the Sidekiq plugin will
   automatically set the component to the class of the job, which helps with
   grouping.
+- The `request.filter_keys` option now includes partial matches: with the filter
+  value "password", keys such as "password" and "otherpassword" will be
+  filtered.
 
 ### Removed
 - Ruby 1.9.3 and 2.0.x are no longer supported.

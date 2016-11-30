@@ -16,10 +16,17 @@ module Honeybadger
       def initialize(opts = {})
         @max_depth = opts.fetch(:max_depth, 20)
 
-        if filters = opts.fetch(:filters, nil)
-          @filters = Array(filters).collect do |f|
-            f.kind_of?(Regexp) ? f : f.to_s
+        if opts[:filters]
+          @filters, strings = [], []
+          Array(opts[:filters]).each do |filter|
+            case filter
+            when Regexp
+              @filters << filter
+            else
+              strings << Regexp.escape(filter.to_s)
+            end
           end
+          @filters << Regexp.new(strings.join('|'.freeze), true) unless strings.empty?
         end
       end
 
@@ -121,13 +128,7 @@ module Honeybadger
       def filter_key?(key)
         return false unless filters
 
-        filters.any? do |filter|
-          if filter.is_a?(Regexp)
-            filter =~ key.to_s
-          else
-            key.to_s.eql?(filter.to_s)
-          end
-        end
+        filters.any? {|f| f =~ key.to_s }
       end
     end
   end
