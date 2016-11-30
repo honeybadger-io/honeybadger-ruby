@@ -19,3 +19,6 @@ gem 'webmock'
 # Required by feature specs.
 gem 'capistrano'
 gem 'rake'
+
+# Lock these deps for Ruby >= 2.1.0 support.
+gem 'listen', '~> 3.0.8'
