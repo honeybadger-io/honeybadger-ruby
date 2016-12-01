@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Pass whole exception to `notify_or_ignore` (includes causes). -@CGamesPlay
 
 ## [2.7.1] - 2016-11-16
 ### Fixed
