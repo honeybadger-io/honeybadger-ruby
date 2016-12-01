@@ -23,7 +23,7 @@ module Honeybadger
       VALID_ENCODINGS = [Encoding::UTF_8, Encoding::ISO_8859_1].freeze
 
       def initialize(max_depth: 20, filters: [])
-        @filters = filters.empty?
+        @filters = !filters.empty?
         @max_depth = max_depth
 
         strings, @regexps, @blocks = [], [], []
@@ -96,7 +96,7 @@ module Honeybadger
       end
 
       def filter_cookies(raw_cookies)
-        return raw_cookies if filters?
+        return raw_cookies unless filters?
 
         cookies = []
 
@@ -110,7 +110,7 @@ module Honeybadger
       end
 
       def filter_url(url)
-        return url if filters?
+        return url unless filters?
 
         filtered_url = url.to_s.dup
 
@@ -131,7 +131,7 @@ module Honeybadger
       end
 
       def filter_key?(key, parents = nil)
-        return false if filters?
+        return false unless filters?
         return true if regexps.any? { |r| key =~ r }
         return true if deep_regexps && parents && (joined = parents.join(".")) && deep_regexps.any? { |r| joined =~ r }
         false
