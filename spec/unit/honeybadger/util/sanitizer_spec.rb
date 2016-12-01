@@ -4,28 +4,15 @@ require 'honeybadger/util/sanitizer'
 
 describe Honeybadger::Util::Sanitizer do
   its(:max_depth) { should eq 20 }
-  its(:filters) { should be_nil }
-
-  context "when max_depth option is passed to #initialize" do
-    subject { described_class.new(max_depth: 5) }
-    its(:max_depth) { should eq 5 }
-  end
-
-  context "when filters option is passed to #initialize" do
-    FILTER_ARRAY = ['foo'].freeze
-
-    subject { described_class.new(filters: FILTER_ARRAY) }
-    its(:filters) { should_not be_empty }
-  end
 
   describe "::sanitize_string" do
     it "converts to string before sanitizing" do
-      expect(Honeybadger::Util::Sanitizer.sanitize_string(nil)).to eq('')
+      expect(subject.sanitize_string(nil)).to eq('')
     end
 
     it "returns the String argument when already valid" do
       foo = "foo"
-      expect(Honeybadger::Util::Sanitizer.sanitize_string(foo)).to be(foo)
+      expect(subject.sanitize_string(foo)).to be(foo)
     end
   end
 
@@ -54,11 +41,11 @@ describe Honeybadger::Util::Sanitizer do
     end
 
     it "ensures #to_hash is called on objects that support it" do
-      expect { described_class.new(:session => { :object => double(:to_hash => {}) }) }.not_to raise_error
+      expect { described_class.new.sanitize(:session => { :object => double(:to_hash => {}) }) }.not_to raise_error
     end
 
     it "ensures #to_ary is called on objects that support it" do
-      expect { described_class.new(:session => { :object => double(:to_ary => {}) }) }.not_to raise_error
+      expect { described_class.new.sanitize(:session => { :object => double(:to_ary => {}) }) }.not_to raise_error
     end
 
     it "allocates under 1/2 objects vs. the original hash.", if: defined?(AllocationStats) do
@@ -96,24 +83,36 @@ describe Honeybadger::Util::Sanitizer do
     context "with filters" do
       subject { described_class.new(filters: filters).sanitize(original) }
 
-      let!(:filters) { ["abc", :def, /private/, /^foo_.*$/] }
+      let!(:filters) { ["abc", :def, /private/, /^foo_.*$/, 'nested.string', /nested\.regexp$/, ->(k,v) { v.replace('block filter') if k == 'block' }] }
 
       let!(:original) do
-        { 'abc' => "123", 'def' => "456", 'ghi' => "789", 'nested' => { 'abc' => '100' },
+        {
+          'abc' => "123", 'def' => "456", 'ghi' => "789", 'nested' => { 'abc' => '100' },
           'something_with_abc' => 'match the entire string', 'private_param' => 'prra',
-          'foo_param' => 'bar', 'not_foo_param' => 'baz', 'nested_foo' => { 'foo_nested' => 'bla'} }
+          'foo_param' => 'bar', 'not_foo_param' => 'baz', 'nested_foo' => { 'foo_nested' => 'bla'},
+          'deeply' => { 'nested' => { 'string' => 'nested', 'regexp' => 'nested' } },
+          'nested.string' => 'value',
+          'nested.regexp' => 'value',
+          'block' => 'value'
+        }
       end
 
       let!(:filtered) do
-        {'abc'    => '[FILTERED]',
-         'def'    => '[FILTERED]',
-         'something_with_abc' => '[FILTERED]',
-         'ghi'    => '789',
-         'nested' => { 'abc' => '[FILTERED]' },
-         'private_param' => '[FILTERED]',
-         'foo_param' => '[FILTERED]',
-         'not_foo_param' => 'baz',
-         'nested_foo' => { 'foo_nested' => '[FILTERED]'}}
+        {
+          'abc'    => '[FILTERED]',
+          'def'    => '[FILTERED]',
+          'something_with_abc' => '[FILTERED]',
+          'ghi'    => '789',
+          'nested' => { 'abc' => '[FILTERED]' },
+          'private_param' => '[FILTERED]',
+          'foo_param' => '[FILTERED]',
+          'not_foo_param' => 'baz',
+          'nested_foo' => { 'foo_nested' => '[FILTERED]'},
+          'deeply' => { 'nested' => { 'string' => '[FILTERED]', 'regexp' => '[FILTERED]' } },
+          'nested.string' => '[FILTERED]',
+          'nested.regexp' => '[FILTERED]',
+          'block' => 'block filter'
+        }
       end
 
       it "filters the hash" do
@@ -127,32 +126,32 @@ describe Honeybadger::Util::Sanitizer do
     end
   end
 
-  describe '#filter_url' do
+  describe "#filter_url" do
     subject { described_class.new.filter_url(url) }
 
-    context 'malformed query' do
+    context "malformed query" do
       let(:url) { 'https://www.honeybadger.io/?foobar12' }
       it { should eq url }
     end
 
-    context 'no query' do
+    context "no query" do
       let(:url) { 'https://www.honeybadger.io' }
       it { should eq url }
     end
 
-    context 'malformed url' do
+    context "malformed url" do
       let(:url) { 'http s ! honeybadger' }
       before { expect { URI.parse(url) }.to raise_error(URI::InvalidURIError) }
       it { should eq url }
     end
 
-    context 'complex url' do
+    context "complex url" do
       let(:url) { 'https://foo:bar@www.honeybadger.io:123/asdf/?foo=1&bar=2&baz=3' }
       it { should eq url }
     end
   end
 
-  describe '#filter_cookies' do
+  describe "#filter_cookies" do
     let!(:filters) { ["abc", :def, /private/] }
 
     let!(:cookies) {"abc=123; def=456; ghi=789; private_param=prra"}
