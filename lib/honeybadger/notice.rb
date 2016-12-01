@@ -464,7 +464,7 @@ module Honeybadger
     end
 
     def rails_params_filters
-      rack_env && rack_env['action_dispatch.parameter_filter'] or []
+      rack_env && Array(rack_env['action_dispatch.parameter_filter']) or []
     end
 
     # Internal: This is how much Honeybadger cares about Rails developers. :)
