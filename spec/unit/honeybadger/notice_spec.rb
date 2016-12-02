@@ -119,7 +119,7 @@ describe Honeybadger::Notice do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
     notice = build_notice(backtrace: build_backtrace_array)
 
-    expect(notice.error_message).to eq 'Notification'
+    expect(notice.error_message).to eq 'No message provided'
     assert_array_starts_with(backtrace.lines, notice.backtrace.lines)
     expect(notice.params).to be_empty
     expect(notice.session).to be_empty

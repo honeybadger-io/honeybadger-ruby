@@ -67,13 +67,14 @@ module Honeybadger
     # exceptions by default.
     #
     # exception_or_opts - An Exception object, or a Hash of options which is used
-    #                     to build the notice.
+    #                     to build the notice. All other types of objects will
+    #                     be converted to a String and used as the `:error_message`.
     # opts              - The options Hash when the first argument is an
     #                     Exception. (default: {}):
-    #                     :error_class   - The String class name of the error.
     #                     :error_message - The String error message.
-    #                     :force         - Always report the exception (even when
-    #                                      ignored).
+    #                     :error_class   - The String class name of the error. (optional)
+    #                     :force         - Always report the exception, even when
+    #                                      ignored. (optional)
     #
     # Examples:
     #
@@ -98,8 +99,16 @@ module Honeybadger
     def notify(exception_or_opts, opts = {})
       return false if config.disabled?
 
-      opts.merge!(exception: exception_or_opts) if exception_or_opts.is_a?(Exception)
-      opts.merge!(exception_or_opts.to_hash) if exception_or_opts.respond_to?(:to_hash)
+      if exception_or_opts.is_a?(Exception)
+        opts.merge!(exception: exception_or_opts)
+      elsif exception_or_opts.respond_to?(:to_hash)
+        opts.merge!(exception_or_opts.to_hash)
+      else
+        opts[:error_message] = exception_or_opts.to_s
+      end
+
+      validate_notify_opts!(opts)
+
       opts.merge!(rack_env: context_manager.get_rack_env)
       opts.merge!(global_context: context_manager.get_context)
 
@@ -321,6 +330,14 @@ module Honeybadger
     def_delegators :config, :init!
 
     private
+
+    def validate_notify_opts!(opts)
+      return if opts.has_key?(:exception)
+      return if opts.has_key?(:error_message)
+      msg = sprintf('`Honeybadger.notify` was called with invalid arguments. You must pass either an Exception or options Hash containing the `:error_message` key. location=%s', caller[caller.size-1])
+      raise ArgumentError.new(msg) if config.dev?
+      warn(msg)
+    end
 
     def context_manager
       return @context if @context
