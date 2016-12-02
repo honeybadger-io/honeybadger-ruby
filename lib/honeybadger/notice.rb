@@ -137,8 +137,8 @@ module Honeybadger
       @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
 
       @exception = unwrap_exception(opts[:exception])
-      @error_class = exception_attribute(:error_class) {|exception| exception.class.name }
-      @error_message = exception_attribute(:error_message, 'Notification') do |exception|
+      @error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
+      @error_message = exception_attribute(:error_message, 'No message provided') do |exception|
         "#{exception.class.name}: #{exception.message}"
       end
       @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))

@@ -112,6 +112,24 @@ describe Honeybadger do
       Honeybadger.notify(exception, notice_args)
     end
 
+    it "sends a notice with a string" do
+      notice = stub_notice!(config)
+
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: 'the test message')).and_return(notice)
+      expect(worker).to receive(:push).with(notice)
+
+      Honeybadger.notify('the test message')
+    end
+
+    it "sends a notice with any arbitrary object" do
+      notice = stub_notice!(config)
+
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: 'the test message')).and_return(notice)
+      expect(worker).to receive(:push).with(notice)
+
+      Honeybadger.notify(double(to_s: 'the test message'))
+    end
+
     it "does not deliver an ignored exception when notifying implicitly" do
       exception = build_exception
       notice = stub_notice!(config)
@@ -142,6 +160,25 @@ describe Honeybadger do
       expect(Honeybadger::Notice).to receive(:new).with(config, kind_of(Hash)).and_return(notice)
 
       Honeybadger.notify(exception)
+    end
+
+    context "without minimum options" do
+      context "outside development" do
+        it "it warns the logger" do
+          expect(worker).to receive(:push)
+          expect(Honeybadger.config.logger).to receive(:warn).with(/invalid arguments/)
+          Honeybadger.notify({})
+        end
+      end
+
+      context "in development" do
+        it "raises an exception" do
+          allow(Honeybadger.config).to receive(:dev?).and_return(true)
+          expect(worker).not_to receive(:push)
+          expect(Honeybadger.config.logger).not_to receive(:warn)
+          expect { Honeybadger.notify({}) }.to raise_error(ArgumentError)
+        end
+      end
     end
   end
 

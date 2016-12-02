@@ -25,6 +25,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   Honeybadger. See `honeybadger help notify`.
 - ~/honeybadger.yml is now a default config path for the CLI and standalone-ruby
   installations.
+- `Honeybadger.notify` now converts arguments which are not `Exception` or
+  `Hash` types to strings and assigns them as the error message. Example:
+  `Honeybadger.notify("Something went wrong")`.
 
 ### Changed
 - `Honeybadger.start` has been deprecated and has no effect.
@@ -48,6 +51,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   filtered.
 - CGI variables are now whitelisted when sending the Rack environment to
   Honeybadger to prevent sensitive data leakage.
+- `Honeybadger.notify` now raises an exception in development mode when called
+  without the required arguments. It logs outside of development and continues
+  to send a generic error report.
 
 ### Removed
 - Ruby 1.9.3 and 2.0.x are no longer supported.
