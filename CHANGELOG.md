@@ -46,6 +46,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - The `request.filter_keys` option now includes partial matches: with the filter
   value "password", keys such as "password" and "otherpassword" will be
   filtered.
+- CGI variables are now whitelisted when sending the Rack environment to
+  Honeybadger to prevent sensitive data leakage.
 
 ### Removed
 - Ruby 1.9.3 and 2.0.x are no longer supported.
