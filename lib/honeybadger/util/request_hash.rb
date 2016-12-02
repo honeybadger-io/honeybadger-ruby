@@ -13,7 +13,6 @@ module Honeybadger
         CONTENT_TYPE
         GATEWAY_INTERFACE
         HTTPS
-        PATH_TRANSLATED
         REMOTE_ADDR
         REMOTE_HOST
         REMOTE_IDENT
