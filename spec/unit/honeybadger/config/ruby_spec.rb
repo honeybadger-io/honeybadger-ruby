@@ -5,6 +5,8 @@ describe Honeybadger::Config::Ruby do
 
   let(:config) { Honeybadger::Config.new(api_key: 'foo', :'user_informer.enabled' => true) }
 
+  it { should respond_to(:api_key) }
+
   it "returns config values" do
     expect(subject.api_key).to eq('foo')
     expect(subject.user_informer.enabled).to eq(true)
