@@ -55,7 +55,7 @@ module Honeybadger
 
         if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
-          return
+          exit(1)
         end
 
         Deploy.new(options, [], config).run
@@ -78,7 +78,7 @@ module Honeybadger
 
         if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
-          return
+          exit(1)
         end
 
         Notify.new(options, [], config).run
@@ -95,7 +95,7 @@ module Honeybadger
 
         if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'")
-          return
+          exit(1)
         end
 
         Exec.new(options, args, config).run
