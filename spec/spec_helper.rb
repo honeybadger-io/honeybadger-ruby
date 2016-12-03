@@ -1,9 +1,10 @@
+require 'aruba/rspec'
 require 'fileutils'
 require 'logger'
 require 'pathname'
 require 'pry'
 require 'rspec/its'
-require 'aruba/rspec'
+require 'webmock/rspec'
 
 # We don't want this bleeding through in tests. (i.e. from CircleCi)
 ENV['RACK_ENV'] = nil

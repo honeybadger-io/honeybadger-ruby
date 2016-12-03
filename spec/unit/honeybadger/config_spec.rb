@@ -12,35 +12,35 @@ describe Honeybadger::Config do
 
   describe "#init!" do
     let(:env) { {} }
+    let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
+
+    before do
+      allow(config).to receive(:ping).and_return(true)
+    end
 
     it "returns the config object" do
-      config = Honeybadger::Config.new(logger: NULL_LOGGER)
       expect(config.init!).to eq(config)
     end
 
     context "with multiple forms of config" do
       it "overrides config with options" do
-        config = Honeybadger::Config.new(logger: NULL_LOGGER)
         config.init!(disabled: true)
         expect(config[:disabled]).to eq true
       end
 
       it "prefers ENV to options" do
         env['HONEYBADGER_DISABLED'] = 'true'
-        config = Honeybadger::Config.new(logger: NULL_LOGGER)
         config.init!({disabled: false}, env)
         expect(config[:disabled]).to eq true
       end
 
       it "prefers file to options" do
-        config = Honeybadger::Config.new(logger: NULL_LOGGER)
         config.init!(:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
         expect(config[:api_key]).to eq 'zxcv'
       end
 
       it "prefers ENV to file" do
         env['HONEYBADGER_API_KEY'] = 'foo'
-        config = Honeybadger::Config.new(logger: NULL_LOGGER)
         config.init!({:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar'}, env)
         expect(config[:api_key]).to eq 'foo'
       end
