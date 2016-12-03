@@ -183,6 +183,33 @@ describe Honeybadger do
   end
 
   describe "#configure" do
-    it "configures the singleton"
+    before do
+      Honeybadger.config.set(:api_key, nil)
+      Honeybadger.config.set(:'user_informer.enabled', true)
+    end
+
+    it "configures the singleton" do
+      expect {
+        Honeybadger.configure do |config|
+          config.api_key = 'test api key'
+        end
+      }.to change { Honeybadger.config.get(:api_key) }.from(nil).to('test api key')
+    end
+
+    it "configures nested values" do
+      expect {
+        Honeybadger.configure do |config|
+          config.user_informer.enabled = false
+        end
+      }.to change { Honeybadger.config.get(:'user_informer.enabled') }.from(true).to(false)
+    end
+
+    it "yields a config object which responds to config methods" do
+      Honeybadger.configure do |config|
+        config.api_key = 'test api key'
+        expect(config.api_key).to eq('test api key')
+        expect(config.user_informer.enabled).to eq(true)
+      end
+    end
   end
 end
