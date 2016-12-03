@@ -22,6 +22,11 @@ module Honeybadger
 
       VALID_ENCODINGS = [Encoding::UTF_8, Encoding::ISO_8859_1].freeze
 
+      def self.sanitize(data)
+        @sanitizer ||= new
+        @sanitizer.sanitize(data)
+      end
+
       def initialize(max_depth: 20, filters: [])
         @filters = !filters.empty?
         @max_depth = max_depth
