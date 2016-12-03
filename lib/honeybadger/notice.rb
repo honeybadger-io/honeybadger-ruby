@@ -133,7 +133,6 @@ module Honeybadger
 
       @rack_env = opts.fetch(:rack_env, nil)
 
-      @sanitizer = Util::Sanitizer.new
       @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
 
       @exception = unwrap_exception(opts[:exception])
@@ -228,7 +227,7 @@ module Honeybadger
     private
 
     attr_reader :config, :opts, :context, :stats, :now, :pid, :causes,
-      :sanitizer, :request_sanitizer, :rack_env
+      :request_sanitizer, :rack_env
 
     def ignore_by_origin?
       return false if opts[:origin] != :rake
@@ -355,7 +354,7 @@ module Honeybadger
     end
 
     def s(data)
-      sanitizer.sanitize(data)
+      Util::Sanitizer.sanitize(data)
     end
 
     # Internal: Fetch local variables from first frame of backtrace.
