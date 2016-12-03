@@ -89,7 +89,7 @@ module Honeybadger
 
       desc 'exec', 'Execute a command. If the exit status is not 0, report the result to Honeybadger'
       project_options
-      option :quiet, required: false, type: :boolean, aliases: :'-q', default: false, desc: 'Suppress all output unless Honeybdager notification fails.'
+      option :quiet, required: false, type: :boolean, aliases: :'-q', default: false, desc: 'Suppress all output unless notification fails.'
       def exec(*args)
         config = build_config(options)
 
