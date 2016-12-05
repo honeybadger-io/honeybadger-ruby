@@ -130,6 +130,14 @@ describe Honeybadger do
       Honeybadger.notify(double(to_s: 'the test message'))
     end
 
+    it "generates a backtrace excluding the singleton" do
+      expect(instance.worker).to receive(:push) do |notice|
+        expect(notice.backtrace.to_a[0][:file]).to eq('[PROJECT_ROOT]/spec/unit/honeybadger_spec.rb')
+      end
+
+      Honeybadger.notify(error_message: 'testing backtrace generation')
+    end
+
     it "does not deliver an ignored exception when notifying implicitly" do
       exception = build_exception
       notice = stub_notice!(config)

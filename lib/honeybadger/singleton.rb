@@ -8,9 +8,13 @@ module Honeybadger
   extend Forwardable
   extend self
 
-  def_delegators :'Agent.instance', :init!, :config, :configure, :notify,
+  def_delegators :'Agent.instance', :init!, :config, :configure,
     :context, :get_context, :flush, :stop, :with_rack_env, :exception_filter,
     :exception_fingerprint, :backtrace_filter
+
+  def notify(exception_or_opts, opts = {})
+    Agent.instance.notify(exception_or_opts, opts)
+  end
 
   def load_plugins!
     Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|

@@ -10,7 +10,20 @@ describe Honeybadger::Agent do
     its(:instance) { should be_a(Honeybadger::Agent) }
   end
 
-  describe "instance methods" do
+  describe "#notify" do
+    it "generates a backtrace" do
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+
+      expect(instance.worker).to receive(:push) do |notice|
+        expect(notice.backtrace.to_a[0][:file]).to eq('[PROJECT_ROOT]/spec/unit/honeybadger/agent_spec.rb')
+      end
+
+      instance.notify(error_message: 'testing backtrace generation')
+    end
+  end
+
+  context do
     let!(:instance) { described_class.new(config) }
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
