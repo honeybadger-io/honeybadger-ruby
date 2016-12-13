@@ -10,7 +10,7 @@ gem 'rspec', '>= 3.0'
 gem 'rspec-its'
 gem 'timecop'
 gem 'aruba', '~> 0.14'
-gem 'webmock'
+gem 'webmock', '< 2.3.0' # Locked for 1.9.3
 gem 'guard'
 gem 'guard-rspec'
 gem 'pry'

@@ -155,7 +155,7 @@ DEPENDENCIES
   rspec-its
   ruby-prof
   timecop
-  webmock
+  webmock (< 2.3.0)
 
 BUNDLED WITH
    1.13.6
