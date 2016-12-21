@@ -28,7 +28,7 @@ module Honeybadger
     raise NoMethodError, <<-WARNING
 `Honeybadger.start` is no longer necessary and has been removed.
 
-  Use `Honeybadger.configure` to explicitly configure the agent moving forward:
+  Use `Honeybadger.configure` to explicitly configure the agent from Ruby moving forward:
 
   Honeybadger.configure do |config|
     config.api_key = 'project api key'
