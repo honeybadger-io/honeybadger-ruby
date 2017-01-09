@@ -64,6 +64,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 - The deprecated `Honeybadger::Rack::MetricsReporter` middleware has been
   removed.
 
+### Fixed
+- Arrays are no longer compacted during sanitization (`nil` values will be sent
+  as they originally appeared).
+
 ## [2.7.2] - 2016-12-12
 ### Fixed
 - Pass whole exception to `notify_or_ignore` (includes causes). -@CGamesPlay

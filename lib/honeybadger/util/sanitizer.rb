@@ -84,7 +84,7 @@ module Honeybadger
           return '[max depth reached]'.freeze if depth >= max_depth
           data.to_a.map do |value|
             sanitize(value, depth+1, stack, parents)
-          end.compact
+          end
         when Numeric, TrueClass, FalseClass, NilClass
           data
         when String

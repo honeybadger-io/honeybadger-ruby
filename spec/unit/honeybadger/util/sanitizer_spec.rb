@@ -53,6 +53,11 @@ describe Honeybadger::Util::Sanitizer do
       expect { sanitized_hash }.to allocate_under((o.new_allocations.size/2)).objects
     end
 
+    it "includes nils in arrays" do
+      ary = [1, nil, 2, nil]
+      expect(described_class.new.sanitize(ary)).to eq(ary)
+    end
+
     context "with bad encodings" do
       let(:string) { 'hello ümlaut' }
       let(:binary) { string.dup.force_encoding(Encoding::BINARY) }
