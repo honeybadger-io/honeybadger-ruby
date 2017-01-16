@@ -37,8 +37,11 @@ module Honeybadger
         end
 
         if filtered_line
-          _, file, number, method = unparsed_line.match(INPUT_FORMAT).to_a
-          _, *filtered_args = filtered_line.match(INPUT_FORMAT).to_a
+          match = unparsed_line.match(INPUT_FORMAT) || [].freeze
+          fmatch = filtered_line.match(INPUT_FORMAT) || [].freeze
+
+          file, number, method = match[1], match[2], match[3]
+          filtered_args = [fmatch[1], fmatch[2], fmatch[3]]
           new(file, number, method, *filtered_args, opts.fetch(:source_radius, 2))
         else
           nil
