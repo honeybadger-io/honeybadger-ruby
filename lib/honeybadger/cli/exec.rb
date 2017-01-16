@@ -63,7 +63,8 @@ MSG
             context: {
               executable: args.first,
               code: result.code,
-              pid: result.pid
+              pid: result.pid,
+              pwd: Dir.pwd
             }
           },
           server: {
