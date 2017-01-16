@@ -74,16 +74,14 @@ MSG
           }
         }
 
-        http = Util::HTTP.new(config)
-
         begin
-          response = http.post('/v1/notices', payload)
+          response = config.backend.notify(:notices, payload)
         rescue
           say(result.msg)
           raise
         end
 
-        if response.code != '201'
+        if !response.success?
           say(result.msg)
           say("\nFailed to notify Honeybadger: #{response.code}", :red)
           exit(1)
@@ -110,9 +108,10 @@ MSG
       def exec_cmd
         stdout, stderr, status = Open3.capture3(args.join(' '))
 
+        success = status.success? && stderr =~ BLANK
         pid = status.pid
         code = status.to_i
-        msg = ERB.new(FAILED_TEMPLATE).result(binding) unless status.success?
+        msg = ERB.new(FAILED_TEMPLATE).result(binding) unless success
 
         OpenStruct.new(
           msg: msg,
@@ -120,7 +119,7 @@ MSG
           code: code,
           stdout: stdout,
           stderr: stderr,
-          success: status.success? && stderr =~ BLANK
+          success: success
         )
       rescue Errno::EACCES, Errno::ENOEXEC
         OpenStruct.new(
