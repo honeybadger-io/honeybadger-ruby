@@ -8,7 +8,7 @@ module Honeybadger
   extend Forwardable
   extend self
 
-  def_delegators :'Agent.instance', :init!, :config, :configure,
+  def_delegators :'Honeybadger::Agent.instance', :init!, :config, :configure,
     :context, :get_context, :flush, :stop, :with_rack_env, :exception_filter,
     :exception_fingerprint, :backtrace_filter
 
