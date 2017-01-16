@@ -52,6 +52,7 @@ MSG
         result = exec_cmd
         return if result.success
 
+        executable = args.first.to_s[/\S+/]
         payload = {
           api_key: config.get(:api_key),
           notifier: NOTIFIER,
@@ -60,11 +61,13 @@ MSG
             message: result.msg
           },
           request: {
+            component: executable,
             context: {
-              executable: args.first,
+              command: args.join(' '),
               code: result.code,
               pid: result.pid,
-              pwd: Dir.pwd
+              pwd: Dir.pwd,
+              path: ENV['PATH']
             }
           },
           server: {
