@@ -27,6 +27,24 @@ module Honeybadger
         option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
       end
 
+      def help(*args, &block)
+        if args.size == 0
+          say(<<-WELCOME)
+⚡  Honeybadger v#{VERSION}
+
+Honeybadger is your favorite error tracker for Ruby. When your app raises an
+exception we notify you with all the context you need to fix it.
+
+The Honeybadger CLI provides tools for interacting with Honeybadger via the
+command line.
+
+If you need support, please drop us a line: support@honeybadger.io
+
+WELCOME
+        end
+        super
+      end
+
       desc 'install API_KEY', 'Install Honeybadger into a new project'
       def install(api_key)
         Install.new(options, api_key).run
