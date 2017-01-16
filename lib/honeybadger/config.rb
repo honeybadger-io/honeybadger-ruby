@@ -31,6 +31,8 @@ module Honeybadger
 
     NOT_BLANK = Regexp.new('\S').freeze
 
+    IVARS = [:@ruby, :@env, :@yaml, :@framework].freeze
+
     def initialize(opts = {})
       @ruby = opts.freeze
       @env = {}.freeze
@@ -78,7 +80,7 @@ module Honeybadger
     end
 
     def get(key)
-      [:@ruby, :@env, :@yaml, :@framework].each do |var|
+      IVARS.each do |var|
         source = instance_variable_get(var)
         if source.has_key?(key)
           return source[key]
