@@ -151,12 +151,7 @@ module Honeybadger
 
       def valid_encoding(string)
         return string if valid_encoding?(string)
-
-        if string.encoding == Encoding::UTF_8
-          string.encode(Encoding::UTF_16, ENCODE_OPTS).encode!(Encoding::UTF_8)
-        else
-          string.encode(Encoding::UTF_8, ENCODE_OPTS)
-        end
+        string.encode(Encoding::UTF_8, ENCODE_OPTS)
       end
 
       def enumerable?(data)
