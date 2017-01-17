@@ -52,6 +52,8 @@ matrix:
       gemfile: gemfiles/rails4.1.gemfile
     - rvm: 2.4.0
       gemfile: gemfiles/rails4.2.gemfile
+    - rvm: jruby-9.1.4.0
+      gemfile: gemfiles/binding_of_caller.gemfile
 env:
   global:
     secure: DwQI6QHuRRaMoKvE9rnXmw3U1KLKH6Y1ZTXCcDN34Zkq7QG5KPt195zvL6XPbsefvd2fOHq4es5D6jxgLlEdKB7njhWX8XNMgb/eprz6zTxSAS/ep31zYHEJ3krWSPM6a7fXJOjdYIzXhVl7I0NRDZGy/Sf6LgHIBMpaGVKGc34=
