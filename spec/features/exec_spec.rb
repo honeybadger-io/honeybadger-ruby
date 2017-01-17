@@ -1,6 +1,6 @@
 require 'honeybadger'
 
-feature "Running the exec cli command", :focus do
+feature "Running the exec cli command" do
   before { set_environment_variable('HONEYBADGER_BACKEND', 'debug') }
 
   it "quietly executes the requested command" do
