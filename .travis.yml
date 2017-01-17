@@ -23,7 +23,6 @@ gemfile:
 rvm:
   - 2.1.10
   - 2.2.5
-  - 2.3.1
   - 2.3.3
   - 2.4.0
   - jruby-9.1.4.0
@@ -32,7 +31,11 @@ matrix:
   allow_failures:
     - rvm: 2.2.5
       gemfile: gemfiles/rails.gemfile
-    - rvm: 2.3.1
+    - rvm: 2.3.3
+      gemfile: gemfiles/rails.gemfile
+    - rvm: 2.4.0
+      gemfile: gemfiles/rails.gemfile
+    - rvm: jruby-9.1.4.0
       gemfile: gemfiles/rails.gemfile
   exclude:
     - rvm: 2.1.10
