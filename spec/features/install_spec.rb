@@ -1,12 +1,6 @@
 require 'honeybadger/config'
 require 'pathname'
 
-begin
-  require 'rails'
-rescue LoadError
-  nil
-end
-
 feature "Installing honeybadger via the cli" do
   shared_examples_for "cli installer" do |rails|
     let(:config) { Honeybadger::Config.new(:api_key => 'asdf', :'config.path' => config_file) }
