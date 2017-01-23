@@ -185,6 +185,7 @@ module Honeybadger
         request: @request,
         server: {
           project_root: s(config[:root]),
+          revision: s(config[:revision]),
           environment_name: s(config[:env]),
           hostname: s(config[:hostname]),
           stats: stats,

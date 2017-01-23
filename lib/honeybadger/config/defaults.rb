@@ -46,6 +46,11 @@ module Honeybadger
         default: Dir.pwd,
         type: String
       },
+      revision: {
+        description: 'The git revision of the project.',
+        default: nil,
+        type: String
+      },
       hostname: {
         description: 'The hostname of the current box.',
         default: Socket.gethostname,

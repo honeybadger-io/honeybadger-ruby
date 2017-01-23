@@ -28,6 +28,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - `Honeybadger.notify` now converts arguments which are not `Exception` or
   `Hash` types to strings and assigns them as the error message. Example:
   `Honeybadger.notify("Something went wrong")`.
+- The currently deployed git revision is now detected automatically and sent
+  with error reports.
 
 ### Changed
 - `Honeybadger.start` has been deprecated and has no effect.

@@ -9,6 +9,7 @@ require 'honeybadger/logging'
 require 'honeybadger/backend'
 require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
+require 'honeybadger/util/revision'
 require 'honeybadger/logging'
 
 module Honeybadger
@@ -46,6 +47,7 @@ module Honeybadger
       self.framework = opts.freeze
       self.env = Env.new(env).freeze
       load_config_from_disk {|yaml| self.yaml = yaml.freeze }
+      detect_revision!
       init_logging!
       init_backend!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
@@ -272,6 +274,11 @@ module Honeybadger
     end
 
     private
+
+    def detect_revision!
+      return if self[:revision]
+      set(:revision, Util::Revision.detect(self[:root]))
+    end
 
     # Internal: Optional path to honeybadger.log log file.
     #
