@@ -13,6 +13,7 @@ require 'honeybadger/util/revision'
 require 'honeybadger/logging'
 
 module Honeybadger
+  # Internal
   class Config
     extend Forwardable
 
@@ -43,6 +44,9 @@ module Honeybadger
 
     attr_accessor :ruby, :env, :yaml, :framework
 
+    # Called by framework (see lib/honeybadger/init/) at the point of
+    # initialization. This is not required for the notifier to work (i.e. with
+    # `require 'honeybadger/ruby'`).
     def init!(opts = {}, env = ENV)
       self.framework = opts.freeze
       self.env = Env.new(env).freeze
