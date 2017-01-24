@@ -52,9 +52,6 @@ module Honeybadger
       init_backend!
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
       logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
-      if valid? && !ping
-        logger.warn('Failed to connect to Honeybadger service -- please verify that api.honeybadger.io is reachable (connection will be retried).')
-      end
       self
     end
 
@@ -139,10 +136,6 @@ module Honeybadger
       return true if self[:report_data]
       return false if self[:report_data] == false
       !self[:env] || !dev?
-    end
-
-    def valid?
-      self[:api_key].to_s =~ /\S/
     end
 
     def debug?
@@ -239,14 +232,6 @@ module Honeybadger
       @no_root = true and return nil unless root =~ NOT_BLANK
 
       @root_regexp = Regexp.new("^#{ Regexp.escape(root) }")
-    end
-
-    def ping
-      if result = send_ping
-        return true
-      end
-
-      false
     end
 
     def detected_framework
@@ -374,33 +359,6 @@ module Honeybadger
     def includes_token?(obj, value)
       return false unless obj.kind_of?(Array)
       obj.map(&:to_sym).include?(value.to_sym)
-    end
-
-    def ping_payload
-      {
-        version: VERSION,
-        framework: framework_name,
-        environment: self[:env],
-        hostname: self[:hostname],
-        config: to_hash
-      }
-    end
-
-    def send_ping
-      payload = ping_payload
-      debug { sprintf('ping payload=%s', payload.to_json.dump) }
-      response = backend.notify(:ping, payload)
-      if response.success?
-        debug { sprintf('ping response=%s', response.body.dump) }
-        JSON.parse(response.body)
-      else
-        warn do
-          msg = sprintf('ping failure code=%s', response.code)
-          msg << sprintf(' message=%s', response.message.dump) if response.message =~ NOT_BLANK
-          msg
-        end
-        nil
-      end
     end
 
     def locate_absolute_path(path, root)

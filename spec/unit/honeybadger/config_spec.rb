@@ -3,8 +3,6 @@ require 'honeybadger/backend/base'
 require 'net/http'
 
 describe Honeybadger::Config do
-  it { should_not be_valid }
-
   specify { expect(subject[:disabled]).to eq false }
   specify { expect(subject[:env]).to eq nil }
   specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
@@ -13,10 +11,6 @@ describe Honeybadger::Config do
   describe "#init!" do
     let(:env) { {} }
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
-
-    before do
-      allow(config).to receive(:ping).and_return(true)
-    end
 
     it "returns the config object" do
       expect(config.init!).to eq(config)
@@ -149,55 +143,6 @@ describe Honeybadger::Config do
 
       it "returns the override" do
         expect(instance.ignored_classes).to eq(['bar'])
-      end
-    end
-  end
-
-  describe "#ping" do
-    let(:instance) { Honeybadger::Config.new(logger: NULL_LOGGER, disabled: true, debug: true) }
-    let(:logger) { instance.logger }
-    let(:body) { {'top' => 'foo'} }
-
-    subject { instance.ping }
-
-    before do
-      allow(logger).to receive(:debug)
-    end
-
-    it "calls the backend with object (not JSON)" do
-      backend = double('Honeybadger::Backend::Server')
-      response = Honeybadger::Backend::Response.new(201, '{}')
-      allow(instance).to receive(:backend).and_return(backend)
-      expect(backend).to receive(:notify).with(:ping, kind_of(Hash)).and_return(response)
-      instance.ping
-    end
-
-    context "when connection succeeds" do
-      before { stub_http(body: body.to_json) }
-
-      it { should eq true }
-
-      it "logs debug action" do
-        expect(logger).to receive(:debug).with(/ping payload/i)
-        instance.ping
-      end
-
-      it "logs debug response" do
-        expect(logger).to receive(:debug).with(/ping response/i)
-        instance.ping
-      end
-    end
-
-    context "when connection fails" do
-      before do
-        stub_http(response: Net::HTTPServerError.new('1.2', '500', 'Internal Error'), body: nil)
-      end
-
-      it { should eq false }
-
-      it "warns logger" do
-        expect(logger).to receive(:warn).with(/ping failure code=500 message="Internal Error"/)
-        instance.ping
       end
     end
   end

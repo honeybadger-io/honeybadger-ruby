@@ -13,12 +13,6 @@ describe Honeybadger::Rack::UserFeedback do
   let(:informer_app) { Honeybadger::Rack::UserFeedback.new(main_app, agent) }
   let(:result) { informer_app.call({}) }
 
-  context "feedback feature is disabled by ping" do
-    it "does not modify the output" do
-      expect(result[2][0]).to eq '<!-- HONEYBADGER FEEDBACK -->'
-    end
-  end
-
   context "there is a honeybadger id" do
     let(:honeybadger_id) { 1 }
 

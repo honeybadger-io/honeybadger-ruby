@@ -10,7 +10,6 @@ module Honeybadger
   module Backend
     class Server < Base
       ENDPOINTS = {
-        ping: '/v1/ping'.freeze,
         notices: '/v1/notices'.freeze,
         deploys: '/v1/deploys'.freeze
       }.freeze
