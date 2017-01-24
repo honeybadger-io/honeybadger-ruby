@@ -109,10 +109,15 @@ WELCOME
       project_options
       option :quiet, required: false, type: :boolean, aliases: :'-q', default: false, desc: 'Suppress all output unless notification fails.'
       def exec(*args)
+        if args.size == 0
+          say("honeybadger: exec needs a command to run", :red)
+          exit(1)
+        end
+
         config = build_config(options)
 
         if config.get(:api_key).to_s =~ BLANK
-          say("No value provided for required options '--api-key'")
+          say("No value provided for required options '--api-key'", :red)
           exit(1)
         end
 
