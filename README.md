@@ -36,8 +36,9 @@ Integrating with other libraries/frameworks is simple! [See the documentation](h
 | Resque        | any           | yes          |
 | Delayed Job   | any           | yes          |
 | Sucker Punch  | any           | yes          |
+| Shoryuken     | any           | yes          |
 
-You can integrate honeybadger into any Ruby script via the `Honeybadger.notify` method. 
+You can integrate honeybadger into any Ruby script via the `Honeybadger.notify` method.
 
 ## Getting Started
 
