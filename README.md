@@ -30,13 +30,20 @@ Integrating with other libraries/frameworks is simple! [See the documentation](h
 
 ## Supported job queues
 
-| Framework     | Version       | Native?      |
+| Library       | Version       | Native?      |
 | ------------- | ------------- | ------------ |
 | Sidekiq       | any           | yes          |
 | Resque        | any           | yes          |
 | Delayed Job   | any           | yes          |
 | Sucker Punch  | any           | yes          |
 | Shoryuken     | any           | yes          |
+
+## Other integrations
+
+| Library       | Version       | Native?      | Description |
+| ------------- | ------------- | ------------ | ----------- |
+| Devise/Warden | any           | yes          | Exceptions are automatically associated with the current user. |
+| Thor          | any           | yes          | Exceptions in commands are automatically reported. |
 
 You can integrate honeybadger into any Ruby script via the `Honeybadger.notify` method.
 
