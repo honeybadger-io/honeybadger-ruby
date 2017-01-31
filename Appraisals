@@ -21,6 +21,11 @@ appraise 'delayed_job' do
   gem 'delayed_job', '< 4.1.2' # See https://github.com/collectiveidea/delayed_job/pull/931
 end
 
+appraise 'resque' do
+  gem 'resque'
+  gem 'mock_redis'
+end
+
 appraise 'rails3.2' do
   gem 'rails', '~> 3.2.12'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]

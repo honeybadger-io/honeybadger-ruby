@@ -6,26 +6,22 @@ module Honeybadger
     module Resque
       module Extension
         def around_perform_with_honeybadger(*args)
-          Honeybadger.flush do
-            begin
-              yield
-            rescue Exception => e
-              Honeybadger.notify(e, parameters: { job_arguments: args }) if send_exception?(e, args)
-              raise e
-            end
-          end
+          Honeybadger.flush { yield }
         ensure
           Honeybadger.context.clear!
         end
 
-        def send_exception?(e, args)
+        def on_failure_with_honeybadger(e, *args)
+          Honeybadger.notify(e, parameters: { job_arguments: args }) if send_exception_to_honeybadger?(e, args)
+        end
+
+        def send_exception_to_honeybadger?(e, args)
           return true unless respond_to?(:retry_criteria_valid?)
           return true if ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying']
 
           !retry_criteria_valid?(e)
         rescue => e
           Honeybadger.notify(e, parameters: { job_arguments: args })
-          raise e
         end
       end
 

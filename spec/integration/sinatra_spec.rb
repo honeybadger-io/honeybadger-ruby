@@ -1,5 +1,6 @@
 begin
   require 'sinatra/base'
+  require 'rack/test'
   SINATRA_PRESENT = true
 rescue LoadError
   SINATRA_PRESENT = false
@@ -9,7 +10,6 @@ end
 if SINATRA_PRESENT
   require FIXTURES_PATH.join('sinatra', 'app.rb')
   require 'honeybadger/init/sinatra'
-  require 'rack/test'
 
   describe 'Sinatra integration' do
     include Rack::Test::Methods
