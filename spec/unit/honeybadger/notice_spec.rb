@@ -484,12 +484,12 @@ describe Honeybadger::Notice do
       expect(notice.as_json[:error][:backtrace]).to eq notice.backtrace.to_ary
     end
 
-    it "trims error message to 2k" do
-      message = 'asdfghjkl'*400
+    it "trims error message to 64k" do
+      message = 'asdfghjkl'*12_000
       e = StandardError.new(message)
       notice = build_notice(exception: e)
-      expect(message.bytesize).to be > 2048
-      expect(2048...2068).to cover notice.as_json[:error][:message].bytesize
+      expect(message.bytesize).to be > 65536
+      expect(65536...65556).to cover notice.as_json[:error][:message].bytesize
     end
   end
 
