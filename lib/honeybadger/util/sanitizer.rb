@@ -16,7 +16,7 @@ module Honeybadger
 
       IMMUTABLE = [NilClass, FalseClass, TrueClass, Symbol, Numeric, BigDecimal, Method].freeze
 
-      MAX_STRING_SIZE = 2048
+      MAX_STRING_SIZE = 65536
 
       TRUNCATION_REPLACEMENT = '[TRUNCATED]'.freeze
 
