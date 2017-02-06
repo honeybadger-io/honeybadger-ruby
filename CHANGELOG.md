@@ -69,6 +69,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Arrays are no longer compacted during sanitization (`nil` values will be sent
   as they originally appeared).
+- Resque plugin now reports `Resque::DirtyExit` exceptions.
 
 ## [2.7.2] - 2016-12-12
 ### Fixed
