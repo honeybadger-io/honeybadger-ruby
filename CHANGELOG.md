@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [3.0.0] - unreleased
+## [3.0.0] - 2017-02-06
 ### Added
 - You may now require 'honeybadger/ruby' instead of 'honeybadger' to get the
   agent without the integrations (no railtie, plugins or monkey patching).
