@@ -25,5 +25,10 @@ describe Honeybadger::Util::RequestHash, if: defined?(Rack) do
       rack_env['QUERY_STRING'] = 'foo'
       expect(subject[:cgi_data]).not_to have_key 'QUERY_STRING'
     end
+
+    it "excludes symbols" do
+      rack_env[:foo] = 'foo'
+      expect(subject[:cgi_data]).not_to have_key :foo
+    end
   end
 end

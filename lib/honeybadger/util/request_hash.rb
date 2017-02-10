@@ -62,6 +62,7 @@ module Honeybadger
 
       def self.extract_cgi_data(request)
         request.env.each_with_object({}) do |(k,v), env|
+          next unless k.is_a?(String)
           next unless k.start_with?(HTTP_HEADER_PREFIX) || CGI_WHITELIST.include?(k)
           env[k] = v
         end
