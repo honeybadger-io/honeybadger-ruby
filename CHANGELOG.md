@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.0.1] - 2017-02-10
 ### Fixed
 - Fixed a bug which caused a NoMethodError (undefined method \`start_with?') when
   Rack env contained non-string keys.
