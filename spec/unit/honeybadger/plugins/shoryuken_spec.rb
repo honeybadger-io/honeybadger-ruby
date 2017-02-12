@@ -1,10 +1,7 @@
 require 'honeybadger/plugins/shoryuken'
 require 'honeybadger/config'
 
-class TestShoryukenWorker < Honeybadger::Plugins::Shoryuken::Middleware
-end
-
-describe "Shoryuken Dependency" do
+RSpec.describe "Shoryuken Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do
@@ -20,13 +17,12 @@ describe "Shoryuken Dependency" do
   context "when shoryuken is installed" do
     let(:shim) do
       Class.new do
-        def self.configure_server
-        end
+        def self.configure_server; end
       end
     end
 
     let(:shoryuken_config) { double("config", {}) }
-    let(:chain) { double("chain", :add => true) }
+    let(:chain) { double("chain", add: true) }
 
     before do
       Object.const_set(:Shoryuken, shim)
@@ -43,20 +39,27 @@ describe "Shoryuken Dependency" do
   end
 end
 
-describe TestShoryukenWorker do
+class TestShoryukenWorker < Honeybadger::Plugins::Shoryuken::Middleware; end
+
+RSpec.describe TestShoryukenWorker do
   let(:sqs_msg) do
-    double("SqsMsg", queue_name: "queue", attributes: { "ApproximateReceiveCount" => receive_count }, data: double("SqsMsgData", message_id: rand.to_s))
+    double("SqsMsg",
+           queue_name: "queue",
+           attributes: { "ApproximateReceiveCount" => receive_count },
+           data: double("SqsMsgData", message_id: rand.to_s))
   end
 
   shared_examples_for "notifies Honeybadger" do
-    it "" do
-      expect(Honeybadger).to receive(:notify).with(kind_of(RuntimeError), hash_including(parameters: [1, 2, 3]))
+    it do
+      expect(Honeybadger).to receive(:notify).with(kind_of(RuntimeError),
+                                                   hash_including(parameters: [1, 2, 3]))
+
       expect { job_execution }.to raise_error(RuntimeError)
     end
   end
 
   shared_examples_for "doesn't notify Honeybadger" do
-    it "" do
+    it do
       expect(Honeybadger).to_not receive(:notify)
       expect { job_execution }.to raise_error(RuntimeError)
     end
@@ -66,7 +69,7 @@ describe TestShoryukenWorker do
   let(:sqs_msgs) { sqs_msg }
   let(:instance) { described_class.new }
   let(:job_execution) do
-    instance.call(instance, nil, sqs_msgs, [1, 2, 3]) { fail "foo" }
+    instance.call(instance, nil, sqs_msgs, [1, 2, 3]) { raise "foo" }
   end
 
   context "with a single message" do
@@ -88,7 +91,7 @@ describe TestShoryukenWorker do
   end
 
   context "with several messages" do
-    let(:sqs_msgs) { 2.times.map { sqs_msg.dup } }
-    include_examples "doesn't notify Honeybadger"
+    let(:sqs_msgs) { Array.new(2) { sqs_msg.dup } }
+    include_examples "notifies Honeybadger"
   end
 end
