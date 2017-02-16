@@ -7,28 +7,23 @@ module Honeybadger
       ::Sinatra::Base.class_eval do
         class << self
           def build_with_honeybadger(*args, &block)
+            configure_honeybadger
             install_honeybadger
             build_without_honeybadger(*args, &block)
           end
           alias :build_without_honeybadger :build
           alias :build :build_with_honeybadger
 
-          def honeybadger_config(app)
-            {
-              api_key: defined?(honeybadger_api_key) ? honeybadger_api_key : nil,
-              env: ENV['APP_ENV'] || ENV['RACK_ENV'],
-              framework: :sinatra,
-              :'logging.path' => 'STDOUT'
-            }
+          def configure_honeybadger
+            return unless defined?(honeybadger_api_key)
+            Honeybadger.configure do |config|
+              config.api_key = honeybadger_api_key
+            end
           end
 
           def install_honeybadger
-            Honeybadger.init!(honeybadger_config(self))
-            Honeybadger.load_plugins!
-
             config = Honeybadger.config
             return unless config[:'sinatra.enabled']
-
             install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier) if config[:'exceptions.enabled']
           end
 
@@ -41,3 +36,11 @@ module Honeybadger
     end
   end
 end
+
+Honeybadger.init!({
+  env: ENV['APP_ENV'] || ENV['RACK_ENV'],
+  framework: :sinatra,
+  :'logging.path' => 'STDOUT'
+})
+
+Honeybadger.load_plugins!
