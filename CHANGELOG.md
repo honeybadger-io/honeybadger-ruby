@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Fixed a bug caused by an interaction with the semantic\_logger gem.
 
 ## [3.0.1] - 2017-02-10
 ### Fixed

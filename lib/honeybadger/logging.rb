@@ -20,19 +20,19 @@ module Honeybadger
       alias :d :debug
 
       def info(msg = nil)
-        return true if Logger::Severity::INFO < logger.level
+        return true unless logger.info?
         msg = yield if block_given?
         logger.info(msg)
       end
 
       def warn(msg = nil)
-        return true if Logger::Severity::WARN < logger.level
+        return true unless logger.warn?
         msg = yield if block_given?
         logger.warn(msg)
       end
 
       def error(msg = nil)
-        return true if Logger::Severity::ERROR < logger.level
+        return true unless logger.error?
         msg = yield if block_given?
         logger.error(msg)
       end
