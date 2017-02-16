@@ -1,6 +1,7 @@
 require 'logger'
 require 'singleton'
 require 'delegate'
+require 'forwardable'
 
 module Honeybadger
   module Logging
@@ -47,6 +48,10 @@ module Honeybadger
         define_method severity.downcase do |msg|
           add(Logger::Severity.const_get(severity), msg)
         end
+
+        define_method :"#{severity.downcase}?" do
+          true
+        end
       end
 
       def add(severity, msg)
@@ -78,6 +83,8 @@ module Honeybadger
     end
 
     class StandardLogger < Base
+      extend Forwardable
+
       def initialize(logger = Logger.new('/dev/null'))
         raise ArgumentError, 'logger not specified' unless logger
         raise ArgumentError, 'logger must be a logger' unless logger.respond_to?(:add)
@@ -85,13 +92,7 @@ module Honeybadger
         @logger = logger
       end
 
-      def add(severity, msg)
-        @logger.add(severity, msg)
-      end
-
-      def level
-        @logger.level
-      end
+      def_delegators :@logger, :level, :add, :debug?, :info?, :warn?, :error?
     end
 
     class FormattedLogger < StandardLogger
