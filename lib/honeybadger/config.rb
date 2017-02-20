@@ -380,15 +380,6 @@ module Honeybadger
           yield(yml) if block_given?
         end
       end
-    rescue ConfigError => e
-      error("Error loading config from disk: #{e}")
-      nil
-    rescue StandardError => e
-      error {
-        msg = "Error loading config from disk. class=%s message=%s\n\t%s"
-        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
-      }
-      nil
     end
 
     def undotify_keys(hash)
