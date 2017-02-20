@@ -42,12 +42,11 @@ module Honeybadger
 
         payload.delete(:request) if payload[:request].empty?
 
-        http = Util::HTTP.new(config)
-        result = http.post('/v1/notices', payload)
-        if result.code == '201'
+        response = config.backend.notify(:notices, payload)
+        if response.success?
           say("Error notification complete.", :green)
         else
-          say("Invalid response from server: #{result.code}", :red)
+          say("Invalid response from server: #{response.code}", :red)
           exit(1)
         end
       end

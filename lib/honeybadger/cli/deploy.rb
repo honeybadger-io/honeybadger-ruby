@@ -22,11 +22,11 @@ module Honeybadger
           local_username: options['user']
         }
 
-        result = config.backend.notify(:deploys, payload)
-        if result.success?
+        response = config.backend.notify(:deploys, payload)
+        if response.success?
           say("Deploy notification complete.", :green)
         else
-          say("Invalid response from server: #{result.code}", :red)
+          say("Invalid response from server: #{response.code}", :red)
           exit(1)
         end
       end
