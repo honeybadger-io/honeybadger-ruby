@@ -48,14 +48,24 @@ module Honeybadger
     # initialization. This is not required for the notifier to work (i.e. with
     # `require 'honeybadger/ruby'`).
     def init!(opts = {}, env = ENV)
-      self.framework = opts.freeze
+      load!(framework: opts, env: env)
+
+      init_logging!
+      init_backend!
+
+      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
+      logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
+
+      self
+    end
+
+    def load!(framework: {}, env: ENV)
+      return self if @loaded
+      self.framework = framework.freeze
       self.env = Env.new(env).freeze
       load_config_from_disk {|yaml| self.yaml = yaml.freeze }
       detect_revision!
-      init_logging!
-      init_backend!
-      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
-      logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
+      @loaded = true
       self
     end
 

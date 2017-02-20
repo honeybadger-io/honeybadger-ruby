@@ -11,6 +11,11 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Friendlier backtraces for exceptions originating in honeybadger.yml.
 
+### Fixed
+- Rails environment is now loaded when running `honeybadger` cli from a Rails
+  root. This fixes an issue where programmatic configuration from Rails was not
+  loaded.
+
 ## [3.0.2] - 2017-02-16
 ### Fixed
 - Fixed a bug caused by an interaction with the semantic\_logger gem.
