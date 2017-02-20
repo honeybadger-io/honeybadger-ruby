@@ -78,16 +78,18 @@ MSG
           }
         }
 
+        http = Util::HTTP.new(config)
+
         begin
-          response = config.backend.notify(:notices, payload)
+          result = http.post('/v1/notices', payload)
         rescue
           say(result.msg)
           raise
         end
 
-        if !response.success?
+        if !result.success?
           say(result.msg)
-          say("\nFailed to notify Honeybadger: #{response.code}", :red)
+          say("\nFailed to notify Honeybadger: #{result.code}", :red)
           exit(1)
         end
 

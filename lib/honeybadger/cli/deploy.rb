@@ -22,8 +22,10 @@ module Honeybadger
           local_username: options['user']
         }
 
-        result = config.backend.notify(:deploys, payload)
-        if result.success?
+        http = Util::HTTP.new(config)
+        result = http.post('/v1/deploys', payload)
+
+        if result.code == '201'
           say("Deploy notification complete.", :green)
         else
           say("Invalid response from server: #{result.code}", :red)

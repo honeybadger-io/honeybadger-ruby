@@ -44,6 +44,7 @@ module Honeybadger
 
         http = Util::HTTP.new(config)
         result = http.post('/v1/notices', payload)
+
         if result.code == '201'
           say("Error notification complete.", :green)
         else
