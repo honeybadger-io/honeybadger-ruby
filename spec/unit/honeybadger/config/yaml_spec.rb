@@ -107,7 +107,7 @@ logging:
     end
 
     it "re-raises the exception" do
-      expect { subject }.to raise_error(RuntimeError)
+      expect { subject }.to raise_error(Honeybadger::Config::ConfigError)
     end
   end
 end
