@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Exceptions encountered while loading/evaluating honeybadger.yml are now raised
   instead of logged.
 
+### Added
+- Friendlier backtraces for exceptions originating in honeybadger.yml.
+
 ## [3.0.2] - 2017-02-16
 ### Fixed
 - Fixed a bug caused by an interaction with the semantic\_logger gem.
