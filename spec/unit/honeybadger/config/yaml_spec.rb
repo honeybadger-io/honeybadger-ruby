@@ -126,7 +126,7 @@ YAML
       expect { described_class.new(config_path) }.to raise_error(Honeybadger::Config::ConfigError)
     end
 
-    it "raises an exception with a helpful backtrace" do
+    it "raises an exception with a helpful backtrace", if: RUBY_PLATFORM !~ /java/ do
       begin
         described_class.new(config_path)
       rescue => e
