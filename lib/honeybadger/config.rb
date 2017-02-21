@@ -13,7 +13,9 @@ require 'honeybadger/util/revision'
 require 'honeybadger/logging'
 
 module Honeybadger
-  # Internal
+  # Internal: The Config class is used to manage Honeybadger's initialization
+  # and configuration. Please don't depend on any internal classes or methods
+  # outside of Honeybadger as they may change without notice.
   class Config
     extend Forwardable
 
@@ -235,7 +237,7 @@ module Honeybadger
       includes_token?(self[:plugins], name)
     end
 
-    # Internal: Match the project root.
+    # Match the project root.
     #
     # Returns Regexp matching the project root in a file string.
     def root_regexp
@@ -279,7 +281,7 @@ module Honeybadger
       set(:revision, Util::Revision.detect(self[:root]))
     end
 
-    # Internal: Optional path to honeybadger.log log file.
+    # Optional path to honeybadger.log log file.
     #
     # Returns the Pathname log path if a log path was specified.
     def log_path
@@ -288,7 +290,7 @@ module Honeybadger
       locate_absolute_path(self[:'logging.path'], self[:root])
     end
 
-    # Internal: Path to honeybadger.yml configuration file; this should be the
+    # Path to honeybadger.yml configuration file; this should be the
     # root directory if no path was specified.
     #
     # Returns the Pathname configuration path.
@@ -364,7 +366,7 @@ module Honeybadger
       @logger = Logging::ConfigLogger.new(self, build_logger)
     end
 
-    # Internal: Does collection include the String value or Symbol value?
+    # Does collection include the String value or Symbol value?
     #
     # obj - The Array object, if present.
     # value - The value which may exist within Array obj.
