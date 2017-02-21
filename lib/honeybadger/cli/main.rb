@@ -151,12 +151,20 @@ WELCOME
       def load_env
         # Initialize Rails when running from Rails root.
         environment_rb = File.join(Dir.pwd, 'config', 'environment.rb')
-        if File.exists?(environment_rb)
-          require environment_rb
-        end
+        load_rails_env(environment_rb) if File.exists?(environment_rb)
 
         # Ensure config is loaded (will be skipped if initialized by Rails).
         Honeybadger.config.load!
+      end
+
+      def load_rails_env(environment_rb)
+        begin
+          require 'rails'
+        rescue LoadError
+          # No Rails, so skip loading Rails environment.
+          return
+        end
+        require environment_rb
       end
 
       def log_error(e)

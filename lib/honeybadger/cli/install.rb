@@ -18,13 +18,14 @@ module Honeybadger
         say("Installing Honeybadger #{VERSION}")
 
         begin
+          require 'rails'
           require File.join(Dir.pwd, 'config', 'application.rb')
+          root = Rails.root
+          config_root = root.join('config')
         rescue LoadError
-          nil
+          root = config_root = Pathname.new(Dir.pwd)
         end
 
-        root = defined?(Rails.root) ? Rails.root : Pathname.new(Dir.pwd)
-        config_root = defined?(Rails.root) ? root.join('config') : root
         config_path = config_root.join('honeybadger.yml')
 
         if config_path.exist?

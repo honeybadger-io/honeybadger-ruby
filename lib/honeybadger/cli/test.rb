@@ -38,8 +38,8 @@ module Honeybadger
 
       def run
         begin
+          require 'rails'
           require File.join(Dir.pwd, 'config', 'environment.rb')
-          raise LoadError unless defined?(::Rails)
           say("Detected Rails #{Rails::VERSION::STRING}")
         rescue LoadError
           require 'honeybadger/init/ruby'
@@ -126,7 +126,7 @@ MSG
       def_delegator :@shell, :say
 
       def run_test
-        if defined?(::Rails.application)
+        if defined?(::Rails.application) && ::Rails.application
           run_rails_test
         else
           run_standalone_test
