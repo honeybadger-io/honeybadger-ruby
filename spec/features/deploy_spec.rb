@@ -19,7 +19,7 @@ feature "Running the deploy cli command" do
 
     it "notifies the user" do
       expect(run('honeybadger deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user')).not_to be_successfully_executed
-      expect(all_output).to match(/invalid response/i)
+      expect(all_output).to match(/request failed/i)
     end
   end
 end

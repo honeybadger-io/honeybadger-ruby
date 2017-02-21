@@ -67,7 +67,7 @@ module Honeybadger
 
 The error notifier is installed, but we encountered an error:
 
-  #{response.code.kind_of?(Integer) ? "(#{response.code}) " : nil}#{response.error_message}
+  #{response.error_message}
 
 To fix this issue, please try the following:
 

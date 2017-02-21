@@ -45,7 +45,12 @@ module Honeybadger
       end
 
       def error_message
-        FRIENDLY_ERRORS[code] || message
+        return message if code == :error
+        return FRIENDLY_ERRORS[code] if FRIENDLY_ERRORS[code]
+        return error if error =~ NOT_BLANK
+        msg = "The server responded with #{code}"
+        msg << ": #{message}" if message =~ NOT_BLANK
+        msg
       end
 
       private

@@ -1,6 +1,7 @@
 require 'erb'
 require 'forwardable'
 require 'honeybadger/cli/main'
+require 'honeybadger/cli/helpers'
 require 'honeybadger/util/http'
 require 'honeybadger/util/stats'
 require 'open3'
@@ -11,6 +12,7 @@ module Honeybadger
   module CLI
     class Exec
       extend Forwardable
+      include Helpers::BackendCmd
 
       FAILED_TEMPLATE = <<-MSG
 Honeybadger detected failure or error output for the command:
@@ -87,7 +89,7 @@ MSG
 
         if !response.success?
           say(result.msg)
-          say("\nFailed to notify Honeybadger: #{response.code}", :red)
+          say(error_message(response), :red)
           exit(1)
         end
 
