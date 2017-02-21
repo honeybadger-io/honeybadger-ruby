@@ -53,7 +53,7 @@ module Honeybadger
 
       private
 
-      # Public: Detects the Heroku app name from GIT.
+      # Internal: Detects the Heroku app name from GIT.
       #
       # prompt_on_default - If a single remote is discoverd, should we prompt the
       #                     user before returning it?

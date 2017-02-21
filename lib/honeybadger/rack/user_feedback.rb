@@ -16,6 +16,8 @@ end
 
 module Honeybadger
   module Rack
+    # Public: Middleware for Rack applications. Adds a feedback form to the
+    # Rack response when an error has occurred.
     class UserFeedback
       extend Forwardable
 
