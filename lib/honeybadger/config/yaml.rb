@@ -31,7 +31,7 @@ module Honeybadger
           config_error = ConfigError.new(e.to_s)
 
           if e.backtrace
-            backtrace = e.backtrace.dup.map do |line|
+            backtrace = e.backtrace.map do |line|
               if line.start_with?('(erb)'.freeze)
                 line.gsub('(erb)'.freeze, path.to_s)
               else
