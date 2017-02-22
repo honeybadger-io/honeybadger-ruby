@@ -31,9 +31,12 @@ module Honeybadger
           config_error = ConfigError.new(e.to_s)
 
           if e.backtrace
-            backtrace = e.backtrace.dup
-            if backtrace[0] && backtrace[0].start_with?('(erb)'.freeze)
-              backtrace[0] = backtrace[0].gsub('(erb)'.freeze, path.to_s)
+            backtrace = e.backtrace.dup.map do |line|
+              if line.start_with?('(erb)'.freeze)
+                line.gsub('(erb)'.freeze, path.to_s)
+              else
+                line
+              end
             end
             config_error.set_backtrace(backtrace)
           end
