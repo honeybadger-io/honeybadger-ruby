@@ -37,13 +37,9 @@ module Honeybadger
       end
 
       def run
-        require 'honeybadger/ruby'
-
         begin
-          require File.join(Dir.pwd, 'config', 'application.rb')
-          raise LoadError unless defined?(::Rails)
-          require 'honeybadger/init/rails'
-          Rails.application.initialize!
+          require 'rails'
+          require File.join(Dir.pwd, 'config', 'environment.rb')
           say("Detected Rails #{Rails::VERSION::STRING}")
         rescue LoadError
           require 'honeybadger/init/ruby'
@@ -59,65 +55,8 @@ module Honeybadger
         Honeybadger.config.backend = test_backend
 
         at_exit do
-          Honeybadger.flush
-
-          if calling = TestBackend.callings[:notices].find {|c| c[0].exception.eql?(TEST_EXCEPTION) }
-            notice, response = *calling
-
-            if response.code != 201
-              host = Honeybadger.config.get(:'connection.host')
-              say(<<-MSG, :red)
-!! --- Honeybadger test failed ------------------------------------------------ !!
-
-The error notifier is installed, but we encountered an error:
-
-  #{response.code.kind_of?(Integer) ? "(#{response.code}) " : nil}#{response.error_message}
-
-To fix this issue, please try the following:
-
-  - Make sure the gem is configured properly.
-  - Retry executing this command a few times.
-  - Make sure you can connect to #{host} (`ping #{host}`).
-  - Email support@honeybadger.io for help. Include as much debug info as you
-    can for a faster resolution!
-
-!! --- End -------------------------------------------------------------------- !!
-MSG
-              exit(1)
-            end
-
-            say(generate_success_message(response), :green)
-
-            exit(0)
-          end
-
-          say(<<-MSG, :red)
-!! --- Honeybadger test failed ------------------------------------------------ !!
-
-Error: The test exception was not reported; the application may not be
-configured properly.
-
-This is usually caused by one of the following issues:
-
-  - There was a problem loading your application. Check your logs to see if a
-    different exception is being raised.
-  - The exception is being rescued before it reaches our Rack middleware. If
-    you're using `rescue` or `rescue_from` you may need to notify Honeybadger
-    manually: `Honeybadger.notify(exception)`.
-  - The honeybadger gem is misconfigured. Check the settings in your
-    honeybadger.yml file.
-MSG
-
-          notices = TestBackend.callings[:notices].map(&:first)
-          unless notices.empty?
-            say("\nThe following errors were reported:", :red)
-            notices.each {|n| say("\n  - #{n.error_class}: #{n.error_message}", :red) }
-          end
-
-          say("\nSee https://git.io/vXCYp for more troubleshooting help.\n\n", :red)
-          say("!! --- End -------------------------------------------------------------------- !!", :red)
-
-          exit(1)
+          # Exceptions will already be reported when exiting.
+          verify_test unless $!
         end
 
         run_test
@@ -130,7 +69,7 @@ MSG
       def_delegator :@shell, :say
 
       def run_test
-        if defined?(::Rails.application)
+        if defined?(::Rails.application) && ::Rails.application
           run_rails_test
         else
           run_standalone_test
@@ -215,6 +154,68 @@ MSG
         env = ::Rack::MockRequest.env_for("http#{ ssl ? 's' : nil }://www.example.com/verify", 'REMOTE_ADDR' => '127.0.0.1')
 
         ::Rails.application.call(env)
+      end
+
+      def verify_test
+        Honeybadger.flush
+
+        if calling = TestBackend.callings[:notices].find {|c| c[0].exception.eql?(TEST_EXCEPTION) }
+          notice, response = *calling
+
+          if response.code != 201
+            host = Honeybadger.config.get(:'connection.host')
+            say(<<-MSG, :red)
+!! --- Honeybadger test failed ------------------------------------------------ !!
+
+The error notifier is installed, but we encountered an error:
+
+  #{response.error_message}
+
+To fix this issue, please try the following:
+
+  - Make sure the gem is configured properly.
+  - Retry executing this command a few times.
+  - Make sure you can connect to #{host} (`ping #{host}`).
+  - Email support@honeybadger.io for help. Include as much debug info as you
+    can for a faster resolution!
+
+!! --- End -------------------------------------------------------------------- !!
+MSG
+            exit(1)
+          end
+
+          say(generate_success_message(response), :green)
+
+          exit(0)
+        end
+
+        say(<<-MSG, :red)
+!! --- Honeybadger test failed ------------------------------------------------ !!
+
+Error: The test exception was not reported; the application may not be
+configured properly.
+
+This is usually caused by one of the following issues:
+
+  - There was a problem loading your application. Check your logs to see if a
+    different exception is being raised.
+  - The exception is being rescued before it reaches our Rack middleware. If
+    you're using `rescue` or `rescue_from` you may need to notify Honeybadger
+    manually: `Honeybadger.notify(exception)`.
+  - The honeybadger gem is misconfigured. Check the settings in your
+    honeybadger.yml file.
+MSG
+
+        notices = TestBackend.callings[:notices].map(&:first)
+        unless notices.empty?
+          say("\nThe following errors were reported:", :red)
+          notices.each {|n| say("\n  - #{n.error_class}: #{n.error_message}", :red) }
+        end
+
+        say("\nSee https://git.io/vXCYp for more troubleshooting help.\n\n", :red)
+        say("!! --- End -------------------------------------------------------------------- !!", :red)
+
+        exit(1)
       end
 
       def generate_success_message(response)

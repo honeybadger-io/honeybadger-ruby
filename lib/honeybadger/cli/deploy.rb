@@ -1,11 +1,13 @@
 require 'forwardable'
 require 'honeybadger/cli/main'
+require 'honeybadger/cli/helpers'
 require 'honeybadger/util/http'
 
 module Honeybadger
   module CLI
     class Deploy
       extend Forwardable
+      include Helpers::BackendCmd
 
       def initialize(options, args, config)
         @options = options
@@ -22,11 +24,11 @@ module Honeybadger
           local_username: options['user']
         }
 
-        result = config.backend.notify(:deploys, payload)
-        if result.success?
+        response = config.backend.notify(:deploys, payload)
+        if response.success?
           say("Deploy notification complete.", :green)
         else
-          say("Invalid response from server: #{result.code}", :red)
+          say(error_message(response), :red)
           exit(1)
         end
       end

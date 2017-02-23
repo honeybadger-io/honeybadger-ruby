@@ -107,7 +107,31 @@ logging:
     end
 
     it "re-raises the exception" do
-      expect { subject }.to raise_error(RuntimeError)
+      expect { subject }.to raise_error(Honeybadger::Config::ConfigError)
+    end
+  end
+
+  context "when an error occurs in ERB" do
+    let(:config_path) { FIXTURES_PATH.join('honeybadger.yml') }
+    let(:yaml) { <<-YAML }
+---
+api_key: "<%= MyApp.config.nonexistant_var %>"
+YAML
+
+    before do
+      allow(config_path).to receive(:read).and_return(yaml)
+    end
+
+    it "raises a config error" do
+      expect { described_class.new(config_path) }.to raise_error(Honeybadger::Config::ConfigError)
+    end
+
+    it "raises an exception with a helpful backtrace", if: RUBY_PLATFORM !~ /java/ do
+      begin
+        described_class.new(config_path)
+      rescue => e
+        expect(e.backtrace[0]).to start_with(config_path.to_s)
+      end
     end
   end
 end

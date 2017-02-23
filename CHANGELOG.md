@@ -4,6 +4,17 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Exceptions encountered while loading/evaluating honeybadger.yml are now raised
+  instead of logged.
+
+### Added
+- Friendlier backtraces for exceptions originating in honeybadger.yml.
+
+### Fixed
+- Rails environment is now loaded when running `honeybadger` cli from a Rails
+  root. This fixes an issue where programmatic configuration from Rails was not
+  loaded.
 
 ## [3.0.2] - 2017-02-16
 ### Fixed

@@ -13,7 +13,9 @@ require 'honeybadger/util/revision'
 require 'honeybadger/logging'
 
 module Honeybadger
-  # Internal
+  # Internal: The Config class is used to manage Honeybadger's initialization
+  # and configuration. Please don't depend on any internal classes or methods
+  # outside of Honeybadger as they may change without notice.
   class Config
     extend Forwardable
 
@@ -48,14 +50,24 @@ module Honeybadger
     # initialization. This is not required for the notifier to work (i.e. with
     # `require 'honeybadger/ruby'`).
     def init!(opts = {}, env = ENV)
-      self.framework = opts.freeze
+      load!(framework: opts, env: env)
+
+      init_logging!
+      init_backend!
+
+      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
+      logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
+
+      self
+    end
+
+    def load!(framework: {}, env: ENV)
+      return self if @loaded
+      self.framework = framework.freeze
       self.env = Env.new(env).freeze
       load_config_from_disk {|yaml| self.yaml = yaml.freeze }
       detect_revision!
-      init_logging!
-      init_backend!
-      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
-      logger.warn('Entering development mode: data will not be reported.') if dev? && backend.kind_of?(Backend::Null)
+      @loaded = true
       self
     end
 
@@ -225,7 +237,7 @@ module Honeybadger
       includes_token?(self[:plugins], name)
     end
 
-    # Internal: Match the project root.
+    # Match the project root.
     #
     # Returns Regexp matching the project root in a file string.
     def root_regexp
@@ -269,7 +281,7 @@ module Honeybadger
       set(:revision, Util::Revision.detect(self[:root]))
     end
 
-    # Internal: Optional path to honeybadger.log log file.
+    # Optional path to honeybadger.log log file.
     #
     # Returns the Pathname log path if a log path was specified.
     def log_path
@@ -278,7 +290,7 @@ module Honeybadger
       locate_absolute_path(self[:'logging.path'], self[:root])
     end
 
-    # Internal: Path to honeybadger.yml configuration file; this should be the
+    # Path to honeybadger.yml configuration file; this should be the
     # root directory if no path was specified.
     #
     # Returns the Pathname configuration path.
@@ -354,7 +366,7 @@ module Honeybadger
       @logger = Logging::ConfigLogger.new(self, build_logger)
     end
 
-    # Internal: Does collection include the String value or Symbol value?
+    # Does collection include the String value or Symbol value?
     #
     # obj - The Array object, if present.
     # value - The value which may exist within Array obj.
@@ -380,15 +392,6 @@ module Honeybadger
           yield(yml) if block_given?
         end
       end
-    rescue ConfigError => e
-      error("Error loading config from disk: #{e}")
-      nil
-    rescue StandardError => e
-      error {
-        msg = "Error loading config from disk. class=%s message=%s\n\t%s"
-        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
-      }
-      nil
     end
 
     def undotify_keys(hash)

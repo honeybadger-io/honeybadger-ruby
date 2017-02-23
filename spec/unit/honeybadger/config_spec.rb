@@ -78,13 +78,8 @@ describe Honeybadger::Config do
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
         end
 
-        it "does not raise an exception" do
-          expect { init_instance }.not_to raise_error
-        end
-
-        it "logs the error message to the default logger" do
-          expect(instance.logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
-          init_instance
+        it "raises the exception" do
+          expect { init_instance }.to raise_error(Honeybadger::Config::ConfigError)
         end
       end
 
@@ -94,18 +89,8 @@ describe Honeybadger::Config do
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
         end
 
-        it "does not raise an exception" do
-          expect { init_instance }.not_to raise_error
-        end
-
-        it "logs the error message to the default logger" do
-          expect(instance.logger).to receive(:add).with(Logger::Severity::ERROR, /ouch/)
-          init_instance
-        end
-
-        it "logs the backtrace to the boot logger" do
-          expect(instance.logger).to receive(:add).with(Logger::Severity::ERROR, /config_spec\.rb/)
-          init_instance
+        it "raises the exception" do
+          expect { init_instance }.to raise_error(RuntimeError)
         end
       end
     end

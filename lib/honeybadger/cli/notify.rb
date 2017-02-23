@@ -1,6 +1,7 @@
 require 'digest'
 require 'forwardable'
 require 'honeybadger/cli/main'
+require 'honeybadger/cli/helpers'
 require 'honeybadger/util/http'
 require 'honeybadger/util/stats'
 
@@ -8,6 +9,7 @@ module Honeybadger
   module CLI
     class Notify
       extend Forwardable
+      include Helpers::BackendCmd
 
       def initialize(options, args, config)
         @options = options
@@ -42,12 +44,11 @@ module Honeybadger
 
         payload.delete(:request) if payload[:request].empty?
 
-        http = Util::HTTP.new(config)
-        result = http.post('/v1/notices', payload)
-        if result.code == '201'
+        response = config.backend.notify(:notices, payload)
+        if response.success?
           say("Error notification complete.", :green)
         else
-          say("Invalid response from server: #{result.code}", :red)
+          say(error_message(response), :red)
           exit(1)
         end
       end
