@@ -5,25 +5,36 @@ module Honeybadger
   module Plugins
     module Shoryuken
       class Middleware
-        def call(worker, queue, sqs_msg, body)
-          if sqs_msg.is_a?(Array)
-            yield
-            return
-          end
-
+        def call(_worker, _queue, sqs_msg, body)
           Honeybadger.flush do
             begin
               yield
             rescue => e
-              receive_count = sqs_msg.attributes['ApproximateReceiveCount'.freeze]
-              if receive_count && ::Honeybadger.config[:'shoryuken.attempt_threshold'].to_i <= receive_count.to_i
-                Honeybadger.notify(e, parameters: body)
+              if attempt_threshold <= receive_count(sqs_msg)
+                Honeybadger.notify(e, parameters: notification_params(body))
               end
+
               raise e
             end
           end
         ensure
           Honeybadger.context.clear!
+        end
+
+        private
+
+        def attempt_threshold
+          ::Honeybadger.config[:'shoryuken.attempt_threshold'].to_i
+        end
+
+        def receive_count(sqs_msg)
+          return 0 if sqs_msg.is_a?(Array)
+
+          sqs_msg.attributes['ApproximateReceiveCount'.freeze].to_i
+        end
+
+        def notification_params(body)
+          body.is_a?(Array) ? { batch: body } : { body: body }
         end
       end
 
