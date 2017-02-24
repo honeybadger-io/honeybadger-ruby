@@ -52,7 +52,7 @@ RSpec.describe TestShoryukenWorker do
   shared_examples_for "notifies Honeybadger" do
     it do
       expect(Honeybadger).to receive(:notify).with(kind_of(RuntimeError),
-                                                   hash_including(parameters: [1, 2, 3]))
+                                                   hash_including(parameters: { body: { "key" => "value" } }))
 
       expect { job_execution }.to raise_error(RuntimeError)
     end
@@ -68,8 +68,9 @@ RSpec.describe TestShoryukenWorker do
   let(:receive_count) { "1" }
   let(:sqs_msgs) { sqs_msg }
   let(:instance) { described_class.new }
+  let(:body) { { "key" => "value" } }
   let(:job_execution) do
-    instance.call(instance, nil, sqs_msgs, [1, 2, 3]) { raise "foo" }
+    instance.call(instance, nil, sqs_msgs, body) { raise "foo" }
   end
 
   context "with a single message" do

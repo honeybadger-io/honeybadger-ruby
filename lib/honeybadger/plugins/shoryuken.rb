@@ -11,7 +11,7 @@ module Honeybadger
               yield
             rescue => e
               if attempt_threshold <= receive_count(sqs_msg)
-                Honeybadger.notify(e, parameters: body)
+                Honeybadger.notify(e, parameters: notification_params(body))
               end
 
               raise e
