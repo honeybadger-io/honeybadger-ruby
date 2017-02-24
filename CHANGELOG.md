@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Friendlier backtraces for exceptions originating in honeybadger.yml.
+- Notify errors in Shoryuken batches - @phstc
 
 ### Fixed
 - Rails environment is now loaded when running `honeybadger` cli from a Rails
