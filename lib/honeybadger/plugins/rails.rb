@@ -35,7 +35,7 @@ module Honeybadger
       end
 
       Plugin.register :rails_exceptions_catcher do
-        requirement { defined?(::Rails) }
+        requirement { defined?(::Rails.application) && ::Rails.application }
 
         execution do
           require 'rack/request'

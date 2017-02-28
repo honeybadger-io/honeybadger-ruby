@@ -38,8 +38,8 @@ module Honeybadger
 
       def run
         begin
-          require 'rails'
           require File.join(Dir.pwd, 'config', 'environment.rb')
+          raise LoadError unless defined?(::Rails.application)
           say("Detected Rails #{Rails::VERSION::STRING}")
         rescue LoadError
           require 'honeybadger/init/ruby'
