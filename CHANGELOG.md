@@ -10,12 +10,14 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Friendlier backtraces for exceptions originating in honeybadger.yml.
-- Notify errors in Shoryuken batches - @phstc
+- Notify errors in Shoryuken batches -@phstc
 
 ### Fixed
 - Rails environment is now loaded when running `honeybadger` cli from a Rails
   root. This fixes an issue where programmatic configuration from Rails was not
   loaded.
+- Fixed logger isn't being overridden properly when configuring with
+  Honeybadger.configure -@anujbiyani
 
 ## [3.0.2] - 2017-02-16
 ### Fixed
