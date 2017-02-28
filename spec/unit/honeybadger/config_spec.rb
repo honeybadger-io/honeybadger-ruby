@@ -72,7 +72,7 @@ describe Honeybadger::Config do
         instance.init!
       end
 
-      context "when a config error occurrs while loading file" do
+      context "when a config error occurs while loading file" do
         before do
           allow(instance.logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
@@ -83,7 +83,7 @@ describe Honeybadger::Config do
         end
       end
 
-      context "when a generic error occurrs while loading file" do
+      context "when a generic error occurs while loading file" do
         before do
           allow(instance.logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
