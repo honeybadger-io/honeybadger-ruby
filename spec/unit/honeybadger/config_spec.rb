@@ -251,4 +251,23 @@ describe Honeybadger::Config do
       it { should be_nil }
     end
   end
+
+  describe "#configure" do
+    context "when the app has already been initialized" do
+      it "overrides the logger with the configured logger" do
+        INIT_LOGGER = Logger.new('/dev/null')
+        CONFIGURE_LOGGER = Logger.new('/dev/null')
+
+        honeybadger = Honeybadger::Config.new.init!(logger: INIT_LOGGER)
+
+        honeybadger.configure do |config|
+          config.logger = CONFIGURE_LOGGER
+        end
+
+        expect(CONFIGURE_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/)
+
+        honeybadger.logger.error('foo')
+      end
+    end
+  end
 end

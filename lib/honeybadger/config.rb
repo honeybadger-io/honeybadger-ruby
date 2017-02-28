@@ -75,7 +75,7 @@ module Honeybadger
       ruby_config = Ruby.new(self)
       yield(ruby_config)
       self.ruby = ruby.merge(ruby_config).freeze
-      @logging = @backend = nil
+      @logger = @backend = nil
       self
     end
 
@@ -108,7 +108,7 @@ module Honeybadger
 
     def set(key, value)
       self.ruby = ruby.merge(key => value).freeze
-      @logging = @backend = nil
+      @logger = @backend = nil
     end
     alias []= :set
 
