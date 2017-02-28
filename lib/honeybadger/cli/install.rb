@@ -18,8 +18,8 @@ module Honeybadger
         say("Installing Honeybadger #{VERSION}")
 
         begin
-          require 'rails'
           require File.join(Dir.pwd, 'config', 'application.rb')
+          raise LoadError unless defined?(::Rails.application)
           root = Rails.root
           config_root = root.join('config')
         rescue LoadError
