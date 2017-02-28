@@ -72,7 +72,7 @@ describe Honeybadger::Config do
         instance.init!
       end
 
-      context "when a config error occurrs while loading file" do
+      context "when a config error occurs while loading file" do
         before do
           allow(instance.logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
@@ -83,7 +83,7 @@ describe Honeybadger::Config do
         end
       end
 
-      context "when a generic error occurrs while loading file" do
+      context "when a generic error occurs while loading file" do
         before do
           allow(instance.logger).to receive(:add)
           allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
@@ -249,6 +249,25 @@ describe Honeybadger::Config do
     context "when root is blank" do
       let(:root) { '' }
       it { should be_nil }
+    end
+  end
+
+  describe "#configure" do
+    context "when the app has already been initialized" do
+      it "overrides the logger with the configured logger" do
+        INIT_LOGGER = Logger.new('/dev/null')
+        CONFIGURE_LOGGER = Logger.new('/dev/null')
+
+        honeybadger = Honeybadger::Config.new.init!(logger: INIT_LOGGER)
+
+        honeybadger.configure do |config|
+          config.logger = CONFIGURE_LOGGER
+        end
+
+        expect(CONFIGURE_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/)
+
+        honeybadger.logger.error('foo')
+      end
     end
   end
 end
