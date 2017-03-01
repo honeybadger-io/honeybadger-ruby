@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.1.0] - 2017-03-01
 ### Changed
 - Exceptions encountered while loading/evaluating honeybadger.yml are now raised
   instead of logged.
