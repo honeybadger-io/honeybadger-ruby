@@ -220,6 +220,7 @@ You can use any of the options below in your config file, or in the environment.
 |`env`                            | String  | The environment the app is running in. In Rails this defaults to `Rails.env`.<br/>_Default: `nil`_|
 |`report_data`                    | Boolean | Enable/disable reporting of data. Defaults to false for "test", "development", and "cucumber" environments.  <br>_Default: `true`_|
 |`root`                           | String  | The project's absolute root path.<br/>_Default: `Dir.pwd`_|
+|`revision`                       | String  | The project's git revision.<br/>_Default: revision detected from git_|
 |`hostname`                       | String  | The hostname of the current box.<br/>_Default: `Socket.gethostname`_|
 |`backend`                        | String  | An alternate backend to use for reporting data.<br/>_Default: `nil`_|
 |`debug`                          | Boolean | Enables verbose debug logging.<br/>_Default: `false`_|
