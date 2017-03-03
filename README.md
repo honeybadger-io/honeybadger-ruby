@@ -320,6 +320,9 @@ end
 
 # Clearing global context:
 Honeybadger.context.clear!
+
+# Fetching current context
+Honeybadger.get_context
 ```
 
 ---
@@ -344,6 +347,26 @@ begin
   fail 'oops'
 rescue => exception
   Honeybadger.notify(exception)
+end
+```
+
+---
+
+### `Honeybadger.configure()`: Configure Honeybadger from Ruby
+
+This method allows you to configure Honeybadger at runtime.
+
+#### Use this method if:
+
+* You want to change Honeybadger's configuration from inside Ruby rather than
+  (or in addition to) using the honeybadger.yml file or environment variables.
+
+#### Examples:
+
+```ruby
+Honeybadger.configure do |config|
+  config.api_key = 'project api key'
+  config.exceptions.ignore += [CustomError]
 end
 ```
 
@@ -378,6 +401,43 @@ end
 ```
 __WARNING:__ While it is possible to use this callback to modify the data that is reported to Honeybadger, this is not officially supported and may not be allowed in future versions of the gem.
 
+---
+
+### `Honeybadger.exception_fingerprint()`: Customize your error grouping.
+
+This method lets you add a callback that should return a unique string given a `Honeybadger::Notice` instance. All notices which match the same string will be grouped together in Honeybadger.
+
+#### Use this method if:
+
+* You currently receive too many error notifications
+* You want to group some errors together which are currently unique
+* You *don't* want to group some errors which are currently grouped
+
+#### Examples:
+
+```ruby
+Honeybadger.exception_fingerprint do |notice|
+  [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
+end
+```
+
+---
+
+### `Honeybadger.backtrace_filter()`: Filter your backtrace.
+
+This method allows you to add a callback which modifies each line of the backtrace before a notification happens.
+
+#### Use this method if:
+
+* You want to change or sanitize common data in your exception backtraces
+
+#### Examples:
+
+```ruby
+Honeybadger.backtrace_filter do |line|
+  line.gsub(/^\/my\/unknown\/bundle\/path/, "[GEM_ROOT]")
+end
+```
 
 ## Deployment Tracking
 
