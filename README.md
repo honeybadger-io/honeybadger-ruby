@@ -139,6 +139,24 @@ use Honeybadger::Rack::ErrorNotifier
 run app
 ```
 
+#### Plain Ruby
+
+To use Honeybadger without any of the automatic integrations, `require
+honeybadger/ruby` instead of `require 'honeybadger'`:
+
+```
+require 'honeybadger/ruby'
+
+begin
+  # Failing code
+rescue => exception
+  Honeybadger.notify(exception)
+end
+```
+
+All of the public API methods are still available, but none of the plugins,
+framework integrations, or hooks are run. You will need to manually set up your
+own middleware and hooks for error monitoring in whatever frameworks you use.
 
 ## Advanced Configuration
 
