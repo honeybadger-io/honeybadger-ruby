@@ -293,7 +293,7 @@ You can use any of the options below in your config file, or in the environment.
 
 ## Public Methods
 
-> What follows is a summary of the gem's most commonly-used public methods. For a more authoritative list, read the [full API documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger).
+> What follows is a summary of the gem's most commonly-used public methods. For a more authoritative list, read the [full API documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger/Agent).
 
 
 ### `Honeybadger.context()`: Set metadata to be sent if an exception occurs
