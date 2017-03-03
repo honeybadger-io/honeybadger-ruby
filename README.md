@@ -142,7 +142,7 @@ run app
 
 ## Advanced Configuration
 
-There are a few ways to configure the Honeybadger gem. You can use a YAML config file. You can use environment variables. Or you can use a combination of the two. 
+There are a few ways to configure the Honeybadger gem. You can use a YAML config file. You can use environment variables. You can use Ruby. Or you can use a combination of the three.
 
 We put together a short video highligting a few of the most common configuration options:
 
@@ -167,7 +167,7 @@ Some configuration options are written in YAML as nested hashes. For example, he
 ```yaml
 ---
 logging:
-  path: "/path/to/honeybadger.log" 
+  path: "/path/to/honeybadger.log"
 request:
   filter_keys:
     - "credit_card"
