@@ -228,7 +228,7 @@ You can use any of the options below in your config file, or in the environment.
 | `config_path`                   | String  | The path of the honeybadger config file. Can only be set via the `$HONEYBADGER_CONFIG_PATH` environment variable |
 |`development_environments`       | Array   | Environments which will not report data by default (use report_data to enable/disable explicitly).<br/>_Default: `["development", "test", "cucumber"]`_|
 |`plugins`                        | Array   | An optional list of plugins to load. Default is to load all plugins.<br/>_Default: `[]`_|
-|`plugins.skip`                   | Array   | An optional list of plugins to skip.<br/>_Default: `[]`_|
+|`skipped_plugins`                | Array   | An optional list of plugins to skip.<br/>_Default: `[]`_|
 |&nbsp;                           |         ||
 |__LOGGING__                      |         ||
 |`logging.path`                   | String  | The path (absolute, or relative from config.root) to the log file. Defaults to the rails logger or STDOUT. To log to standard out, use 'STDOUT'.<br/>_Default: `nil`_|
@@ -271,9 +271,11 @@ You can use any of the options below in your config file, or in the environment.
 |&nbsp;                           |         ||
 |__SIDEKIQ__                      |         ||
 |`sidekiq.attempt_threshold`      | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
-|`sidekiq.use_component`          | Boolean | Automatically set the component to the class of the job. Helps with grouping.<br/>_Default: `false`_|
+|`sidekiq.use_component`          | Boolean | Automatically set the component to the class of the job. Helps with grouping.<br/>_Default: `true`_|
 |__DELAYED JOB__                  |         ||
 |`delayed_job.attempt_threshold`  | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
+|__SHORYUKEN__                    |         ||
+|`shoryuken.attempt_threshold`    | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
 |__SINATRA__                        |         ||
 |`sinatra.enabled`                | Boolean | Enable Sinatra auto-initialization.<br/>_Default: `true`_|
 
