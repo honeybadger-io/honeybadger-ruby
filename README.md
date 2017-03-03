@@ -547,6 +547,27 @@ $ honeybadger notify --message "This is an error from the command line"
 
 For full usage run `honeybadger help notify`.
 
+## Reporting to multiple Honeybadger projects in the same app
+
+To send errors to another Honeybadger project, configure an additional agent:
+
+```ruby
+OtherBadger = Honeybadger::Agent.new
+
+OtherBadger.configure do |config|
+  config.api_key = 'project api key'
+end
+
+begin
+  # Failing code
+rescue => exception
+  OtherBadger.notify(exception)
+end
+```
+
+Agents do not use the global honeybadger.yml or environment variable
+configuration and must be configured manually after they are instantiated.
+
 ## Custom Error Pages
 
 The Honeybadger gem has a few special tags that it looks for whenever you render an error page. These can be used to display extra information about the error, or to ask the user for information about how they triggered the error.
