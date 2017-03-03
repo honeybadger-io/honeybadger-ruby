@@ -208,6 +208,17 @@ export HONEYBADGER_LOGGING_PATH=/path/to/honeybadger.log
 
 ENV options override other options read from framework or `honeybadger.yml` sources, so both can be used together. 
 
+### Configuration via Ruby (programmatic)
+
+To configure Honeybadger from Ruby, use `Honeybadger.configure`:
+
+```ruby
+Honeybadger.configure do |config|
+  config.api_key = 'project api key'
+  config.exceptions.ignore += [CustomError]
+end
+```
+
 ## Configuration Options
 
 You can use any of the options below in your config file, or in the environment. 
