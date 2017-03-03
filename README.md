@@ -499,6 +499,35 @@ bundle exec honeybadger deploy --environment=production
 Run&nbsp; `bundle exec honeybadger help deploy` for all available options.
 
 
+## Cron/command line monitoring
+
+`honeybadger exec` can be used from the command line/terminal to monitor failed
+commands.  To use it, prefix any normal command with `honeybadger exec` (much
+like `bundle exec`):
+
+```sh
+$ honeybadger exec my-command --my-flag
+```
+
+If the command executes successfully, honeybadger exits with code 0. It prints
+any output from the command by default. To use with cron's automatic email
+feature, use the `--quiet` flag, which will suppress all standard output from
+the origin command unless the command fails *and* the Honeybadger notification
+fails, in which case it will dump the output so that cron can send a backup
+email notification.
+
+For full usage run `honeybadger help exec`.
+
+## Notify from the command line
+
+To send a Honeybadger notification from the command line/terminal, use
+`honeybadger notify`:
+
+```sh
+$ honeybadger notify --message "This is an error from the command line"
+```
+
+For full usage run `honeybadger help notify`.
 
 ## Custom Error Pages
 
