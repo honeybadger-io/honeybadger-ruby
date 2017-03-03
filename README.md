@@ -24,7 +24,7 @@ When an uncaught exception occurs, Honeybadger will POST the relevant data to th
 
 Rails and Sinatra are supported natively (install/configure the gem and you're done). For vanilla Rack apps, we provide a collection of middleware that must be installed manually.
 
-To use Rails 2.x, you'll need to use an earlier version of the Honeybadger gem. [Go to version 1.x of the gem docs](https://github.com/honeybadger-io/honeybadger-ruby/blob/1.16-stable/docs/index.md). 
+To use Rails 2.x, you'll need to use an earlier version of the Honeybadger gem. [Go to version 1.x of the gem docs](https://github.com/honeybadger-io/honeybadger-ruby/blob/1.16-stable/docs/index.md).
 
 Integrating with other libraries/frameworks is simple! [See the documentation](http://rubydoc.info/gems/honeybadger/) to learn about our public API, and see [Contributing](#contributing) to suggest a patch.
 
@@ -49,7 +49,7 @@ You can integrate honeybadger into any Ruby script via the `Honeybadger.notify` 
 
 ## Getting Started
 
-Honeybadger works out of the box with all popular Ruby frameworks. Installation is just a matter of including the gem and setting your API key. In this section, we'll cover the basics. More advanced installations are covered later. 
+Honeybadger works out of the box with all popular Ruby frameworks. Installation is just a matter of including the gem and setting your API key. In this section, we'll cover the basics. More advanced installations are covered later.
 
 ### 1. Install the gem
 
@@ -93,7 +93,7 @@ This step isn't necessary if you're using our [Heroku add-on](https://elements.h
 
 #### Rails
 
-You're done! Any rake tasks and job queues that load the Rails environment are also covered. 
+You're done! Any rake tasks and job queues that load the Rails environment are also covered.
 
 For more info, check out our screencast on getting up and running with Honeybadger and Rails:
 
@@ -101,7 +101,7 @@ For more info, check out our screencast on getting up and running with Honeybadg
 
 #### Sinatra
 
-All you need to do is to include the honeybadger gem: 
+All you need to do is to include the honeybadger gem:
 
 ```ruby
 # Always require Sinatra first.
@@ -151,7 +151,7 @@ We put together a short video highligting a few of the most common configuration
 
 ### YAML Configuration File
 
-By default, Honeybadger looks for a `honeybadger.yml` configuration file in the root of your project, and then `config/honeybadger.yml` (in that order). 
+By default, Honeybadger looks for a `honeybadger.yml` configuration file in the root of your project, and then `config/honeybadger.yml` (in that order).
 
 Here's what the simplest config file looks like:
 
@@ -206,7 +206,7 @@ All configuration options can also be read from environment variables (ENV). To 
 export HONEYBADGER_LOGGING_PATH=/path/to/honeybadger.log
 ```
 
-ENV options override other options read from framework or `honeybadger.yml` sources, so both can be used together. 
+ENV options override other options read from framework or `honeybadger.yml` sources, so both can be used together.
 
 ### Configuration via Ruby (programmatic)
 
@@ -221,7 +221,7 @@ end
 
 ## Configuration Options
 
-You can use any of the options below in your config file, or in the environment. 
+You can use any of the options below in your config file, or in the environment.
 
 
 
@@ -291,7 +291,7 @@ You can use any of the options below in your config file, or in the environment.
 |__SINATRA__                        |         ||
 |`sinatra.enabled`                | Boolean | Enable Sinatra auto-initialization.<br/>_Default: `true`_|
 
-## Public Methods 
+## Public Methods
 
 > What follows is a summary of the gem's most commonly-used public methods. For a more authoritative list, read the [full API documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger).
 
@@ -332,8 +332,8 @@ You normally won't have to use this method. Honeybadger detects and reports erro
 #### Use this method if:
 
 * You've rescued an exception, but still want to report it
-* You need to report an exception outside of a supported framework. 
-* You want complete control over what exception data is sent to us. 
+* You need to report an exception outside of a supported framework.
+* You want complete control over what exception data is sent to us.
 
 
 #### Examples:
@@ -343,7 +343,7 @@ You normally won't have to use this method. Honeybadger detects and reports erro
 begin
   fail 'oops'
 rescue => exception
-  Honeybadger.notify(exception) 
+  Honeybadger.notify(exception)
 end
 ```
 
@@ -379,7 +379,7 @@ end
 __WARNING:__ While it is possible to use this callback to modify the data that is reported to Honeybadger, this is not officially supported and may not be allowed in future versions of the gem.
 
 
-## Deployment Tracking 
+## Deployment Tracking
 
 Honeybadger has an API to keep track of project deployments. Whenever you deploy, all errors for that environment will be resolved automatically. You can choose to enable or disable the auto-resolve feature from your Honeybadger project settings page.
 
@@ -399,7 +399,7 @@ Adding options to your&nbsp; _config/deploy.rb_&nbsp;file allows you to&nbsp;cus
 set :honeybadger_env, "preprod"
 ```
 
-You can use any of the following options when configuring capistrano. 
+You can use any of the following options when configuring capistrano.
 
 | Option                    |      |
 |-------------------------- | ---- |
@@ -442,13 +442,13 @@ Run&nbsp; `bundle exec honeybadger help deploy` for all available options.
 
 ## Custom Error Pages
 
-The Honeybadger gem has a few special tags that it looks for whenever you render an error page. These can be used to display extra information about the error, or to ask the user for information about how they triggered the error. 
+The Honeybadger gem has a few special tags that it looks for whenever you render an error page. These can be used to display extra information about the error, or to ask the user for information about how they triggered the error.
 
 ### Displaying Error ID
 
 When an error is sent to Honeybadger, our API returns a unique UUID for the occurrence within your project. This UUID can be automatically displayed for reference on Rails error pages (e.g. `public/500.html`) or any rack output by including the `Honeybadger::UserInformer` middleware.
 
-To include the error id, simply place this magic HTML comment on your error page: 
+To include the error id, simply place this magic HTML comment on your error page:
 
 ```html
 <!-- HONEYBADGER ERROR -->
