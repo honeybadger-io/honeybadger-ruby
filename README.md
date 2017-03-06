@@ -158,7 +158,7 @@ All of the public API methods are still available, but none of the plugins,
 framework integrations, or hooks are run. You will need to manually set up your
 own middleware and hooks for error monitoring in whatever frameworks you use.
 
-## Advanced Configuration
+## Configuration
 
 There are a few ways to configure the Honeybadger gem. You can use a YAML config file. You can use environment variables. You can use Ruby. Or you can use a combination of the three.
 
