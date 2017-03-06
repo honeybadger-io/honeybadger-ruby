@@ -531,7 +531,8 @@ honeybadger` and then run `honeybadger`.
 ### Configuration
 
 The `honeybadger` command optionally reads configuration from the following
-locations. Each location in the list take precedence over the previous location:
+locations. Each location in the list takes precedence over the previous
+location:
 
 1. ~/honeybadger.yml
 2. ./config/honeybadger.yml
