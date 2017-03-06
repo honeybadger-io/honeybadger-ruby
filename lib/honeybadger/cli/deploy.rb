@@ -18,7 +18,7 @@ module Honeybadger
 
       def run
         payload = {
-          environment: options['environment'],
+          environment: config.get(:env),
           revision: options['revision'],
           repository: options['repository'],
           local_username: options['user']

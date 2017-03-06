@@ -4,6 +4,9 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- `honeybadger deploy` cli command now reads default environment from
+  honeybadger.yml/environment variable.
 
 ## [3.1.0] - 2017-03-01
 ### Changed
