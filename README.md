@@ -624,6 +624,81 @@ en:
         comment: "Comment (required)"
 ```
 
+## Testing Honeybadger in your integration tests
+
+It is possible to test Honeybadger's integration with your application using the
+included test backend.
+
+The test backend replaces the default server backend with a stub that records
+error notices rather than sending them, allowing all but the HTTP notification
+itself to be verified. Alternatively, you could use something like
+[WebMock](https://github.com/bblimke/webmock) to perform a similar test using
+the "server" backend.
+
+### Configuring the test backend
+
+To use the test backend, set the `backend` configuration option to "test" in
+honeybadger.yml for your test environment only:
+
+```yaml
+test:
+  backend: test
+```
+
+You can also use the *HONEYBADGER_BACKEND* environment variable to configure the
+test backend.
+
+### Writing the integration test
+
+The test backend can be used in any testing framework to test any code which
+reports an error with `Honeybadger.notify`. A common scenario is to test the
+Rails-integration which reports exceptions in a Rails controller automatically.
+
+The following example uses RSpec to test error notification in a Rails
+controller.
+
+First, create the controller:
+
+```ruby
+# app/controllers/honeybadger_test_controller.rb
+class HoneybadgerTestController < ApplicationController
+  ERROR = RuntimeError.new("testing reporting an error to Honeybadger")
+
+  def index
+    raise ERROR
+  end
+end
+```
+
+Next, create a route. For security, it's a good idea to enable the route only in
+the test environment:
+
+```ruby
+  # ...
+  get '/test/honeybadger' => 'honeybadger_test#index' if Rails.env.test?
+```
+
+Finally, create the integration test:
+
+```ruby
+# spec/features/honeybadger_spec.rb
+require 'rails_helper'
+
+describe "error notification" do
+  it "notifies Honeybadger" do
+    expect {
+      # Code to test goes here:
+      expect { visit '/test/honeybadger' }.to raise_error(HoneybadgerTestController::ERROR)
+
+      # Important: `Honeybadger.flush` ensures that asynchronous notifications
+      # are delivered before the test's remaining expectations are verified.
+      Honeybadger.flush
+    }.to change(Honeybadger::Backend::Test.notifications[:notices], :size).by(1)
+    expect(Honeybadger::Backend::Test.notifications[:notices].first.error_message).to eq('testing reporting an error to Honeybadger')
+  end
+end
+```
+
 ## Changelog
 
 See https://github.com/honeybadger-io/honeybadger-ruby/blob/master/CHANGELOG.md
