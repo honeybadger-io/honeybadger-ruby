@@ -528,7 +528,7 @@ When using the *honeybadger* gem with Bundler, run `bundle exec honeybadger`.
 To use outside of bundler, install the Honeybadger gem with `gem install
 honeybadger` and then run `honeybadger`.
 
-### Configuration
+### CLI Configuration
 
 The `honeybadger` command optionally reads configuration from the following
 locations. Each location in the list takes precedence over the previous
@@ -546,7 +546,7 @@ The following configuration options are used by the CLI when applicable:
 
 All other options must be passed as command-line flags.
 
-### Commands
+### CLI Commands
 
 The following commands are available through the `honeybadger` CLI:
 
