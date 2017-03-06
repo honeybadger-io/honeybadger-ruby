@@ -517,6 +517,56 @@ bundle exec honeybadger deploy --environment=production
 Run&nbsp; `bundle exec honeybadger help deploy` for all available options.
 
 
+## Honeybadger CLI
+
+The Honeybadger CLI provides a Command Line Interface for various
+Honeybadger-related programs and utilities. All features are available through
+the `honeybadger` command and can be used independently of Bundler/Rails.
+
+When using the *honeybadger* gem with Bundler, run `bundle exec honeybadger`.
+
+To use outside of bundler, install the Honeybadger gem with `gem install
+honeybadger` and then run `honeybadger`.
+
+### Configuration
+
+The `honeybadger` command optionally reads configuration from the following
+locations. Each location in the list take precedence over the previous location:
+
+1. ~/honeybadger.yml
+2. ./config/honeybadger.yml
+3. ./honeybadger.yml
+4. Rails/Ruby configuration (only when called from a Rails app root)
+5. Environment variables
+6. Command-line flags (i.e. `--api-key`)
+
+The following configuration options are used by the CLI when applicable:
+`api_key`, `env`. See [Configuration Options](#configuration-options)
+
+All other options must be passed as command-line flags.
+
+### Commands
+
+The following commands are available through the `honeybadger` CLI:
+
+| Command              | Description |
+| -------------------- | ----------- |
+| honeybadger deploy   | Notify Honeybadger of deployment |
+| honeybadger exec     | Execute a command. If the exit status is not 0, report the result to Honeybadger |
+| honeybadger help     | Describe available commands or one specific command |
+| honeybadger heroku   | Manage Honeybadger on Heroku |
+| honeybadger install  | Install Honeybadger into a new project |
+| honeybadger notify   | Notify Honeybadger of an error |
+| honeybadger test     | Send a test notification from Honeybadger |
+
+For additional info about each command, run `honeybadger help`.
+
+### Rails initialization
+
+When run from the root of a Rails project, the `honeybadger` command will load
+the Rails environment so that any framework/programmatic configuration is picked
+up.
+
 ## Cron/command line monitoring
 
 `honeybadger exec` can be used from the command line/terminal to monitor failed
