@@ -692,12 +692,15 @@ To use the test backend, set the `backend` configuration option to "test" in
 honeybadger.yml for your test environment only:
 
 ```yaml
+api_key: 'project api key'
 test:
   backend: test
 ```
 
 You can also use the *HONEYBADGER_BACKEND* environment variable to configure the
-test backend.
+test backend. Note that you must also configure your API key for the test to
+succeed.
+
 
 ### Writing the integration test
 
