@@ -674,6 +674,8 @@ Next, create a route. For security, it's a good idea to enable the route only in
 the test environment:
 
 ```ruby
+  # config/routes.rb
+
   # ...
   get '/test/honeybadger' => 'honeybadger_test#index' if Rails.env.test?
 ```
