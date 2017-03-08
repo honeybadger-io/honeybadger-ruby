@@ -8,7 +8,7 @@ one or all of our helpful founders will assist you!
 ## Upgrade the gem
 
 Before digging deeper into this guide, **make sure you are on the latest minor
-release of the honeybadger gem** (i.e. 2.x.x). There's a chance you've found a bug
+release of the honeybadger gem** (i.e. 3.x.x). There's a chance you've found a bug
 which has already been fixed!
 
 ## How to enable verbose logging
@@ -85,29 +85,6 @@ begin
 rescue => e
   Honeybadger.notify(e)
 end
-```
-
-#### Honeybadger is not started
-
-We currently initialize Rails and Sinatra apps automatically. If you use either
-of those frameworks and are not receiving error reports, then you probably have
-a different issue and should skip this section. For all other frameworks (or
-plain ol' Ruby), `Honeybadger.start()` must be called manually.
-
-To verify that Honeybadger is not started, [enable debug
-logging](#how-to-enable-verbose-logging) and then start your app; if Honeybadger
-was initialized, you should see something in the log output.
-
-```
-** [Honeybadger] Starting Honeybadger version 2.1.0 level=1 pid=18077
-```
-
-If you don't get any logs prefixed with "** [Honeybadger]", then you can start
-Honeybadger manually like this:
-
-```ruby
-honeybadger_config = Honeybadger::Config.new
-Honeybadger.start(honeybadger_config)
 ```
 
 ## Sidekiq/Resque/ActiveJob/etc.
