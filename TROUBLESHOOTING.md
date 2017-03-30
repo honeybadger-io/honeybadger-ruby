@@ -11,6 +11,14 @@ Before digging deeper into this guide, **make sure you are on the latest minor
 release of the honeybadger gem** (i.e. 3.x.x). There's a chance you've found a bug
 which has already been fixed!
 
+## Send a Test Exception
+
+You can send a test exception using the `honeybadger` command line utility:
+
+```bash
+$ honeybadger test
+```
+
 ## How to enable verbose logging
 
 Troubleshooting any of these issues will be much easier if you can see what's
@@ -91,6 +99,12 @@ rescue => e
 end
 ```
 
+#### Was the error reported already and is unresolved?
+
+By default we only send notifications the first time an exception happens, and
+when it re-occurs after being marked resolved. If an exception happens 100
+times, but was never resolved you'll only get 1 email about it.
+
 ## Sidekiq/Resque/ActiveJob/etc.
 
 - See [Common Issues](#common-issues)
@@ -110,3 +124,12 @@ behavior:
 ```
 HONEYBADGER_EXCEPTIONS_IGNORE_ONLY=Error,ClassNames,Here bundle exec sidekiq
 ```
+
+## Command line utility
+
+If you get an error while running the `honeybadger` command line utility:
+
+0. Try prefixing the command with `bundle exec`...even if you normally rely on bin-stubs to do this for you
+1. Check `honeybadger help` if you're having trouble with the syntax for a specific command.
+2. Try enabling [verbose logging](#how-to-enable-verbose-logging) to get more info
+3. Ask Us! We're always here to help. Just copy the terminal output and email it to us at support@honeybadger.io
