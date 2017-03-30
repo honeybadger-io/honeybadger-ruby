@@ -62,6 +62,10 @@ development:
   report_data: true
 ```
 
+##### The `better_errors` gem is installed
+
+The [`better_errors` gem](https://github.com/charliesome/better_errors) conflicts with the Honeybadger gem when in development mode. To be able to report errors from development you must first temporarily disable/remove the `better_errors` gem. Better Errors should not affect production because it should never be enabled in production.
+
 #### Is the error ignored by default?
 
 Honeybadger ignores [this list of
