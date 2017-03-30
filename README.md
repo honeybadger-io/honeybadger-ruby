@@ -755,6 +755,10 @@ describe "error notification" do
 end
 ```
 
+## Troubleshooting
+
+See [TROUBLESHOOTING.md](https://github.com/honeybadger-io/honeybadger-ruby/blob/master/TROUBLESHOOTING.md)
+
 ## Changelog
 
 See https://github.com/honeybadger-io/honeybadger-ruby/blob/master/CHANGELOG.md
