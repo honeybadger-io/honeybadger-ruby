@@ -99,6 +99,8 @@ rescue => e
 end
 ```
 
+### I'm not receiving notifications
+
 #### Was the error reported already and is unresolved?
 
 By default we only send notifications the first time an exception happens, and
