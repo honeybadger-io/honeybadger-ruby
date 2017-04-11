@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - `honeybadger deploy` cli command now reads default environment from
   honeybadger.yml/environment variable.
+- Fixed a conflict with the web-console gem.
 
 ## [3.1.0] - 2017-03-01
 ### Changed
