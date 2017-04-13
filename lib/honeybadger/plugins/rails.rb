@@ -4,11 +4,6 @@ module Honeybadger
   module Plugins
     module Rails
       module ExceptionsCatcher
-        def self.included(base)
-          base.send(:alias_method, :render_exception_without_honeybadger, :render_exception)
-          base.send(:alias_method, :render_exception, :render_exception_with_honeybadger)
-        end
-
         # Internal: Adds additional Honeybadger info to Request env when an
         # exception is rendered in Rails' middleware.
         #
@@ -18,7 +13,7 @@ module Honeybadger
         #
         # Returns the super value of the middleware's #render_exception()
         # method.
-        def render_exception_with_honeybadger(arg, exception)
+        def render_exception(arg, exception)
           if arg.kind_of?(::ActionDispatch::Request)
             request = arg
             env = request.env
@@ -30,7 +25,7 @@ module Honeybadger
           env['honeybadger.exception'] = exception
           env['honeybadger.request.url'] = request.url rescue nil
 
-          render_exception_without_honeybadger(arg, exception)
+          super(arg, exception)
         end
       end
 
@@ -41,10 +36,10 @@ module Honeybadger
           require 'rack/request'
           if defined?(::ActionDispatch::DebugExceptions)
             # Rails 3.2.x+
-            ::ActionDispatch::DebugExceptions.send(:include, ExceptionsCatcher)
+            ::ActionDispatch::DebugExceptions.prepend(ExceptionsCatcher)
           elsif defined?(::ActionDispatch::ShowExceptions)
             # Rails 3.0.x and 3.1.x
-            ::ActionDispatch::ShowExceptions.send(:include, ExceptionsCatcher)
+            ::ActionDispatch::ShowExceptions.prepend(ExceptionsCatcher)
           end
         end
       end
