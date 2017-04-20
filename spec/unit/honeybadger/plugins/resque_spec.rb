@@ -12,7 +12,7 @@ describe TestWorker do
 
     shared_examples_for "reports exceptions" do
       specify do
-        expect(Honeybadger).to receive(:notify).with(error, hash_including(parameters: {job_arguments: [1, 2, 3]}))
+        expect(Honeybadger).to receive(:notify).with(error, hash_including(parameters: {job_arguments: [1, 2, 3]}, sync: true))
         described_class.on_failure_with_honeybadger(error, 1, 2, 3)
       end
     end
@@ -83,7 +83,7 @@ describe TestWorker do
           it "should report raised error to honeybadger" do
             other_error = StandardError.new('stubbed Honeybadger error in retry_criteria_valid?')
             allow(described_class).to receive(:retry_criteria_valid?).and_raise(other_error)
-            expect(Honeybadger).to receive(:notify).with(other_error, hash_including(parameters: {job_arguments: [1, 2, 3]}))
+            expect(Honeybadger).to receive(:notify).with(other_error, hash_including(parameters: {job_arguments: [1, 2, 3]}, sync: true))
             described_class.on_failure_with_honeybadger(error, 1, 2, 3)
           end
         end
