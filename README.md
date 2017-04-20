@@ -309,42 +309,64 @@ You can use any of the options below in your config file, or in the environment.
 |__SINATRA__                        |         ||
 |`sinatra.enabled`                | Boolean | Enable Sinatra auto-initialization.<br/>_Default: `true`_|
 
-## Public Methods
+## Adding extra data to error reports
 
-> What follows is a summary of the gem's most commonly-used public methods. For a more authoritative list, read the [full API documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger/Agent).
+Sometimes, default exception data just isn't enough. If you have extra data that
+will help you in debugging, send it as part of an error's context. Context is
+what you're looking for if:
 
-
-### `Honeybadger.context()`: Set metadata to be sent if an exception occurs
-
-Sometimes, default exception data just isn't enough. If you have extra data that will help you in debugging, send it as part of an error's context. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Acontext)
-
-Global context is stored in a thread local variable and automatically reported with any exception which occurs within the current thread's execution.
-
-#### Use this method if:
-
-* You want to record the current user's id at the time of an exception
+* You want to record the current user's id or email address at the time of an exception
 * You need to send raw POST data for use in debugging
 * You have any other metadata you'd like to send with an exception
 
-#### Examples:
+Honeybadger supports two types of context: global and local.
+
+### Global context
+
+Global context is automatically reported with any exception which occurs within
+the current thread's execution:
 
 ```ruby
 Honeybadger.context({my_data: 'my value'})
+```
 
-# Inside a Rails controller:
-before_action do
-  Honeybadger.context({user_id: current_user.id})
-end
+A few other methods are also available when working with context:
 
-# Clearing global context:
+```
+# Clear the global context:
 Honeybadger.context.clear!
 
-# Fetching current context
+# Fetch the global context:
 Honeybadger.get_context
 ```
 
+### Local context
+
+You can also add context to a manual error report using the `:context` option,
+like this:
+
+```ruby
+Honeybadger.notify(exception, context: { my_data: 'my local value' })
+```
+
+Local context always overrides any global values when the error is reported.
+
+## Special context values
+
+While you can add any key/value data to context, a few keys have special meaning
+in Honeybadger:
+
+| Option        | Description |
+| ------------- | ----------- |
+| `:user_id`    | The `String` user ID used by Honeybadger to aggregate user data across occurrences on the error page. |
+| `:user_email` | Same as `:user_id`, but for email addresses |
+| `:tags`       | A `String` comma-separated list of tags. When present, tags will be applied to errors with this context. |
+
 ---
 
+## Public Methods
+
+> What follows is a summary of the gem's most commonly-used public methods. For a more authoritative list, read the [full API documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger/Agent).
 
 ### `Honeybadger.notify()`: Send an exception to Honeybadger.
 
