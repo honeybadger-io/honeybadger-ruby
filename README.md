@@ -323,11 +323,13 @@ Honeybadger supports two types of context: global and local.
 
 ### Global context
 
-Global context is automatically reported with any exception which occurs within
-the current thread's execution:
+Global context is automatically reported with any exception which occurs after
+the context has been created:
 
 ```ruby
-Honeybadger.context({my_data: 'my value'})
+Honeybadger.context({
+  my_data: 'my value'
+})
 ```
 
 A few other methods are also available when working with context:
@@ -346,7 +348,9 @@ You can also add context to a manual error report using the `:context` option,
 like this:
 
 ```ruby
-Honeybadger.notify(exception, context: { my_data: 'my local value' })
+Honeybadger.notify(exception, context: {
+  my_data: 'my local value'
+})
 ```
 
 Local context always overrides any global values when the error is reported.
