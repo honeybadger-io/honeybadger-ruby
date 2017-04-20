@@ -158,156 +158,8 @@ All of the public API methods are still available, but none of the plugins,
 framework integrations, or hooks are run. You will need to manually set up your
 own middleware and hooks for error monitoring in whatever frameworks you use.
 
-## Configuration
-
-There are a few ways to configure the Honeybadger gem. You can use a YAML config file. You can use environment variables. You can use Ruby. Or you can use a combination of the three.
-
-We put together a short video highligting a few of the most common configuration options:
-
-[![Advanced Honeybadger Gem Usage](https://embed-ssl.wistia.com/deliveries/5fccf29d2b27d0f7ec62b5b39e2f5d9cd1f6f5b7.jpg?image_play_button=true&image_play_button_color=7b796ae0&image_crop_resized=150x84)](https://honeybadger.wistia.com/medias/vv9qq9x39d)
-
-
-### YAML Configuration File
-
-By default, Honeybadger looks for a `honeybadger.yml` configuration file in the root of your project, and then `config/honeybadger.yml` (in that order).
-
-Here's what the simplest config file looks like:
-
-```yaml
 ---
-api_key: "my_api_key"
-```
 
-#### Nested Options
-
-Some configuration options are written in YAML as nested hashes. For example, here's what the `logging.path` and `request.filter_keys` options look like in YAML:
-
-```yaml
----
-logging:
-  path: "/path/to/honeybadger.log"
-request:
-  filter_keys:
-    - "credit_card"
-```
-
-#### Environments
-
-Environment-specific options can be set by name-spacing the options beneath the environment name. For example:
-
-```yaml
----
-api_key: "my_api_key"
-production:
-  logging:
-    path: "/path/to/honeybadger.log"
-    level: "WARN"
-```
-
-#### ERB and Regex
-
-The configuration file is rendered using ERB. That means you can set configuration options programmatically. You can also include regular expressions. Here's what that looks like:
-
-```yaml
----
-api_key: "<%= MyApplication.config.api_key %>"
-request:
-  filter_keys:
-    - !ruby/regexp '/credit_card/i'
-```
-
-### Configuring with Environment Variables (12-factor style)
-
-All configuration options can also be read from environment variables (ENV). To do this, uppercase the option name, replace all non-alphanumeric characters with underscores, and prefix with `HONEYBADGER_`. For example, `logging.path` becomes `HONEYBADGER_LOGGING_PATH`:
-
-```
-export HONEYBADGER_LOGGING_PATH=/path/to/honeybadger.log
-```
-
-ENV options override other options read from framework or `honeybadger.yml` sources, so both can be used together.
-
-### Configuration via Ruby (programmatic)
-
-To configure Honeybadger from Ruby, use `Honeybadger.configure`:
-
-```ruby
-Honeybadger.configure do |config|
-  config.api_key = 'project api key'
-  config.exceptions.ignore += [CustomError]
-end
-```
-
-## Configuration Options
-
-You can use any of the options below in your config file, or in the environment.
-
-
-
-|Option                           | Type    | Description |
-|-------------------------------- | ------- | ----------- |
-|`api_key`                        | String  | The API key for your Honeybadger project.<br/>_Default: `nil`_|
-|`env`                            | String  | The environment the app is running in. In Rails this defaults to `Rails.env`.<br/>_Default: `nil`_|
-|`report_data`                    | Boolean | Enable/disable reporting of data. Defaults to false for "test", "development", and "cucumber" environments.  <br>_Default: `true`_|
-|`root`                           | String  | The project's absolute root path.<br/>_Default: `Dir.pwd`_|
-|`revision`                       | String  | The project's git revision.<br/>_Default: revision detected from git_|
-|`hostname`                       | String  | The hostname of the current box.<br/>_Default: `Socket.gethostname`_|
-|`backend`                        | String  | An alternate backend to use for reporting data.<br/>_Default: `nil`_|
-|`debug`                          | Boolean | Enables verbose debug logging.<br/>_Default: `false`_|
-|`send_data_at_exit`              | Boolean | Finish sending enqueued exceptions before allowing program to exit.<br/>_Default: `true`_|
-|`disabled`                       | Boolean | Prevents Honeybadger from starting entirely.<br/>_Default: `false`_|
-| `config_path`                   | String  | The path of the honeybadger config file. Can only be set via the `$HONEYBADGER_CONFIG_PATH` environment variable |
-|`development_environments`       | Array   | Environments which will not report data by default (use report_data to enable/disable explicitly).<br/>_Default: `["development", "test", "cucumber"]`_|
-|`plugins`                        | Array   | An optional list of plugins to load. Default is to load all plugins.<br/>_Default: `[]`_|
-|`skipped_plugins`                | Array   | An optional list of plugins to skip.<br/>_Default: `[]`_|
-|&nbsp;                           |         ||
-|__LOGGING__                      |         ||
-|`logging.path`                   | String  | The path (absolute, or relative from config.root) to the log file. Defaults to the rails logger or STDOUT. To log to standard out, use 'STDOUT'.<br/>_Default: `nil`_|
-|`logging.level`                  | String  | The log level. Does nothing unless `logging.path` is also set.<br/>_Default: `INFO`_|
-|&nbsp;                           |         ||
-|__HTTP CONNECTION__              |         ||
-|`connection.secure`              | Boolean | Use SSL when sending data.<br/>_Default: `true`_|
-|`connection.host`                | String  | The host to use when sending data.<br/>_Default: `api.honeybadger.io`_|
-|`connection.port`                | Integer | The port to use when sending data.<br/>_Default: `443`_|
-|`connection.http_open_timeout`   | Integer | The HTTP open timeout when connecting to the server.<br/>_Default: `2`_|
-|`connection.http_read_timeout`   | Integer | The HTTP read timeout when connecting to the server.<br/>_Default: `5`_|
-|`connection.proxy_host`          | String  | The proxy host to use when sending data.<br/>_Default: `nil`_|
-|`connection.proxy_port`          | Integer | The proxy port to use when sending data.<br/>_Default: `nil`_|
-|`connection.proxy_user`          | String  | The proxy user to use when sending data.<br/>_Default: `nil`_|
-|`connection.proxy_pass`          | String  | The proxy password to use when sending data.<br/>_Default: `nil`_|
-|&nbsp;                           |         ||
-|__REQUEST DATA FILTERING__       |         ||
-|`request.filter_keys`            | Array   |  A list of keys to filter when sending request data. In Rails, this also includes existing params filters.<br/>*Default: `['password', 'password_confirmation']`*|
-|`request.disable_session`        | Boolean | Prevent session from being sent with request data.<br/>_Default: `false`_|
-|`request.disable_params`         | Boolean | Prevent params from being sent with request data.<br/>_Default: `false`_|
-|`request.disable_environment`    | Boolean | Prevent Rack environment from being sent with request data.<br/>_Default: `false`_|
-|`request.disable_url`            | Boolean | Prevent url from being sent with request data (Rack environment may still contain it in some cases).<br/>_Default: `false`_|
-|&nbsp;                           |         ||
-|__USER INFORMER__                |         ||
-|`user_informer.enabled`          | Boolean | Enable the UserInformer middleware.  The user informer displays information about a Honeybadger error to your end-users when you display a 500 error page. This typically includes the error id which can be used to reference the error inside your Honeybadger account.  [Learn More](http://docs.honeybadger.io/article/48-show-users-a-unique-id-when-they-encounter-an-error)<br/>_Default: `true`_|
-|`user_informer.info`             | String  | Replacement string for HTML comment in templates.<br/>*Default: `'Honeybadger Error {{error_id}}'`*|
-|&nbsp;                           |         ||
-|__USER FEEDBACK__                |         ||
-|`feedback.enabled`               | Boolean | Enable the UserFeedback middleware. Feedback displays a comment form to your-end user when they encounter an error. When the user creates a comment, it is added to the error in Honeybadger, and a notification is sent.  [Learn More](http://docs.honeybadger.io/article/166-how-to-implement-a-custom-feedback-form)<br/>_Default: `true`_|
-|&nbsp;                           |         ||
-|__EXCEPTION REPORTING__          |         ||
-|`exceptions.ignore`              | Array   | A list of exception class names to ignore (appends to defaults).<br/>_Default: `['ActionController::RoutingError', 'AbstractController::ActionNotFound', 'ActionController::MethodNotAllowed', 'ActionController::UnknownHttpMethod', 'ActionController::NotImplemented', 'ActionController::UnknownFormat', 'ActionController::InvalidAuthenticityToken', 'ActionController::InvalidCrossOriginRequest', 'ActionDispatch::ParamsParser::ParseError', 'ActionController::BadRequest', 'ActionController::ParameterMissing', 'ActiveRecord::RecordNotFound', 'ActionController::UnknownAction', 'CGI::Session::CookieStore::TamperedWithCookie', 'Mongoid::Errors::DocumentNotFound', 'Sinatra::NotFound']`_|
-|`exceptions.ignore_only`         | Array   | A list of exception class names to ignore (overrides defaults).<br/>_Default: `[]`_|
-|`exceptions.` `ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
-|`exceptions.rescue_rake`         | Boolean | Enable rescuing exceptions in rake tasks.<br/>_Default: `true` when run in background; `false` when run in terminal._|
-|`exceptions.notify_at_exit`      | Boolean | Report unhandled exception when Ruby crashes (at\_exit).<br/>_Default: `true`._|
-|`exceptions.source_radius`       | Integer | The number of lines before and after the source when reporting snippets.<br/>_Default: `2`_|
-|`exceptions.local_variables`     | Boolean | Enable sending local variables. Requires the [binding_of_caller gem](https://rubygems.org/gems/binding_of_caller).<br/>_Default: `false`_|
-|`exceptions.unwrap`              | Boolean | Reports #original_exception or #cause one level up from rescued exception when available.<br/>_Default: `false`_|
-|&nbsp;                           |         ||
-|__SIDEKIQ__                      |         ||
-|`sidekiq.attempt_threshold`      | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
-|`sidekiq.use_component`          | Boolean | Automatically set the component to the class of the job. Helps with grouping.<br/>_Default: `true`_|
-|__DELAYED JOB__                  |         ||
-|`delayed_job.attempt_threshold`  | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
-|__SHORYUKEN__                    |         ||
-|`shoryuken.attempt_threshold`    | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
-|__SINATRA__                        |         ||
-|`sinatra.enabled`                | Boolean | Enable Sinatra auto-initialization.<br/>_Default: `true`_|
 
 ## Adding extra data to error reports
 
@@ -483,6 +335,8 @@ Honeybadger.backtrace_filter do |line|
 end
 ```
 
+---
+
 ## Deployment Tracking
 
 Honeybadger has an API to keep track of project deployments. Whenever you deploy, all errors for that environment will be resolved automatically. You can choose to enable or disable the auto-resolve feature from your Honeybadger project settings page.
@@ -541,6 +395,156 @@ bundle exec honeybadger deploy --environment=production
 ```
 
 Run&nbsp; `bundle exec honeybadger help deploy` for all available options.
+
+## Configuration
+
+There are a few ways to configure the Honeybadger gem. You can use a YAML config file. You can use environment variables. You can use Ruby. Or you can use a combination of the three.
+
+We put together a short video highligting a few of the most common configuration options:
+
+[![Advanced Honeybadger Gem Usage](https://embed-ssl.wistia.com/deliveries/5fccf29d2b27d0f7ec62b5b39e2f5d9cd1f6f5b7.jpg?image_play_button=true&image_play_button_color=7b796ae0&image_crop_resized=150x84)](https://honeybadger.wistia.com/medias/vv9qq9x39d)
+
+
+### YAML Configuration File
+
+By default, Honeybadger looks for a `honeybadger.yml` configuration file in the root of your project, and then `config/honeybadger.yml` (in that order).
+
+Here's what the simplest config file looks like:
+
+```yaml
+---
+api_key: "my_api_key"
+```
+
+#### Nested Options
+
+Some configuration options are written in YAML as nested hashes. For example, here's what the `logging.path` and `request.filter_keys` options look like in YAML:
+
+```yaml
+---
+logging:
+  path: "/path/to/honeybadger.log"
+request:
+  filter_keys:
+    - "credit_card"
+```
+
+#### Environments
+
+Environment-specific options can be set by name-spacing the options beneath the environment name. For example:
+
+```yaml
+---
+api_key: "my_api_key"
+production:
+  logging:
+    path: "/path/to/honeybadger.log"
+    level: "WARN"
+```
+
+#### ERB and Regex
+
+The configuration file is rendered using ERB. That means you can set configuration options programmatically. You can also include regular expressions. Here's what that looks like:
+
+```yaml
+---
+api_key: "<%= MyApplication.config.api_key %>"
+request:
+  filter_keys:
+    - !ruby/regexp '/credit_card/i'
+```
+
+### Configuring with Environment Variables (12-factor style)
+
+All configuration options can also be read from environment variables (ENV). To do this, uppercase the option name, replace all non-alphanumeric characters with underscores, and prefix with `HONEYBADGER_`. For example, `logging.path` becomes `HONEYBADGER_LOGGING_PATH`:
+
+```
+export HONEYBADGER_LOGGING_PATH=/path/to/honeybadger.log
+```
+
+ENV options override other options read from framework or `honeybadger.yml` sources, so both can be used together.
+
+### Configuration via Ruby (programmatic)
+
+To configure Honeybadger from Ruby, use `Honeybadger.configure`:
+
+```ruby
+Honeybadger.configure do |config|
+  config.api_key = 'project api key'
+  config.exceptions.ignore += [CustomError]
+end
+```
+
+## Configuration Options
+
+You can use any of the options below in your config file, or in the environment.
+
+
+|Option                           | Type    | Description |
+|-------------------------------- | ------- | ----------- |
+|`api_key`                        | String  | The API key for your Honeybadger project.<br/>_Default: `nil`_|
+|`env`                            | String  | The environment the app is running in. In Rails this defaults to `Rails.env`.<br/>_Default: `nil`_|
+|`report_data`                    | Boolean | Enable/disable reporting of data. Defaults to false for "test", "development", and "cucumber" environments.  <br>_Default: `true`_|
+|`root`                           | String  | The project's absolute root path.<br/>_Default: `Dir.pwd`_|
+|`revision`                       | String  | The project's git revision.<br/>_Default: revision detected from git_|
+|`hostname`                       | String  | The hostname of the current box.<br/>_Default: `Socket.gethostname`_|
+|`backend`                        | String  | An alternate backend to use for reporting data.<br/>_Default: `nil`_|
+|`debug`                          | Boolean | Enables verbose debug logging.<br/>_Default: `false`_|
+|`send_data_at_exit`              | Boolean | Finish sending enqueued exceptions before allowing program to exit.<br/>_Default: `true`_|
+|`disabled`                       | Boolean | Prevents Honeybadger from starting entirely.<br/>_Default: `false`_|
+| `config_path`                   | String  | The path of the honeybadger config file. Can only be set via the `$HONEYBADGER_CONFIG_PATH` environment variable |
+|`development_environments`       | Array   | Environments which will not report data by default (use report_data to enable/disable explicitly).<br/>_Default: `["development", "test", "cucumber"]`_|
+|`plugins`                        | Array   | An optional list of plugins to load. Default is to load all plugins.<br/>_Default: `[]`_|
+|`skipped_plugins`                | Array   | An optional list of plugins to skip.<br/>_Default: `[]`_|
+|&nbsp;                           |         ||
+|__LOGGING__                      |         ||
+|`logging.path`                   | String  | The path (absolute, or relative from config.root) to the log file. Defaults to the rails logger or STDOUT. To log to standard out, use 'STDOUT'.<br/>_Default: `nil`_|
+|`logging.level`                  | String  | The log level. Does nothing unless `logging.path` is also set.<br/>_Default: `INFO`_|
+|&nbsp;                           |         ||
+|__HTTP CONNECTION__              |         ||
+|`connection.secure`              | Boolean | Use SSL when sending data.<br/>_Default: `true`_|
+|`connection.host`                | String  | The host to use when sending data.<br/>_Default: `api.honeybadger.io`_|
+|`connection.port`                | Integer | The port to use when sending data.<br/>_Default: `443`_|
+|`connection.http_open_timeout`   | Integer | The HTTP open timeout when connecting to the server.<br/>_Default: `2`_|
+|`connection.http_read_timeout`   | Integer | The HTTP read timeout when connecting to the server.<br/>_Default: `5`_|
+|`connection.proxy_host`          | String  | The proxy host to use when sending data.<br/>_Default: `nil`_|
+|`connection.proxy_port`          | Integer | The proxy port to use when sending data.<br/>_Default: `nil`_|
+|`connection.proxy_user`          | String  | The proxy user to use when sending data.<br/>_Default: `nil`_|
+|`connection.proxy_pass`          | String  | The proxy password to use when sending data.<br/>_Default: `nil`_|
+|&nbsp;                           |         ||
+|__REQUEST DATA FILTERING__       |         ||
+|`request.filter_keys`            | Array   |  A list of keys to filter when sending request data. In Rails, this also includes existing params filters.<br/>*Default: `['password', 'password_confirmation']`*|
+|`request.disable_session`        | Boolean | Prevent session from being sent with request data.<br/>_Default: `false`_|
+|`request.disable_params`         | Boolean | Prevent params from being sent with request data.<br/>_Default: `false`_|
+|`request.disable_environment`    | Boolean | Prevent Rack environment from being sent with request data.<br/>_Default: `false`_|
+|`request.disable_url`            | Boolean | Prevent url from being sent with request data (Rack environment may still contain it in some cases).<br/>_Default: `false`_|
+|&nbsp;                           |         ||
+|__USER INFORMER__                |         ||
+|`user_informer.enabled`          | Boolean | Enable the UserInformer middleware.  The user informer displays information about a Honeybadger error to your end-users when you display a 500 error page. This typically includes the error id which can be used to reference the error inside your Honeybadger account.  [Learn More](http://docs.honeybadger.io/article/48-show-users-a-unique-id-when-they-encounter-an-error)<br/>_Default: `true`_|
+|`user_informer.info`             | String  | Replacement string for HTML comment in templates.<br/>*Default: `'Honeybadger Error {{error_id}}'`*|
+|&nbsp;                           |         ||
+|__USER FEEDBACK__                |         ||
+|`feedback.enabled`               | Boolean | Enable the UserFeedback middleware. Feedback displays a comment form to your-end user when they encounter an error. When the user creates a comment, it is added to the error in Honeybadger, and a notification is sent.  [Learn More](http://docs.honeybadger.io/article/166-how-to-implement-a-custom-feedback-form)<br/>_Default: `true`_|
+|&nbsp;                           |         ||
+|__EXCEPTION REPORTING__          |         ||
+|`exceptions.ignore`              | Array   | A list of exception class names to ignore (appends to defaults).<br/>_Default: `['ActionController::RoutingError', 'AbstractController::ActionNotFound', 'ActionController::MethodNotAllowed', 'ActionController::UnknownHttpMethod', 'ActionController::NotImplemented', 'ActionController::UnknownFormat', 'ActionController::InvalidAuthenticityToken', 'ActionController::InvalidCrossOriginRequest', 'ActionDispatch::ParamsParser::ParseError', 'ActionController::BadRequest', 'ActionController::ParameterMissing', 'ActiveRecord::RecordNotFound', 'ActionController::UnknownAction', 'CGI::Session::CookieStore::TamperedWithCookie', 'Mongoid::Errors::DocumentNotFound', 'Sinatra::NotFound']`_|
+|`exceptions.ignore_only`         | Array   | A list of exception class names to ignore (overrides defaults).<br/>_Default: `[]`_|
+|`exceptions.` `ignored_user_agents` | Array   | A list of user agents to ignore.<br/>_Default: `[]`_|
+|`exceptions.rescue_rake`         | Boolean | Enable rescuing exceptions in rake tasks.<br/>_Default: `true` when run in background; `false` when run in terminal._|
+|`exceptions.notify_at_exit`      | Boolean | Report unhandled exception when Ruby crashes (at\_exit).<br/>_Default: `true`._|
+|`exceptions.source_radius`       | Integer | The number of lines before and after the source when reporting snippets.<br/>_Default: `2`_|
+|`exceptions.local_variables`     | Boolean | Enable sending local variables. Requires the [binding_of_caller gem](https://rubygems.org/gems/binding_of_caller).<br/>_Default: `false`_|
+|`exceptions.unwrap`              | Boolean | Reports #original_exception or #cause one level up from rescued exception when available.<br/>_Default: `false`_|
+|&nbsp;                           |         ||
+|__SIDEKIQ__                      |         ||
+|`sidekiq.attempt_threshold`      | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
+|`sidekiq.use_component`          | Boolean | Automatically set the component to the class of the job. Helps with grouping.<br/>_Default: `true`_|
+|__DELAYED JOB__                  |         ||
+|`delayed_job.attempt_threshold`  | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
+|__SHORYUKEN__                    |         ||
+|`shoryuken.attempt_threshold`    | Integer | The number of attempts before notifications will be sent.<br/>_Default: `0`_|
+|__SINATRA__                        |         ||
+|`sinatra.enabled`                | Boolean | Enable Sinatra auto-initialization.<br/>_Default: `true`_|
 
 
 ## Honeybadger CLI
