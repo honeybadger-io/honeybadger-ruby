@@ -332,7 +332,7 @@ Honeybadger.context({my_data: 'my value'})
 
 A few other methods are also available when working with context:
 
-```
+```ruby
 # Clear the global context:
 Honeybadger.context.clear!
 
