@@ -598,7 +598,7 @@ When run from the root of a Rails project, the `honeybadger` command will load
 the Rails environment so that any framework/programmatic configuration is picked
 up.
 
-### Cron/command line monitoring
+## Cron/command line monitoring
 
 `honeybadger exec` can be used from the command line/terminal to monitor failed
 commands.  To use it, prefix any normal command with `honeybadger exec` (much
@@ -617,7 +617,7 @@ email notification.
 
 For full usage run `honeybadger help exec`.
 
-### Notify from the command line
+## Notify from the command line
 
 To send a Honeybadger notification from the command line/terminal, use
 `honeybadger notify`:
