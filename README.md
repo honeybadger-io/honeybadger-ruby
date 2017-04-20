@@ -248,26 +248,6 @@ end
 
 ---
 
-### `Honeybadger.configure()`: Configure Honeybadger from Ruby
-
-This method allows you to configure Honeybadger at runtime.
-
-#### Use this method if:
-
-* You want to change Honeybadger's configuration from inside Ruby rather than
-  (or in addition to) using the honeybadger.yml file or environment variables.
-
-#### Examples:
-
-```ruby
-Honeybadger.configure do |config|
-  config.api_key = 'project api key'
-  config.exceptions.ignore += [CustomError]
-end
-```
-
----
-
 ### `Honeybadger.exception_filter()`: Programmatically ignore exceptions
 
 This method lets you add a callback that will be run every time an exception is about to be reported to Honeybadger. If your callback returns a truthy value, the exception won't be reported. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Aexception_filter)
