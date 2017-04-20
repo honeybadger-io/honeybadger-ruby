@@ -5,14 +5,18 @@ module Honeybadger
   module Plugins
     module Resque
       module Extension
+        # Executed before `on_failure` hook; the flush is necessary so that
+        # errors reported within jobs get sent before the worker dies.
         def around_perform_with_honeybadger(*args)
           Honeybadger.flush { yield }
         ensure
           Honeybadger.context.clear!
         end
 
+        # Error notifications must be synchronous as the `on_failure` hook is
+        # executed after `around_perform`.
         def on_failure_with_honeybadger(e, *args)
-          Honeybadger.notify(e, parameters: { job_arguments: args }) if send_exception_to_honeybadger?(e, args)
+          Honeybadger.notify(e, parameters: { job_arguments: args }, sync: true) if send_exception_to_honeybadger?(e, args)
         end
 
         def send_exception_to_honeybadger?(e, args)
@@ -21,7 +25,7 @@ module Honeybadger
 
           !retry_criteria_valid?(e)
         rescue => e
-          Honeybadger.notify(e, parameters: { job_arguments: args })
+          Honeybadger.notify(e, parameters: { job_arguments: args }, sync: true)
         end
       end
 
