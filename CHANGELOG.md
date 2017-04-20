@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.1.2] - 2017-04-20
 ### Fixed
 - Fixed a bug in the Resque plugin which prevented error reports from being
   sent. The issue was that the Resque's callbacks were executed in an unexpected
