@@ -351,7 +351,7 @@ Honeybadger.notify(exception, context: { my_data: 'my local value' })
 
 Local context always overrides any global values when the error is reported.
 
-## Special context values
+### Special context values
 
 While you can add any key/value data to context, a few keys have special meaning
 in Honeybadger:
