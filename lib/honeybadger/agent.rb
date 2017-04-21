@@ -19,7 +19,7 @@ module Honeybadger
   # This also includes the Rack environment when using the Honeybadger rack
   # middleware.
   #
-  # Examples:
+  # Examples
   #
   #   # Standard usage:
   #   OtherBadger = Honeybadger::Agent.new
@@ -147,7 +147,7 @@ module Honeybadger
     # hash - A Hash of data which will be sent to Honeybadger when an error
     #        occurs. (default: nil)
     #
-    # Examples:
+    # Examples
     #
     #   Honeybadger.context({my_data: 'my value'})
     #
@@ -173,7 +173,7 @@ module Honeybadger
     # Public: Get global context for the current request.
     #
     #
-    # Examples:
+    # Examples
     #
     #   Honeybadger.context({my_data: 'my value'})
     #   Honeybadger.get_context #now returns {my_data: 'my value'}
@@ -190,7 +190,7 @@ module Honeybadger
     # block - The optional block to execute (exceptions will propagate after data
     # is flushed).
     #
-    # Examples:
+    # Examples
     #
     #   # Without a block:
     #   it "sends a notification to Honeybadger" do
@@ -222,7 +222,7 @@ module Honeybadger
 
     # Public: Stops the Honeybadger service.
     #
-    # Examples:
+    # Examples
     #
     #   Honeybadger.stop # => nil
     #
@@ -238,7 +238,7 @@ module Honeybadger
     #
     # block - The configuration block.
     #
-    # Examples:
+    # Examples
     #
     #   Honeybadger.configure do |config|
     #     config.api_key = 'project api key'
@@ -256,7 +256,7 @@ module Honeybadger
     # block - A block returning TrueClass true (to ignore) or FalseClass false
     #         (to send).
     #
-    # Examples:
+    # Examples
     #
     #   # Ignoring based on error message:
     #   Honeybadger.exception_filter do |notice|
@@ -279,7 +279,7 @@ module Honeybadger
     #
     # block - A block returning any Object responding to #to_s.
     #
-    # Examples:
+    # Examples
     #
     #   Honeybadger.exception_fingerprint do |notice|
     #     [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
@@ -296,7 +296,7 @@ module Honeybadger
     #         Honeybadger. The block expects one argument (line) which is the String line
     #         from the Backtrace, and must return the String new line.
     #
-    # Examples:
+    # Examples
     #
     #    Honeybadger.backtrace_filter do |line|
     #      line.gsub(/^\/my\/unknown\/bundle\/path/, "[GEM_ROOT]")
@@ -312,7 +312,7 @@ module Honeybadger
     # block    - A block to call. Errors reported from within the block will
     #            include request data.
     #
-    # Examples:
+    # Examples
     #
     #   Honeybadger.with_rack_env(env) do
     #     begin

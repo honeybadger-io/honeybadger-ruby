@@ -21,7 +21,7 @@ module Honeybadger
       # Public: Initializes the Response instance.
       #
       # response - With 1 argument Net::HTTPResponse, the code, body, and
-      #            message will be determined automatically. (optional)
+      #            message will be determined automatically (optional).
       # code      - The Integer status code. May also be :error for requests which
       #             failed to reach the server.
       # body      - The String body of the response.
@@ -76,10 +76,10 @@ module Honeybadger
       # Internal: Process payload for feature.
       #
       # feature - A Symbol feature name (corresponds to HTTP endpoint). Current
-      #           options are: :notices, :deploys, :ping
-      # payload - Any Object responding to #to_json.
+      #           options are: `:notices`, `:deploys`, `:ping`.
+      # payload - Any Object responding to `#to_json`.
       #
-      # Examples:
+      # Examples
       #
       #   backend.notify(:notices, Notice.new(...))
       #

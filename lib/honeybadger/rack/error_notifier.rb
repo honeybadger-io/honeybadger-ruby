@@ -8,7 +8,7 @@ module Honeybadger
     # Public: Middleware for Rack applications. Any errors raised by the upstream
     # application will be delivered to Honeybadger and re-raised.
     #
-    # Examples:
+    # Examples
     #
     #   require 'honeybadger/rack/error_notifier'
     #

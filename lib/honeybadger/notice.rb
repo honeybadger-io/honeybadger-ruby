@@ -23,7 +23,7 @@ module Honeybadger
   # Internal: Substitution for project root in backtrace lines.
   PROJECT_ROOT = '[PROJECT_ROOT]'.freeze
 
-  # Internal: Empty String (used for equality comparisons and assignment)
+  # Internal: Empty String (used for equality comparisons and assignment).
   STRING_EMPTY = ''.freeze
 
   # Internal: A Regexp which matches non-blank characters.
@@ -59,7 +59,7 @@ module Honeybadger
     # Public: Tags which will be applied to error.
     attr_reader :tags
 
-    # Public: The name of the class of error. (example: RuntimeError)
+    # Public: The name of the class of error (example: RuntimeError).
     attr_reader :error_class
 
     # Public: The message from the exception, or a general description of the error.
@@ -75,7 +75,7 @@ module Honeybadger
     def params; @request[:params]; end
     alias_method :parameters, :params
 
-    # Public: The component (if any) which was used in this request. (usually the controller)
+    # Public: The component (if any) which was used in this request (usually the controller).
     def component; @request[:component]; end
     alias_method :controller, :component
 
@@ -163,9 +163,9 @@ module Honeybadger
       @fingerprint = construct_fingerprint(opts)
     end
 
-    # Internal: Template used to create JSON payload
+    # Internal: Template used to create JSON payload.
     #
-    # Returns Hash JSON representation of notice
+    # Returns Hash JSON representation of notice.
     def as_json(*args)
       @request[:context] = s(context)
       @request[:local_variables] = local_variables if local_variables
@@ -195,22 +195,22 @@ module Honeybadger
       }
     end
 
-    # Public: Creates JSON
+    # Public: Creates JSON.
     #
-    # Returns valid JSON representation of Notice
+    # Returns valid JSON representation of Notice.
     def to_json(*a)
       ::JSON.generate(as_json(*a))
     end
 
-    # Public: Allows properties to be accessed using a hash-like syntax
+    # Public: Allows properties to be accessed using a hash-like syntax.
     #
-    # method - The given key for an attribute
+    # method - The given key for an attribute.
     #
-    # Examples:
+    # Examples
     #
     #   notice[:error_message]
     #
-    # Returns the attribute value, or self if given +:request+
+    # Returns the attribute value, or self if given `:request`.
     def [](method)
       case method
       when :request
@@ -220,7 +220,7 @@ module Honeybadger
       end
     end
 
-    # Internal: Determines if this notice should be ignored
+    # Internal: Determines if this notice should be ignored.
     def ignore?
       ignore_by_origin? || ignore_by_class? || ignore_by_callbacks?
     end
@@ -242,15 +242,15 @@ module Honeybadger
     end
 
     # Gets a property named "attribute" of an exception, either from
-    # the #args hash or actual exception (in order of precidence)
+    # the #args hash or actual exception (in order of precidence).
     #
     # attribute - A Symbol existing as a key in #args and/or attribute on
-    #             Exception
-    # default   - Default value if no other value is found. (optional)
+    #             Exception.
+    # default   - Default value if no other value is found (optional).
     # block     - An optional block which receives an Exception and returns the
-    #             desired value
+    #             desired value.
     #
-    # Returns attribute value from args or exception, otherwise default
+    # Returns attribute value from args or exception, otherwise default.
     def exception_attribute(attribute, default = nil, &block)
       opts[attribute] || (exception && from_exception(attribute, &block)) || default
     end
@@ -273,12 +273,12 @@ module Honeybadger
       end
     end
 
-    # Internal: Determines if error class should be ignored
+    # Internal: Determines if error class should be ignored.
     #
     # ignored_class_name - The name of the ignored class. May be a
-    # string or regexp (optional)
+    # string or regexp (optional).
     #
-    # Returns true or false
+    # Returns true or false.
     def ignore_by_class?(ignored_class = nil)
       @ignore_by_class ||= Proc.new do |ignored_class|
         case error_class
@@ -362,7 +362,7 @@ module Honeybadger
     #
     # exception - The Exception containing the bindings stack.
     #
-    # Returns a Hash of local variables
+    # Returns a Hash of local variables.
     def local_variables_from_exception(exception, config)
       return nil unless send_local_variables?(config)
       return {} unless Exception === exception
@@ -394,7 +394,7 @@ module Honeybadger
 
     # Internal: Should local variables be sent?
     #
-    # Returns true to send local_variables
+    # Returns true to send local_variables.
     def send_local_variables?(config)
       config[:'exceptions.local_variables']
     end
@@ -486,7 +486,7 @@ module Honeybadger
     # This method restores the correct #session method on @request and warns
     # the user of the issue.
     #
-    # Returns nothing
+    # Returns nothing.
     def monkey_patch_action_dispatch_test_process!
       return unless defined?(ActionDispatch::TestProcess) && defined?(self.fixture_file_upload)
 

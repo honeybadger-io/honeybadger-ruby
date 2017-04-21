@@ -5,7 +5,7 @@ module Honeybadger
     class Test < Null
       # Public: The notification list.
       #
-      # Examples:
+      # Examples
       #
       #   Test.notifications[:notices] # => [Notice, Notice, ...]
       #
