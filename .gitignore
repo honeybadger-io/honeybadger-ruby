@@ -6,3 +6,4 @@ pkg/
 Gemfile.lock
 .rbenv-vars
 java.hprof.txt
+.yardoc
