@@ -160,6 +160,70 @@ own middleware and hooks for error monitoring in whatever frameworks you use.
 
 ---
 
+## Reporting errors manually
+
+Honeybadger detects and reports unhandled exceptions automatically in Rails and
+other popular frameworks. But there may be times when you need to manually
+control exception reporting, such as:
+
+* You've rescued an exception, but still want to report it.
+* You need to report an exception outside of a supported framework.
+* You want complete control over what exception data is sent to us.
+
+### Reporting exceptions that you've rescued
+
+Use `Honeybadger.notify(exception)` to send any exception to Honeybadger. For
+example, to notify Honeybadger of a rescued exception without re-raising:
+
+```ruby
+begin
+  fail 'oops'
+rescue => exception
+  Honeybadger.notify(exception)
+end
+```
+
+### Reporting errors without an exception
+
+You can report any type of error to Honeybadger, not just exceptions. The
+simplest form is calling `Honeybadger.notify` with an error message:
+
+```ruby
+Honeybadger.notify("Something is wrong here")
+```
+
+The error's class name will default to "Notice", and a backtrace will be
+generated for you from the location in your code where `Honeybadger.notify` was
+called.
+
+### Passing additional options to `Honeybadger.notify`
+
+In some cases you will want to override the defaults or add additional
+information to your error reports. To do so, you can pass a second options
+`Hash` to `Honeybadger.notify`.
+
+For example, building on the example in [Reporting errors without an
+exception](#reporting-errors-without-an-exception), you could override the
+default class name:
+
+```ruby
+Honeybadger.notify("Something is wrong here", class_name: "MyError")
+```
+
+These are all of the options available to `Honeybadger.notify`:
+
+| Option Name | Description | Default value |
+| ----------- | ----------- | ------------- |
+| `:error_message` | The `String` error message | `nil` |
+| `:error_class`   | The `String` error class name | `"Notice"` |
+| `:backtrace`     | The `Array` backtrace of the error (must be standard Ruby format) | `nil` |
+| `:fingerprint`   | The `String` grouping fingerprint of the error | `nil` |
+| `:force`         | `true` to always report the exception, even when ignored by configuration | `false` |
+| `:tags`          | The `String` comma-separated list of tags to add to the error in Honeybadger | `nil` |
+| `:context`       | The `Hash` of additional metadata to associate with the error (see [Adding extra data to error reports](#adding-extra-data-to-error-reports) | `nil` |
+| `:controller`    | The `String` controller name (such as a Rails controller name) | `nil` |
+| `:action`        | The `String` action name (such as a Rails controller action) | `nil` |
+| `:parameters`    | The `Hash` HTTP request parameters | `nil` |
 
 ## Adding extra data to error reports
 
@@ -223,28 +287,6 @@ in Honeybadger:
 ## Public Methods
 
 > What follows is a summary of the gem's most commonly-used public methods. For a more authoritative list, read the [full API documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger/Agent).
-
-### `Honeybadger.notify()`: Send an exception to Honeybadger.
-
-You normally won't have to use this method. Honeybadger detects and reports errors automatically in Rails and other popular frameworks. But there may be times when you need to manually control exception reporting. [View full method documentation](http://www.rubydoc.info/gems/honeybadger/Honeybadger%3Anotify)
-
-#### Use this method if:
-
-* You've rescued an exception, but still want to report it
-* You need to report an exception outside of a supported framework.
-* You want complete control over what exception data is sent to us.
-
-
-#### Examples:
-
-```ruby
-# Sending an exception that you've already rescued
-begin
-  fail 'oops'
-rescue => exception
-  Honeybadger.notify(exception)
-end
-```
 
 ---
 
