@@ -70,13 +70,21 @@ module Honeybadger
     #                     to build the notice. All other types of objects will
     #                     be converted to a String and used as the `:error_message`.
     # opts              - The options Hash when the first argument is an
-    #                     Exception. (default: {}):
+    #                     Exception (default: {}):
     #                     :error_message - The String error message.
-    #                     :error_class   - The String class name of the error. (optional)
-    #                     :force         - Always report the exception, even when
-    #                                      ignored. (optional)
+    #                     :error_class   - The String class name of the error (default: "Notice").
+    #                     :backtrace     - The Array backtrace of the error (optional).
+    #                     :fingerprint   - The String grouping fingerprint of the exception (optional).
+    #                     :force         - Always report the exception when true, even when ignored (default: false).
+    #                     :tags          - The String comma-separated list of tags (optional).
+    #                     :context       - The Hash context to associate with the exception (optional).
+    #                     :controller    - The String controller name (such as a Rails controller) (optional).
+    #                     :action        - The String action name (such as a Rails controller action) (optional).
+    #                     :parameters    - The Hash HTTP request paramaters (optional).
+    #                     :session       - The Hash HTTP request session (optional).
+    #                     :url           - The String HTTP request URL (optional).
     #
-    # Examples:
+    # Examples
     #
     #   # With an exception:
     #   begin
@@ -88,9 +96,8 @@ module Honeybadger
     #   end
     #
     #   # Custom notification:
-    #   Honeybadger.notify({
+    #   Honeybadger.notify('Something went wrong.', {
     #     error_class: 'MyClass',
-    #     error_message: 'Something went wrong.',
     #     context: {my_data: 'value'}
     #   }) # => '06220c5a-b471-41e5-baeb-de247da45a56'
     #
