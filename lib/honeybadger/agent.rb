@@ -145,7 +145,13 @@ module Honeybadger
     # Public: Save global context for the current request.
     #
     # hash - A Hash of data which will be sent to Honeybadger when an error
-    #        occurs. (default: nil)
+    #        occurs; can include any key/value, but a few keys have a special meaning
+    #        in Honeybadger (default: nil):
+    #        :user_id    - The String user ID used by Honeybadger to aggregate
+    #                      user data across occurrences on the error page (optional).
+    #        :user_email - The String user email address (optional).
+    #        :tags       - The String comma-separated list of tags. When present,
+    #                      tags will be applied to errors with this context (optional).
     #
     # Examples
     #
