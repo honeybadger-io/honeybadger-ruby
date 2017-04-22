@@ -10,6 +10,7 @@ require 'honeybadger/util/request_hash'
 require 'honeybadger/util/request_payload'
 
 module Honeybadger
+  # Internal: The notifier information, included in the JSON payload.
   NOTIFIER = {
     name: 'honeybadger-ruby'.freeze,
     url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
@@ -32,6 +33,7 @@ module Honeybadger
   # Internal: Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
 
+  # Internal: The maximum number of nested causes to report.
   MAX_EXCEPTION_CAUSES = 5
 
   class Notice
@@ -43,57 +45,56 @@ module Honeybadger
     # Internal: The Regexp used to strip invalid characters from individual tags.
     TAG_SANITIZER = /[^\w]/.freeze
 
-    # Public: The unique ID of this notice which can be used to reference the
-    # error in Honeybadger.
-    attr_reader :id
+    # Public: The backtrace from the given exception or hash.
+    attr_accessor :backtrace
+
+    # Public: Custom fingerprint for error, used to group similar errors together.
+    attr_accessor :fingerprint
+
+    # Public: Tags which will be applied to error.
+    attr_accessor :tags
+
+    # Public: The name of the class of error (example: RuntimeError).
+    attr_accessor :error_class
+
+    # Public: The message from the exception, or a general description of the error.
+    attr_accessor :error_message
+
+    # Public: CGI variables such as HTTP_METHOD.
+    attr_accessor :cgi_data
+
+    # Public: A hash of parameters from the query string or post body.
+    attr_accessor :params
+    alias :parameters :params
+
+    # Public: The component (if any) which was used in this request (usually the controller).
+    attr_accessor :component
+    alias :controller :component
+
+    # Public: The action (if any) that was called in this request.
+    attr_accessor :action
+
+    # Public: A hash of session data from the request.
+    attr_accessor :session
+
+    # Public: The URL at which the error occurred (if any).
+    attr_accessor :url
+
+    # Public: The API key used to deliver this notice.
+    attr_accessor :api_key
 
     # Public: The exception that caused this notice, if any.
     attr_reader :exception
 
-    # Public: The backtrace from the given exception or hash.
-    attr_reader :backtrace
-
-    # Public: Custom fingerprint for error, used to group similar errors together.
-    attr_reader :fingerprint
-
-    # Public: Tags which will be applied to error.
-    attr_reader :tags
-
-    # Public: The name of the class of error (example: RuntimeError).
-    attr_reader :error_class
-
-    # Public: The message from the exception, or a general description of the error.
-    attr_reader :error_message
-
-    # Deprecated: Excerpt from source file.
-    attr_reader :source
-
-    # Public: CGI variables such as HTTP_METHOD.
-    def cgi_data; @request[:cgi_data]; end
-
-    # Public: A hash of parameters from the query string or post body.
-    def params; @request[:params]; end
-    alias_method :parameters, :params
-
-    # Public: The component (if any) which was used in this request (usually the controller).
-    def component; @request[:component]; end
-    alias_method :controller, :component
-
-    # Public: The action (if any) that was called in this request.
-    def action; @request[:action]; end
-
-    # Public: A hash of session data from the request.
-    def_delegator :@request, :session
-    def session; @request[:session]; end
-
-    # Public: The URL at which the error occurred (if any).
-    def url; @request[:url]; end
+    # Public: The unique ID of this notice which can be used to reference the
+    # error in Honeybadger.
+    attr_reader :id
 
     # Public: Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
-    # Public: The API key used to deliver this notice.
-    attr_reader :api_key
+    # Deprecated: Excerpt from source file.
+    attr_reader :source
 
     # Internal: Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
@@ -142,7 +143,14 @@ module Honeybadger
       end
       @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))
 
-      @request = construct_request_hash(config, opts)
+      request = construct_request_hash(config, opts)
+      Util::RequestPayload::KEYS.each do |key|
+        self.send(:"#{key}=", request[key])
+      end
+
+      self.params ||= {}
+      self.session ||= {}
+      self.cgi_data ||= {}
 
       @context = construct_context_hash(opts)
 
@@ -167,8 +175,21 @@ module Honeybadger
     #
     # Returns Hash JSON representation of notice.
     def as_json(*args)
-      @request[:context] = s(context)
-      @request[:local_variables] = local_variables if local_variables
+      request = {
+        url: url,
+        component: component,
+        action: action,
+        params: params,
+        session: session,
+        cgi_data: cgi_data
+      }
+      request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
+
+      request[:sanitizer] = request_sanitizer
+      request = Util::RequestPayload.build(request)
+
+      request[:context] = s(context)
+      request[:local_variables] = local_variables if local_variables
 
       {
         api_key: s(api_key),
@@ -182,7 +203,7 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: @request,
+        request: request,
         server: {
           project_root: s(config[:root]),
           revision: s(config[:revision]),
@@ -310,11 +331,10 @@ module Honeybadger
       request = {}
       request.merge!(request_hash)
       request.merge!(opts)
+      request[:session] = opts[:session][:data] if opts[:session] && opts[:session][:data]
       request[:component] = opts[:controller] if opts.has_key?(:controller)
       request[:params] = opts[:parameters] if opts.has_key?(:parameters)
-      request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
-      request[:sanitizer] = request_sanitizer
-      Util::RequestPayload.build(request)
+      request
     end
 
     def construct_context_hash(opts)
