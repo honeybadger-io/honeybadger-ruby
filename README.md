@@ -7,7 +7,9 @@ This is the notifier gem for integrating apps with the :zap: [Honeybadger Except
 
 When an uncaught exception occurs, Honeybadger will POST the relevant data to the Honeybadger server specified in your environment.
 
-For comprehensive instructions and support, [check out our documentation site](https://docs.honeybadger.io/ruby/index.html).
+## Documentation and Support
+
+For comprehensive documentation and support, [check out our documentation site](https://docs.honeybadger.io/ruby/index.html).
 
 ## Changelog
 
