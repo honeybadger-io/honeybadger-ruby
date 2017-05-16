@@ -13,8 +13,8 @@ module Honeybadger
 
         initializer 'honeybadger.install_middleware' do |app|
           app.config.middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
-          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer)
-          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback)
+          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer) if Honeybadger.config[:'user_informer.enabled']
+          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback) if Honeybadger.config[:'feedback.enabled']
         end
 
         config.after_initialize do
