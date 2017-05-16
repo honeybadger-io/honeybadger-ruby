@@ -17,7 +17,6 @@ module Honeybadger
       end
 
       def call(env)
-        return @app.call(env) unless config[:'user_informer.enabled']
         status, headers, body = @app.call(env)
         if env['honeybadger.error_id']
           new_body = []
