@@ -152,10 +152,16 @@ module Honeybadger
     #        :user_email - The String user email address (optional).
     #        :tags       - The String comma-separated list of tags. When present,
     #                      tags will be applied to errors with this context (optional).
+    # block - An optional block that the context will be contained to.
     #
     # Examples
     #
     #   Honeybadger.context({my_data: 'my value'})
+    #
+    #   # Block-level context:
+    #   Honeybadger.context({local_data: 'my value'}) do
+    #     # Do something
+    #   end
     #
     #   # Inside a Rails controller:
     #   before_action do
@@ -166,8 +172,11 @@ module Honeybadger
     #   Honeybadger.context.clear!
     #
     # Returns self so that method calls can be chained.
-    def context(hash = nil)
-      context_manager.set_context(hash) unless hash.nil?
+    def context(hash = nil, &block)
+      raise ArgumentError, 'The context Hash must be provided with a block' if block_given? && hash.nil?
+
+      context_manager.set_context(hash, &block) unless hash.nil?
+
       self
     end
 

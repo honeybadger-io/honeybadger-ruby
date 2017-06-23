@@ -60,6 +60,59 @@ describe Honeybadger do
     it "clears the context" do
       expect { described_class.context.clear! }.to change { described_class.get_context }.from(c).to(nil)
     end
+
+    it "implicitly converts objects to context" do
+      described_class.context(double(to_hash: {bar: :baz}))
+      expect(described_class.get_context).to eq({foo: :bar, bar: :baz})
+    end
+
+    it "raises exception when implicit conversion fails" do
+      expect {
+        described_class.context(1)
+      }.to raise_error(TypeError)
+    end
+
+    it "raises an exception when block is provided without context" do
+      expect {
+        described_class.context do
+          fail "this shouldn't be executed"
+        end
+      }.to raise_error(ArgumentError)
+    end
+
+    it "merges block-level context" do
+      described_class.context(level1: true) do
+        expect(described_class.get_context).to eq({foo: :bar, level1: true})
+
+        described_class.context(level2: true) do
+          expect(described_class.get_context).to eq({foo: :bar, level1: true, level2: true})
+        end
+
+        expect(described_class.get_context).to eq({foo: :bar, level1: true})
+      end
+
+      expect(described_class.get_context).to eq({foo: :bar})
+    end
+
+    it "correctly handles global context inside block-context" do
+      described_class.context(level1: true) do
+        described_class.context(level2: true) do
+          described_class.context({bar: :baz})
+        end
+      end
+
+      expect(described_class.get_context).to eq({foo: :bar, bar: :baz})
+    end
+
+    it "can overwrite values in block level context" do
+      described_class.context(foo: :not_bar) do
+        expect(described_class.get_context).to eq({foo: :not_bar})
+        described_class.context(foo: :not_not_bar) do
+          expect(described_class.get_context).to eq({foo: :not_not_bar})
+        end
+      end
+      expect(described_class.get_context).to eq({foo: :bar})
+    end
   end
 
   describe "#notify" do

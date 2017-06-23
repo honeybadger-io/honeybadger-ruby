@@ -17,14 +17,28 @@ module Honeybadger
     # Internal accessors
 
     def set_context(hash)
+      raise TypeError, "no implicit conversion of #{hash.class.name} into Hash" unless hash.respond_to?(:to_hash)
+
       @mutex.synchronize do
-        @context ||= {}
-        @context.update(hash)
+        @context ||= []
+        @context.push(hash)
+      end
+
+      return nil unless block_given?
+
+      begin
+        yield
+        nil
+      ensure
+        @mutex.synchronize { @context.delete(hash) }
       end
     end
 
     def get_context
-      @mutex.synchronize { @context }
+      @mutex.synchronize do
+        return nil unless @context
+        @context.reduce({}) {|a,e| a.update(e) }
+      end
     end
 
     def set_rack_env(env)
