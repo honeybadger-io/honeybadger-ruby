@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- `Honeybadger.context` now accepts a block; the local context Hash will added
+- `Honeybadger.context` now accepts a block; the local context Hash will be added
   to exceptions which occur within the block's execution and cleared afterwards.
 
 ## [3.1.2] - 2017-04-20
