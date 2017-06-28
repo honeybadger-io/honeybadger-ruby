@@ -4,6 +4,10 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- The exception cause may now be set using an optional `:cause` option when
+  calling `Honeybadger.notify`. If not present, the exception's cause will be
+  used, or the global `$!` exception if available.
 
 ## [3.1.2] - 2017-04-20
 ### Fixed

@@ -50,6 +50,9 @@ module Honeybadger
     # Public: The exception that caused this notice, if any.
     attr_reader :exception
 
+    # Public: The exception cause if available.
+    attr_reader :cause
+
     # Public: The backtrace from the given exception or hash.
     attr_reader :backtrace
 
@@ -146,7 +149,8 @@ module Honeybadger
 
       @context = construct_context_hash(opts)
 
-      @causes = unwrap_causes(@exception)
+      @cause = opts[:cause] || exception_cause(@exception) || $!
+      @causes = unwrap_causes(@cause)
 
       @tags = construct_tags(opts[:tags])
       @tags = construct_tags(context[:tags]) | @tags if context
@@ -447,13 +451,14 @@ module Honeybadger
     # Returns Hash causes (in payload format).
     def unwrap_causes(exception)
       c, e, i = [], exception, 0
-      while (e = exception_cause(e)) && i < MAX_EXCEPTION_CAUSES
+      while (e) && i < MAX_EXCEPTION_CAUSES
         c << {
           class: e.class.name,
           message: e.message,
           backtrace: parse_backtrace(e.backtrace || caller).to_a
         }
         i += 1
+        e = exception_cause(e)
       end
 
       c
