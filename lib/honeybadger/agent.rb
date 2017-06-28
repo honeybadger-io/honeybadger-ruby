@@ -83,6 +83,7 @@ module Honeybadger
     #                     :parameters    - The Hash HTTP request paramaters (optional).
     #                     :session       - The Hash HTTP request session (optional).
     #                     :url           - The String HTTP request URL (optional).
+    #                     :cause         - The Exception cause for this error (optional).
     #
     # Examples
     #
