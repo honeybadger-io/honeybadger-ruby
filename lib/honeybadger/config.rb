@@ -359,7 +359,7 @@ module Honeybadger
 
       return framework[:logger] if framework[:logger]
 
-      Logger.new('/dev/null')
+      Logger.new(nil)
     end
 
     def init_logging!

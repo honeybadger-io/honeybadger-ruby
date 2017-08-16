@@ -94,9 +94,9 @@ module Honeybadger
         # logging the framework trace (moved to ActionDispatch::DebugExceptions),
         # which caused cluttered output while running the test task.
         defined?(::ActionDispatch::DebugExceptions) and
-          ::ActionDispatch::DebugExceptions.class_eval { def logger(*args) ; @logger ||= Logger.new('/dev/null') ; end }
+          ::ActionDispatch::DebugExceptions.class_eval { def logger(*args) ; @logger ||= Logger.new(nil) ; end }
         defined?(::ActionDispatch::ShowExceptions) and
-          ::ActionDispatch::ShowExceptions.class_eval { def logger(*args) ; @logger ||= Logger.new('/dev/null') ; end }
+          ::ActionDispatch::ShowExceptions.class_eval { def logger(*args) ; @logger ||= Logger.new(nil) ; end }
 
         # Detect and disable the better_errors gem
         if defined?(::BetterErrors::Middleware)

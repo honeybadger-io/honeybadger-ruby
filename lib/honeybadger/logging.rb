@@ -85,7 +85,7 @@ module Honeybadger
     class StandardLogger < Base
       extend Forwardable
 
-      def initialize(logger = Logger.new('/dev/null'))
+      def initialize(logger = Logger.new(nil))
         raise ArgumentError, 'logger not specified' unless logger
         raise ArgumentError, 'logger must be a logger' unless logger.respond_to?(:add)
 
@@ -115,7 +115,7 @@ module Honeybadger
       INFO_SUPPLEMENT = ' level=%s pid=%s'.freeze
       DEBUG_SUPPLEMENT = ' at=%s'.freeze
 
-      def initialize(config, logger = Logger.new('/dev/null'))
+      def initialize(config, logger = Logger.new(nil))
         @config = config
         @tty = STDOUT.tty?
         @tty_level = @config.log_level(:'logging.tty_level')
