@@ -57,7 +57,7 @@ module Honeybadger
       end
 
       def custom_template_file?
-        custom_template_file && File.exists?(custom_template_file)
+        custom_template_file && File.exist?(custom_template_file)
       end
 
       def template_file

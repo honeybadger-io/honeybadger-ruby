@@ -80,7 +80,7 @@ describe Honeybadger::Backtrace do
       ]
 
       ['app/models/user.rb', 'app/concerns/authenticated_controller.rb', 'app/controllers/users_controller.rb'].each do |file|
-        expect(File).to receive(:exists?).with(file).and_return(true)
+        expect(File).to receive(:exist?).with(file).and_return(true)
         expect(File).to receive(:open).with(file).and_yield(StringIO.new(source))
       end
 
