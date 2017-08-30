@@ -452,7 +452,7 @@ module Honeybadger
     def unwrap_causes(cause)
       causes, c, i = [], cause, 0
 
-      while (c) && i < MAX_EXCEPTION_CAUSES
+      while c && i < MAX_EXCEPTION_CAUSES
         causes << {
           class: c.class.name,
           message: c.message,
