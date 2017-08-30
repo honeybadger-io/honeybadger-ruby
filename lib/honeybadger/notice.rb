@@ -444,24 +444,25 @@ module Honeybadger
       end
     end
 
-    # Internal: Unwrap causes from exception.
+    # Internal: Create a list of causes.
     #
-    # exception - Exception to unwrap.
+    # cause - The first cause to unwrap.
     #
-    # Returns Hash causes (in payload format).
-    def unwrap_causes(exception)
-      c, e, i = [], exception, 0
-      while (e) && i < MAX_EXCEPTION_CAUSES
-        c << {
-          class: e.class.name,
-          message: e.message,
-          backtrace: parse_backtrace(e.backtrace || caller).to_a
+    # Returns Array causes (in Hash payload format).
+    def unwrap_causes(cause)
+      causes, c, i = [], cause, 0
+
+      while (c) && i < MAX_EXCEPTION_CAUSES
+        causes << {
+          class: c.class.name,
+          message: c.message,
+          backtrace: parse_backtrace(c.backtrace || caller).to_a
         }
         i += 1
-        e = exception_cause(e)
+        c = exception_cause(c)
       end
 
-      c
+      causes
     end
 
     def params_filters
