@@ -1,8 +1,8 @@
 module Honeybadger
   module Util
     class Stats
-      HAS_MEM = File.exists?("/proc/meminfo")
-      HAS_LOAD = File.exists?("/proc/loadavg")
+      HAS_MEM = File.exist?("/proc/meminfo")
+      HAS_LOAD = File.exist?("/proc/loadavg")
 
       class << self
         def all

@@ -92,7 +92,7 @@ module Honeybadger
       #
       # Returns an array of line(s) from source file.
       def get_source(file, number, radius = 2)
-        if file && File.exists?(file)
+        if file && File.exist?(file)
           before = after = radius
           start = (number.to_i - 1) - before
           start = 0 and before = 1 if start <= 0
