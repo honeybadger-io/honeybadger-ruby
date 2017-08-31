@@ -147,7 +147,7 @@ module Honeybadger
 
       @request = construct_request_hash(config, opts)
 
-      @context = construct_context_hash(opts)
+      @context = construct_context_hash(opts, exception)
 
       @cause = opts[:cause] || exception_cause(@exception) || $!
       @causes = unwrap_causes(@cause)
@@ -321,9 +321,15 @@ module Honeybadger
       Util::RequestPayload.build(request)
     end
 
-    def construct_context_hash(opts)
+    def exception_context(exception)
+      return {}.freeze unless exception && exception.respond_to?(:honeybadger_context)
+      exception.honeybadger_context
+    end
+
+    def construct_context_hash(opts, exception)
       context = {}
       context.merge!(opts[:global_context]) if opts[:global_context]
+      context.merge!(exception_context(exception))
       context.merge!(opts[:context]) if opts[:context]
       context.empty? ? nil : context
     end
