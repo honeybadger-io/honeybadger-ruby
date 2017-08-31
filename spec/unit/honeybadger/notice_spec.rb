@@ -789,6 +789,37 @@ describe Honeybadger::Notice do
           causes = build_notice(exception: exception).as_json[:error][:causes]
           expect(causes.size).to eq 5
         end
+
+        context "and the :cause option is also present" do
+          it "prefers the option" do
+            exception = error_class.new('badgers!')
+            exception.cause = StandardError.new('cause!')
+            causes = build_notice(exception: exception, cause: StandardError.new('this cause was passed explicitly')).as_json[:error][:causes]
+
+            expect(causes.size).to eq 1
+            expect(causes[0][:class]).to eq 'StandardError'
+            expect(causes[0][:message]).to eq 'this cause was passed explicitly'
+            expect(causes[0][:backtrace]).not_to be_empty
+          end
+        end
+
+        context "and there is a current exception" do
+          it "prefers the notice's exception's cause" do
+            exception = error_class.new('badgers!')
+            exception.cause = StandardError.new('cause!')
+
+            begin
+              raise StandardError.new('this should not be the cause')
+            rescue
+              causes = build_notice(exception: exception).as_json[:error][:causes]
+            end
+
+            expect(causes.size).to eq 1
+            expect(causes[0][:class]).to eq 'StandardError'
+            expect(causes[0][:message]).to eq 'cause!'
+            expect(causes[0][:backtrace]).not_to be_empty
+          end
+        end
       end
 
       context "when raising #{error_class} with a non-exception cause" do
@@ -797,6 +828,36 @@ describe Honeybadger::Notice do
           exception.cause = "Some reason you werent expecting"
           causes = build_notice(exception: exception).as_json[:error][:causes]
           expect(causes.size).to eq 0
+        end
+      end
+
+      context "when there is a current global exception" do
+        it "uses the global cause" do
+          begin
+            raise StandardError.new('this should be the cause')
+          rescue
+            causes = build_notice.as_json[:error][:causes]
+          end
+
+          expect(causes.size).to eq 1
+          expect(causes[0][:class]).to eq 'StandardError'
+          expect(causes[0][:message]).to eq 'this should be the cause'
+          expect(causes[0][:backtrace]).not_to be_empty
+        end
+      end
+
+      context "when the :cause option is present" do
+        it "uses the cause option" do
+          begin
+            raise StandardError.new('this should not be the cause')
+          rescue
+            causes = build_notice(cause: StandardError.new('this should be the cause')).as_json[:error][:causes]
+          end
+
+          expect(causes.size).to eq 1
+          expect(causes[0][:class]).to eq 'StandardError'
+          expect(causes[0][:message]).to eq 'this should be the cause'
+          expect(causes[0][:backtrace]).not_to be_empty
         end
       end
     end
