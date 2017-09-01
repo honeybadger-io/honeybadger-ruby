@@ -280,10 +280,49 @@ describe Honeybadger::Notice do
   end
 
   describe "#context" do
-    it "merges context from args with context from Honeybadger#context" do
-      global_context = {'one' => 'two', 'foo' => 'bar'}
-      notice = build_notice(global_context: global_context, context: {'three' => 'four', 'foo' => 'baz'})
-      expect(notice[:request][:context]).to eq({'one' => 'two', 'three' => 'four', 'foo' => 'baz'})
+    it "merges local context" do
+      notice = build_notice(context: { local: 'local' })
+      expect(notice[:request][:context]).to eql({ local: 'local' })
+    end
+
+    it "merges global context" do
+      notice = build_notice(global_context: { global: 'global' })
+      expect(notice[:request][:context]).to eql({ global: 'global' })
+    end
+
+    it "merges exception context" do
+      exception = Class.new(RuntimeError) do
+        def honeybadger_context
+          { exception: 'exception' }
+        end
+      end
+      notice = build_notice(exception: exception.new)
+
+      expect(notice[:request][:context]).to eql({ exception: 'exception' })
+    end
+
+    it "skips exception context when method isn't defined" do
+      notice = build_notice(exception: RuntimeError.new)
+      expect(notice[:request][:context]).to be_nil
+    end
+
+    it "merges context in order of precedence: local, exception, global" do
+      global_context = { global: 'global', local_override: 'global', exception_override: 'global' }
+      exception = Class.new(RuntimeError) do
+        def honeybadger_context
+          { exception: 'exception', local_override: 'exception', exception_override: 'exception' }
+        end
+      end
+      local_context = { local: 'local', local_override: 'local' }
+      notice = build_notice(exception: exception.new, global_context: global_context, context: local_context)
+
+      expect(notice[:request][:context]).to eq({
+        global: 'global',
+        exception: 'exception',
+        local: 'local',
+        local_override: 'local',
+        exception_override: 'exception'
+      })
     end
 
     it "doesn't mutate global context" do
