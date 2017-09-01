@@ -12,6 +12,10 @@ adheres to [Semantic Versioning](http://semver.org/).
   `#honeybadger_context` method. The method should have no arguments and return
   a `Hash` of context data.
 
+### Fixed
+- We no longer use "/dev/null" as the default log device as it doesn't exist on
+  Windows.
+
 ## [3.1.2] - 2017-04-20
 ### Fixed
 - Fixed a bug in the Resque plugin which prevented error reports from being
