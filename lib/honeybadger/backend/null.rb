@@ -8,7 +8,7 @@ module Honeybadger
       end
 
       def notify(feature, payload)
-        Response.new(201, '{}')
+        Response.new(:stubbed, '{}')
       end
     end
   end
