@@ -34,8 +34,6 @@ module Honeybadger
     config.api_key = 'project api key'
     config.exceptions.ignore += [CustomError]
   end
-
-  See https://git.io/v1Sd4 for documentation.
 WARNING
   end
 end
