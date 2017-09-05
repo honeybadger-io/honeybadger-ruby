@@ -246,7 +246,7 @@ Optional steps:
 If you ever need help:
 
   - Read the gem troubleshooting guide: https://docs.honeybadger.io/gem-troubleshooting
-  - Check out our documentation: http://docs.honeybadger.io/
+  - Check out our documentation: https://docs.honeybadger.io/
   - Email the founders: support@honeybadger.io
 
 Most people don't realize that Honeybadger is a small, bootstrapped company. We
