@@ -15,6 +15,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - We no longer use "/dev/null" as the default log device as it doesn't exist on
   Windows.
+- Logs when reporting errors in development mode now mention that the error wasn't
+  *actually* reported. :)
 
 ## [3.1.2] - 2017-04-20
 ### Fixed
