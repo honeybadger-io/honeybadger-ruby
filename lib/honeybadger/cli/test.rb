@@ -237,11 +237,11 @@ Honeybadger. For now, we've generated a test exception for you:
 Optional steps:
 
   - Show a feedback form on your error page:
-    http://docs.honeybadger.io/gem-feedback
+    https://docs.honeybadger.io/gem-feedback
   - Show a UUID or link to Honeybadger on your error page:
-    http://docs.honeybadger.io/gem-informer
+    https://docs.honeybadger.io/gem-informer
   - Track deployments (if you're using Capistrano, we already did this):
-    http://docs.honeybadger.io/gem-deploys
+    https://docs.honeybadger.io/gem-deploys
 
 If you ever need help:
 
