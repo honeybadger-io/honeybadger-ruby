@@ -212,7 +212,7 @@ MSG
           notices.each {|n| say("\n  - #{n.error_class}: #{n.error_message}", :red) }
         end
 
-        say("\nSee https://git.io/vXCYp for more troubleshooting help.\n\n", :red)
+        say("\nSee https://docs.honeybadger.io/gem-troubleshooting for more troubleshooting help.\n\n", :red)
         say("!! --- End -------------------------------------------------------------------- !!", :red)
 
         exit(1)
@@ -245,7 +245,7 @@ Optional steps:
 
 If you ever need help:
 
-  - Read the gem troubleshooting guide: https://git.io/vXCYp
+  - Read the gem troubleshooting guide: https://docs.honeybadger.io/gem-troubleshooting
   - Check out our documentation: http://docs.honeybadger.io/
   - Email the founders: support@honeybadger.io
 
