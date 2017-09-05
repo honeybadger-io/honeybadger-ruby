@@ -3,12 +3,22 @@ require 'honeybadger/backend/base'
 module Honeybadger
   module Backend
     class Null < Base
+      class StubbedResponse < Response
+        def initialize
+          super(:stubbed, '{}'.freeze)
+        end
+
+        def success?
+          true
+        end
+      end
+
       def initialize(*args)
         super
       end
 
       def notify(feature, payload)
-        Response.new(:stubbed, '{}')
+        StubbedResponse.new
       end
     end
   end
