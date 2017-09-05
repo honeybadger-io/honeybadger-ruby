@@ -162,7 +162,7 @@ module Honeybadger
         if calling = TestBackend.callings[:notices].find {|c| c[0].exception.eql?(TEST_EXCEPTION) }
           notice, response = *calling
 
-          if response.code != 201
+          if !response.success?
             host = Honeybadger.config.get(:'connection.host')
             say(<<-MSG, :red)
 !! --- Honeybadger test failed ------------------------------------------------ !!
