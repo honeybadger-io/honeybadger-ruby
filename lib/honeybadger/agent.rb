@@ -312,6 +312,33 @@ module Honeybadger
     # Returns nothing.
     def_delegator :config, :backtrace_filter
 
+    # Public: Callback to filter/transform local variables. Keys are also
+    #         filtered using the `request.filter_keys` config option.
+    #
+    # block - A block which can be used to modify the value of each local
+    #         variable. Requires two block arguments: Symbol name and Object
+    #         value. Returns the Object value (which is passed to our default
+    #         request sanitizer).
+    #
+    # Examples
+    #
+    #   # Exclude the value if the variable name is "password":
+    #   Honeybadger.local_variable_filter do |name, value|
+    #     if name == :password
+    #       nil
+    #     else
+    #       value
+    #     end
+    #   end
+    #
+    #   # Use `#inspect` rather than the default `#to_s`:
+    #   Honeybadger.local_variable_filter do |_, value|
+    #     value.inspect
+    #   end
+    #
+    # Returns nothing.
+    def_delegator :config, :local_variable_filter
+
     # Public: Sets the Rack environment which is used to report request data
     # with errors.
     #

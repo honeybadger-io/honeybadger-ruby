@@ -10,7 +10,7 @@ module Honeybadger
 
   def_delegators :'Honeybadger::Agent.instance', :init!, :config, :configure,
     :context, :get_context, :flush, :stop, :with_rack_env, :exception_filter,
-    :exception_fingerprint, :backtrace_filter
+    :exception_fingerprint, :backtrace_filter, :local_variable_filter
 
   def notify(exception_or_opts, opts = {})
     Agent.instance.notify(exception_or_opts, opts)

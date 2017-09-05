@@ -387,10 +387,10 @@ module Honeybadger
 
       vars = binding.eval('local_variables')
       results =
-        vars.inject([]) { |acc, arg|
+        vars.inject([]) { |acc, var|
           begin
-            result = binding.eval(arg.to_s)
-            acc << [arg, result]
+            result = filter_local_variable(var, binding.eval(var.to_s))
+            acc << [var, result]
           rescue NameError
             # Do Nothing
           end
@@ -400,6 +400,11 @@ module Honeybadger
 
       result_hash = Hash[results]
       request_sanitizer.sanitize(result_hash)
+    end
+
+    def filter_local_variable(name, value)
+      return value unless config.local_variable_filter
+      config.local_variable_filter.call(name, value)
     end
 
     # Internal: Should local variables be sent?

@@ -11,6 +11,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Context can now be added to any exception object by defining the
   `#honeybadger_context` method. The method should have no arguments and return
   a `Hash` of context data.
+- The values of local variables can now be filtered/transformed using a new
+  `Honeybadger.local_variable_filter` callback.
 
 ### Fixed
 - We no longer use "/dev/null" as the default log device as it doesn't exist on
