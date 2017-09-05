@@ -1,2 +1,3 @@
 ---
-BUNDLE_WITHOUT: development
+BUNDLE_WITHOUT: "development"
+BUNDLE_RETRY: "1"
