@@ -34,6 +34,11 @@ describe Honeybadger do
     Honeybadger.exception_fingerprint {}
   end
 
+  it "delegates ::local_variable_filter to agent config" do
+    expect(Honeybadger.config).to receive(:local_variable_filter)
+    Honeybadger.local_variable_filter {}
+  end
+
   it "delegates ::flush to agent instance" do
     expect(Honeybadger::Agent.instance).to receive(:flush)
     Honeybadger.flush

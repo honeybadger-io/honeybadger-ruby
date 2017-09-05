@@ -100,4 +100,14 @@ describe Honeybadger::Config::Ruby do
       })
     end
   end
+
+  describe "#local_variable_filter" do
+    it "assigns the local_variable_filter" do
+      block = ->{}
+      subject.local_variable_filter(&block)
+      expect(subject.to_hash).to eq({
+        local_variable_filter: block
+      })
+    end
+  end
 end

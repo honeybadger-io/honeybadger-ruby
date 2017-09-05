@@ -94,6 +94,11 @@ module Honeybadger
       self[:exception_fingerprint]
     end
 
+    def local_variable_filter
+      self[:local_variable_filter] = Proc.new if block_given?
+      self[:local_variable_filter]
+    end
+
     def get(key)
       IVARS.each do |var|
         source = instance_variable_get(var)

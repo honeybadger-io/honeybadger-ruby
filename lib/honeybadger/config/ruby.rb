@@ -95,6 +95,11 @@ module Honeybadger
         hash[:exception_fingerprint] = Proc.new if block_given?
         get(:exception_fingerprint)
       end
+
+      def local_variable_filter
+        hash[:local_variable_filter] = Proc.new if block_given?
+        get(:local_variable_filter)
+      end
     end
   end
 end
