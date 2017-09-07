@@ -1,6 +1,8 @@
 require 'bigdecimal'
 require 'set'
 
+require 'honeybadger/conversions'
+
 module Honeybadger
   module Util
     # Internal: Sanitizer sanitizes data for sending to Honeybadger's API. The
@@ -12,13 +14,16 @@ module Honeybadger
 
       ENCODE_OPTS = { invalid: :replace, undef: :replace, replace: '?'.freeze }.freeze
 
+      BASIC_OBJECT = '#<BasicObject>'.freeze
+      DEPTH = '[DEPTH]'.freeze
       FILTERED = '[FILTERED]'.freeze
+      RAISED = '[RAISED]'.freeze
+      RECURSION = '[RECURSION]'.freeze
+      TRUNCATED = '[TRUNCATED]'.freeze
 
       IMMUTABLE = [NilClass, FalseClass, TrueClass, Symbol, Numeric, BigDecimal, Method].freeze
 
       MAX_STRING_SIZE = 65536
-
-      TRUNCATION_REPLACEMENT = '[TRUNCATED]'.freeze
 
       VALID_ENCODINGS = [Encoding::UTF_8, Encoding::ISO_8859_1].freeze
 
@@ -52,36 +57,47 @@ module Honeybadger
       end
 
       def sanitize(data, depth = 0, stack = nil, parents = [])
-        if enumerable?(data)
-          return '[possible infinite recursion halted]'.freeze if stack && stack.include?(data.object_id)
+        return BASIC_OBJECT if basic_object?(data)
+
+        if recursive?(data)
+          return RECURSION if stack && stack.include?(data.object_id)
+
           stack = stack ? stack.dup : Set.new
           stack << data.object_id
         end
 
         case data
         when Hash
-          return '[max depth reached]'.freeze if depth >= max_depth
+          return DEPTH if depth >= max_depth
+
           hash = data.to_hash
           new_hash = {}
+
           hash.each_pair do |key, value|
             parents.push(key) if deep_regexps
             key = key.kind_of?(Symbol) ? key : sanitize(key, depth+1, stack, parents)
+
             if filter_key?(key, parents)
               new_hash[key] = FILTERED
             else
               value = sanitize(value, depth+1, stack, parents)
-              if blocks.any? && !enumerable?(value)
+
+              if blocks.any? && !recursive?(value)
                 key = key.dup if can_dup?(key)
                 value = value.dup if can_dup?(value)
                 blocks.each { |b| b.call(key, value) }
               end
+
               new_hash[key] = value
             end
+
             parents.pop if deep_regexps
           end
+
           new_hash
         when Array, Set
-          return '[max depth reached]'.freeze if depth >= max_depth
+          return DEPTH if depth >= max_depth
+
           data.to_a.map do |value|
             sanitize(value, depth+1, stack, parents)
           end
@@ -89,15 +105,27 @@ module Honeybadger
           data
         when String
           sanitize_string(data)
-        else # all other objects:
-          data.respond_to?(:to_s) ? sanitize_string(data.to_s) : nil
-        end
-      end
+        when -> (d) { d.respond_to?(:to_honeybadger) }
+          begin
+            data = data.to_honeybadger
+          rescue
+            return RAISED
+          end
 
-      def sanitize_string(string)
-        string = valid_encoding(string.to_s)
-        return string unless string.respond_to?(:size) && string.size > MAX_STRING_SIZE
-        string[0...MAX_STRING_SIZE] + TRUNCATION_REPLACEMENT
+          sanitize(data, depth+1, stack, parents)
+        else # all other objects
+          klass = data.class
+
+          begin
+            data = String(data)
+          rescue
+            return RAISED
+          end
+
+          return "#<#{klass.name}>" if inspected?(data)
+
+          sanitize_string(data)
+        end
       end
 
       def filter_cookies(raw_cookies)
@@ -142,6 +170,12 @@ module Honeybadger
         false
       end
 
+      def sanitize_string(string)
+        string = valid_encoding(string)
+        return string unless string.respond_to?(:size) && string.size > MAX_STRING_SIZE
+        string[0...MAX_STRING_SIZE] + TRUNCATED
+      end
+
       def valid_encoding?(string)
         string.valid_encoding? && (
           VALID_ENCODINGS.include?(string.encoding) ||
@@ -154,12 +188,24 @@ module Honeybadger
         string.encode(Encoding::UTF_8, ENCODE_OPTS)
       end
 
-      def enumerable?(data)
-        data.kind_of?(Hash) || data.kind_of?(Array) || data.kind_of?(Set)
+      def recursive?(data)
+        data.is_a?(Hash) || data.is_a?(Array) || data.is_a?(Set) || data.respond_to?(:to_honeybadger)
+      end
+
+      def basic_object?(object)
+        object.respond_to?(:to_s)
+        false
+      rescue
+        # BasicObject doesn't respond to `#respond_to?`.
+        true
       end
 
       def can_dup?(obj)
         !IMMUTABLE.any? {|k| obj.kind_of?(k) }
+      end
+
+      def inspected?(string)
+        String(string) =~ /#<.*>/
       end
     end
   end

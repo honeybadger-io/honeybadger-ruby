@@ -2,9 +2,9 @@ module Honeybadger
   module Conversions
     module_function
 
-    # Internal: Coerce context into a Hash.
+    # Internal: Convert context into a Hash.
     #
-    # context - The context object.
+    # object - The context object.
     #
     # Returns the Hash context.
     def Context(object)
