@@ -1,5 +1,8 @@
+require 'honeybadger/conversions'
+
 module Honeybadger
   class ContextManager
+    include Conversions
 
     def self.current
       Thread.current[:__hb_context_manager] ||= new
@@ -19,7 +22,7 @@ module Honeybadger
     def set_context(hash)
       @mutex.synchronize do
         @context ||= {}
-        @context.update(hash)
+        @context.update(Context(hash))
       end
     end
 

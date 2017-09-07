@@ -4,6 +4,7 @@ require 'forwardable'
 
 require 'honeybadger/version'
 require 'honeybadger/backtrace'
+require 'honeybadger/conversions'
 require 'honeybadger/util/stats'
 require 'honeybadger/util/sanitizer'
 require 'honeybadger/util/request_hash'
@@ -36,6 +37,8 @@ module Honeybadger
 
   class Notice
     extend Forwardable
+
+    include Conversions
 
     # Internal: The String character used to split tag strings.
     TAG_SEPERATOR = ','.freeze
@@ -322,15 +325,15 @@ module Honeybadger
     end
 
     def exception_context(exception)
-      return {}.freeze unless exception && exception.respond_to?(:honeybadger_context)
-      exception.honeybadger_context
+      return {}.freeze unless exception.respond_to?(:to_honeybadger_context)
+      exception.to_honeybadger_context
     end
 
     def construct_context_hash(opts, exception)
       context = {}
-      context.merge!(opts[:global_context]) if opts[:global_context]
-      context.merge!(exception_context(exception))
-      context.merge!(opts[:context]) if opts[:context]
+      context.merge!(Context(opts[:global_context]))
+      context.merge!(Context(exception_context(exception)))
+      context.merge!(Context(opts[:context]))
       context.empty? ? nil : context
     end
 

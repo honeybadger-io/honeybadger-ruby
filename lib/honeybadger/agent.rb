@@ -145,14 +145,16 @@ module Honeybadger
 
     # Public: Save global context for the current request.
     #
-    # hash - A Hash of data which will be sent to Honeybadger when an error
-    #        occurs; can include any key/value, but a few keys have a special meaning
-    #        in Honeybadger (default: nil):
-    #        :user_id    - The String user ID used by Honeybadger to aggregate
-    #                      user data across occurrences on the error page (optional).
-    #        :user_email - The String user email address (optional).
-    #        :tags       - The String comma-separated list of tags. When present,
-    #                      tags will be applied to errors with this context (optional).
+    # context - A Hash of data which will be sent to Honeybadger when an error
+    #           occurs. If the object responds to #to_honeybadger_context, the return
+    #           value of that method will be used (explicit conversion). Can
+    #           include any key/value, but a few keys have a special meaning in
+    #           Honeybadger (default: nil):
+    #           :user_id    - The String user ID used by Honeybadger to aggregate
+    #                         user data across occurrences on the error page (optional).
+    #           :user_email - The String user email address (optional).
+    #           :tags       - The String comma-separated list of tags. When present,
+    #                         tags will be applied to errors with this context (optional).
     #
     # Examples
     #
@@ -163,12 +165,22 @@ module Honeybadger
     #     Honeybadger.context({user_id: current_user.id})
     #   end
     #
+    #   # Explicit conversion
+    #   class User < ActiveRecord::Base
+    #     def to_honeybadger_context
+    #       { user_id: id, user_email: email }
+    #     end
+    #   end
+    #
+    #   user = User.first
+    #   Honeybadger.context(user)
+    #
     #   # Clearing global context:
     #   Honeybadger.context.clear!
     #
     # Returns self so that method calls can be chained.
-    def context(hash = nil)
-      context_manager.set_context(hash) unless hash.nil?
+    def context(context = nil)
+      context_manager.set_context(context) unless context.nil?
       self
     end
 

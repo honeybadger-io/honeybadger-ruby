@@ -292,7 +292,7 @@ describe Honeybadger::Notice do
 
     it "merges exception context" do
       exception = Class.new(RuntimeError) do
-        def honeybadger_context
+        def to_honeybadger_context
           { exception: 'exception' }
         end
       end
@@ -309,7 +309,7 @@ describe Honeybadger::Notice do
     it "merges context in order of precedence: local, exception, global" do
       global_context = { global: 'global', local_override: 'global', exception_override: 'global' }
       exception = Class.new(RuntimeError) do
-        def honeybadger_context
+        def to_honeybadger_context
           { exception: 'exception', local_override: 'exception', exception_override: 'exception' }
         end
       end

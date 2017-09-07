@@ -8,9 +8,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 - The exception cause may now be set using an optional `:cause` option when
   calling `Honeybadger.notify`. If not present, the exception's cause will be
   used, or the global `$!` exception if available.
-- Context can now be added to any exception object by defining the
-  `#honeybadger_context` method. The method should have no arguments and return
-  a `Hash` of context data.
+- Any object can now act as context using the `#to_honeybadger_context` method.
+  The method should have no arguments and return a `Hash` of context data.
+  Context from exceptions which define this method will automatically be
+  included in error reports.
 
 ### Fixed
 - We no longer use "/dev/null" as the default log device as it doesn't exist on
