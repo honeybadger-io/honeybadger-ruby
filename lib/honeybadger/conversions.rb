@@ -7,9 +7,9 @@ module Honeybadger
     # context - The context object.
     #
     # Returns the Hash context.
-    def Context(context)
-      context = exception.to_honeybadger_context if context.respond_to?(:to_honeybadger_context)
-      Hash(context)
+    def Context(object)
+      object = object.to_honeybadger_context if object.respond_to?(:to_honeybadger_context)
+      Hash(object)
     end
   end
 end
