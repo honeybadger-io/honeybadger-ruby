@@ -5,20 +5,9 @@ require 'honeybadger/util/sanitizer'
 describe Honeybadger::Util::Sanitizer do
   its(:max_depth) { should eq 20 }
 
-  describe "::sanitize_string" do
-    it "converts to string before sanitizing" do
-      expect(subject.sanitize_string(nil)).to eq('')
-    end
-
-    it "returns the String argument when already valid" do
-      foo = "foo"
-      expect(subject.sanitize_string(foo)).to be(foo)
-    end
-  end
-
   describe "#sanitize" do
     let(:deep_hash) { {}.tap {|h| 30.times.each {|i| h = h[i.to_s] = {:string => 'string'} }} }
-    let(:expected_hash) { {}.tap {|h| max_depth.times.each {|i| h = h[i.to_s] = (i < max_depth-1 ? {:string => 'string'} : '[max depth reached]') }} }
+    let(:expected_hash) { {}.tap {|h| max_depth.times.each {|i| h = h[i.to_s] = (i < max_depth-1 ? {:string => 'string'} : '[DEPTH]') }} }
     let(:sanitized_hash) { described_class.new(max_depth: max_depth).sanitize(deep_hash) }
     let(:max_depth) { 10 }
 
@@ -30,7 +19,7 @@ describe Honeybadger::Util::Sanitizer do
       hash = {:a => :a}
       hash[:hash] = hash
       payload = described_class.new.sanitize(request: {params: hash})
-      expect(payload[:request][:params][:hash]).to eq "[possible infinite recursion halted]"
+      expect(payload[:request][:params][:hash]).to eq "[RECURSION]"
     end
 
     it "converts unserializable objects to strings" do
@@ -38,6 +27,38 @@ describe Honeybadger::Util::Sanitizer do
       assert_serializes(:request, :cgi_data)
       assert_serializes(:request, :session_data)
       assert_serializes(:request, :local_variables)
+    end
+
+    it "converts string-like objects to strings" do
+      object = double(to_s: 'expected value')
+      expect(described_class.new.sanitize(object)).to eq('expected value')
+    end
+
+    it "indicates raised when the object can't be converted to string" do
+      object = double
+      allow(object).to receive(:to_s).and_raise("error while converting to string")
+      expect(described_class.new.sanitize(object)).to eq('[RAISED]')
+    end
+
+    it "identifies basic objects which would otherwise cause errors" do
+      expect(described_class.new.sanitize(BasicObject.new)).to eq('#<BasicObject>')
+    end
+
+    it "converts objects with #to_honeybadger before sanitizing" do
+      object = double(to_honeybadger: { string: double(to_honeybadger: 'expected value') })
+      expect(described_class.new.sanitize(object)).to eq({ string: 'expected value' })
+    end
+
+    it "indicates raised when #to_honeybadger raises an exception" do
+      object = double
+      allow(object).to receive(:to_honeybadger).and_raise("error in #to_honeybadger")
+      expect(described_class.new.sanitize(object)).to eq('[RAISED]')
+    end
+
+    it "halts infinite recursion of #to_honeybadger" do
+      object = double
+      allow(object).to receive(:to_honeybadger).and_return(object)
+      expect(described_class.new.sanitize(object)).to eq('[RECURSION]')
     end
 
     it "ensures #to_hash is called on objects that support it" do
@@ -56,6 +77,16 @@ describe Honeybadger::Util::Sanitizer do
     it "includes nils in arrays" do
       ary = [1, nil, 2, nil]
       expect(described_class.new.sanitize(ary)).to eq(ary)
+    end
+
+    it "sanitizes objects which return #inspect output from #to_s" do
+      object = double(to_s: '#<RSpec::Mocks::Double secret: "shhhh">')
+      expect(described_class.new.sanitize(object)).to eq('#<RSpec::Mocks::Double>')
+    end
+
+    it "doesn't sanitize #inspect output when passed explicitly as a String" do
+      object = '#<RSpec::Mocks::Double secret: "shhhh">'
+      expect(described_class.new.sanitize(object)).to eq(object)
     end
 
     context "with bad encodings" do
@@ -183,11 +214,11 @@ describe Honeybadger::Util::Sanitizer do
       first_key = keys.shift
       hash = keys.reduce(payload[first_key]) {|a,k| a[k] }
 
-      expect(hash[:strange_object]).to eq object.to_s # objects should be serialized
+      expect(hash[:strange_object]).to eq "#<#{object.class.name}>" # objects should be serialized
       expect(hash[:sub_hash]).to be_a Hash # subhashes should be kept
-      expect(hash[:sub_hash][:sub_object]).to eq object.to_s # subhash members should be serialized
+      expect(hash[:sub_hash][:sub_object]).to eq "#<#{object.class.name}>" # subhash members should be serialized
       expect(hash[:array]).to be_a Array # arrays should be kept
-      expect(hash[:array].first).to eq object.to_s # array members should be serialized
+      expect(hash[:array].first).to eq "#<#{object.class.name}>" # array members should be serialized
     end
   end
 end

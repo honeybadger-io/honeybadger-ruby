@@ -660,8 +660,9 @@ describe Honeybadger::Notice do
   describe "#local_variables", order: :defined do
     let(:notice) { build_notice(exception: exception, config: config) }
     let(:mock_binding) { @mock_binding }
+    let(:value) { double() }
     let(:exception) do
-      foo = 'bar'
+      foo = value
       begin
         @mock_binding = binding
         fail 'oops'
@@ -711,7 +712,14 @@ describe Honeybadger::Notice do
         let(:config) { build_config(:'exceptions.local_variables' => true) }
 
         it "finds the local variables from first frame of trace" do
-          expect(notice.local_variables[:foo]).to eq 'bar'
+          expect(notice.local_variables[:foo]).to eq(String(value))
+        end
+
+        context "when value responds to #to_honeybadger" do
+          it "returns the #to_honeybadger value" do
+            allow(value).to receive(:to_honeybadger).and_return('baz')
+            expect(notice.local_variables[:foo]).to eq('baz')
+          end
         end
 
         context "with an application trace" do
@@ -721,7 +729,7 @@ describe Honeybadger::Notice do
           end
 
           it "finds the local variables from first frame of application trace" do
-            expect(notice.local_variables[:foo]).to eq 'bar'
+            expect(notice.local_variables[:foo]).to eq(String(value))
           end
 
           it "filters local variable keys" do
