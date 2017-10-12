@@ -12,12 +12,26 @@ adheres to [Semantic Versioning](http://semver.org/).
   The method should have no arguments and return a `Hash` of context data.
   Context from exceptions which define this method will automatically be
   included in error reports.
+- Final object representations in Honeybadger (normally the value of `#to_s`
+  for unknown types) can be changed by defining the `#to_honeybadger` method. If
+  the method is defined, the return value of that method will be sent to Honeybadger
+  instead of the `#to_s` value (for context values, local variables, etc.).
+- `BasicObject`, which previously could not be serialized, is now serialized as
+  `"#<BasicObject>"`.
+- Objects which explicitly alias `#to_s` to `#inspect` (such as `OpenStruct`) are
+  now sanitized. `'#<OpenStruct attribute="value">'` becomes `'#<OpenStruct>'`.
+  If you pass the value of `#inspect` (as a `String`) directly to Honeybadger (or
+  return it from `#to_honeybadger`), the value will not be sanitized.
+- We're now using `String(object)` instead of `object.to_s` as the last resort
+  during sanitization.
+- `'[RAISED]'` is returned when `object.to_honeybadger` or `String(object)` fails.
 
 ### Fixed
 - We no longer use "/dev/null" as the default log device as it doesn't exist on
   Windows.
 - Logs when reporting errors in development mode now mention that the error wasn't
   *actually* reported. :)
+- Support new Sidekiq job params key.
 
 ## [3.1.2] - 2017-04-20
 ### Fixed
