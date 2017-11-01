@@ -32,6 +32,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Logs when reporting errors in development mode now mention that the error wasn't
   *actually* reported. :)
 - Support new Sidekiq job params key.
+- Move at_exit callback to an appropriate place for sinatra apps, so that it does
+  not prematurely stop honeybadger workers.
 
 ## [3.1.2] - 2017-04-20
 ### Fixed

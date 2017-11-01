@@ -9,6 +9,7 @@ module Honeybadger
           def build_with_honeybadger(*args, &block)
             configure_honeybadger
             install_honeybadger
+            Honeybadger.install_at_exit_callback
             build_without_honeybadger(*args, &block)
           end
           alias :build_without_honeybadger :build
@@ -31,6 +32,7 @@ module Honeybadger
             return if middleware.any? {|m| m[0] == klass }
             use(klass)
           end
+
         end
       end
     end
