@@ -10,9 +10,9 @@ if defined?(Rake.application)
   require 'honeybadger/init/rake'
 end
 
-at_exit do
-  if $! && !$!.is_a?(SystemExit) && Honeybadger.config[:'exceptions.notify_at_exit']
-    Honeybadger.notify($!, component: 'at_exit', sync: true)
-  end
-  Honeybadger.stop if Honeybadger.config[:'send_data_at_exit']
+# Sinatra is a special case. Sinatra starts the web application in an at_exit
+# handler. And, since we require sinatra before requiring HB, the only way to
+# setup our at_exit callback is in the sinatra build callback honeybadger/init/sinatra.rb
+if !defined?(Sinatra::Base)
+  Honeybadger.install_at_exit_callback
 end

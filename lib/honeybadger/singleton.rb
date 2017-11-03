@@ -23,6 +23,16 @@ module Honeybadger
     Plugin.load!(self.config)
   end
 
+  def install_at_exit_callback
+    at_exit do
+      if $! && !$!.is_a?(SystemExit) && Honeybadger.config[:'exceptions.notify_at_exit']
+        Honeybadger.notify($!, component: 'at_exit', sync: true)
+      end
+
+      Honeybadger.stop if Honeybadger.config[:'send_data_at_exit']
+    end
+  end
+
   # Deprecated
   def start(config = {})
     raise NoMethodError, <<-WARNING
