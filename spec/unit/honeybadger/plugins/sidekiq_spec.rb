@@ -23,7 +23,7 @@ describe "Sidekiq Dependency" do
     end
 
     let(:sidekiq_config) { double('config', :error_handlers => []) }
-    let(:chain) { double('chain', :add => true) }
+    let(:chain) { double('chain', :prepend => true) }
 
     before do
       Object.const_set(:Sidekiq, shim)
@@ -39,7 +39,7 @@ describe "Sidekiq Dependency" do
       end
 
       it "adds the server middleware" do
-        expect(chain).to receive(:add).with(Honeybadger::Plugins::Sidekiq::Middleware)
+        expect(chain).to receive(:prepend).with(Honeybadger::Plugins::Sidekiq::Middleware)
         Honeybadger::Plugin.instances[:sidekiq].load!(config)
       end
 
