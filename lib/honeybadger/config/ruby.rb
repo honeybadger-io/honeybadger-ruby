@@ -86,6 +86,16 @@ module Honeybadger
         get(:backtrace_filter)
       end
 
+      def before_notify(action = nil, &block)
+        (hash[:before_notify] ||= []).tap do |before_notify_hooks|
+          if action && validate_before_action(action)
+            before_notify_hooks << action
+          elsif block_given? && validate_before_action(block)
+            before_notify_hooks << block
+          end
+        end
+      end
+
       def exception_filter
         hash[:exception_filter] = Proc.new if block_given?
         get(:exception_filter)
@@ -94,6 +104,28 @@ module Honeybadger
       def exception_fingerprint
         hash[:exception_fingerprint] = Proc.new if block_given?
         get(:exception_fingerprint)
+      end
+
+      private
+
+      def validate_before_action(action)
+        if !action.respond_to?(:call)
+          logger.warn(
+            'You attempted to add a before notify hook that does not respond ' \
+            'to #call. We are discarding this hook so your intended behavior ' \
+            'will not occur.'
+          )
+          false
+        elsif action.arity != 1
+          logger.warn(
+            'You attempted to add a before notify hook that has an arity ' \
+            'other than one. We are discarding this hook so your intended ' \
+            'behavior will not occur.'
+          )
+          false
+        else
+          true
+        end
       end
     end
   end
