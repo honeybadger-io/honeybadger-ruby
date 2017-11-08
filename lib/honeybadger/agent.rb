@@ -127,6 +127,10 @@ module Honeybadger
 
       notice = Notice.new(config, opts)
 
+      config.before_notify_hooks.each do |hook|
+        with_error_handling { hook.call(notice) }
+      end
+
       unless notice.api_key =~ NOT_BLANK
         error { sprintf('Unable to send error report: API key is missing. id=%s', notice.id) }
         return false
@@ -379,6 +383,12 @@ module Honeybadger
 
     def init_worker
       @worker = Worker.new(config)
+    end
+
+    def with_error_handling
+      yield
+    rescue => ex
+      error { "Rescued an error in a before notify hook: #{ex.message}" }
     end
 
     @instance = new(Config.new)

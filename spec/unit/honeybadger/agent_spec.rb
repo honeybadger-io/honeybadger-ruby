@@ -56,6 +56,30 @@ describe Honeybadger::Agent do
 
       instance.notify(error_message: 'testing backtrace generation')
     end
+
+    it "calls all of the before notify hooks before sending" do
+      hooks = [spy("hook one", arity: 1), spy("hook two", arity: 1), spy("hook three", arity: 1)]
+      instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
+      instance.configure do |config|
+        hooks.each { |hook| config.before_notify(hook) }
+      end
+
+      instance.notify(error_message: "testing before notify hooks")
+
+      hooks.each do |hook|
+        expect(hook).to have_received(:call).with(instance_of(Honeybadger::Notice))
+      end
+    end
+
+    it "continues processing even if a before notify hook throws an error" do
+      hook = ->(notice) { raise ArgumentError, "this was incorrect" }
+      instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
+      instance.configure do |config|
+        config.before_notify(hook)
+      end
+
+      expect { instance.notify(error_message: "testing error-raising before notify hook") }.not_to raise_error
+    end
   end
 
   context do
