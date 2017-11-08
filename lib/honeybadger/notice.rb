@@ -107,8 +107,8 @@ module Honeybadger
     # Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
-    # The API key used to deliver this notice.
-    attr_reader :api_key
+    # Public: The API key used to deliver this notice.
+    attr_accessor :api_key
 
     # @api private
     # Cache project path substitutions for backtrace lines.
