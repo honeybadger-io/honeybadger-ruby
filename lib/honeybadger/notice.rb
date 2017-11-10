@@ -324,15 +324,22 @@ module Honeybadger
       Util::RequestPayload.build(request)
     end
 
+    # Internal: Get optional context from exception.
+    #
+    # Returns the Hash context.
     def exception_context(exception)
-      return {}.freeze unless exception.respond_to?(:to_honeybadger_context)
-      exception.to_honeybadger_context
+      # This extra check exists because the exception itself is not expected to
+      # convert to a hash.
+      object = exception if exception.respond_to?(:to_honeybadger_context)
+      object ||= {}.freeze
+
+      Context(object)
     end
 
     def construct_context_hash(opts, exception)
       context = {}
       context.merge!(Context(opts[:global_context]))
-      context.merge!(Context(exception_context(exception)))
+      context.merge!(exception_context(exception))
       context.merge!(Context(opts[:context]))
       context.empty? ? nil : context
     end
