@@ -106,6 +106,8 @@ module Honeybadger
         when String
           sanitize_string(data)
         when -> (d) { d.respond_to?(:to_honeybadger) }
+          return DEPTH if depth >= max_depth
+
           begin
             data = data.to_honeybadger
           rescue

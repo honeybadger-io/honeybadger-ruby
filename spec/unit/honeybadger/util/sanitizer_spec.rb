@@ -61,6 +61,16 @@ describe Honeybadger::Util::Sanitizer do
       expect(described_class.new.sanitize(object)).to eq('[RECURSION]')
     end
 
+    it "halts infinite recursion of different objects responding to #to_honeybadger" do
+      to_honeybadger = -> {
+        object = double
+        allow(object).to receive(:to_honeybadger, &to_honeybadger)
+        object
+      }
+      object = to_honeybadger.call
+      expect(described_class.new.sanitize(object)).to eq('[DEPTH]')
+    end
+
     it "ensures #to_hash is called on objects that support it" do
       expect { described_class.new.sanitize(:session => { :object => double(:to_hash => {}) }) }.not_to raise_error
     end
