@@ -5,7 +5,7 @@ language: ruby
 cache: bundler
 before_install:
   - unset _JAVA_OPTIONS
-  - gem install bundler
+  - gem install bundler minitest
 sudo: false
 gemfile:
   - gemfiles/standalone.gemfile
