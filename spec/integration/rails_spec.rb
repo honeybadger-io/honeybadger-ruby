@@ -40,6 +40,16 @@ if RAILS_PRESENT
       expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
     end
 
+    it "reports exceptions with correct controller and action" do
+      Honeybadger.flush do
+        get '/runtime_error'
+        expect(response.status).to eq(500)
+      end
+
+      expect(Honeybadger::Backend::Test.notifications[:notices].first.controller).to eq('rails')
+      expect(Honeybadger::Backend::Test.notifications[:notices].first.action).to eq('runtime_error')
+    end
+
     it "sets the root from the Rails root" do
       expect(Honeybadger.config.get(:root)).to eq(Rails.root.to_s)
     end
