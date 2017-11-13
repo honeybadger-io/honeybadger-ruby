@@ -16,6 +16,10 @@ module Honeybadger
     Agent.instance.notify(exception_or_opts, opts)
   end
 
+  def check_in(id)
+    Agent.instance.check_in(id)
+  end
+
   def load_plugins!
     Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
       require plugin

@@ -25,6 +25,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - We're now using `String(object)` instead of `object.to_s` as the last resort
   during sanitization.
 - `'[RAISED]'` is returned when `object.to_honeybadger` or `String(object)` fails.
+- Added `Honeybadger.check_in` function which allows performing a check in using
+  and id or a url.
 
 ### Fixed
 - We no longer use "/dev/null" as the default log device as it doesn't exist on

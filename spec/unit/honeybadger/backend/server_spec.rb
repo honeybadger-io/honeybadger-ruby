@@ -10,6 +10,14 @@ describe Honeybadger::Backend::Server do
   subject { described_class.new(config) }
 
   it { should respond_to :notify }
+  it { should respond_to :check_in }
+
+  describe "#check_in" do
+    it "returns a response" do
+      stub_http
+      expect(subject.check_in('foobar')).to be_a Honeybadger::Backend::Response
+    end
+  end
 
   describe "#notify" do
     it "returns the response" do
@@ -71,5 +79,6 @@ describe Honeybadger::Backend::Server do
     def notify_backend
       subject.notify(:notices, payload)
     end
+
   end
 end

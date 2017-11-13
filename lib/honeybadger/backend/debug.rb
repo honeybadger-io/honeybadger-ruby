@@ -11,6 +11,12 @@ module Honeybadger
         return Response.new(ENV['DEBUG_BACKEND_STATUS'].to_i, nil) if ENV['DEBUG_BACKEND_STATUS']
         super
       end
+
+      def check_in(id)
+        logger.unknown("checking in debug backend with id=#{id}")
+        return Response.new(ENV['DEBUG_BACKEND_STATUS'].to_i, nil) if ENV['DEBUG_BACKEND_STATUS']
+        super
+      end
     end
   end
 end

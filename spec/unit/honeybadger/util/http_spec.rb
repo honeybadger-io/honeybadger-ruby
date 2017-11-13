@@ -10,6 +10,7 @@ describe Honeybadger::Util::HTTP do
   subject { described_class.new(config) }
 
   it { should respond_to :post }
+  it { should respond_to :get }
 
   it "sends a user agent with version number" do
     http  = stub_http
@@ -28,6 +29,17 @@ describe Honeybadger::Util::HTTP do
       })
     }
 
+    it "gets from Honeybadger when using an HTTP proxy" do
+      http  = stub_http
+      proxy = double(new: http)
+      allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
+
+      expect(http).to receive(:get).with('/v1/foo')
+      expect(Net::HTTP).to receive(:Proxy).with('some.host', 88, 'login', 'passwd')
+
+      http_get
+    end
+
     it "posts to Honeybadger when using an HTTP proxy" do
       http  = stub_http
       proxy = double(new: http)
@@ -45,6 +57,11 @@ describe Honeybadger::Util::HTTP do
     expect(http_post).to be_a Net::HTTPResponse
   end
 
+  it "returns the response for #get" do
+    stub_http
+    expect(http_get).to be_a Net::HTTPResponse
+  end
+
   context "success response from server" do
     let(:sender) { build_sender }
 
@@ -56,11 +73,28 @@ describe Honeybadger::Util::HTTP do
     end
   end
 
+  context "success response from server on #get" do
+    before { stub_http }
+
+    it "logs success" do
+      expect(logger).to receive(:debug).with(/code=200/)
+      http_get
+    end
+  end
+
   context "non-success response from server" do
     it "logs failure" do
       stub_http(response: Net::HTTPClientError.new('1.2', '429', 'Too Many Requests'))
       expect(logger).to receive(:debug).with(/code=429/)
       http_post
+    end
+  end
+
+  context "non-success response from server on #get" do
+    it "logs failure" do
+      stub_http(response: Net::HTTPClientError.new('1.2', '429', 'Too Many Requests'))
+      expect(logger).to receive(:debug).with(/code=429/)
+      http_get
     end
   end
 
@@ -79,6 +113,7 @@ describe Honeybadger::Util::HTTP do
         allow(proxy).to receive(:new).and_raise(NoMemoryError)
         allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
         expect { http_post }.to raise_error(NoMemoryError)
+        expect { http_get }.to raise_error(NoMemoryError)
       end
     end
 
@@ -207,5 +242,9 @@ describe Honeybadger::Util::HTTP do
 
   def http_post
     subject.post('/v1/foo', double('Notice', to_json: '{}'))
+  end
+
+  def http_get
+    subject.get('/v1/foo')
   end
 end

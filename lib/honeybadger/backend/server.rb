@@ -14,6 +14,9 @@ module Honeybadger
         deploys: '/v1/deploys'.freeze
       }.freeze
 
+      CHECK_IN_ENDPOINT = '/v1/check_in'.freeze
+
+
       HTTP_ERRORS = Util::HTTP::ERRORS
 
       def initialize(config)
@@ -30,6 +33,17 @@ module Honeybadger
       def notify(feature, payload)
         ENDPOINTS[feature] or raise(BackendError, "Unknown feature: #{feature}")
         Response.new(@http.post(ENDPOINTS[feature], payload, payload_headers(payload)))
+      rescue *HTTP_ERRORS => e
+        Response.new(:error, nil, "HTTP Error: #{e.class}")
+      end
+
+      # Internal: Does a check in using the input id.
+      #
+      # id - The unique check_in id.
+      #
+      # Returns Response.
+      def check_in(id)
+        Response.new(@http.get("#{CHECK_IN_ENDPOINT}/#{id}"))
       rescue *HTTP_ERRORS => e
         Response.new(:error, nil, "HTTP Error: #{e.class}")
       end
