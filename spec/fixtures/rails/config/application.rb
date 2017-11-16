@@ -25,7 +25,7 @@ class RailsApp < Rails::Application
   config.exceptions_app = routes
 
   routes.append do
-    get '/500', to: 'errors#display_error'
+    get '/500', to: 'rails#display_error'
     get '/runtime_error', :to => 'rails#runtime_error'
     get '/record_not_found', :to => 'rails#record_not_found'
     root to: 'rails#index'
