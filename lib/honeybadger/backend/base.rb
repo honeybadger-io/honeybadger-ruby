@@ -88,6 +88,15 @@ module Honeybadger
         raise NotImplementedError, 'must define #notify on subclass.'
       end
 
+      # Internal: Does a check in using the input id.
+      #
+      # id - The unique check_in id.
+      #
+      # Raises NotImplementedError.
+      def check_in(id)
+        raise NotImplementedError, 'must define #check_in on subclass.'
+      end
+
       private
 
       attr_reader :config

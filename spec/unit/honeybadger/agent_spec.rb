@@ -10,6 +10,41 @@ describe Honeybadger::Agent do
     its(:instance) { should be_a(Honeybadger::Agent) }
   end
 
+  describe "#check_in" do
+
+    it 'parses check_in id from a url' do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/1MqIo1").
+         to_return(status: 200)
+
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+
+      instance.check_in('https://api.honeybadger.io/v1/check_in/1MqIo1')
+    end
+
+    it 'returns true for successful check ins' do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/foobar").
+         to_return(status: 200)
+
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+
+      expect(instance.check_in('foobar')).to eq(true)
+      expect(instance.check_in('/foobar')).to eq(true)
+      expect(instance.check_in('/foobar/')).to eq(true)
+    end
+
+    it 'returns false for failed check ins' do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/danny").
+         to_return(status: 400)
+
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+
+      expect(instance.check_in('danny')).to eq(false)
+    end
+  end
+
   describe "#notify" do
     it "generates a backtrace" do
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)

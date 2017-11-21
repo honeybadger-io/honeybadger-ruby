@@ -20,6 +20,10 @@ module Honeybadger
       def notify(feature, payload)
         StubbedResponse.new
       end
+
+      def check_in(id)
+        StubbedResponse.new
+      end
     end
   end
 end

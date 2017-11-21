@@ -143,6 +143,23 @@ module Honeybadger
       notice.id
     end
 
+    # Public: Perform a synchronous check_in.
+    #
+    # id - The unique check in id (e.g. '1MqIo1') or the check in url.
+    #
+    # Examples
+    #
+    #   Honeybadger.check_in('1MqIo1')
+    #
+    # Returns a boolean which is true if the check in was successful and false
+    # otherwise.
+    def check_in(id)
+      # this is to allow check ins even if a url is passed
+      check_in_id = id.to_s.strip.gsub(/\/$/, '').split('/').last
+      response = backend.check_in(check_in_id)
+      response.success?
+    end
+
     # Public: Save global context for the current request.
     #
     # context - A Hash of data which will be sent to Honeybadger when an error
@@ -354,6 +371,9 @@ module Honeybadger
 
     # Internal
     def_delegators :config, :init!
+
+    # Internal
+    def_delegators :config, :backend
 
     private
 
