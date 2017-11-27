@@ -4,6 +4,14 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Objects which explicitly alias `#to_s` to `#inspect` (such as `OpenStruct`) are
+  now sanitized. `'#<OpenStruct attribute="value">'` becomes `'#<OpenStruct>'`.
+  If you pass the value of `#inspect` (as a `String`) directly to Honeybadger (or
+  return it from `#to_honeybadger`), the value will not be sanitized.
+- We're now using `String(object)` instead of `object.to_s` as the last resort
+  during sanitization.
+
 ### Added
 - The exception cause may now be set using an optional `:cause` option when
   calling `Honeybadger.notify`. If not present, the exception's cause will be
@@ -16,17 +24,8 @@ adheres to [Semantic Versioning](http://semver.org/).
   for unknown types) can be changed by defining the `#to_honeybadger` method. If
   the method is defined, the return value of that method will be sent to Honeybadger
   instead of the `#to_s` value (for context values, local variables, etc.).
-- `BasicObject`, which previously could not be serialized, is now serialized as
-  `"#<BasicObject>"`.
-- Objects which explicitly alias `#to_s` to `#inspect` (such as `OpenStruct`) are
-  now sanitized. `'#<OpenStruct attribute="value">'` becomes `'#<OpenStruct>'`.
-  If you pass the value of `#inspect` (as a `String`) directly to Honeybadger (or
-  return it from `#to_honeybadger`), the value will not be sanitized.
-- We're now using `String(object)` instead of `object.to_s` as the last resort
-  during sanitization.
 - `'[RAISED]'` is returned when `object.to_honeybadger` or `String(object)` fails.
-- Added `Honeybadger.check_in` function which allows performing a check in using
-  and id or a url.
+- Added `Honeybadger.check_in` method which allows performing check ins from ruby.
 
 ### Fixed
 - We no longer use "/dev/null" as the default log device as it doesn't exist on
@@ -36,6 +35,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Support new Sidekiq job params key.
 - Move at_exit callback to an appropriate place for sinatra apps, so that it does
   not prematurely stop honeybadger workers.
+- `BasicObject`, which previously could not be serialized, is now serialized as
+  `"#<BasicObject>"`.
 
 ## [3.1.2] - 2017-04-20
 ### Fixed
