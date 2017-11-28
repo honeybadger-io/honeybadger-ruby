@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.2.0] - 2017-11-27
 ### Changed
 - Objects which explicitly alias `#to_s` to `#inspect` (such as `OpenStruct`) are
   now sanitized. `'#<OpenStruct attribute="value">'` becomes `'#<OpenStruct>'`.
