@@ -108,7 +108,7 @@ module Honeybadger
       return false if config.disabled?
 
       if exception_or_opts.is_a?(Exception)
-        opts.merge!(exception: exception_or_opts)
+        opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
         opts.merge!(exception_or_opts.to_hash)
       else
