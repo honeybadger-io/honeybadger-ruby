@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Use a unique route name in rails to avoid name conflicts.
 
 ## [3.2.0] - 2017-11-27
 ### Changed
