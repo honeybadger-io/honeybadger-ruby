@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Use a unique route name in rails to avoid name conflicts.
+- Use prepend to add Sidekiq Middleware to fix context getting cleared.
 
 ## [3.2.0] - 2017-11-27
 ### Changed
