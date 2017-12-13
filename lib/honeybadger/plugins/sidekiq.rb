@@ -17,7 +17,7 @@ module Honeybadger
         execution do
           ::Sidekiq.configure_server do |sidekiq|
             sidekiq.server_middleware do |chain|
-              chain.add Middleware
+              chain.prepend Middleware
             end
           end
 
