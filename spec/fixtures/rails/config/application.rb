@@ -22,8 +22,10 @@ class RailsApp < Rails::Application
   config.cache_classes = true
   config.serve_static_files = false
   config.consider_all_requests_local = false
+  config.exceptions_app = routes
 
   routes.append do
+    get '/500', to: 'rails#display_error'
     get '/runtime_error', :to => 'rails#runtime_error'
     get '/record_not_found', :to => 'rails#record_not_found'
     root to: 'rails#index'
@@ -45,6 +47,10 @@ class RailsController < ApplicationController
 
   def index
     render plain: 'This is a test Rails app used by the honeybadger gem test suite.'
+  end
+
+  def display_error
+    render plain: 'This is an error page'
   end
 end
 
