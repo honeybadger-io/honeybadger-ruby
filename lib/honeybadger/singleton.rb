@@ -25,7 +25,6 @@ module Honeybadger
   #   @!method $2(...)
   #     Forwards to {$1}.
   #     @see Agent#$2
-  def_delegator :'Honeybadger::Agent.instance', :notify
   def_delegator :'Honeybadger::Agent.instance', :check_in
   def_delegator :'Honeybadger::Agent.instance', :context
   def_delegator :'Honeybadger::Agent.instance', :configure
@@ -44,6 +43,15 @@ module Honeybadger
   def_delegator :'Honeybadger::Agent.instance', :config
   def_delegator :'Honeybadger::Agent.instance', :init!
   def_delegator :'Honeybadger::Agent.instance', :with_rack_env
+
+  # @!method notify(...)
+  # Forwards to {Agent.instance}.
+  # @see Agent#notify
+  def notify(exception_or_opts, opts = {})
+    # Note this is defined directly (instead of via forwardable) so that
+    # generated stack traces work as expected.
+    Agent.instance.notify(exception_or_opts, opts)
+  end
 
   # @api private
   def load_plugins!
