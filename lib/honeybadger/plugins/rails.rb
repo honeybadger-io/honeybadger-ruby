@@ -4,15 +4,15 @@ module Honeybadger
   module Plugins
     module Rails
       module ExceptionsCatcher
-        # Internal: Adds additional Honeybadger info to Request env when an
+        # Adds additional Honeybadger info to Request env when an
         # exception is rendered in Rails' middleware.
         #
-        # arg       - The Rack env Hash in Rails 3.0-4.2. After Rails 5 arg is
-        #             an ActionDispatch::Request.
-        # exception - The Exception which was rescued.
+        # @param [Hash, ActionDispatch::Request] arg The Rack env +Hash+ in
+        #   Rails 3.0-4.2. After Rails 5 +arg+ is an +ActionDispatch::Request+.
+        # @param [Exception] exception The error which was rescued.
         #
-        # Returns the super value of the middleware's #render_exception()
-        # method.
+        # @return The super value of the middleware's +#render_exception()+
+        #   method.
         def render_exception(arg, exception)
           if arg.kind_of?(::ActionDispatch::Request)
             request = arg

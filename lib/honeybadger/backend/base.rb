@@ -18,17 +18,20 @@ module Honeybadger
         403 => "The API key is invalid. Please check your API key and try again.".freeze
       }.freeze
 
-      # Public: Initializes the Response instance.
+      # Initializes the Response instance.
       #
-      # response - With 1 argument Net::HTTPResponse, the code, body, and
-      #            message will be determined automatically (optional).
-      # code      - The Integer status code. May also be :error for requests which
-      #             failed to reach the server.
-      # body      - The String body of the response.
-      # message   - The String message returned by the server (or set by the
-      #             backend in the case of an :error code).
+      # @overload initialize(response)
+      #   Creates an instance from a +Net::HTTPResponse+.
+      #   @param [Net::HTTPResponse] response With 1 argument, the code, body,
+      #     and message will be determined automatically.
       #
-      # Returns nothing
+      # @overload initialize(code, body, message)
+      #   Creates an instance from parameters.
+      #   @param [Integer] code The status code. May also be :error for requests
+      #     which failed to reach the server.
+      #   @param [String] body The String body of the response.
+      #   @param [String] message The String message returned by the server (or
+      #     set by the backend in the case of an :error code).
       def initialize(*args)
         if (response = args.first).kind_of?(Net::HTTPResponse)
           @code, @body, @message = response.code.to_i, response.body.to_s, response.message
@@ -73,26 +76,25 @@ module Honeybadger
         @config = config
       end
 
-      # Internal: Process payload for feature.
+      # Process payload for feature.
       #
-      # feature - A Symbol feature name (corresponds to HTTP endpoint). Current
-      #           options are: `:notices`, `:deploys`, `:ping`.
-      # payload - Any Object responding to `#to_json`.
-      #
-      # Examples
-      #
+      # @example
       #   backend.notify(:notices, Notice.new(...))
       #
-      # Raises NotImplementedError
+      # @param [Symbol] feature The feature name (corresponds to HTTP
+      #   endpoint). Current options are: `:notices`, `:deploys`, `:ping`.
+      # @param [#to_json] payload The JSON payload to send.
+      #
+      # @raise NotImplementedError
       def notify(feature, payload)
         raise NotImplementedError, 'must define #notify on subclass.'
       end
 
-      # Internal: Does a check in using the input id.
+      # Does a check in using the input id.
       #
-      # id - The unique check_in id.
+      # @param [String] id The unique check_in id.
       #
-      # Raises NotImplementedError.
+      # @raise NotImplementedError
       def check_in(id)
         raise NotImplementedError, 'must define #check_in on subclass.'
       end

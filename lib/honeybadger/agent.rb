@@ -9,17 +9,21 @@ require 'honeybadger/logging'
 require 'honeybadger/worker'
 
 module Honeybadger
-  # Public: The Honeybadger agent contains all the methods for interacting with
-  # the Honeybadger service. It can be used to send notifications to multiple
-  # projects in large apps.
+  # The Honeybadger agent contains all the methods for interacting with the
+  # Honeybadger service. It can be used to send notifications to multiple
+  # projects in large apps. The global agent instance ({Agent.instance}) should
+  # always be accessed through the {Honeybadger} singleton.
+  #
+  # === Context
   #
   # Context is global by default, meaning agents created via
-  # `Honeybadger::Agent.new` will share context (added via
-  # `Honeybadger.context` or `Honeybadger::Agent#context`) with other agents.
-  # This also includes the Rack environment when using the Honeybadger rack
-  # middleware.
+  # +Honeybadger::Agent.new+ will share context (added via
+  # +Honeybadger.context+ or {Honeybadger::Agent#context}) with other agents.
+  # This also includes the Rack environment when using the
+  # {Honeybadger::Rack::ErrorNotifier} middleware. To localize context for a
+  # custom agent, use the +local_context: true+ option when initializing.
   #
-  # Examples
+  # @example
   #
   #   # Standard usage:
   #   OtherBadger = Honeybadger::Agent.new
@@ -41,10 +45,12 @@ module Honeybadger
 
     include Logging::Helper
 
+    # @api private
     def self.instance
       @instance
     end
 
+    # @api private
     def self.instance=(instance)
       @instance = instance
     end
@@ -63,30 +69,10 @@ module Honeybadger
       init_worker
     end
 
-    # Public: Send an exception to Honeybadger. Does not report ignored
-    # exceptions by default.
+    # Sends an exception to Honeybadger. Does not report ignored exceptions by
+    # default.
     #
-    # exception_or_opts - An Exception object, or a Hash of options which is used
-    #                     to build the notice. All other types of objects will
-    #                     be converted to a String and used as the `:error_message`.
-    # opts              - The options Hash when the first argument is an
-    #                     Exception (default: {}):
-    #                     :error_message - The String error message.
-    #                     :error_class   - The String class name of the error (default: "Notice").
-    #                     :backtrace     - The Array backtrace of the error (optional).
-    #                     :fingerprint   - The String grouping fingerprint of the exception (optional).
-    #                     :force         - Always report the exception when true, even when ignored (default: false).
-    #                     :tags          - The String comma-separated list of tags (optional).
-    #                     :context       - The Hash context to associate with the exception (optional).
-    #                     :controller    - The String controller name (such as a Rails controller) (optional).
-    #                     :action        - The String action name (such as a Rails controller action) (optional).
-    #                     :parameters    - The Hash HTTP request paramaters (optional).
-    #                     :session       - The Hash HTTP request session (optional).
-    #                     :url           - The String HTTP request URL (optional).
-    #                     :cause         - The Exception cause for this error (optional).
-    #
-    # Examples
-    #
+    # @example
     #   # With an exception:
     #   begin
     #     fail 'oops'
@@ -102,8 +88,27 @@ module Honeybadger
     #     context: {my_data: 'value'}
     #   }) # => '06220c5a-b471-41e5-baeb-de247da45a56'
     #
-    # Returns a String UUID reference to the notice within Honeybadger or false
-    # when ignored.
+    # @param [Exception, Hash, Object] exception_or_opts An Exception object,
+    #   or a Hash of options which is used to build the notice. All other types
+    #   of objects will be converted to a String and used as the :error_message.
+    # @param [Hash] opts The options Hash when the first argument is an Exception.
+    #
+    # @option opts [String]    :error_message The error message.
+    # @option opts [String]    :error_class ('Notice') The class name of the error.
+    # @option opts [Array]     :backtrace The backtrace of the error (optional).
+    # @option opts [String]    :fingerprint The grouping fingerprint of the exception (optional).
+    # @option opts [Boolean]   :force (false) Always report the exception when true, even when ignored (optional).
+    # @option opts [String]    :tags The comma-separated list of tags (optional).
+    # @option opts [Hash]      :context The context to associate with the exception (optional).
+    # @option opts [String]    :controller The controller name (such as a Rails controller) (optional).
+    # @option opts [String]    :action The action name (such as a Rails controller action) (optional).
+    # @option opts [Hash]      :parameters The HTTP request paramaters (optional).
+    # @option opts [Hash]      :session The HTTP request session (optional).
+    # @option opts [String]    :url The HTTP request URL (optional).
+    # @option opts [Exception] :cause The cause for this error (optional).
+    #
+    # @return [String] UUID reference to the notice within Honeybadger.
+    # @return [false] when ignored.
     def notify(exception_or_opts, opts = {})
       return false if config.disabled?
 
@@ -143,16 +148,15 @@ module Honeybadger
       notice.id
     end
 
-    # Public: Perform a synchronous check_in.
+    # Perform a synchronous check_in.
     #
-    # id - The unique check in id (e.g. '1MqIo1') or the check in url.
-    #
-    # Examples
-    #
+    # @example
     #   Honeybadger.check_in('1MqIo1')
     #
-    # Returns a boolean which is true if the check in was successful and false
-    # otherwise.
+    # @param [String] id The unique check in id (e.g. '1MqIo1') or the check in url.
+    #
+    # @return [Boolean] true if the check in was successful and false
+    #   otherwise.
     def check_in(id)
       # this is to allow check ins even if a url is passed
       check_in_id = id.to_s.strip.gsub(/\/$/, '').split('/').last
@@ -160,21 +164,9 @@ module Honeybadger
       response.success?
     end
 
-    # Public: Save global context for the current request.
+    # Save global context for the current request.
     #
-    # context - A Hash of data which will be sent to Honeybadger when an error
-    #           occurs. If the object responds to #to_honeybadger_context, the return
-    #           value of that method will be used (explicit conversion). Can
-    #           include any key/value, but a few keys have a special meaning in
-    #           Honeybadger (default: nil):
-    #           :user_id    - The String user ID used by Honeybadger to aggregate
-    #                         user data across occurrences on the error page (optional).
-    #           :user_email - The String user email address (optional).
-    #           :tags       - The String comma-separated list of tags. When present,
-    #                         tags will be applied to errors with this context (optional).
-    #
-    # Examples
-    #
+    # @example
     #   Honeybadger.context({my_data: 'my value'})
     #
     #   # Inside a Rails controller:
@@ -195,39 +187,47 @@ module Honeybadger
     #   # Clearing global context:
     #   Honeybadger.context.clear!
     #
-    # Returns self so that method calls can be chained.
+    # @param [Hash] context A Hash of data which will be sent to Honeybadger
+    #   when an error occurs. If the object responds to +#to_honeybadger_context+,
+    #   the return value of that method will be used (explicit conversion). Can
+    #   include any key/value, but a few keys have a special meaning in
+    #   Honeybadger.
+    #
+    # @option context [String] :user_id The user ID used by Honeybadger
+    #   to aggregate user data across occurrences on the error page (optional).
+    # @option context [String] :user_email The user email address (optional).
+    # @option context [String] :tags The comma-separated list of tags.
+    #   When present, tags will be applied to errors with this context
+    #   (optional).
+    #
+    # @return [self] so that method calls can be chained.
     def context(context = nil)
       context_manager.set_context(context) unless context.nil?
       self
     end
 
-    # Internal: Used to clear context via `#context.clear!`.
-    def clear!
+    # @api private
+    # Used to clear context via `#context.clear!`.
+    def clear! # :nodoc:
       context_manager.clear!
     end
 
-    # Public: Get global context for the current request.
+    # Get global context for the current request.
     #
-    #
-    # Examples
-    #
+    # @example
     #   Honeybadger.context({my_data: 'my value'})
-    #   Honeybadger.get_context #now returns {my_data: 'my value'}
+    #   Honeybadger.get_context # => {my_data: 'my value'}
     #
-    # Returns hash or nil.
+    # @return [Hash, nil]
     def get_context
       context_manager.get_context
     end
 
-    # Public: Flushes all data from workers before returning. This is most useful
-    # in tests when using the test backend, where normally the asynchronous
-    # nature of this library could create race conditions.
+    # Flushes all data from workers before returning. This is most useful in
+    # tests when using the test backend, where normally the asynchronous nature
+    # of this library could create race conditions.
     #
-    # block - The optional block to execute (exceptions will propagate after data
-    # is flushed).
-    #
-    # Examples
-    #
+    # @example
     #   # Without a block:
     #   it "sends a notification to Honeybadger" do
     #     expect {
@@ -247,8 +247,11 @@ module Honeybadger
     #     }.to change(Honeybadger::Backend::Test.notifications[:notices], :size).by(49)
     #   end
     #
-    # Returns value of block if block is given, otherwise true on success or
-    # false if Honeybadger isn't running.
+    # @yield An optional block to execute (exceptions will propagate after
+    #   data is flushed).
+    #
+    # @return [Object, Boolean] value of block if block is given, otherwise true
+    #   on success or false if Honeybadger isn't running.
     def flush
       return true unless block_given?
       yield
@@ -256,44 +259,35 @@ module Honeybadger
       worker.flush
     end
 
-    # Public: Stops the Honeybadger service.
+    # Stops the Honeybadger service.
     #
-    # Examples
-    #
+    # @example
     #   Honeybadger.stop # => nil
-    #
-    # Returns nothing
     def stop(force = false)
       worker.send(force ? :shutdown! : :shutdown)
       true
     end
 
+    # @api private
     attr_reader :config
 
-    # Public: Configure the Honeybadger agent via Ruby.
+    # Configure the Honeybadger agent via Ruby.
     #
-    # block - The configuration block.
-    #
-    # Examples
-    #
+    # @example
     #   Honeybadger.configure do |config|
     #     config.api_key = 'project api key'
     #     config.exceptions.ignore += [CustomError]
     #   end
     #
-    # Yields configuration object.
-    # Returns nothing.
+    # @!method configure
+    # @yield [Config::Ruby] configuration object.
     def_delegator :config, :configure
 
-    # Public: Callback to ignore exceptions.
+    # Callback to ignore exceptions.
     #
-    # See public API documentation for Honeybadger::Notice for available attributes.
+    # See public API documentation for {Honeybadger::Notice} for available attributes.
     #
-    # block - A block returning TrueClass true (to ignore) or FalseClass false
-    #         (to send).
-    #
-    # Examples
-    #
+    # @example
     #   # Ignoring based on error message:
     #   Honeybadger.exception_filter do |notice|
     #     notice[:error_message] =~ /sensitive data/
@@ -304,61 +298,40 @@ module Honeybadger
     #     notice[:exception].class < MyError
     #   end
     #
-    # Returns nothing.
+    # @!method exception_filter
+    # @yieldreturn [Boolean] true (to ignore) or false (to send).
     def_delegator :config, :exception_filter
 
-    # Public: Callback to add a custom grouping strategy for exceptions. The
-    # return value is hashed and sent to Honeybadger. Errors with the same
-    # fingerprint will be grouped.
+    # Callback to add a custom grouping strategy for exceptions. The return
+    # value is hashed and sent to Honeybadger. Errors with the same fingerprint
+    # will be grouped.
     #
-    # See public API documentation for Honeybadger::Notice for available attributes.
+    # See public API documentation for {Honeybadger::Notice} for available attributes.
     #
-    # block - A block returning any Object responding to #to_s.
-    #
-    # Examples
-    #
+    # @example
     #   Honeybadger.exception_fingerprint do |notice|
     #     [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
     #   end
     #
-    # Returns nothing.
+    # @!method exception_fingerprint
+    # @yieldreturn [#to_s] The fingerprint of the error.
     def_delegator :config, :exception_fingerprint
 
-    # Public: Callback to filter backtrace lines. One use for this is to make
+    # Callback to filter backtrace lines. One use for this is to make
     # additional [PROJECT_ROOT] or [GEM_ROOT] substitutions, which are used by
     # Honeybadger when grouping errors and displaying application traces.
     #
-    # block - A block which can be used to modify the Backtrace lines sent to
-    #         Honeybadger. The block expects one argument (line) which is the String line
-    #         from the Backtrace, and must return the String new line.
-    #
-    # Examples
-    #
-    #    Honeybadger.backtrace_filter do |line|
-    #      line.gsub(/^\/my\/unknown\/bundle\/path/, "[GEM_ROOT]")
-    #    end
-    #
-    # Returns nothing.
-    def_delegator :config, :backtrace_filter
-
-    # Public: Sets the Rack environment which is used to report request data
-    # with errors.
-    #
-    # rack_env - The Hash Rack environment.
-    # block    - A block to call. Errors reported from within the block will
-    #            include request data.
-    #
-    # Examples
-    #
-    #   Honeybadger.with_rack_env(env) do
-    #     begin
-    #       # Risky operation
-    #     rescue => e
-    #       Honeybadger.notify(e)
-    #     end
+    # @example
+    #   Honeybadger.backtrace_filter do |line|
+    #     line.gsub(/^\/my\/unknown\/bundle\/path/, "[GEM_ROOT]")
     #   end
     #
-    # Returns the return value of block.
+    # @!method backtrace_filter
+    # @yieldparam  [String] line The backtrace line to modify.
+    # @yieldreturn [String] The new (modified) backtrace line.
+    def_delegator :config, :backtrace_filter
+
+    # @api private
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
       yield
@@ -366,13 +339,17 @@ module Honeybadger
       context_manager.set_rack_env(nil)
     end
 
-    # Internal
+    # @api private
     attr_reader :worker
 
-    # Internal
+    # @api private
+    # @!method init!(...)
+    # @see Config#init!
     def_delegators :config, :init!
 
-    # Internal
+    # @api private
+    # @!method backend
+    # @see Config#backend
     def_delegators :config, :backend
 
     private

@@ -1,20 +1,21 @@
 require 'json'
 
 module Honeybadger
-  # Internal: Front end to parsing the backtrace for each notice
+  # @api private
+  # Front end to parsing the backtrace for each notice.
   class Backtrace
-    # Internal: Handles backtrace parsing line by line
+    # Handles backtrace parsing line by line.
     class Line
-      # Backtrace line regexp (optionally allowing leading X: for windows support)
+      # Backtrace line regexp (optionally allowing leading X: for windows support).
       INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in `([^']+)')?$}.freeze
 
-      # The file portion of the line (such as app/models/user.rb)
+      # The file portion of the line (such as app/models/user.rb).
       attr_reader :file
 
-      # The line number portion of the line
+      # The line number portion of the line.
       attr_reader :number
 
-      # The method of the line (such as index)
+      # The method of the line (such as index).
       attr_reader :method
 
       # Filtered representations
@@ -22,9 +23,9 @@ module Honeybadger
 
       # Parses a single line of a given backtrace
       #
-      # unparsed_line - The raw line from +caller+ or some backtrace
+      # @param [String] unparsed_line The raw line from +caller+ or some backtrace.
       #
-      # Returns the parsed backtrace line
+      # @return The parsed backtrace line.
       def self.parse(unparsed_line, opts = {})
         filters = opts[:filters] || []
         filtered_line = filters.reduce(unparsed_line) do |line, proc|

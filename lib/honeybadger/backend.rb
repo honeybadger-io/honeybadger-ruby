@@ -7,6 +7,7 @@ require 'honeybadger/backend/null'
 require 'honeybadger/backend/debug'
 
 module Honeybadger
+  # @api private
   module Backend
     class BackendError < StandardError; end
 

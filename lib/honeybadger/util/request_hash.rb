@@ -2,8 +2,8 @@ require 'set'
 
 module Honeybadger
   module Util
-    # Internal: Constructs a request hash from a Rack::Request matching the
-    # /v1/notices API specification.
+    # Constructs a request hash from a Rack::Request matching the /v1/notices
+    # API specification.
     module RequestHash
       HTTP_HEADER_PREFIX = 'HTTP_'.freeze
 

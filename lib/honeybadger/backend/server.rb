@@ -24,12 +24,12 @@ module Honeybadger
         super
       end
 
-      # Internal: Post payload to endpoint for feature.
+      # Post payload to endpoint for feature.
       #
-      # feature - The feature which is being notified.
-      # payload - The payload to send, responding to `#to_json`.
+      # @param [Symbol] feature The feature which is being notified.
+      # @param [#to_json] payload The JSON payload to send.
       #
-      # Returns Response.
+      # @return [Response]
       def notify(feature, payload)
         ENDPOINTS[feature] or raise(BackendError, "Unknown feature: #{feature}")
         Response.new(@http.post(ENDPOINTS[feature], payload, payload_headers(payload)))
@@ -37,11 +37,11 @@ module Honeybadger
         Response.new(:error, nil, "HTTP Error: #{e.class}")
       end
 
-      # Internal: Does a check in using the input id.
+      # Does a check in using the input id.
       #
-      # id - The unique check_in id.
+      # @param [String] id The unique check_in id.
       #
-      # Returns Response.
+      # @return [Response]
       def check_in(id)
         Response.new(@http.get("#{CHECK_IN_ENDPOINT}/#{id}"))
       rescue *HTTP_ERRORS => e
@@ -50,11 +50,6 @@ module Honeybadger
 
       private
 
-      # Internal: Construct headers for supported payloads.
-      #
-      # payload - The payload object.
-      #
-      # Returns Hash headers if supported, otherwise nil.
       def payload_headers(payload)
         if payload.respond_to?(:api_key) && payload.api_key
           {

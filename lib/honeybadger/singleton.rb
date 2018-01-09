@@ -1,25 +1,51 @@
 require 'forwardable'
 require 'honeybadger/agent'
 
-# The Singleton module includes the public API for Honeybadger which can be
-# accessed via the global agent (i.e. `Honeybadger.notify`) or via instances of
-# the `Honeybadger::Agent` class.
+# Honeybadger's public API is made up of two parts: the {Honeybadger} singleton
+# module, and the {Agent} class. The singleton module delegates its methods to
+# a global agent instance, {Agent#instance}; this allows methods to be accessed
+# directly, for example when calling +Honeybadger.notify+:
+#
+#   begin
+#     raise 'testing an error report'
+#   rescue => err
+#     Honeybadger.notify(err)
+#   end
+#
+# Custom agents may also be created by users who want to report to multiple
+# Honeybadger projects in the same app (or have fine-grained control over
+# configuration), however most users will use the global agent.
+#
+# @see Honeybadger::Agent
 module Honeybadger
   extend Forwardable
   extend self
 
-  def_delegators :'Honeybadger::Agent.instance', :init!, :config, :configure,
-    :context, :get_context, :flush, :stop, :with_rack_env, :exception_filter,
-    :exception_fingerprint, :backtrace_filter
+  # @!macro [attach] def_delegator
+  #   @!method $2(...)
+  #     Forwards to {$1}.
+  #     @see Agent#$2
+  def_delegator :'Honeybadger::Agent.instance', :notify
+  def_delegator :'Honeybadger::Agent.instance', :check_in
+  def_delegator :'Honeybadger::Agent.instance', :context
+  def_delegator :'Honeybadger::Agent.instance', :configure
+  def_delegator :'Honeybadger::Agent.instance', :get_context
+  def_delegator :'Honeybadger::Agent.instance', :flush
+  def_delegator :'Honeybadger::Agent.instance', :stop
+  def_delegator :'Honeybadger::Agent.instance', :exception_filter
+  def_delegator :'Honeybadger::Agent.instance', :exception_fingerprint
+  def_delegator :'Honeybadger::Agent.instance', :backtrace_filter
 
-  def notify(exception_or_opts, opts = {})
-    Agent.instance.notify(exception_or_opts, opts)
-  end
+  # @!macro [attach] def_delegator
+  #   @!method $2(...)
+  #     @api private
+  #     Forwards to {$1}.
+  #     @see Agent#$2
+  def_delegator :'Honeybadger::Agent.instance', :config
+  def_delegator :'Honeybadger::Agent.instance', :init!
+  def_delegator :'Honeybadger::Agent.instance', :with_rack_env
 
-  def check_in(id)
-    Agent.instance.check_in(id)
-  end
-
+  # @api private
   def load_plugins!
     Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
       require plugin
@@ -27,6 +53,7 @@ module Honeybadger
     Plugin.load!(self.config)
   end
 
+  # @api private
   def install_at_exit_callback
     at_exit do
       if $! && !$!.is_a?(SystemExit) && Honeybadger.config[:'exceptions.notify_at_exit']
@@ -37,7 +64,7 @@ module Honeybadger
     end
   end
 
-  # Deprecated
+  # @deprecated
   def start(config = {})
     raise NoMethodError, <<-WARNING
 `Honeybadger.start` is no longer necessary and has been removed.

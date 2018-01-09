@@ -2,8 +2,8 @@ require 'forwardable'
 
 module Honeybadger
   module Rack
-    # Public: Middleware for Rack applications. Adds an error ID to the Rack
-    # response when an error has occurred.
+    # Middleware for Rack applications. Adds an error ID to the Rack response
+    # when an error has occurred.
     class UserInformer
       extend Forwardable
 

@@ -53,10 +53,10 @@ module Honeybadger
 
       private
 
-      # Internal: Detects the Heroku app name from GIT.
+      # Detects the Heroku app name from GIT.
       #
-      # prompt_on_default - If a single remote is discoverd, should we prompt the
-      #                     user before returning it?
+      # @param [Boolean] prompt_on_default If a single remote is discoverd,
+      #   should we prompt the user before returning it?
       #
       # Returns the String app name if detected, otherwise nil.
       def detect_heroku_app(prompt_on_default = true)

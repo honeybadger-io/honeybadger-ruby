@@ -1,7 +1,8 @@
 require 'honeybadger/ruby'
 
-# Patch Rake::Application to handle errors with Honeybadger
 module Honeybadger
+  # @api private
+  # Patch Rake::Application to handle errors with Honeybadger
   module RakeHandler
     def self.included(klass)
       klass.class_eval do
