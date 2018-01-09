@@ -4,13 +4,14 @@ require 'delegate'
 require 'forwardable'
 
 module Honeybadger
+  # @api private
   module Logging
     PREFIX = '** [Honeybadger] '.freeze
 
-    # Internal: Logging helper methods. Requires a Honeybadger::Config @config
-    # instance variable to exist and/or #logger to be defined. Each
-    # method is defined/block captured in this module rather than delegating to
-    # the logger directly to avoid extra object allocation.
+    # Logging helper methods. Requires a Honeybadger::Config @config instance
+    # variable to exist and/or #logger to be defined. Each method is
+    # defined/block captured in this module rather than delegating to the
+    # logger directly to avoid extra object allocation.
     module Helper
       private
       def debug(msg = nil)

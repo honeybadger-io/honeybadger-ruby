@@ -10,8 +10,8 @@ module Honeybadger
 
         private
 
-        # Requires (currently) alpha platform feature
-        # `heroku labs:enable runtime-dyno-metadata`
+        # Requires (currently) alpha platform feature `heroku labs:enable
+        # runtime-dyno-metadata`
         #
         # See https://devcenter.heroku.com/articles/dyno-metadata
         def from_heroku

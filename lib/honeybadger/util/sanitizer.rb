@@ -5,8 +5,8 @@ require 'honeybadger/conversions'
 
 module Honeybadger
   module Util
-    # Internal: Sanitizer sanitizes data for sending to Honeybadger's API. The
-    # filters are based on Rails' HTTP parameter filter.
+    # Sanitizer sanitizes data for sending to Honeybadger's API. The filters
+    # are based on Rails' HTTP parameter filter.
     class Sanitizer
       COOKIE_PAIRS = /[;,]\s?/
       COOKIE_SEP = '='.freeze

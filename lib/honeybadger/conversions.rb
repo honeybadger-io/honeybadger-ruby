@@ -1,12 +1,13 @@
 module Honeybadger
+  # @api private
   module Conversions
     module_function
 
-    # Internal: Convert context into a Hash.
+    # Convert context into a Hash.
     #
-    # object - The context object.
+    # @param [Object] object The context object.
     #
-    # Returns the Hash context.
+    # @return [Hash] The hash context.
     def Context(object)
       object = object.to_honeybadger_context if object.respond_to?(:to_honeybadger_context)
       Hash(object)

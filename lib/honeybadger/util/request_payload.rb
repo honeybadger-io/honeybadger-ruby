@@ -2,9 +2,9 @@ require 'honeybadger/util/sanitizer'
 
 module Honeybadger
   module Util
-    # Internal: Constructs/sanitizes request data for notices
+    # Constructs/sanitizes request data for notices
     module RequestPayload
-      # Internal: Default values to use for request data.
+      # Default values to use for request data.
       DEFAULTS = {
         url: nil,
         component: nil,
@@ -14,10 +14,10 @@ module Honeybadger
         cgi_data: {}.freeze
       }.freeze
 
-      # Internal: Allowed keys.
+      # Allowed keys.
       KEYS = DEFAULTS.keys.freeze
 
-      # Internal: The cgi_data key where the raw Cookie header is stored.
+      # The cgi_data key where the raw Cookie header is stored.
       HTTP_COOKIE_KEY = 'HTTP_COOKIE'.freeze
 
       def self.build(opts = {})

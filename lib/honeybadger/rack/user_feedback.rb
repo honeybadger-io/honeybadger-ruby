@@ -16,8 +16,8 @@ end
 
 module Honeybadger
   module Rack
-    # Public: Middleware for Rack applications. Adds a feedback form to the
-    # Rack response when an error has occurred.
+    # Middleware for Rack applications. Adds a feedback form to the Rack
+    # response when an error has occurred.
     class UserFeedback
       extend Forwardable
 
@@ -41,25 +41,31 @@ module Honeybadger
         [status, headers, body]
       end
 
+      # @private
+      # @todo Make this method and others actually private.
       def action
         URI.parse("#{config.connection_protocol}://#{config[:'connection.host']}:#{config.connection_port}/v1/feedback/").to_s
       rescue URI::InvalidURIError
         nil
       end
 
+      # @private
       def render_form(error_id, action = action())
         return unless action
         ERB.new(@template ||= File.read(template_file)).result(binding)
       end
 
+      # @private
       def custom_template_file
         @custom_template_file ||= File.join(config[:root], 'lib', 'honeybadger', 'templates', 'feedback_form.erb')
       end
 
+      # @private
       def custom_template_file?
         custom_template_file && File.exist?(custom_template_file)
       end
 
+      # @private
       def template_file
         if custom_template_file?
           custom_template_file

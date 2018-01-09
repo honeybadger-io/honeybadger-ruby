@@ -1,6 +1,7 @@
 require 'forwardable'
 
 module Honeybadger
+  # @api private
   class Plugin
     CALLER_FILE = Regexp.new('\A(?:\w:)?([^:]+)(?=(:\d+))').freeze
 
@@ -94,9 +95,8 @@ module Honeybadger
       false
     end
 
-    # Private: Used for testing only; don't normally call this. :)
-    #
-    # Returns nothing
+    # @private
+    # Used for testing only; don't normally call this. :)
     def reset!
       @loaded = false
     end

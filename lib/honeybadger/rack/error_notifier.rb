@@ -5,11 +5,10 @@ require 'honeybadger/ruby'
 
 module Honeybadger
   module Rack
-    # Public: Middleware for Rack applications. Any errors raised by the upstream
+    # Middleware for Rack applications. Any errors raised by the upstream
     # application will be delivered to Honeybadger and re-raised.
     #
-    # Examples
-    #
+    # @example
     #   require 'honeybadger/rack/error_notifier'
     #
     #   app = Rack::Builder.app do

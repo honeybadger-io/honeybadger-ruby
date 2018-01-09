@@ -4,16 +4,17 @@ require 'net/http'
 require 'honeybadger/logging'
 
 module Honeybadger
-  # Internal: A concurrent queue to notify the backend.
+  # A concurrent queue to notify the backend.
+  # @api private
   class Worker
     extend Forwardable
 
     include Honeybadger::Logging::Helper
 
-    # Internal: Sub-class thread so we have a named thread (useful for debugging in Thread.list).
+    # Sub-class thread so we have a named thread (useful for debugging in Thread.list).
     class Thread < ::Thread; end
 
-    # Internal: A queue which enforces a maximum size.
+    # A queue which enforces a maximum size.
     class Queue < ::Queue
       attr_reader :max_size
 
@@ -48,9 +49,6 @@ module Honeybadger
       handle_response(msg, notify_backend(msg))
     end
 
-    # Internal: Shutdown the worker after sending remaining data.
-    #
-    # Returns true.
     def shutdown
       d { 'shutting down worker' }
 
@@ -91,9 +89,7 @@ module Honeybadger
       true
     end
 
-    # Internal: Blocks until queue is processed up to this point in time.
-    #
-    # Returns nothing.
+    # Blocks until queue is processed up to this point in time.
     def flush
       mutex.synchronize do
         if thread && thread.alive?
@@ -226,19 +222,12 @@ module Honeybadger
       end
     end
 
-    # Internal: Release the marker. Important to perform during cleanup when
-    # shutting down, otherwise it could end up waiting indefinitely.
-    #
-    # Returns nothing.
+    # Release the marker. Important to perform during cleanup when shutting
+    # down, otherwise it could end up waiting indefinitely.
     def release_marker
       signal_marker(marker)
     end
 
-    # Internal: Signal a marker.
-    #
-    # marker - The ConditionVariable marker to signal.
-    #
-    # Returns nothing.
     def signal_marker(marker)
       mutex.synchronize do
         marker.signal

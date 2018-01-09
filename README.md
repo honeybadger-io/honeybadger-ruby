@@ -21,7 +21,7 @@ Pull requests are welcome. If you're adding a new feature, please [submit an iss
 
 If you're integrating your gem/open source project with Honeybadger, please consider submitting an official plugin to our gem. [Submit an issue](https://github.com/honeybadger-io/honeybadger-ruby/issues/new) to discuss with us!
 
-We use [TomDoc](http://tomdoc.org/) to document our API. Classes and methods which are safe to depend on in your gems/projects are marked "Public". All other classes/methods are considered internal and may change without notice -- don't depend on them! If you need a new public API, we're happy to work with you. [Submit an issue](https://github.com/honeybadger-io/honeybadger-ruby/issues/new) to discuss.
+We use [YARD](https://yardoc.org/) to document our API. Classes and methods which are safe to depend on in your gems/projects are marked "Public". All other classes/methods are considered internal and may change without notice -- don't depend on them! If you need a new public API, we're happy to work with you. [Submit an issue](https://github.com/honeybadger-io/honeybadger-ruby/issues/new) to discuss.
 
 ### To contribute your code:
 

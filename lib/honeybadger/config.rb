@@ -13,9 +13,9 @@ require 'honeybadger/util/revision'
 require 'honeybadger/logging'
 
 module Honeybadger
-  # Internal: The Config class is used to manage Honeybadger's initialization
-  # and configuration. Please don't depend on any internal classes or methods
-  # outside of Honeybadger as they may change without notice.
+  # @api private
+  # The Config class is used to manage Honeybadger's initialization and
+  # configuration.
   class Config
     extend Forwardable
 
@@ -124,6 +124,7 @@ module Honeybadger
     alias to_h to_hash
 
     # Internal Helpers
+
 
     def logger
       init_logging! unless @logger
@@ -241,9 +242,6 @@ module Honeybadger
       includes_token?(self[:plugins], name)
     end
 
-    # Match the project root.
-    #
-    # Returns Regexp matching the project root in a file string.
     def root_regexp
       return @root_regexp if @root_regexp
       return nil if @no_root
@@ -285,19 +283,12 @@ module Honeybadger
       set(:revision, Util::Revision.detect(self[:root]))
     end
 
-    # Optional path to honeybadger.log log file.
-    #
-    # Returns the Pathname log path if a log path was specified.
     def log_path
       return if log_stdout?
       return if !self[:'logging.path']
       locate_absolute_path(self[:'logging.path'], self[:root])
     end
 
-    # Path to honeybadger.yml configuration file; this should be the
-    # root directory if no path was specified.
-    #
-    # Returns the Pathname configuration path.
     def config_path
       config_paths.first
     end
@@ -370,12 +361,8 @@ module Honeybadger
       @logger = Logging::ConfigLogger.new(self, build_logger)
     end
 
-    # Does collection include the String value or Symbol value?
-    #
-    # obj - The Array object, if present.
-    # value - The value which may exist within Array obj.
-    #
-    # Returns true or false.
+    # Takes an Array and a value and returns true if the value exists in the
+    # array in String or Symbol form, otherwise false.
     def includes_token?(obj, value)
       return false unless obj.kind_of?(Array)
       obj.map(&:to_sym).include?(value.to_sym)

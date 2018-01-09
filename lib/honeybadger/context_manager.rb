@@ -1,6 +1,7 @@
 require 'honeybadger/conversions'
 
 module Honeybadger
+  # @api private
   class ContextManager
     include Conversions
 
@@ -17,7 +18,8 @@ module Honeybadger
       _initialize
     end
 
-    # Internal accessors
+    # Internal helpers
+
 
     def set_context(hash)
       @mutex.synchronize do

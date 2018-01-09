@@ -3,34 +3,31 @@ require 'honeybadger/backend/null'
 module Honeybadger
   module Backend
     class Test < Null
-      # Public: The notification list.
+      # The notification list.
       #
-      # Examples
-      #
+      # @example
       #   Test.notifications[:notices] # => [Notice, Notice, ...]
       #
-      # Returns the Hash notifications.
+      # @return [Hash] Notifications hash.
       def self.notifications
         @notifications ||= Hash.new {|h,k| h[k] = [] }
       end
 
-      # Public: The check in list.
+      # @api public
+      # The check in list.
       #
-      # Examples
-      #
+      # @example
       #   Test.check_ins # => ["foobar", "danny", ...]
       #
-      # Returns the Array of check ins.
+      # @return [Array<Object>] List of check ins.
       def self.check_ins
         @check_ins ||= []
       end
 
-      # Internal: Local helper.
       def notifications
         self.class.notifications
       end
 
-      # Internal: Local helper.
       def check_ins
         self.class.check_ins
       end

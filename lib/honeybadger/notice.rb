@@ -11,6 +11,7 @@ require 'honeybadger/util/request_hash'
 require 'honeybadger/util/request_payload'
 
 module Honeybadger
+  # @api private
   NOTIFIER = {
     name: 'honeybadger-ruby'.freeze,
     url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
@@ -18,21 +19,27 @@ module Honeybadger
     language: 'ruby'.freeze
   }.freeze
 
-  # Internal: Substitution for gem root in backtrace lines.
+  # @api private
+  # Substitution for gem root in backtrace lines.
   GEM_ROOT = '[GEM_ROOT]'.freeze
 
-  # Internal: Substitution for project root in backtrace lines.
+  # @api private
+  # Substitution for project root in backtrace lines.
   PROJECT_ROOT = '[PROJECT_ROOT]'.freeze
 
-  # Internal: Empty String (used for equality comparisons and assignment).
+  # @api private
+  # Empty String (used for equality comparisons and assignment).
   STRING_EMPTY = ''.freeze
 
-  # Internal: A Regexp which matches non-blank characters.
+  # @api private
+  # A Regexp which matches non-blank characters.
   NOT_BLANK = /\S/.freeze
 
-  # Internal: Matches lines beginning with ./
+  # @api private
+  # Matches lines beginning with ./
   RELATIVE_ROOT = Regexp.new('^\.\/').freeze
 
+  # @api private
   MAX_EXCEPTION_CAUSES = 5
 
   class Notice
@@ -40,74 +47,79 @@ module Honeybadger
 
     include Conversions
 
-    # Internal: The String character used to split tag strings.
+    # @api private
+    # The String character used to split tag strings.
     TAG_SEPERATOR = ','.freeze
 
-    # Internal: The Regexp used to strip invalid characters from individual tags.
+    # @api private
+    # The Regexp used to strip invalid characters from individual tags.
     TAG_SANITIZER = /[^\w]/.freeze
 
-    # Public: The unique ID of this notice which can be used to reference the
-    # error in Honeybadger.
+    # The unique ID of this notice which can be used to reference the error in
+    # Honeybadger.
     attr_reader :id
 
-    # Public: The exception that caused this notice, if any.
+    # The exception that caused this notice, if any.
     attr_reader :exception
 
-    # Public: The exception cause if available.
+    # The exception cause if available.
     attr_reader :cause
 
-    # Public: The backtrace from the given exception or hash.
+    # The backtrace from the given exception or hash.
     attr_reader :backtrace
 
-    # Public: Custom fingerprint for error, used to group similar errors together.
+    # Custom fingerprint for error, used to group similar errors together.
     attr_reader :fingerprint
 
-    # Public: Tags which will be applied to error.
+    # Tags which will be applied to error.
     attr_reader :tags
 
-    # Public: The name of the class of error (example: RuntimeError).
+    # The name of the class of error (example: RuntimeError).
     attr_reader :error_class
 
-    # Public: The message from the exception, or a general description of the error.
+    # The message from the exception, or a general description of the error.
     attr_reader :error_message
 
     # Deprecated: Excerpt from source file.
     attr_reader :source
 
-    # Public: CGI variables such as HTTP_METHOD.
+    # CGI variables such as HTTP_METHOD.
     def cgi_data; @request[:cgi_data]; end
 
-    # Public: A hash of parameters from the query string or post body.
+    # A hash of parameters from the query string or post body.
     def params; @request[:params]; end
     alias_method :parameters, :params
 
-    # Public: The component (if any) which was used in this request (usually the controller).
+    # The component (if any) which was used in this request (usually the controller).
     def component; @request[:component]; end
     alias_method :controller, :component
 
-    # Public: The action (if any) that was called in this request.
+    # The action (if any) that was called in this request.
     def action; @request[:action]; end
 
-    # Public: A hash of session data from the request.
+    # A hash of session data from the request.
     def_delegator :@request, :session
     def session; @request[:session]; end
 
-    # Public: The URL at which the error occurred (if any).
+    # The URL at which the error occurred (if any).
     def url; @request[:url]; end
 
-    # Public: Local variables are extracted from first frame of backtrace.
+    # Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
-    # Public: The API key used to deliver this notice.
+    # The API key used to deliver this notice.
     attr_reader :api_key
 
-    # Internal: Cache project path substitutions for backtrace lines.
+    # @api private
+    # Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
 
-    # Internal: Cache gem path substitutions for backtrace lines.
+    # @api private
+    # Cache gem path substitutions for backtrace lines.
     GEM_ROOT_CACHE = {}
 
-    # Internal: A list of backtrace filters to run all the time.
+    # @api private
+    # A list of backtrace filters to run all the time.
     BACKTRACE_FILTERS = [
       lambda { |line|
         return line unless defined?(Gem)
@@ -129,6 +141,7 @@ module Honeybadger
       lambda { |line| line if line !~ %r{lib/honeybadger} }
     ].freeze
 
+    # @api private
     def initialize(config, opts = {})
       @now = Time.now.utc
       @pid = Process.pid
@@ -170,9 +183,10 @@ module Honeybadger
       @fingerprint = construct_fingerprint(opts)
     end
 
-    # Internal: Template used to create JSON payload.
+    # @api private
+    # Template used to create JSON payload.
     #
-    # Returns Hash JSON representation of notice.
+    # @return [Hash] JSON representation of notice.
     def as_json(*args)
       @request[:context] = s(context)
       @request[:local_variables] = local_variables if local_variables
@@ -202,22 +216,21 @@ module Honeybadger
       }
     end
 
-    # Public: Creates JSON.
+    # Converts the notice to JSON.
     #
-    # Returns valid JSON representation of Notice.
+    # @return [Hash] The JSON representation of the notice.
     def to_json(*a)
       ::JSON.generate(as_json(*a))
     end
 
-    # Public: Allows properties to be accessed using a hash-like syntax.
+    # Allows properties to be accessed using a hash-like syntax.
     #
-    # method - The given key for an attribute.
-    #
-    # Examples
-    #
+    # @example
     #   notice[:error_message]
     #
-    # Returns the attribute value, or self if given `:request`.
+    # @param [Symbol] method The given key for an attribute.
+    #
+    # @return [Object] The attribute value.
     def [](method)
       case method
       when :request
@@ -227,7 +240,8 @@ module Honeybadger
       end
     end
 
-    # Internal: Determines if this notice should be ignored.
+    # @api private
+    # Determines if this notice should be ignored.
     def ignore?
       ignore_by_origin? || ignore_by_class? || ignore_by_callbacks?
     end
@@ -280,7 +294,7 @@ module Honeybadger
       end
     end
 
-    # Internal: Determines if error class should be ignored.
+    # Determines if error class should be ignored.
     #
     # ignored_class_name - The name of the ignored class. May be a
     # string or regexp (optional).
@@ -310,7 +324,7 @@ module Honeybadger
       Util::RequestHash.from_env(rack_env)
     end
 
-    # Internal: Construct the request object with data from various sources.
+    # Construct the request object with data from various sources.
     #
     # Returns Request.
     def construct_request_hash(config, opts)
@@ -324,7 +338,7 @@ module Honeybadger
       Util::RequestPayload.build(request)
     end
 
-    # Internal: Get optional context from exception.
+    # Get optional context from exception.
     #
     # Returns the Hash context.
     def exception_context(exception)
@@ -378,7 +392,7 @@ module Honeybadger
       Util::Sanitizer.sanitize(data)
     end
 
-    # Internal: Fetch local variables from first frame of backtrace.
+    # Fetch local variables from first frame of backtrace.
     #
     # exception - The Exception containing the bindings stack.
     #
@@ -412,14 +426,14 @@ module Honeybadger
       request_sanitizer.sanitize(result_hash)
     end
 
-    # Internal: Should local variables be sent?
+    # Should local variables be sent?
     #
     # Returns true to send local_variables.
     def send_local_variables?(config)
       config[:'exceptions.local_variables']
     end
 
-    # Internal: Parse Backtrace from exception backtrace.
+    # Parse Backtrace from exception backtrace.
     #
     # backtrace - The Array backtrace from exception.
     #
@@ -433,7 +447,7 @@ module Honeybadger
       )
     end
 
-    # Internal: Unwrap the exception so that original exception is ignored or
+    # Unwrap the exception so that original exception is ignored or
     # reported.
     #
     # exception - The exception which was rescued.
@@ -444,7 +458,7 @@ module Honeybadger
       exception_cause(exception) || exception
     end
 
-    # Internal: Fetch cause from exception.
+    # Fetch cause from exception.
     #
     # exception - Exception to fetch cause from.
     #
@@ -460,7 +474,7 @@ module Honeybadger
       end
     end
 
-    # Internal: Create a list of causes.
+    # Create a list of causes.
     #
     # cause - The first cause to unwrap.
     #
@@ -489,7 +503,7 @@ module Honeybadger
       rack_env && Array(rack_env['action_dispatch.parameter_filter']) or []
     end
 
-    # Internal: This is how much Honeybadger cares about Rails developers. :)
+    # This is how much Honeybadger cares about Rails developers. :)
     #
     # Some Rails projects include ActionDispatch::TestProcess globally for the
     # use of `fixture_file_upload` in tests. This is a bad practice because it
@@ -498,7 +512,7 @@ module Honeybadger
     #
     # When you call #session on any object which had previously defined it
     # (such as OpenStruct), that newly defined method calls #session on
-    # @request (defined in `ActionDispatch::TestProcess`), and if @request
+    # +@request+ (defined in `ActionDispatch::TestProcess`), and if +@request+
     # doesn't exist in that object, it calls #session *again* on `nil`, which
     # also inherited it from Object, resulting in a SystemStackError.
     #
