@@ -8,6 +8,8 @@ before_install:
   - unset _JAVA_OPTIONS
   - gem install bundler
 sudo: false
+dist: trusty
+group: deprecated-2017Q4
 gemfile:
   - gemfiles/standalone.gemfile
   - gemfiles/binding_of_caller.gemfile
