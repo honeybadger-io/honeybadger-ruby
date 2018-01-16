@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'bundler', '1.16.0'
+
 gem 'allocation_stats', platforms: :mri, require: false
 gem 'appraisal', '~> 2.1'
 gem 'aruba', '0.14.2'
