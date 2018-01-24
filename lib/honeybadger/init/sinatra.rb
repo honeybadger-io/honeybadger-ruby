@@ -9,6 +9,9 @@ module Honeybadger
           def build_with_honeybadger(*args, &block)
             configure_honeybadger
             install_honeybadger
+            # Sinatra is a special case. Sinatra starts the web application in an at_exit
+            # handler. And, since we require sinatra before requiring HB, the only way to
+            # setup our at_exit callback is in the sinatra build callback honeybadger/init/sinatra.rb
             Honeybadger.install_at_exit_callback
             build_without_honeybadger(*args, &block)
           end

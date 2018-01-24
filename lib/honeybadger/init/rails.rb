@@ -31,3 +31,5 @@ module Honeybadger
     end
   end
 end
+
+Honeybadger.install_at_exit_callback

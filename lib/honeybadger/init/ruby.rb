@@ -7,3 +7,5 @@ Honeybadger.init!({
 })
 
 Honeybadger.load_plugins!
+
+Honeybadger.install_at_exit_callback
