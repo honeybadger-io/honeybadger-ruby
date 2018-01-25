@@ -17,6 +17,8 @@ module Honeybadger
                       'ActionController::ParameterMissing',
                       'ActiveRecord::RecordNotFound',
                       'ActionController::UnknownAction',
+                      'Rack::QueryParser::ParameterTypeError',
+                      'Rack::QueryParser::InvalidParameterError',
                       'CGI::Session::CookieStore::TamperedWithCookie',
                       'Mongoid::Errors::DocumentNotFound',
                       'Sinatra::NotFound'].map(&:freeze).freeze
