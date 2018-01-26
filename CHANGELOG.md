@@ -8,7 +8,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Use a unique route name in rails to avoid name conflicts.
 - Use prepend to add Sidekiq Middleware to fix context getting cleared.
 - Fix at_exit callback being skipped in rails apps with a sinatra dependency.
-- Add Rack::QueryParser::ParameterTypeError and Rack::QueryParser::InvalidParameterError to default ignore list
+- Add `Rack::QueryParser::ParameterTypeError` and
+  `Rack::QueryParser::InvalidParameterError` to default ignore list.
 
 ## [3.2.0] - 2017-11-27
 ### Changed
