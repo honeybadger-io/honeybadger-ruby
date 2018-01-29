@@ -4,12 +4,16 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Fixed
-- Use a unique route name in rails to avoid name conflicts.
+
+## [3.3.0] - 2018-01-29
+### Changed
 - Use prepend to add Sidekiq Middleware to fix context getting cleared.
-- Fix at_exit callback being skipped in rails apps with a sinatra dependency.
 - Add `Rack::QueryParser::ParameterTypeError` and
   `Rack::QueryParser::InvalidParameterError` to default ignore list.
+
+### Fixed
+- Use a unique route name in rails to avoid name conflicts.
+- Fix `at_exit` callback being skipped in rails apps with a sinatra dependency.
 
 ## [3.2.0] - 2017-11-27
 ### Changed
