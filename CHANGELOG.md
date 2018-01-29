@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Fix at_exit callback being skipped in rails apps with a sinatra dependency.
 - Add `Rack::QueryParser::ParameterTypeError` and
   `Rack::QueryParser::InvalidParameterError` to default ignore list.
+- Fix HB initialization for Rails apps in rake tasks without an environment dependency.
 
 ## [3.2.0] - 2017-11-27
 ### Changed
