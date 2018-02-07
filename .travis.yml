@@ -27,6 +27,7 @@ rvm:
   - 2.2.6
   - 2.3.3
   - 2.4.0
+  - 2.5.0
   - jruby-9.1.4.0
 matrix:
   fast_finish: true
@@ -36,6 +37,8 @@ matrix:
     - rvm: 2.3.3
       gemfile: gemfiles/rails.gemfile
     - rvm: 2.4.0
+      gemfile: gemfiles/rails.gemfile
+    - rvm: 2.5.0
       gemfile: gemfiles/rails.gemfile
     - rvm: jruby-9.1.4.0
       gemfile: gemfiles/rails.gemfile
@@ -55,6 +58,12 @@ matrix:
     - rvm: 2.4.0
       gemfile: gemfiles/rails4.1.gemfile
     - rvm: 2.4.0
+      gemfile: gemfiles/rails4.2.gemfile
+    - rvm: 2.5.0
+      gemfile: gemfiles/rails4.0.gemfile
+    - rvm: 2.5.0
+      gemfile: gemfiles/rails4.1.gemfile
+    - rvm: 2.5.0
       gemfile: gemfiles/rails4.2.gemfile
     - rvm: jruby-9.1.4.0
       gemfile: gemfiles/binding_of_caller.gemfile
