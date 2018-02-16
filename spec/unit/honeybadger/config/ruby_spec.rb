@@ -81,6 +81,33 @@ describe Honeybadger::Config::Ruby do
     end
   end
 
+  describe "#before_notify" do
+    it "adds a block as a before hook" do
+      block = ->(_notice) {}
+
+      subject.before_notify(&block)
+
+      expect(subject.to_hash).to eq(before_notify: [block])
+    end
+
+    it "adds a callable as a before hook" do
+      callable = ->(_notice) {}
+
+      subject.before_notify(callable)
+
+      expect(subject.to_hash).to eq(before_notify: [callable])
+    end
+
+    it "gives access to the before hooks when passed nothing" do
+      expect(subject.before_notify).to eq([])
+
+      callable = ->(_notice) {}
+      subject.before_notify(callable)
+
+      expect(subject.before_notify).to eq([callable])
+    end
+  end
+
   describe "#exception_filter" do
     it "assigns the exception_filter" do
       block = ->{}

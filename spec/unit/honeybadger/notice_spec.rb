@@ -532,6 +532,16 @@ describe Honeybadger::Notice do
     end
   end
 
+  describe "#api_key=" do
+    it "can override the API key for the notice" do
+      notice = build_notice
+
+      notice.api_key = "Hello, world"
+
+      expect(notice.api_key).to eq("Hello, world")
+    end
+  end
+
   context "custom fingerprint" do
     it "includes nil fingerprint when no fingerprint is specified" do
       notice = build_notice

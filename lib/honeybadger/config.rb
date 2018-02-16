@@ -84,6 +84,10 @@ module Honeybadger
       self[:backtrace_filter]
     end
 
+    def before_notify_hooks
+      (ruby[:before_notify] || []).clone
+    end
+
     def exception_filter
       self[:exception_filter] = Proc.new if block_given?
       self[:exception_filter]
