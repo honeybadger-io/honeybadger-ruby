@@ -246,6 +246,19 @@ module Honeybadger
       ignore_by_origin? || ignore_by_class? || ignore_by_callbacks?
     end
 
+    # Halts the notice and the before_notify callback chain.
+    #
+    # Returns nothing.
+    def halt!
+      @halted ||= true
+    end
+
+    # @api private
+    # Determines if this notice will be discarded.
+    def halted?
+      !!@halted
+    end
+
     private
 
     attr_reader :config, :opts, :context, :stats, :now, :pid, :causes,
@@ -536,5 +549,6 @@ module Honeybadger
         @request.session
       end
     end
+
   end
 end
