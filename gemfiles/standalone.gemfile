@@ -19,4 +19,8 @@ gem "capistrano"
 gem "rake"
 gem "listen", "~> 3.0.8"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"

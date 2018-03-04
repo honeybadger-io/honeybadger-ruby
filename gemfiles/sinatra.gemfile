@@ -21,4 +21,8 @@ gem "listen", "~> 3.0.8"
 gem "sinatra", "~> 2.0.0.beta1"
 gem "rack-test"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"

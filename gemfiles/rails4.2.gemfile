@@ -23,4 +23,8 @@ gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"

@@ -20,4 +20,8 @@ gem "rake"
 gem "listen", "~> 3.0.8"
 gem "delayed_job", "< 4.1.2"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"
