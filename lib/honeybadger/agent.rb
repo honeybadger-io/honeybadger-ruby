@@ -141,6 +141,11 @@ module Honeybadger
         return false
       end
 
+      if notice.halted?
+        debug { sprintf('halted notice feature=notices id=%s', notice.id) }
+        return false
+      end
+
       info { sprintf('Reporting error id=%s', notice.id) }
 
       if opts[:sync]
