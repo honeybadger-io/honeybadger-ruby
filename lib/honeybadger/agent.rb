@@ -128,6 +128,7 @@ module Honeybadger
       notice = Notice.new(config, opts)
 
       config.before_notify_hooks.each do |hook|
+        break if notice.halted?
         with_error_handling { hook.call(notice) }
       end
 
