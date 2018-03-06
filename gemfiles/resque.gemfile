@@ -21,4 +21,8 @@ gem "listen", "~> 3.0.8"
 gem "resque"
 gem "mock_redis"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"

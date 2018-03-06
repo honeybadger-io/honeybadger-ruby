@@ -24,4 +24,8 @@ gem "arel", github: "rails/arel"
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rspec-rails"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"

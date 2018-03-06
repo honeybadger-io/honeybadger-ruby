@@ -20,4 +20,8 @@ gem "rake"
 gem "listen", "~> 3.0.8"
 gem "binding_of_caller"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"

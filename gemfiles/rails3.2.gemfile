@@ -24,4 +24,8 @@ gem "rack-mini-profiler", require: false
 gem "rspec-rails"
 gem "test-unit", "~> 3.0"
 
+platforms :ruby_25 do
+  gem "mathn"
+end
+
 gemspec path: "../"
