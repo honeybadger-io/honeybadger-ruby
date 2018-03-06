@@ -148,6 +148,26 @@ describe Honeybadger do
       Honeybadger.notify(exception)
     end
 
+    it "does not deliver a halted notice when notifying implicitly" do
+      exception = build_exception
+      notice = stub_notice!(config)
+      allow(notice).to receive(:halted?).and_return(true)
+
+      expect(worker).not_to receive(:push)
+
+      Honeybadger.notify(exception)
+    end
+
+    it "does not deliver a halted notice when notifying implicitly with :force option" do
+      exception = build_exception
+      notice = stub_notice!(config)
+      allow(notice).to receive(:halted?).and_return(true)
+
+      expect(worker).not_to receive(:push)
+
+      Honeybadger.notify(exception, force: true)
+    end
+
     it "delivers an ignored exception when notifying implicitly with :force option" do
       exception = build_exception
       notice = stub_notice!(config)

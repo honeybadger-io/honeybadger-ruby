@@ -917,6 +917,23 @@ describe Honeybadger::Notice do
           expect(causes[0][:backtrace]).not_to be_empty
         end
       end
+
+      context "when halted" do
+        it ".halted? returns true" do
+          notice = build_notice(component: 'users_controller')
+          notice.halt!
+
+          expect(notice.halted?).to eq(true)
+        end
+      end
+
+      context "when not halted" do
+        it ".halted? returns false" do
+          notice = build_notice(component: 'users_controller')
+          expect(notice.halted?).to eq(false)
+        end
+      end
+
     end
   end
 end

@@ -80,6 +80,29 @@ describe Honeybadger::Agent do
 
       expect { instance.notify(error_message: "testing error-raising before notify hook") }.not_to raise_error
     end
+
+    it "halts the callback chain when a notice is halted" do
+      before_halt_hooks = [spy("hook one", arity: 1), spy("hook two", arity: 1)]
+      halt_hook = ->(notice) { notice.halt! }
+      after_halt_hooks = [spy("hook three", arity: 1), spy("hook four", arity: 1)]
+      instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
+      instance.configure do |config|
+        before_halt_hooks.each { |hook| config.before_notify(hook) }
+        config.before_notify(halt_hook)
+        after_halt_hooks.each { |hook| config.before_notify(hook) }
+      end
+
+      instance.notify(error_message: "testing error-raising before notify hook")
+
+      before_halt_hooks.each do |hook|
+        expect(hook).to have_received(:call).with(instance_of(Honeybadger::Notice))
+      end
+
+      after_halt_hooks.each do |hook|
+        expect(hook).not_to have_received(:call).with(instance_of(Honeybadger::Notice))
+      end
+    end
+
   end
 
   context do
