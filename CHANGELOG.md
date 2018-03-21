@@ -6,7 +6,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Added the ability to halt notices in callbacks using `notice.halt!`
-
+### Fixed
+- Ignore SIGTERM SignalExceptions.
 
 ## [3.3.0] - 2018-01-29
 ### Changed

@@ -64,7 +64,7 @@ module Honeybadger
   # @api private
   def install_at_exit_callback
     at_exit do
-      if $! && !$!.is_a?(SystemExit) && Honeybadger.config[:'exceptions.notify_at_exit']
+      if $! && !ignored_exception?($!) && Honeybadger.config[:'exceptions.notify_at_exit']
         Honeybadger.notify($!, component: 'at_exit', sync: true)
       end
 
@@ -84,5 +84,12 @@ module Honeybadger
     config.exceptions.ignore += [CustomError]
   end
 WARNING
+  end
+
+  private
+  # @api private
+  def ignored_exception?(exception)
+    exception.is_a?(SystemExit) ||
+      (exception.is_a?(SignalException) && exception.signm == "SIGTERM")
   end
 end
