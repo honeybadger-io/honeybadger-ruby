@@ -90,6 +90,10 @@ WARNING
   # @api private
   def ignored_exception?(exception)
     exception.is_a?(SystemExit) ||
-      (exception.is_a?(SignalException) && exception.signm == "SIGTERM")
+      ( exception.is_a?(SignalException) &&
+         ( (exception.respond_to?(:signm) && exception.signm == "SIGTERM") ||
+          # jruby has a missing #signm implementation
+          ["TERM", "SIGTERM"].include?(exception.to_s) )
+    )
   end
 end
