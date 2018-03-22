@@ -70,7 +70,7 @@ module Honeybadger
       end
 
       def logger
-        get(:logger)
+        get(:logger) || config.logger
       end
 
       def backend=(backend)
@@ -78,7 +78,7 @@ module Honeybadger
       end
 
       def backend
-        get(:backend)
+        get(:backend) || config.backend
       end
 
       def backtrace_filter
