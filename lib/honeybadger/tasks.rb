@@ -19,4 +19,15 @@ namespace :honeybadger do
       warn_task_moved('heroku:add_deploy_notification', 'honeybadger heroku help install_deploy_notification')
     end
   end
+
+  # Meta task to initialize honeybadger before any rake tasks are started
+  task :init do
+    # TODO: we need to remove the duplication between this and lib/honeybadger
+    if defined?(::Rails::Railtie)
+      ::Honeybadger::Init::Rails::Railtie.rails_init(:without_env)
+    end
+  end
 end
+
+# This is so that we can enhance tasks after all of them are loaded
+import(File.expand_path "../enhance_rake_tasks.rb", __FILE__)

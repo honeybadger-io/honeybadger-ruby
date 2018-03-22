@@ -5,6 +5,7 @@ require 'fileutils'
 require 'openssl'
 
 require 'honeybadger/version'
+require 'honeybadger/lock'
 require 'honeybadger/logging'
 require 'honeybadger/backend'
 require 'honeybadger/config/defaults'
@@ -54,6 +55,8 @@ module Honeybadger
 
       init_logging!
       init_backend!
+      # Remember that we have initialized honeybadger in a threadsafe var.
+      Honeybadger::Lock.init_status = detected_framework
 
       logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
       logger.warn('Development mode is enabled. Data will not be reported until you deploy your app.') if warn_development?

@@ -17,6 +17,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Use prepend to add Sidekiq Middleware to fix context getting cleared.
 - Add `Rack::QueryParser::ParameterTypeError` and
   `Rack::QueryParser::InvalidParameterError` to default ignore list.
+- Fix HB initialization for Rails apps in rake tasks without an environment dependency.
 
 ### Fixed
 - Use a unique route name in rails to avoid name conflicts.
