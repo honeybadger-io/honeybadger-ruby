@@ -9,7 +9,8 @@ adheres to [Semantic Versioning](http://semver.org/).
   hooks which will be invoked with a `notice` before a `notice` is sent. Each
   `before_notify` hook MUST be a `callable` (lambda, Proc etc,) with an arity of 1.
 - Added the ability to halt notices in callbacks using `notice.halt!`
-
+### Fixed
+- Ignore SIGTERM SignalExceptions.
 
 ## [3.3.0] - 2018-01-29
 ### Changed
