@@ -40,7 +40,7 @@ matrix:
       gemfile: gemfiles/rails.gemfile
     - rvm: 2.5.0
       gemfile: gemfiles/rails.gemfile
-    - rvm: jruby-9.1.4.0
+    - rvm: jruby-9.1.7.0
       gemfile: gemfiles/rails.gemfile
   exclude:
     - rvm: 2.1.10
@@ -65,11 +65,11 @@ matrix:
       gemfile: gemfiles/rails4.1.gemfile
     - rvm: 2.5.0
       gemfile: gemfiles/rails4.2.gemfile
-    - rvm: jruby-9.1.4.0
+    - rvm: jruby-9.1.7.0
       gemfile: gemfiles/binding_of_caller.gemfile
     # activesupport 4.0 depends on minitest ~> 4.2, Ruby 2.3 bundles minitest
     # 5. This isn't a problem locally, but it blows up Travis for some reason.
-    - rvm: jruby-9.1.4.0
+    - rvm: jruby-9.1.7.0
       gemfile: gemfiles/rails4.0.gemfile
 env:
   global:
