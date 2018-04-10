@@ -32,7 +32,7 @@ describe Honeybadger::Notice do
 
   def build_backtrace_array
     ["app/models/user.rb:13:in `magic'",
-      "app/controllers/users_controller.rb:8:in `index'"]
+     "app/controllers/users_controller.rb:8:in `index'"]
   end
 
   def assert_array_starts_with(expected, actual)
@@ -532,13 +532,53 @@ describe Honeybadger::Notice do
     end
   end
 
-  describe "#api_key=" do
-    it "can override the API key for the notice" do
-      notice = build_notice
+  describe 'public attrs' do
+    it 'can override them' do
+      {
+        api_key: 'fee00adf',
+        error_message: "Danny's revenge",
+        error_class: 'MujjuRocks',
+        backtrace: ['Mariana Trench!'],
+        fingerprint: 'Uniq',
+        tags: ['Zainu', 'Zohru'],
+        context: { user: 33 },
+        controller: 'AuthController',
+        action: 'become_admin',
+        parameters: { q: 'Marcus Aurelius' },
+        session: { uid: 42 },
+        url: "/surfs-up",
+        cause: RuntimeError.new('The sky is falling!')
+      }.each do |attr, val|
+        notice = build_notice
+        notice.send(:"#{attr}=", val)
 
-      notice.api_key = "Hello, world"
+        expect(notice.send(attr)).to eq(val)
+      end
+    end
+    it 'can NOT override with invalid values' do
+      {
+        api_key: :fee00adf,
+        error_message: ["Aah"],
+        error_class: String,
+        backtrace: 'Mariana Trench!',
+        fingerprint: 42,
+        tags: 'Zainu, Zohru',
+        context: [:user, 33],
+        controller: String,
+        action: :become_admin,
+        parameters: [:q, 'Marcus Aurelius'],
+        session: [:uid, 42],
+        url: :"/surfs-up",
+        cause: 'The sky is falling!'
+      }.each do |attr, val|
+        notice = build_notice
+        original_value = notice.send(attr)
 
-      expect(notice.api_key).to eq("Hello, world")
+        notice.send(:"#{attr}=", val)
+
+        expect(notice.send(attr)).to eq(original_value)
+        expect(notice.send(attr)).not_to eq(val)
+      end
     end
   end
 

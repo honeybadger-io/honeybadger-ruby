@@ -55,6 +55,16 @@ module Honeybadger
     # The Regexp used to strip invalid characters from individual tags.
     TAG_SANITIZER = /[^\w]/.freeze
 
+    def self.typed_attr_writer(method, type)
+      define_method(:"#{method}=") do |arg|
+        if !arg.is_a?(type)
+          puts "Discarding `#{method}=#{arg.inspect}`, it is not a #{type}."
+          return
+        end
+        instance_variable_set(:"@#{method}", arg)
+      end
+    end
+
     # The unique ID of this notice which can be used to reference the error in
     # Honeybadger.
     attr_reader :id
@@ -64,21 +74,31 @@ module Honeybadger
 
     # The exception cause if available.
     attr_reader :cause
+    typed_attr_writer :cause, Exception
 
     # The backtrace from the given exception or hash.
     attr_reader :backtrace
+    typed_attr_writer :backtrace, Array
 
     # Custom fingerprint for error, used to group similar errors together.
     attr_reader :fingerprint
+    typed_attr_writer :fingerprint, String
 
     # Tags which will be applied to error.
     attr_reader :tags
+    typed_attr_writer :tags, Array
 
     # The name of the class of error (example: RuntimeError).
     attr_reader :error_class
+    typed_attr_writer :error_class, String
 
     # The message from the exception, or a general description of the error.
     attr_reader :error_message
+    typed_attr_writer :error_message, String
+
+    # The context of the notice.
+    attr_reader :context
+    typed_attr_writer :context, Hash
 
     # Deprecated: Excerpt from source file.
     attr_reader :source
@@ -87,28 +107,33 @@ module Honeybadger
     def cgi_data; @request[:cgi_data]; end
 
     # A hash of parameters from the query string or post body.
-    def params; @request[:params]; end
+    def params; @parameters || @request[:params]; end
     alias_method :parameters, :params
+    typed_attr_writer :parameters, Hash
 
     # The component (if any) which was used in this request (usually the controller).
-    def component; @request[:component]; end
+    def component; @controller || @request[:component]; end
     alias_method :controller, :component
+    typed_attr_writer :controller, String
 
     # The action (if any) that was called in this request.
-    def action; @request[:action]; end
+    def action; @action || @request[:action]; end
+    typed_attr_writer :action, String
 
     # A hash of session data from the request.
-    def_delegator :@request, :session
-    def session; @request[:session]; end
+    def session; @session || @request[:session]; end
+    typed_attr_writer :session, Hash
 
     # The URL at which the error occurred (if any).
-    def url; @request[:url]; end
+    def url; @url || @request[:url]; end
+    typed_attr_writer :url, String
 
     # Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
     # Public: The API key used to deliver this notice.
-    attr_accessor :api_key
+    attr_reader :api_key
+    typed_attr_writer :api_key, String
 
     # @api private
     # Cache project path substitutions for backtrace lines.
@@ -261,7 +286,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes,
+    attr_reader :config, :opts, :stats, :now, :pid, :causes,
       :request_sanitizer, :rack_env
 
     def ignore_by_origin?
@@ -433,7 +458,7 @@ module Honeybadger
           end
 
           acc
-        }
+      }
 
       result_hash = Hash[results]
       request_sanitizer.sanitize(result_hash)
