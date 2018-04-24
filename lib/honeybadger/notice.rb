@@ -72,7 +72,11 @@ module Honeybadger
     attr_accessor :fingerprint
 
     # Tags which will be applied to error.
-    attr_accessor :tags
+    attr_reader :tags
+
+    def tags=(tags)
+      @tags = construct_tags(tags)
+    end
 
     # The name of the class of error (example: RuntimeError).
     attr_accessor :error_class
@@ -81,7 +85,10 @@ module Honeybadger
     attr_accessor :error_message
 
     # The context of the notice.
-    attr_accessor :context
+    attr_reader :context
+    def context=(context)
+      @context = construct_context_hash(@opts.merge(context: context), nil)
+    end
 
     # Deprecated: Excerpt from source file.
     attr_reader :source

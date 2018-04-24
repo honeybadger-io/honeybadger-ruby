@@ -555,31 +555,6 @@ describe Honeybadger::Notice do
         expect(notice.send(attr)).to eq(val)
       end
     end
-    it 'can NOT override with invalid values' do
-      {
-        api_key: :fee00adf,
-        error_message: ["Aah"],
-        error_class: String,
-        backtrace: 'Mariana Trench!',
-        fingerprint: 42,
-        tags: 'Zainu, Zohru',
-        context: [:user, 33],
-        controller: String,
-        action: :become_admin,
-        parameters: [:q, 'Marcus Aurelius'],
-        session: [:uid, 42],
-        url: :"/surfs-up",
-        cause: 'The sky is falling!'
-      }.each do |attr, val|
-        notice = build_notice
-        original_value = notice.send(attr)
-
-        notice.send(:"#{attr}=", val)
-
-        expect(notice.send(attr)).to eq(original_value)
-        expect(notice.send(attr)).not_to eq(val)
-      end
-    end
   end
 
   context "custom fingerprint" do
