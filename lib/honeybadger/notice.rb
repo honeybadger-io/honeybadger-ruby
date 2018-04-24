@@ -55,37 +55,50 @@ module Honeybadger
     # The Regexp used to strip invalid characters from individual tags.
     TAG_SANITIZER = /[^\w]/.freeze
 
+    # @api public
     # The unique ID of this notice which can be used to reference the error in
     # Honeybadger.
     attr_reader :id
 
+    # @api public
     # The exception that caused this notice, if any.
     attr_reader :exception
 
+    # @api public
     # The exception cause if available.
     attr_accessor :cause
 
+    # @api public
     # The backtrace from the given exception or hash.
     attr_accessor :backtrace
 
+    # @api public
     # Custom fingerprint for error, used to group similar errors together.
     attr_accessor :fingerprint
 
+    # @api public
     # Tags which will be applied to error.
     attr_reader :tags
 
+    # @api public
+    # Set the tags for the this notice.
     def tags=(tags)
       @tags = construct_tags(tags)
     end
 
+    # @api public
     # The name of the class of error (example: RuntimeError).
     attr_accessor :error_class
 
+    # @api public
     # The message from the exception, or a general description of the error.
     attr_accessor :error_message
 
-    # The context of the notice.
+    # @api public
+    # The context for the notice.
     attr_reader :context
+    # @api public
+    # Set the context for this notice.
     def context=(context)
       @context = construct_context_hash(@opts.merge(context: context), nil)
     end
@@ -96,32 +109,49 @@ module Honeybadger
     # CGI variables such as HTTP_METHOD.
     def cgi_data; @request[:cgi_data]; end
 
+    # @api public
     # A hash of parameters from the query string or post body.
     def params; @parameters || @request[:params]; end
     alias_method :parameters, :params
+    # @api public
+    # Set the params/parameters for this notice.
     attr_writer :parameters
 
+    # @api public
     # The component (if any) which was used in this request (usually the controller).
     def component; @controller || @request[:component]; end
     alias_method :controller, :component
+    # @api public
+    # Set the component/controller for this notice.
     attr_writer :controller
 
+    # @api public
     # The action (if any) that was called in this request.
     def action; @action || @request[:action]; end
+    # @api public
+    # Set the action for this notice.
     attr_writer :action
 
+    # @api public
     # A hash of session data from the request.
     def session; @session || @request[:session]; end
+    # @api public
+    # Set the session hash for this notice.
     attr_writer :session
 
+    # @api public
     # The URL at which the error occurred (if any).
     def url; @url || @request[:url]; end
+    # @api public
+    # Set the URL at which the error occured.
     attr_writer :url
 
+    # @api public
     # Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
-    # Public: The API key used to deliver this notice.
+    # @api public
+    # The API key used to deliver this notice.
     attr_accessor :api_key
 
     # @api private
