@@ -51,7 +51,7 @@ describe Honeybadger::Agent do
       instance = described_class.new(config)
 
       expect(instance.worker).to receive(:push) do |notice|
-        expect(notice.backtrace.to_a[0][:file]).to eq('[PROJECT_ROOT]/spec/unit/honeybadger/agent_spec.rb')
+        expect(notice.backtrace.to_a[0]).to match('lib/honeybadger/agent.rb')
       end
 
       instance.notify(error_message: 'testing backtrace generation')

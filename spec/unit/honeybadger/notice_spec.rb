@@ -116,20 +116,18 @@ describe Honeybadger::Notice do
   end
 
   it "sets sensible defaults without an exception" do
-    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
-    notice = build_notice(backtrace: build_backtrace_array)
+    backtrace = build_backtrace_array
+    notice = build_notice(backtrace: backtrace)
 
     expect(notice.error_message).to eq 'No message provided'
-    assert_array_starts_with(backtrace.lines, notice.backtrace.lines)
+    assert_array_starts_with(backtrace, notice.backtrace)
     expect(notice.params).to be_empty
     expect(notice.session).to be_empty
   end
 
   it "uses the caller as the backtrace for an exception without a backtrace" do
-    backtrace = Honeybadger::Backtrace.parse(caller, filters: Honeybadger::Notice::BACKTRACE_FILTERS)
     notice = build_notice(exception: StandardError.new('error'), backtrace: nil)
-
-    assert_array_starts_with backtrace.lines, notice.backtrace.lines
+    assert_array_starts_with caller, notice.backtrace
   end
 
   it "does not send empty request data" do
@@ -520,7 +518,6 @@ describe Honeybadger::Notice do
     it "converts the backtrace to an array" do
       notice = build_notice
       expect(notice.as_json[:error][:backtrace]).to be_a Array
-      expect(notice.as_json[:error][:backtrace]).to eq notice.backtrace.to_ary
     end
 
     it "trims error message to 64k" do
@@ -595,8 +592,8 @@ describe Honeybadger::Notice do
 
     it "passes its backtrace filters for parsing" do
       allow(config).to receive(:backtrace_filter).and_return('foo')
-      expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(filters: array_including('foo'))).and_return(double(lines: []))
-      build_notice({exception: @exception, config: config})
+      expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(filters: array_including('foo'))).and_return(double(to_a: []))
+      build_notice({exception: @exception, config: config}).to_json
     end
 
     it "passes backtrace line filters for parsing" do
@@ -606,11 +603,11 @@ describe Honeybadger::Notice do
         expect(Honeybadger::Backtrace::Line).to receive(:parse).with(line, hash_including({filters: array_including('foo'), config: config}))
       end
 
-      build_notice({exception: @exception, callbacks: config, config: config})
+      build_notice({exception: @exception, callbacks: config, config: config}).to_json
     end
 
     it "accepts a backtrace from an exception or hash" do
-      backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
+      backtrace = @backtrace_array
       notice_from_exception = build_notice(exception: @exception)
 
       expect(notice_from_exception.backtrace).to eq backtrace # backtrace was not correctly set from an exception

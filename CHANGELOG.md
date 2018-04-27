@@ -13,6 +13,21 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Ignore SIGTERM SignalExceptions.
 
+### Changed
+- The public method `Notice#backtrace` is now exposed as the raw Ruby
+  backtrace instead of an instance of `Honeybadger::Backtrace` (a private
+  class).
+
+  Before:
+  ```ruby
+  notice.backtrace # => #<Honeybadger::Backtrace>
+  ```
+
+  After:
+  ```ruby
+  notice.backtrace # => ["/path/to/file.rb:5 in `method'"]
+  ```
+
 ## [3.3.0] - 2018-01-29
 ### Changed
 - Use prepend to add Sidekiq Middleware to fix context getting cleared.

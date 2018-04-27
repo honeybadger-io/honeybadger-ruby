@@ -66,7 +66,7 @@ module Honeybadger
     attr_reader :cause
 
     # The backtrace from the given exception or hash.
-    attr_reader :backtrace
+    attr_accessor :backtrace
 
     # Custom fingerprint for error, used to group similar errors together.
     attr_reader :fingerprint
@@ -159,7 +159,8 @@ module Honeybadger
       @error_message = exception_attribute(:error_message, 'No message provided') do |exception|
         "#{exception.class.name}: #{exception.message}"
       end
-      @backtrace = parse_backtrace(exception_attribute(:backtrace, caller))
+
+      self.backtrace = exception_attribute(:backtrace, caller)
 
       @request = construct_request_hash(config, opts)
 
@@ -198,7 +199,7 @@ module Honeybadger
           token: id,
           class: s(error_class),
           message: s(error_message),
-          backtrace: s(backtrace.to_a),
+          backtrace: s(parse_backtrace(backtrace)),
           fingerprint: s(fingerprint),
           tags: s(tags),
           causes: s(causes)
@@ -457,7 +458,7 @@ module Honeybadger
         filters: construct_backtrace_filters(opts),
         config: config,
         source_radius: config[:'exceptions.source_radius']
-      )
+      ).to_a
     end
 
     # Unwrap the exception so that original exception is ignored or
@@ -499,7 +500,7 @@ module Honeybadger
         causes << {
           class: c.class.name,
           message: c.message,
-          backtrace: parse_backtrace(c.backtrace || caller).to_a
+          backtrace: parse_backtrace(c.backtrace || caller)
         }
         i += 1
         c = exception_cause(c)
