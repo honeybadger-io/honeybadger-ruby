@@ -78,10 +78,10 @@ module Honeybadger
     end
 
     # The name of the class of error (example: RuntimeError).
-    attr_reader :error_class
+    attr_accessor :error_class
 
     # The message from the exception, or a general description of the error.
-    attr_reader :error_message
+    attr_accessor :error_message
 
     # Deprecated: Excerpt from source file.
     attr_reader :source
@@ -158,8 +158,8 @@ module Honeybadger
       @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
 
       @exception = unwrap_exception(opts[:exception])
-      @error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
-      @error_message = exception_attribute(:error_message, 'No message provided') do |exception|
+      self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
+      self.error_message = exception_attribute(:error_message, 'No message provided') do |exception|
         "#{exception.class.name}: #{exception.message}"
       end
 
