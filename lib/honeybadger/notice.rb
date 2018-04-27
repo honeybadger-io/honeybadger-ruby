@@ -149,40 +149,32 @@ module Honeybadger
 
     # @api private
     def initialize(config, opts = {})
-      @now = Time.now.utc
-      @pid = Process.pid
-      @id = SecureRandom.uuid
+      @now   = Time.now.utc
+      @pid   = Process.pid
+      @id    = SecureRandom.uuid
+      @stats = Util::Stats.all
 
       @opts = opts
       @config = config
 
       @rack_env = opts.fetch(:rack_env, nil)
-
       @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
+      @request = construct_request_hash(config, opts)
 
       @exception = unwrap_exception(opts[:exception])
+      @cause = opts[:cause] || exception_cause(@exception) || $!
+      @causes = unwrap_causes(@cause)
+
       self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
       self.error_message = exception_attribute(:error_message, 'No message provided') do |exception|
         "#{exception.class.name}: #{exception.message}"
       end
-
       self.backtrace = exception_attribute(:backtrace, caller)
 
-      @request = construct_request_hash(config, opts)
-
       self.context = construct_context_hash(opts, exception)
-
-      @cause = opts[:cause] || exception_cause(@exception) || $!
-      @causes = unwrap_causes(@cause)
-
-      self.tags = opts[:tags]
-      self.tags = tags | construct_tags(context[:tags]) if context
-
-      @stats = Util::Stats.all
-
       self.local_variables = local_variables_from_exception(exception, config)
-
       self.api_key = opts[:api_key] || config[:api_key]
+      self.tags = construct_tags(opts[:tags]) | construct_tags(context[:tags])
 
       monkey_patch_action_dispatch_test_process!
 
