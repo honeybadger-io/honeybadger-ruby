@@ -547,23 +547,28 @@ describe Honeybadger::Notice do
 
     it "accepts fingerprint as string" do
       notice = build_notice({fingerprint: 'foo' })
-      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      expect(notice.fingerprint).to eq 'foo'
+      expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
     it "accepts fingerprint responding to #call" do
       notice = build_notice({fingerprint: double(call: 'foo')})
-      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      expect(notice.fingerprint).to eq 'foo'
+      expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
     it "accepts fingerprint using #to_s" do
-      notice = build_notice({fingerprint: double(to_s: 'foo')})
-      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      object = double(to_s: 'foo')
+      notice = build_notice({fingerprint: object})
+      expect(notice.fingerprint).to eq object
+      expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
     context "fingerprint is a callback which accesses notice" do
       it "can access request information" do
         notice = build_notice({params: { key: 'foo' }, fingerprint: lambda {|n| n[:params][:key] }})
-        expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+        expect(notice.fingerprint).to eq 'foo'
+        expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
       end
     end
   end

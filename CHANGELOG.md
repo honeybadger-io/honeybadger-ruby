@@ -38,6 +38,10 @@ adheres to [Semantic Versioning](http://semver.org/).
   ```ruby
   notice[:context] # => {}
   ```
+- The public method `Notice#fingerprint` now returns the original
+  String which was passed in from the `:fingerprint` option or the
+  `exception_fingerprint` callback, not a SHA1 hashed value. The value is
+  still hashed before sending through to the API.
 
 ## [3.3.0] - 2018-01-29
 ### Changed

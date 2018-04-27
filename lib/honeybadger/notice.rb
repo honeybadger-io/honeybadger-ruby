@@ -69,7 +69,7 @@ module Honeybadger
     attr_accessor :backtrace
 
     # Custom fingerprint for error, used to group similar errors together.
-    attr_reader :fingerprint
+    attr_accessor :fingerprint
 
     # Tags which will be applied to error.
     attr_reader :tags
@@ -187,7 +187,7 @@ module Honeybadger
       monkey_patch_action_dispatch_test_process!
 
       # Fingerprint must be calculated last since callback operates on `self`.
-      @fingerprint = construct_fingerprint(opts)
+      self.fingerprint = fingerprint_from_opts(opts)
     end
 
     # @api private
@@ -206,7 +206,7 @@ module Honeybadger
           class: s(error_class),
           message: s(error_message),
           backtrace: s(parse_backtrace(backtrace)),
-          fingerprint: s(fingerprint),
+          fingerprint: fingerprint_hash,
           tags: s(tags),
           causes: s(causes)
         },
@@ -389,11 +389,9 @@ module Honeybadger
       end
     end
 
-    def construct_fingerprint(opts)
-      fingerprint = fingerprint_from_opts(opts)
-      if fingerprint && fingerprint.respond_to?(:to_s)
-        Digest::SHA1.hexdigest(fingerprint.to_s)
-      end
+    def fingerprint_hash
+      return unless fingerprint
+      Digest::SHA1.hexdigest(fingerprint.to_s)
     end
 
     def construct_tags(tags)
