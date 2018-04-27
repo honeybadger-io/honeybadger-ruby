@@ -27,6 +27,17 @@ adheres to [Semantic Versioning](http://semver.org/).
   ```ruby
   notice.backtrace # => ["/path/to/file.rb:5 in `method'"]
   ```
+- `notice[:context]` now defaults to an empty Hash instead of nil.
+
+  Before:
+  ```ruby
+  notice[:context] # => nil
+  ```
+
+  After:
+  ```ruby
+  notice[:context] # => {}
+  ```
 
 ## [3.3.0] - 2018-01-29
 ### Changed

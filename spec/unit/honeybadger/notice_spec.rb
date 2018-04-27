@@ -301,7 +301,7 @@ describe Honeybadger::Notice do
 
     it "skips exception context when method isn't defined" do
       notice = build_notice(exception: RuntimeError.new)
-      expect(notice[:request][:context]).to be_nil
+      expect(notice[:request][:context]).to eq({})
     end
 
     it "merges context in order of precedence: local, exception, global" do
@@ -334,9 +334,9 @@ describe Honeybadger::Notice do
       expect { build_notice(global_context: global_context, context: hash) }.not_to change { hash }
     end
 
-    it "returns nil context when context is not set" do
+    it "returns empty Hash when context is not set" do
       notice = build_notice
-      expect(notice[:request][:context]).to be_nil
+      expect(notice[:request][:context]).to eq({})
     end
 
     it "allows falsey values in context" do

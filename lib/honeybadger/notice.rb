@@ -83,6 +83,9 @@ module Honeybadger
     # The message from the exception, or a general description of the error.
     attr_accessor :error_message
 
+    # The context Hash.
+    attr_accessor :context
+
     # CGI variables such as HTTP_METHOD.
     def cgi_data; @request[:cgi_data]; end
 
@@ -167,7 +170,7 @@ module Honeybadger
 
       @request = construct_request_hash(config, opts)
 
-      @context = construct_context_hash(opts, exception)
+      self.context = construct_context_hash(opts, exception)
 
       @cause = opts[:cause] || exception_cause(@exception) || $!
       @causes = unwrap_causes(@cause)
@@ -265,7 +268,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :context, :stats, :now, :pid, :causes,
+    attr_reader :config, :opts, :stats, :now, :pid, :causes,
       :request_sanitizer, :rack_env
 
     def ignore_by_origin?
@@ -372,7 +375,7 @@ module Honeybadger
       context.merge!(Context(opts[:global_context]))
       context.merge!(exception_context(exception))
       context.merge!(Context(opts[:context]))
-      context.empty? ? nil : context
+      context
     end
 
     def fingerprint_from_opts(opts)
