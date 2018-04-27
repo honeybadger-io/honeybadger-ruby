@@ -73,6 +73,9 @@ module Honeybadger
 
     # Tags which will be applied to error.
     attr_reader :tags
+    def tags=(tags)
+      @tags = construct_tags(tags)
+    end
 
     # The name of the class of error (example: RuntimeError).
     attr_reader :error_class
@@ -169,8 +172,8 @@ module Honeybadger
       @cause = opts[:cause] || exception_cause(@exception) || $!
       @causes = unwrap_causes(@cause)
 
-      @tags = construct_tags(opts[:tags])
-      @tags = construct_tags(context[:tags]) | @tags if context
+      self.tags = opts[:tags]
+      self.tags = tags | construct_tags(context[:tags]) if context
 
       @stats = Util::Stats.all
 

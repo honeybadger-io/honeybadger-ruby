@@ -791,8 +791,12 @@ describe Honeybadger::Notice do
 
     context "from both" do
       it "merges tags" do
-        expect(build_notice(tags: 'baz', context: { tags: ' foo  , bar ' }).tags).to eq(%w(foo bar baz))
+        expect(build_notice(tags: 'foo , bar', context: { tags: ' foo , baz ' }).tags).to eq(%w(foo bar baz))
       end
+    end
+
+    it "converts nil to empty Array" do
+      expect(build_notice(tags: nil).tags).to eq([])
     end
   end
 
