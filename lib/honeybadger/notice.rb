@@ -108,7 +108,7 @@ module Honeybadger
     def url; @request[:url]; end
 
     # Local variables are extracted from first frame of backtrace.
-    attr_reader :local_variables
+    attr_accessor :local_variables
 
     # The API key used to deliver this notice.
     attr_accessor :api_key
@@ -180,7 +180,7 @@ module Honeybadger
 
       @stats = Util::Stats.all
 
-      @local_variables = local_variables_from_exception(exception, config)
+      self.local_variables = local_variables_from_exception(exception, config)
 
       @api_key = opts[:api_key] || config[:api_key]
 
