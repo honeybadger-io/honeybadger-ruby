@@ -83,9 +83,6 @@ module Honeybadger
     # The message from the exception, or a general description of the error.
     attr_accessor :error_message
 
-    # Deprecated: Excerpt from source file.
-    attr_reader :source
-
     # CGI variables such as HTTP_METHOD.
     def cgi_data; @request[:cgi_data]; end
 
@@ -110,8 +107,11 @@ module Honeybadger
     # Local variables are extracted from first frame of backtrace.
     attr_reader :local_variables
 
-    # Public: The API key used to deliver this notice.
+    # The API key used to deliver this notice.
     attr_accessor :api_key
+
+    # Deprecated: Excerpt from source file.
+    attr_reader :source
 
     # @api private
     # Cache project path substitutions for backtrace lines.
