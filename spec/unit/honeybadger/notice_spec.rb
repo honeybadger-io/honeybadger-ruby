@@ -529,13 +529,31 @@ describe Honeybadger::Notice do
     end
   end
 
-  describe "#api_key=" do
-    it "can override the API key for the notice" do
-      notice = build_notice
+  describe 'public attributes' do
+    it 'assigns the same values from each opt and setter method' do
+      opts = {
+        api_key: 'custom api key',
+        error_message: 'badgers!',
+        error_class: 'MyError',
+        backtrace: ["/path/to/file.rb:5 in `method'"],
+        fingerprint: 'some unique string',
+        tags: ['foo', 'bar'],
+        context: { user: 33 },
+        # TODO
+        # controller: 'AuthController',
+        # action: 'become_admin',
+        # parameters: { q: 'Marcus Aurelius' },
+        # session: { uid: 42 },
+        # url: "/surfs-up",
+      }
 
-      notice.api_key = "Hello, world"
-
-      expect(notice.api_key).to eq("Hello, world")
+      opts_notice = build_notice(opts)
+      opts.each do |attr, val|
+        setter_notice = build_notice
+        setter_notice.send(:"#{attr}=", val)
+        expect(setter_notice.send(attr)).to eq(val)
+        expect(opts_notice.send(attr)).to eq(val)
+      end
     end
   end
 
