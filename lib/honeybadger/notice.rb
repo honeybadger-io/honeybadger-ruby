@@ -182,7 +182,7 @@ module Honeybadger
 
       self.local_variables = local_variables_from_exception(exception, config)
 
-      @api_key = opts[:api_key] || config[:api_key]
+      self.api_key = opts[:api_key] || config[:api_key]
 
       monkey_patch_action_dispatch_test_process!
 
