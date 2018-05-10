@@ -29,7 +29,6 @@ module Honeybadger
           payload[key] = sanitizer.sanitize(opts[key])
         end
 
-        payload[:session] = opts[:session][:data] if opts[:session] && opts[:session][:data]
         payload[:url] = sanitizer.filter_url(payload[:url]) if payload[:url]
         if payload[:cgi_data][HTTP_COOKIE_KEY]
           payload[:cgi_data][HTTP_COOKIE_KEY] = sanitizer.filter_cookies(payload[:cgi_data][HTTP_COOKIE_KEY])

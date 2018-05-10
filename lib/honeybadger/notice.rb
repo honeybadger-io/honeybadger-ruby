@@ -87,25 +87,24 @@ module Honeybadger
     attr_accessor :context
 
     # CGI variables such as HTTP_METHOD.
-    def cgi_data; @request[:cgi_data]; end
+    attr_accessor :cgi_data
 
     # A hash of parameters from the query string or post body.
-    def params; @request[:params]; end
+    attr_accessor :params
     alias_method :parameters, :params
 
     # The component (if any) which was used in this request (usually the controller).
-    def component; @request[:component]; end
+    attr_accessor :component
     alias_method :controller, :component
 
     # The action (if any) that was called in this request.
-    def action; @request[:action]; end
+    attr_accessor :action
 
     # A hash of session data from the request.
-    def_delegator :@request, :session
-    def session; @request[:session]; end
+    attr_accessor :session
 
     # The URL at which the error occurred (if any).
-    def url; @request[:url]; end
+    attr_accessor :url
 
     # Local variables are extracted from first frame of backtrace.
     attr_accessor :local_variables
@@ -159,10 +158,10 @@ module Honeybadger
 
       @rack_env = opts.fetch(:rack_env, nil)
       @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
-      @request = construct_request_hash(config, opts)
 
       @exception = unwrap_exception(opts[:exception])
       @cause = opts[:cause] || exception_cause(@exception) || $!
+
       @causes = unwrap_causes(@cause)
 
       self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
@@ -176,7 +175,14 @@ module Honeybadger
       self.api_key = opts[:api_key] || config[:api_key]
       self.tags = construct_tags(opts[:tags]) | construct_tags(context[:tags])
 
-      monkey_patch_action_dispatch_test_process!
+      self.url       = opts[:url]        || request_hash[:url]      || nil
+      self.action    = opts[:action]     || request_hash[:action]   || nil
+      self.component = opts[:controller] || opts[:component]        || request_hash[:component] || nil
+      self.params    = opts[:parameters] || opts[:params]           || request_hash[:params] || {}
+      self.session   = opts[:session]    || request_hash[:session]  || {}
+      self.cgi_data  = opts[:cgi_data]   || request_hash[:cgi_data] || {}
+
+      self.session = opts[:session][:data] if opts[:session] && opts[:session][:data]
 
       # Fingerprint must be calculated last since callback operates on `self`.
       self.fingerprint = fingerprint_from_opts(opts)
@@ -187,8 +193,9 @@ module Honeybadger
     #
     # @return [Hash] JSON representation of notice.
     def as_json(*args)
-      @request[:context] = s(context)
-      @request[:local_variables] = local_variables if local_variables
+      request = construct_request_hash
+      request[:context] = s(context)
+      request[:local_variables] = local_variables if local_variables
 
       {
         api_key: s(api_key),
@@ -202,7 +209,7 @@ module Honeybadger
           tags: s(tags),
           causes: s(causes)
         },
-        request: @request,
+        request: request,
         server: {
           project_root: s(config[:root]),
           revision: s(config[:revision]),
@@ -332,21 +339,23 @@ module Honeybadger
     end
 
     def request_hash
-      return {} unless rack_env
-      Util::RequestHash.from_env(rack_env)
+      @request_hash ||= Util::RequestHash.from_env(rack_env)
     end
 
-    # Construct the request object with data from various sources.
+    # Construct the request data.
     #
-    # Returns Request.
-    def construct_request_hash(config, opts)
-      request = {}
-      request.merge!(request_hash)
-      request.merge!(opts)
-      request[:component] = opts[:controller] if opts.has_key?(:controller)
-      request[:params] = opts[:parameters] if opts.has_key?(:parameters)
+    # Returns Hash request data.
+    def construct_request_hash
+      request = {
+        url: url,
+        component: component,
+        action: action,
+        params: params,
+        session: session,
+        cgi_data: cgi_data,
+        sanitizer: request_sanitizer
+      }
       request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
-      request[:sanitizer] = request_sanitizer
       Util::RequestPayload.build(request)
     end
 
@@ -512,40 +521,5 @@ module Honeybadger
     def rails_params_filters
       rack_env && Array(rack_env['action_dispatch.parameter_filter']) or []
     end
-
-    # This is how much Honeybadger cares about Rails developers. :)
-    #
-    # Some Rails projects include ActionDispatch::TestProcess globally for the
-    # use of `fixture_file_upload` in tests. This is a bad practice because it
-    # includes other methods -- such as #session -- which override existing
-    # methods on *all objects*. This creates the following bug in Notice:
-    #
-    # When you call #session on any object which had previously defined it
-    # (such as OpenStruct), that newly defined method calls #session on
-    # +@request+ (defined in `ActionDispatch::TestProcess`), and if +@request+
-    # doesn't exist in that object, it calls #session *again* on `nil`, which
-    # also inherited it from Object, resulting in a SystemStackError.
-    #
-    # See https://stackoverflow.com/questions/18202261/include-actiondispatchtestprocess-prevents-guard-from-reloading-properly
-    # for more info.
-    #
-    # This method restores the correct #session method on @request and warns
-    # the user of the issue.
-    #
-    # Returns nothing.
-    def monkey_patch_action_dispatch_test_process!
-      return unless defined?(ActionDispatch::TestProcess) && defined?(self.fixture_file_upload)
-
-      STDOUT.puts('WARNING: It appears you may be including ActionDispatch::TestProcess globally. Check out https://www.honeybadger.io/s/adtp for more info.')
-
-      def @request.session
-        @table[:session]
-      end
-
-      def self.session
-        @request.session
-      end
-    end
-
   end
 end
