@@ -9,6 +9,25 @@ adheres to [Semantic Versioning](http://semver.org/).
   hooks which will be invoked with a `notice` before a `notice` is sent. Each
   `before_notify` hook MUST be a `callable` (lambda, Proc etc,) with an arity of 1.
 - Added the ability to halt notices in callbacks using `notice.halt!`
+- Make essential attributes on Notice writable:
+  ```ruby
+  Honeybadger.configure do |config|
+    config.before_notify do |notice|
+      notice.api_key = 'custom api key',
+      notice.error_message = "badgers!",
+      notice.error_class = 'MyError',
+      notice.backtrace = ["/path/to/file.rb:5 in `method'"],
+      notice.fingerprint = 'some unique string',
+      notice.tags = ['foo', 'bar'],
+      notice.context = { user: 33 },
+      notice.controller = 'MyController',
+      notice.action = 'index',
+      notice.parameters = { q: 'badgers?' },
+      notice.session = { uid: 42 },
+      notice.url = "/badgers",
+    end
+  end
+  ```
 
 ### Fixed
 - Ignore SIGTERM SignalExceptions.
