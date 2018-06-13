@@ -116,20 +116,18 @@ describe Honeybadger::Notice do
   end
 
   it "sets sensible defaults without an exception" do
-    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
-    notice = build_notice(backtrace: build_backtrace_array)
+    backtrace = build_backtrace_array
+    notice = build_notice(backtrace: backtrace)
 
     expect(notice.error_message).to eq 'No message provided'
-    assert_array_starts_with(backtrace.lines, notice.backtrace.lines)
+    assert_array_starts_with(backtrace, notice.backtrace)
     expect(notice.params).to be_empty
     expect(notice.session).to be_empty
   end
 
   it "uses the caller as the backtrace for an exception without a backtrace" do
-    backtrace = Honeybadger::Backtrace.parse(caller, filters: Honeybadger::Notice::BACKTRACE_FILTERS)
     notice = build_notice(exception: StandardError.new('error'), backtrace: nil)
-
-    assert_array_starts_with backtrace.lines, notice.backtrace.lines
+    assert_array_starts_with caller, notice.backtrace
   end
 
   it "does not send empty request data" do
@@ -303,7 +301,7 @@ describe Honeybadger::Notice do
 
     it "skips exception context when method isn't defined" do
       notice = build_notice(exception: RuntimeError.new)
-      expect(notice[:request][:context]).to be_nil
+      expect(notice[:request][:context]).to eq({})
     end
 
     it "merges context in order of precedence: local, exception, global" do
@@ -336,9 +334,9 @@ describe Honeybadger::Notice do
       expect { build_notice(global_context: global_context, context: hash) }.not_to change { hash }
     end
 
-    it "returns nil context when context is not set" do
+    it "returns empty Hash when context is not set" do
       notice = build_notice
-      expect(notice[:request][:context]).to be_nil
+      expect(notice[:request][:context]).to eq({})
     end
 
     it "allows falsey values in context" do
@@ -520,7 +518,6 @@ describe Honeybadger::Notice do
     it "converts the backtrace to an array" do
       notice = build_notice
       expect(notice.as_json[:error][:backtrace]).to be_a Array
-      expect(notice.as_json[:error][:backtrace]).to eq notice.backtrace.to_ary
     end
 
     it "trims error message to 64k" do
@@ -532,13 +529,31 @@ describe Honeybadger::Notice do
     end
   end
 
-  describe "#api_key=" do
-    it "can override the API key for the notice" do
-      notice = build_notice
+  describe 'public attributes' do
+    it 'assigns the same values from each opt and setter method' do
+      opts = {
+        api_key: 'custom api key',
+        error_message: 'badgers!',
+        error_class: 'MyError',
+        backtrace: ["/path/to/file.rb:5 in `method'"],
+        fingerprint: 'some unique string',
+        tags: ['foo', 'bar'],
+        context: { user: 33 },
+        # TODO
+        # controller: 'AuthController',
+        # action: 'become_admin',
+        # parameters: { q: 'Marcus Aurelius' },
+        # session: { uid: 42 },
+        # url: "/surfs-up",
+      }
 
-      notice.api_key = "Hello, world"
-
-      expect(notice.api_key).to eq("Hello, world")
+      opts_notice = build_notice(opts)
+      opts.each do |attr, val|
+        setter_notice = build_notice
+        setter_notice.send(:"#{attr}=", val)
+        expect(setter_notice.send(attr)).to eq(val)
+        expect(opts_notice.send(attr)).to eq(val)
+      end
     end
   end
 
@@ -550,23 +565,28 @@ describe Honeybadger::Notice do
 
     it "accepts fingerprint as string" do
       notice = build_notice({fingerprint: 'foo' })
-      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      expect(notice.fingerprint).to eq 'foo'
+      expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
     it "accepts fingerprint responding to #call" do
       notice = build_notice({fingerprint: double(call: 'foo')})
-      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      expect(notice.fingerprint).to eq 'foo'
+      expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
     it "accepts fingerprint using #to_s" do
-      notice = build_notice({fingerprint: double(to_s: 'foo')})
-      expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+      object = double(to_s: 'foo')
+      notice = build_notice({fingerprint: object})
+      expect(notice.fingerprint).to eq object
+      expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
     end
 
     context "fingerprint is a callback which accesses notice" do
       it "can access request information" do
         notice = build_notice({params: { key: 'foo' }, fingerprint: lambda {|n| n[:params][:key] }})
-        expect(notice.fingerprint).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
+        expect(notice.fingerprint).to eq 'foo'
+        expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
       end
     end
   end
@@ -595,8 +615,8 @@ describe Honeybadger::Notice do
 
     it "passes its backtrace filters for parsing" do
       allow(config).to receive(:backtrace_filter).and_return('foo')
-      expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(filters: array_including('foo'))).and_return(double(lines: []))
-      build_notice({exception: @exception, config: config})
+      expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(filters: array_including('foo'))).and_return(double(to_a: []))
+      build_notice({exception: @exception, config: config}).to_json
     end
 
     it "passes backtrace line filters for parsing" do
@@ -606,11 +626,11 @@ describe Honeybadger::Notice do
         expect(Honeybadger::Backtrace::Line).to receive(:parse).with(line, hash_including({filters: array_including('foo'), config: config}))
       end
 
-      build_notice({exception: @exception, callbacks: config, config: config})
+      build_notice({exception: @exception, callbacks: config, config: config}).to_json
     end
 
     it "accepts a backtrace from an exception or hash" do
-      backtrace = Honeybadger::Backtrace.parse(@backtrace_array)
+      backtrace = @backtrace_array
       notice_from_exception = build_notice(exception: @exception)
 
       expect(notice_from_exception.backtrace).to eq backtrace # backtrace was not correctly set from an exception
@@ -794,8 +814,12 @@ describe Honeybadger::Notice do
 
     context "from both" do
       it "merges tags" do
-        expect(build_notice(tags: 'baz', context: { tags: ' foo  , bar ' }).tags).to eq(%w(foo bar baz))
+        expect(build_notice(tags: 'foo , bar', context: { tags: ' foo , baz ' }).tags).to eq(%w(foo bar baz))
       end
+    end
+
+    it "converts nil to empty Array" do
+      expect(build_notice(tags: nil).tags).to eq([])
     end
   end
 

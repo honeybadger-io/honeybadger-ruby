@@ -26,6 +26,7 @@ module Honeybadger
 
       def self.from_env(env)
         return {} unless defined?(::Rack::Request)
+        return {} unless env
 
         hash, request = {}, ::Rack::Request.new(env)
 

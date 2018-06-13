@@ -9,9 +9,58 @@ adheres to [Semantic Versioning](http://semver.org/).
   hooks which will be invoked with a `notice` before a `notice` is sent. Each
   `before_notify` hook MUST be a `callable` (lambda, Proc etc,) with an arity of 1.
 - Added the ability to halt notices in callbacks using `notice.halt!`
+- Make essential attributes on Notice writable:
+  ```ruby
+  Honeybadger.configure do |config|
+    config.before_notify do |notice|
+      notice.api_key = 'custom api key',
+      notice.error_message = "badgers!",
+      notice.error_class = 'MyError',
+      notice.backtrace = ["/path/to/file.rb:5 in `method'"],
+      notice.fingerprint = 'some unique string',
+      notice.tags = ['foo', 'bar'],
+      notice.context = { user: 33 },
+      notice.controller = 'MyController',
+      notice.action = 'index',
+      notice.parameters = { q: 'badgers?' },
+      notice.session = { uid: 42 },
+      notice.url = "/badgers",
+    end
+  end
+  ```
 
 ### Fixed
 - Ignore SIGTERM SignalExceptions.
+
+### Changed
+- The public method `Notice#backtrace` is now exposed as the raw Ruby
+  backtrace instead of an instance of `Honeybadger::Backtrace` (a private
+  class).
+
+  Before:
+  ```ruby
+  notice.backtrace # => #<Honeybadger::Backtrace>
+  ```
+
+  After:
+  ```ruby
+  notice.backtrace # => ["/path/to/file.rb:5 in `method'"]
+  ```
+- `notice[:context]` now defaults to an empty Hash instead of nil.
+
+  Before:
+  ```ruby
+  notice[:context] # => nil
+  ```
+
+  After:
+  ```ruby
+  notice[:context] # => {}
+  ```
+- The public method `Notice#fingerprint` now returns the original
+  String which was passed in from the `:fingerprint` option or the
+  `exception_fingerprint` callback, not a SHA1 hashed value. The value is
+  still hashed before sending through to the API.
 
 ## [3.3.0] - 2018-01-29
 ### Changed
