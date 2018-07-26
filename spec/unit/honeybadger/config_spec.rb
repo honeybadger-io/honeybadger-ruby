@@ -3,7 +3,6 @@ require 'honeybadger/backend/base'
 require 'net/http'
 
 describe Honeybadger::Config do
-  specify { expect(subject[:disabled]).to eq false }
   specify { expect(subject[:env]).to eq nil }
   specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
   specify { expect(subject[:debug]).to eq false }
@@ -18,14 +17,14 @@ describe Honeybadger::Config do
 
     context "with multiple forms of config" do
       it "overrides config with options" do
-        config.init!(disabled: true)
-        expect(config[:disabled]).to eq true
+        config.init!(report_data: true)
+        expect(config[:report_data]).to eq true
       end
 
       it "prefers ENV to options" do
-        env['HONEYBADGER_DISABLED'] = 'true'
-        config.init!({disabled: false}, env)
-        expect(config[:disabled]).to eq true
+        env['HONEYBADGER_API_KEY'] = 'dan'
+        config.init!({api_key: 'muj'}, env)
+        expect(config[:api_key]).to eq 'dan'
       end
 
       it "prefers file to options" do
@@ -97,7 +96,7 @@ describe Honeybadger::Config do
   end
 
   describe "#get" do
-    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, disabled: true, debug: true}.merge!(opts)) }
+    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, debug: true}.merge!(opts)) }
     let(:opts) { {} }
 
     context "when a normal option doesn't exist" do
@@ -116,7 +115,7 @@ describe Honeybadger::Config do
   end
 
   describe "#ignored_classes" do
-    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, disabled: true, debug: true}.merge!(opts)) }
+    let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, debug: true}.merge!(opts)) }
     let(:opts) { { :'exceptions.ignore' => ['foo']} }
 
     it "returns the exceptions.ignore option value plus defaults" do

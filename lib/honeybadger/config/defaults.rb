@@ -68,11 +68,6 @@ module Honeybadger
         default: false,
         type: Boolean
       },
-      disabled: {
-        description: 'Prevents Honeybadger from starting entirely.',
-        default: false,
-        type: Boolean
-      },
       development_environments: {
         description: 'Environments which will not report data by default (use report_data to enable/disable explicitly).',
         default: DEVELOPMENT_ENVIRONMENTS,
