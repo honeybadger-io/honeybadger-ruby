@@ -31,6 +31,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Ignore SIGTERM SignalExceptions.
+- Fix synchronous throttling in shoryuken
 
 ### Changed
 - The public method `Notice#backtrace` is now exposed as the raw Ruby
