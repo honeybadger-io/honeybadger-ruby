@@ -62,6 +62,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   `exception_fingerprint` callback, not a SHA1 hashed value. The value is
   still hashed before sending through to the API.
 
+### Removed
+- The `disabled` option is now removed, Use the `report_data` option instead.
+
 ## [3.3.0] - 2018-01-29
 ### Changed
 - Use prepend to add Sidekiq Middleware to fix context getting cleared.
