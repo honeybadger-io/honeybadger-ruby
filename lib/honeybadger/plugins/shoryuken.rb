@@ -6,16 +6,14 @@ module Honeybadger
     module Shoryuken
       class Middleware
         def call(_worker, _queue, sqs_msg, body)
-          Honeybadger.flush do
-            begin
-              yield
-            rescue => e
-              if attempt_threshold <= receive_count(sqs_msg)
-                Honeybadger.notify(e, parameters: notification_params(body))
-              end
-
-              raise e
+          begin
+            yield
+          rescue => e
+            if attempt_threshold <= receive_count(sqs_msg)
+              Honeybadger.notify(e, parameters: notification_params(body))
             end
+
+            raise e
           end
         ensure
           Honeybadger.context.clear!

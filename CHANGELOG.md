@@ -65,6 +65,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - The `disabled` option is now removed, Use the `report_data` option instead.
 
+## [3.3.1] - 2018-08-02
+### Fixed
+- Fix synchronous throttling in shoryuken
+
 ## [3.3.0] - 2018-01-29
 ### Changed
 - Use prepend to add Sidekiq Middleware to fix context getting cleared.
