@@ -1,6 +1,7 @@
 branches:
   only:
     - master
+    - 3.3-stable
 language: ruby
 cache: bundler
 before_install:
