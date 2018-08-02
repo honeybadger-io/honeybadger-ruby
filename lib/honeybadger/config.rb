@@ -145,10 +145,6 @@ module Honeybadger
       @backend = nil
     end
 
-    def disabled?
-      !!self[:disabled]
-    end
-
     def dev?
       self[:env] && Array(self[:development_environments]).include?(self[:env])
     end

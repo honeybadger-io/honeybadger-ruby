@@ -62,6 +62,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   `exception_fingerprint` callback, not a SHA1 hashed value. The value is
   still hashed before sending through to the API.
 
+### Removed
+- The `disabled` option is now removed, Use the `report_data` option instead.
+
 ## [3.3.1] - 2018-08-02
 ### Fixed
 - Fix synchronous throttling in shoryuken
