@@ -31,7 +31,6 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Ignore SIGTERM SignalExceptions.
-- Fix synchronous throttling in shoryuken
 
 ### Changed
 - The public method `Notice#backtrace` is now exposed as the raw Ruby
@@ -62,6 +61,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   String which was passed in from the `:fingerprint` option or the
   `exception_fingerprint` callback, not a SHA1 hashed value. The value is
   still hashed before sending through to the API.
+
+## [3.3.1] - 2018-08-02
+- Fix synchronous throttling in shoryuken
 
 ## [3.3.0] - 2018-01-29
 ### Changed
