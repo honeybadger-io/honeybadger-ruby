@@ -63,6 +63,7 @@ adheres to [Semantic Versioning](http://semver.org/).
   still hashed before sending through to the API.
 
 ## [3.3.1] - 2018-08-02
+### Fixed
 - Fix synchronous throttling in shoryuken
 
 ## [3.3.0] - 2018-01-29
