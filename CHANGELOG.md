@@ -32,6 +32,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Ignore SIGTERM SignalExceptions.
 
+### Removed
+- Removed Notice#[]
+
 ### Changed
 - The public method `Notice#backtrace` is now exposed as the raw Ruby
   backtrace instead of an instance of `Honeybadger::Backtrace` (a private

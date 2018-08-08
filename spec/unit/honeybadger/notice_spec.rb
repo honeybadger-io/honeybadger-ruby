@@ -258,34 +258,15 @@ describe Honeybadger::Notice do
     end
   end
 
-  describe "#[]" do
-    it "acts like a hash" do
-      notice = build_notice(error_message: 'some message')
-      expect(notice[:error_message]).to eq notice.error_message
-    end
-
-    it "returns params on notice[:request][:params]" do
-      params = {'one' => 'two'}
-      notice = build_notice(params: params)
-      expect(notice[:request][:params]).to eq params
-    end
-
-    it "returns context on notice[:request][:context]" do
-      context = {'one' => 'two'}
-      notice = build_notice(context: context)
-      expect(notice[:request][:context]).to eq context
-    end
-  end
-
   describe "#context" do
     it "merges local context" do
       notice = build_notice(context: { local: 'local' })
-      expect(notice[:request][:context]).to eql({ local: 'local' })
+      expect(notice.context).to eql({ local: 'local' })
     end
 
     it "merges global context" do
       notice = build_notice(global_context: { global: 'global' })
-      expect(notice[:request][:context]).to eql({ global: 'global' })
+      expect(notice.context).to eql({ global: 'global' })
     end
 
     it "merges exception context" do
@@ -296,12 +277,12 @@ describe Honeybadger::Notice do
       end
       notice = build_notice(exception: exception.new)
 
-      expect(notice[:request][:context]).to eql({ exception: 'exception' })
+      expect(notice.context).to eql({ exception: 'exception' })
     end
 
     it "skips exception context when method isn't defined" do
       notice = build_notice(exception: RuntimeError.new)
-      expect(notice[:request][:context]).to eq({})
+      expect(notice.context).to eq({})
     end
 
     it "merges context in order of precedence: local, exception, global" do
@@ -314,7 +295,7 @@ describe Honeybadger::Notice do
       local_context = { local: 'local', local_override: 'local' }
       notice = build_notice(exception: exception.new, global_context: global_context, context: local_context)
 
-      expect(notice[:request][:context]).to eq({
+      expect(notice.context).to eq({
         global: 'global',
         exception: 'exception',
         local: 'local',
@@ -336,7 +317,7 @@ describe Honeybadger::Notice do
 
     it "returns empty Hash when context is not set" do
       notice = build_notice
-      expect(notice[:request][:context]).to eq({})
+      expect(notice.context).to eq({})
     end
 
     it "allows falsey values in context" do
@@ -385,14 +366,14 @@ describe Honeybadger::Notice do
           env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.parameters' => params })
           notice = build_notice(rack_env: env)
 
-          expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.parameters'
+          expect(notice.cgi_data).not_to have_key 'action_dispatch.request.parameters'
         end
 
         it "removes action_dispatch.request.request_parameters from cgi_data" do
           env = Rack::MockRequest.env_for('/', { 'action_dispatch.request.request_parameters' => params })
           notice = build_notice(rack_env: env)
 
-          expect(notice[:cgi_data]).not_to have_key 'action_dispatch.request.request_parameters'
+          expect(notice.cgi_data).not_to have_key 'action_dispatch.request.request_parameters'
         end
       end
 
@@ -584,7 +565,7 @@ describe Honeybadger::Notice do
 
     context "fingerprint is a callback which accesses notice" do
       it "can access request information" do
-        notice = build_notice({params: { key: 'foo' }, fingerprint: lambda {|n| n[:params][:key] }})
+        notice = build_notice({params: { key: 'foo' }, fingerprint: lambda {|n| n.params[:key] }})
         expect(notice.fingerprint).to eq 'foo'
         expect(notice.as_json[:error][:fingerprint]).to eq '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33'
       end

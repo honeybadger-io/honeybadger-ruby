@@ -229,23 +229,6 @@ module Honeybadger
       ::JSON.generate(as_json(*a))
     end
 
-    # Allows properties to be accessed using a hash-like syntax.
-    #
-    # @example
-    #   notice[:error_message]
-    #
-    # @param [Symbol] method The given key for an attribute.
-    #
-    # @return [Object] The attribute value.
-    def [](method)
-      case method
-      when :request
-        self
-      else
-        send(method)
-      end
-    end
-
     # @api private
     # Determines if this notice should be ignored.
     def ignore?
