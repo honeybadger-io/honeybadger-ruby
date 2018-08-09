@@ -298,12 +298,12 @@ module Honeybadger
     # @example
     #   # Ignoring based on error message:
     #   Honeybadger.exception_filter do |notice|
-    #     notice[:error_message] =~ /sensitive data/
+    #     notice.error_message =~ /sensitive data/
     #   end
     #
     #   # Ignore an entire class of exceptions:
     #   Honeybadger.exception_filter do |notice|
-    #     notice[:exception].class < MyError
+    #     notice.exception.class < MyError
     #   end
     #
     # @!method exception_filter
@@ -318,7 +318,7 @@ module Honeybadger
     #
     # @example
     #   Honeybadger.exception_fingerprint do |notice|
-    #     [notice[:error_class], notice[:component], notice[:backtrace].to_s].join(':')
+    #     [notice.error_class, notice.component, notice.backtrace.to_s].join(':')
     #   end
     #
     # @!method exception_fingerprint
