@@ -65,6 +65,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   `exception_fingerprint` callback, not a SHA1 hashed value. The value is
   still hashed before sending through to the API.
 
+- The public method `Honeybadger.exception_filter` has been deprecated in favor
+  of `Honeybadger.before_notify`.
+
 ### Removed
 - The `disabled` option is now removed, Use the `report_data` option instead.
 

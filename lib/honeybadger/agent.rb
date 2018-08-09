@@ -291,7 +291,7 @@ module Honeybadger
     # @yield [Config::Ruby] configuration object.
     def_delegator :config, :configure
 
-    # Callback to ignore exceptions.
+    # DEPRECATED: Callback to ignore exceptions.
     #
     # See public API documentation for {Honeybadger::Notice} for available attributes.
     #
@@ -308,7 +308,10 @@ module Honeybadger
     #
     # @!method exception_filter
     # @yieldreturn [Boolean] true (to ignore) or false (to send).
-    def_delegator :config, :exception_filter
+    def exception_filter
+      warn 'DEPRECATED: Honeybadger.exception_filter is deprecated. Please use Honeybadger.before_notify instead.'
+      config.exception_filter
+    end
 
     # Callback to add a custom grouping strategy for exceptions. The return
     # value is hashed and sent to Honeybadger. Errors with the same fingerprint
