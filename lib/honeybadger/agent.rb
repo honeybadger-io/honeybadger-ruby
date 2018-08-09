@@ -308,9 +308,9 @@ module Honeybadger
     #
     # @!method exception_filter
     # @yieldreturn [Boolean] true (to ignore) or false (to send).
-    def exception_filter
+    def exception_filter(&block)
       warn 'DEPRECATED: Honeybadger.exception_filter is deprecated. Please use Honeybadger.before_notify instead.'
-      config.exception_filter
+      config.exception_filter(&block)
     end
 
     # Callback to add a custom grouping strategy for exceptions. The return
