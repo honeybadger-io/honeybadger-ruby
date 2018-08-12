@@ -89,6 +89,7 @@ module Honeybadger
     end
 
     def exception_filter
+      warn 'DEPRECATED: exception_filter is deprecated. Please use Honeybadger.before_notify instead.'
       self[:exception_filter] = Proc.new if block_given?
       self[:exception_filter]
     end
