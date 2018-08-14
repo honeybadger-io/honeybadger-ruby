@@ -64,9 +64,15 @@ adheres to [Semantic Versioning](http://semver.org/).
   String which was passed in from the `:fingerprint` option or the
   `exception_fingerprint` callback, not a SHA1 hashed value. The value is
   still hashed before sending through to the API.
-
 - The public method `Honeybadger.exception_filter` has been deprecated in favor
-  of `Honeybadger.before_notify`.
+  of `before_notify`:
+  ```ruby
+  Honeybadger.configure do |config|
+    config.before_notify do |notice|
+      notice.halt!
+    end
+  end
+  ```
 
 ### Removed
 - The `disabled` option is now removed, Use the `report_data` option instead.
