@@ -308,9 +308,7 @@ module Honeybadger
     #
     # @!method exception_filter
     # @yieldreturn [Boolean] true (to ignore) or false (to send).
-    def exception_filter(&block)
-      config.exception_filter(&block)
-    end
+    def_delegator :config, :exception_filter
 
     # Callback to add a custom grouping strategy for exceptions. The return
     # value is hashed and sent to Honeybadger. Errors with the same fingerprint
