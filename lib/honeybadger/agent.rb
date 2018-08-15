@@ -310,7 +310,7 @@ module Honeybadger
     # @yieldreturn [Boolean] true (to ignore) or false (to send).
     def_delegator :config, :exception_filter
 
-    # Callback to add a custom grouping strategy for exceptions. The return
+    # DEPRECATED: Callback to add a custom grouping strategy for exceptions. The return
     # value is hashed and sent to Honeybadger. Errors with the same fingerprint
     # will be grouped.
     #
@@ -325,7 +325,7 @@ module Honeybadger
     # @yieldreturn [#to_s] The fingerprint of the error.
     def_delegator :config, :exception_fingerprint
 
-    # Callback to filter backtrace lines. One use for this is to make
+    # DEPRECATED: Callback to filter backtrace lines. One use for this is to make
     # additional [PROJECT_ROOT] or [GEM_ROOT] substitutions, which are used by
     # Honeybadger when grouping errors and displaying application traces.
     #

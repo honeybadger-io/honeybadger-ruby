@@ -80,7 +80,10 @@ module Honeybadger
     end
 
     def backtrace_filter
-      self[:backtrace_filter] = Proc.new if block_given?
+      if block_given?
+        warn('DEPRECATED: backtrace_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#backtrace_filter')
+        self[:backtrace_filter] = Proc.new
+      end
       self[:backtrace_filter]
     end
 
@@ -98,7 +101,11 @@ module Honeybadger
     end
 
     def exception_fingerprint
-      self[:exception_fingerprint] = Proc.new if block_given?
+      if block_given?
+        warn('DEPRECATED: exception_fingerprint is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_fingerprint')
+        self[:exception_fingerprint] = Proc.new
+      end
+
       self[:exception_fingerprint]
     end
 
