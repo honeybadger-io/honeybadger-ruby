@@ -291,7 +291,7 @@ module Honeybadger
     # @yield [Config::Ruby] configuration object.
     def_delegator :config, :configure
 
-    # Callback to ignore exceptions.
+    # DEPRECATED: Callback to ignore exceptions.
     #
     # See public API documentation for {Honeybadger::Notice} for available attributes.
     #

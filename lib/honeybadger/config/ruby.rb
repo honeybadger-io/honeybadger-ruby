@@ -97,7 +97,11 @@ module Honeybadger
       end
 
       def exception_filter
-        hash[:exception_filter] = Proc.new if block_given?
+        if block_given?
+          logger.warn('DEPRECATED: exception_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_filter')
+          hash[:exception_filter] = Proc.new
+        end
+
         get(:exception_filter)
       end
 
