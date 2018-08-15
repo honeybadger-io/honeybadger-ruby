@@ -84,6 +84,7 @@ module Honeybadger
         warn('DEPRECATED: backtrace_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#backtrace_filter')
         self[:backtrace_filter] = Proc.new
       end
+
       self[:backtrace_filter]
     end
 
