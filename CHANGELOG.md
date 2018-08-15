@@ -73,6 +73,24 @@ adheres to [Semantic Versioning](http://semver.org/).
     end
   end
   ```
+- The public method `Honeybadger.exception_fingerprint` has been deprecated in favor
+  of `before_notify`:
+  ```ruby
+  Honeybadger.configure do |config|
+    config.before_notify do |notice|
+      notice.exception_fingerprint = 'new fingerprint'
+    end
+  end
+  ```
+- The public method `Honeybadger.backtrace_filter` has been deprecated in favor
+  of `before_notify`:
+  ```ruby
+  Honeybadger.configure do |config|
+    config.before_notify do |notice|
+      notice.backtrace.reject!{|x| x =~ /gem/}
+    end
+  end
+  ```
 
 ### Removed
 - The `disabled` option is now removed, Use the `report_data` option instead.
