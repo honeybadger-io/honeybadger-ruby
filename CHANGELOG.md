@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.0.0] - 2018-08-21
 ### Added
 - Added `before_notify` hooks to be defined, this allows setting up of multiple
   hooks which will be invoked with a `notice` before a `notice` is sent. Each
