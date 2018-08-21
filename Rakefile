@@ -38,6 +38,11 @@ task spec: :'spec:all'
 task test: :spec
 task default: :spec
 
+desc "Bump CHANGELOG v#{Release.next_version(VERSION)}"
+task :bump_changelog, [:version] do |_, args|
+  Release.bump_changelog(args[:version])
+end
+
 desc "Bump v#{VERSION} to v#{Release.next_version(VERSION)}"
 task :bump do
   Release.bump
