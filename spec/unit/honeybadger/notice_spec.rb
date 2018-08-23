@@ -715,6 +715,15 @@ describe Honeybadger::Notice do
           expect(notice.local_variables[:foo]).to eq(String(value))
         end
 
+        context "when local variable filter is set" do
+          let(:value) { 'bar' }
+
+          it "filter can alter the local variable value" do
+            config.local_variable_filter {|symbol, object, filter_keys| "#{object}-filtered" }
+            expect(notice.local_variables[:foo]).to eq 'bar-filtered'
+          end
+        end
+
         context "when value responds to #to_honeybadger" do
           it "returns the #to_honeybadger value" do
             allow(value).to receive(:to_honeybadger).and_return('baz')

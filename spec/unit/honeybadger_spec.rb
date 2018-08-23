@@ -29,6 +29,11 @@ describe Honeybadger do
     Honeybadger.backtrace_filter {}
   end
 
+  it "delegates ::local_variable_filter to agent config" do
+    expect(Honeybadger.config).to receive(:local_variable_filter)
+    Honeybadger.local_variable_filter {}
+  end
+
   it "delegates ::exception_fingerprint to agent config" do
     expect(Honeybadger.config).to receive(:exception_fingerprint)
     Honeybadger.exception_fingerprint {}

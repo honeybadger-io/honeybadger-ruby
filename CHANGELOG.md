@@ -5,6 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.4.0] - 2018-08-23
+### Added
+- Local variable filter callback for filtering or augmenting local variables before they are logged.
+
 ## [3.3.1] - 2018-08-02
 ### Fixed
 - Fix synchronous throttling in shoryuken

@@ -414,9 +414,10 @@ module Honeybadger
         vars.inject([]) { |acc, arg|
           begin
             result = binding.eval(arg.to_s)
-            acc << [arg, result]
           rescue NameError
             # Do Nothing
+          else
+            acc << [arg, filter_local_variable(arg, result)]
           end
 
           acc
@@ -431,6 +432,20 @@ module Honeybadger
     # Returns true to send local_variables.
     def send_local_variables?(config)
       config[:'exceptions.local_variables']
+    end
+
+    # Executes variable filter callback, if configured
+    #
+    # symbol - The symbol for the local variable to be filtered
+    # object - The value of the local variable to be filtered
+    #
+    # Returns filtered value, if filter is configured, otherwise original value
+    def filter_local_variable(symbol, object)
+      if config.local_variable_filter
+        config.local_variable_filter.call(symbol, object, config[:'request.filter_keys'] || [])
+      else
+        object
+      end
     end
 
     # Parse Backtrace from exception backtrace.
