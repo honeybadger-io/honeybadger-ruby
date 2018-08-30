@@ -331,6 +331,26 @@ module Honeybadger
     # @yieldreturn [String] The new (modified) backtrace line.
     def_delegator :config, :backtrace_filter
 
+    # Public: Takes a block and adds it to the list of local variable filters. When
+    # the filters run, the block will be handed the local variable object and symbol.
+    #
+    # &block - The new local variable filter
+    #          The value returned by the block will be logged as the value for the local variable.
+    #
+    # Examples:
+    #
+    #   # Redacting a local variable
+    #   Honeybadger.local_variable_filter do |symbol, object, filter_keys|
+    #     if object.is_a?(MyPoro)
+    #       object.inspect unless object.inspect ~= /password/
+    #     else
+    #       value
+    #     end
+    #   end
+    #
+    # Yields the filtered value of the local variable
+    def_delegator :config, :local_variable_filter
+
     # @api private
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)

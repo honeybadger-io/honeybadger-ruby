@@ -135,5 +135,11 @@ describe Honeybadger::Agent do
         expect { instance.backtrace_filter(&NULL_BLOCK) }.to change(instance.config, :backtrace_filter).from(nil).to(NULL_BLOCK)
       end
     end
+
+    describe "#local_variable_filter" do
+      it "configures the local_variable_filter callback" do
+        expect { instance.local_variable_filter(&NULL_BLOCK) }.to change(instance.config, :local_variable_filter).from(nil).to(NULL_BLOCK)
+      end
+    end
   end
 end

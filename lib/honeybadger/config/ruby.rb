@@ -86,6 +86,11 @@ module Honeybadger
         get(:backtrace_filter)
       end
 
+      def local_variable_filter
+        hash[:local_variable_filter] = Proc.new if block_given?
+        get(:local_variable_filter)
+      end
+
       def exception_filter
         hash[:exception_filter] = Proc.new if block_given?
         get(:exception_filter)
