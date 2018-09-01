@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added flag `--skip-rails-load` to cli commands for optionally skipping Rails initialization when running from a Rails root.
 
 ## [4.0.0] - 2018-08-21
 ### Added
