@@ -32,6 +32,7 @@ describe Honeybadger::Backend::Debug do
   describe "#check_in" do
     it "logs the check_in" do
       expect(logger).to receive(:unknown).with("checking in debug backend with id=10")
+      
       instance.check_in(10)
     end
   end
