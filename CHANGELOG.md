@@ -4,6 +4,7 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Add missing Backend::Server#check_in specs
 
 ## [4.0.0] - 2018-08-21
 ### Added
