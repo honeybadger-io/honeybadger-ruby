@@ -13,6 +13,13 @@ describe Honeybadger::Backend::Null do
 
   describe "#notify" do
     subject { instance.notify(:notices, double('Notice')) }
+    
+    it { should be_a Honeybadger::Backend::Response }
+  end
+
+  describe "#check_in" do
+    subject { instance.check_in(10) }
+
     it { should be_a Honeybadger::Backend::Response }
   end
 end
