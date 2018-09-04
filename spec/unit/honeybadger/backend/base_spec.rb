@@ -49,4 +49,10 @@ describe Honeybadger::Backend::Base do
       expect { subject.notify(:notices, double('Notice')) }.to raise_error NotImplementedError
     end
   end
+
+  describe "#check_in" do
+    it "raises NotImplementedError" do
+      expect { subject.check_in(10) }.to raise_error NotImplementedError
+    end
+  end
 end
