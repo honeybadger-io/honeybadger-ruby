@@ -24,8 +24,9 @@ module Honeybadger
 
     class Main < Thor
       def self.project_options
-        option :api_key,     required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
-        option :environment, required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
+        option :api_key,         required: false, aliases: :'-k', type: :string, desc: 'Api key of your Honeybadger application'
+        option :environment,     required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
+        option :skip_rails_load, required: false, type: :boolean, desc: 'Flag to skip rails initialization'
       end
 
       def help(*args, &block)
@@ -138,7 +139,7 @@ WELCOME
       end
 
       def build_config(options)
-        load_env
+        load_env(options)
 
         config = Honeybadger.config
         config.set(:report_data, true)
@@ -148,13 +149,23 @@ WELCOME
         config
       end
 
-      def load_env
+      def load_env(options)
         # Initialize Rails when running from Rails root.
         environment_rb = File.join(Dir.pwd, 'config', 'environment.rb')
-        load_rails_env(environment_rb) if File.exist?(environment_rb)
-
+        if File.exist?(environment_rb)
+          load_rails_env_if_allowed(environment_rb, options)
+        end
         # Ensure config is loaded (will be skipped if initialized by Rails).
         Honeybadger.config.load!
+      end
+
+      def load_rails_env_if_allowed(environment_rb, options)
+        # Skip Rails initialization according to option flag
+        if options.has_key?('skip_rails_load') && fetch_value(options, 'skip_rails_load')
+          say("Skipping Rails initialization.")
+        else
+          load_rails_env(environment_rb)
+        end
       end
 
       def load_rails_env(environment_rb)
