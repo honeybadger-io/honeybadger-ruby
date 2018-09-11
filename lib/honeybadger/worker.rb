@@ -24,7 +24,7 @@ module Honeybadger
       end
 
       def push(msg)
-        super unless size == max_size
+        super unless size >= max_size
       end
     end
 
