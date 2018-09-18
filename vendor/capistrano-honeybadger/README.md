@@ -30,6 +30,9 @@ gem 'honeybadger', '~> 2.0'
 ```ruby
 # Capfile
 require 'capistrano/honeybadger'
+
+# production.rb / staging.rb / etc.
+after 'deploy:finishing', 'honeybadger:deploy' 
 ```
 
 Please note that any `require` should be placed in `Capfile`, not `config/deploy.rb`.

@@ -84,5 +84,3 @@ namespace :load do
     set :rvm_map_bins, fetch(:rvm_map_bins, []).push('honeybadger')
   end
 end
-
-after 'deploy:finishing', 'honeybadger:deploy'
