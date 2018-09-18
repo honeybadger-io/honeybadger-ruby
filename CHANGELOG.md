@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added missing Backend::Server#check_in specs
 - Added flag `--skip-rails-load` to cli commands for optionally skipping Rails initialization when running from a Rails root.
+- Notify HB on demand
 
 ## [4.0.0] - 2018-08-21
 ### Added
