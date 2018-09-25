@@ -19,12 +19,15 @@ module Honeybadger
       attr_reader :max_size
 
       def initialize(max_size)
+        @mutex = Mutex.new
         @max_size = max_size
         super()
       end
 
       def push(msg)
-        super unless size == max_size
+        @mutex.synchronize do
+          super unless size >= max_size
+        end
       end
     end
 
