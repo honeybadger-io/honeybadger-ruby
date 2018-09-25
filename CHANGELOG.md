@@ -83,7 +83,7 @@ adheres to [Semantic Versioning](http://semver.org/).
   ```ruby
   Honeybadger.configure do |config|
     config.before_notify do |notice|
-      notice.exception_fingerprint = 'new fingerprint'
+      notice.fingerprint = 'new fingerprint'
     end
   end
   ```
