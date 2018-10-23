@@ -2,7 +2,7 @@ require 'honeybadger/ruby'
 
 Honeybadger.init!({
   :framework      => :ruby,
-  :env            => ENV['RUBY_ENV'] || ENV['RACK_ENV'],
+  :env            => ENV['RUBY_ENV'] || ENV['RACK_ENV'] || ENV['SERVICE_ENV'],
   :'logging.path' => 'STDOUT'
 })
 
