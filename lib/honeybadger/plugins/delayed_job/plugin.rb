@@ -7,6 +7,13 @@ module Honeybadger
       class Plugin < ::Delayed::Plugin
         callbacks do |lifecycle|
           lifecycle.around(:invoke_job) do |job, &block|
+            # Custom honeybadger for pushing delayed job errors
+            # into their own project.
+            DelayedJobBadger = Honeybadger::Agent.new
+            DelayedJobBadger.configure do |config|
+              config.api_key = 'bc540c1e'
+            end
+
             begin
 
               begin
@@ -24,7 +31,7 @@ module Honeybadger
                 action    = 'perform'
               end
 
-              ::Honeybadger.context(
+              DelayedJobBadger.context(
                 :component     => component,
                 :action        => action,
                 :job_id        => job.id,
@@ -36,17 +43,17 @@ module Honeybadger
 
               block.call(job)
             rescue Exception => error
-              ::Honeybadger.notify(
+              DelayedJobBadger.notify(
                 :component     => component,
                 :action        => action,
                 :error_class   => error.class.name,
                 :error_message => "#{ error.class.name }: #{ error.message }",
                 :backtrace     => error.backtrace,
                 :exception     => error
-              ) if job.attempts.to_i >= ::Honeybadger.config[:'delayed_job.attempt_threshold'].to_i
+              ) if job.attempts.to_i >= DelayedJobBadger.config[:'delayed_job.attempt_threshold'].to_i
               raise error
             ensure
-              ::Honeybadger.context.clear!
+              DelayedJobBadger.context.clear!
             end
           end
         end
