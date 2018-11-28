@@ -25,7 +25,15 @@ module Honeybadger
             ::Sidekiq.configure_server do |sidekiq|
               sidekiq.error_handlers << lambda {|ex, params|
                 job = params[:job] || params
-                return if job['retry'.freeze] && job['retry_count'.freeze].to_i < config[:'sidekiq.attempt_threshold'].to_i
+                retry_count = job['retry_count'.freeze].to_i
+                retry_opt = job['retry'.freeze]
+                max_retries = if retry_opt.is_a?(Integer)
+                  [retry_opt - 1, config[:'sidekiq.attempt_threshold'].to_i].min
+                else
+                  config[:'sidekiq.attempt_threshold'].to_i
+                end
+
+                return if retry_opt && retry_count < max_retries
                 opts = {parameters: params}
                 opts[:component] = job['wrapped'.freeze] || job['class'.freeze] if config[:'sidekiq.use_component']
                 Honeybadger.notify(ex, opts)
