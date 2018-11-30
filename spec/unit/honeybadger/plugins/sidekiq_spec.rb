@@ -141,6 +141,15 @@ describe "Sidekiq Dependency" do
                 sidekiq_config.error_handlers[0].call(exception, job_context)
               end
             end
+
+            context "and the retry count meets the job set threshold" do
+              let(:job) { { 'retry_count' => 2, 'retry' => 2 } }
+
+              it "notifies Honeybadger" do
+                expect(Honeybadger).to receive(:notify).with(exception, { parameters: job_context, component: nil }).once
+                sidekiq_config.error_handlers[0].call(exception, job_context)
+              end
+            end
           end
         end
       end
