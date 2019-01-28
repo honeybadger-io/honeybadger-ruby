@@ -125,6 +125,17 @@ module Honeybadger
 
       notice = Notice.new(config, opts)
 
+      begin
+        if const_defined?(Rails) && Rails.application.config.exceptions_app.is_a?(ActionDispatch::Routing::RouteSet)
+          route_resolver = Rails.application.routes.recognize_path(context_manager.get_rack_env["ORIGINAL_FULLPATH"])
+          notice.component = route_resolver[:controller]
+          notice.action = route_resolver[:action]
+        end
+      rescue ActionController::RoutingError
+        # if rails can't find the route (like assets)
+        # we just ignore and keep the old component / action
+      end
+
       config.before_notify_hooks.each do |hook|
         break if notice.halted?
         with_error_handling { hook.call(notice) }
