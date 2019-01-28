@@ -15,17 +15,12 @@ gemfile:
   - gemfiles/rack.gemfile
   - gemfiles/sinatra_1.gemfile
   - gemfiles/sinatra.gemfile
-  - gemfiles/rails3.2.gemfile
-  - gemfiles/rails4.0.gemfile
-  - gemfiles/rails4.1.gemfile
   - gemfiles/rails4.2.gemfile
   - gemfiles/rails.gemfile
   - gemfiles/rails5.0.gemfile
   - gemfiles/rails5.1.gemfile
   - gemfiles/rails5.2.gemfile
 rvm:
-  - 2.1.10
-  - 2.2.6
   - 2.3.3
   - 2.4.0
   - 2.5.0
@@ -33,8 +28,6 @@ rvm:
 matrix:
   fast_finish: true
   allow_failures:
-    - rvm: 2.2.6
-      gemfile: gemfiles/rails.gemfile
     - rvm: 2.3.3
       gemfile: gemfiles/rails.gemfile
     - rvm: 2.4.0
@@ -44,36 +37,12 @@ matrix:
     - rvm: jruby-9.1.7.0
       gemfile: gemfiles/rails.gemfile
   exclude:
-    - rvm: 2.1.10
-      gemfile: gemfiles/rails.gemfile
-    - rvm: 2.1.10
-      gemfile: gemfiles/rails5.0.gemfile
-    - rvm: 2.1.10
-      gemfile: gemfiles/rails5.1.gemfile
-    - rvm: 2.1.10
-      gemfile: gemfiles/rails5.2.gemfile
-    - rvm: 2.1.10
-      gemfile: gemfiles/rack.gemfile
-    - rvm: 2.1.10
-      gemfile: gemfiles/sinatra.gemfile
-    - rvm: 2.4.0
-      gemfile: gemfiles/rails4.0.gemfile
-    - rvm: 2.4.0
-      gemfile: gemfiles/rails4.1.gemfile
     - rvm: 2.4.0
       gemfile: gemfiles/rails4.2.gemfile
-    - rvm: 2.5.0
-      gemfile: gemfiles/rails4.0.gemfile
-    - rvm: 2.5.0
-      gemfile: gemfiles/rails4.1.gemfile
     - rvm: 2.5.0
       gemfile: gemfiles/rails4.2.gemfile
     - rvm: jruby-9.1.7.0
       gemfile: gemfiles/binding_of_caller.gemfile
-    # activesupport 4.0 depends on minitest ~> 4.2, Ruby 2.3 bundles minitest
-    # 5. This isn't a problem locally, but it blows up Travis for some reason.
-    - rvm: jruby-9.1.7.0
-      gemfile: gemfiles/rails4.0.gemfile
 env:
   global:
     secure: DwQI6QHuRRaMoKvE9rnXmw3U1KLKH6Y1ZTXCcDN34Zkq7QG5KPt195zvL6XPbsefvd2fOHq4es5D6jxgLlEdKB7njhWX8XNMgb/eprz6zTxSAS/ep31zYHEJ3krWSPM6a7fXJOjdYIzXhVl7I0NRDZGy/Sf6LgHIBMpaGVKGc34=
