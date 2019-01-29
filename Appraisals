@@ -26,29 +26,6 @@ appraise 'resque' do
   gem 'mock_redis'
 end
 
-appraise 'rails3.2' do
-  gem 'rails', '~> 3.2.12'
-  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-  gem 'rack-mini-profiler', require: false
-  gem 'capistrano', '~> 2.0'
-  gem 'rspec-rails'
-  gem 'test-unit', '~> 3.0'
-end
-
-appraise 'rails4.0' do
-  gem 'rails', '~> 4.0.0'
-  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-  gem 'rack-mini-profiler', require: false
-  gem 'rspec-rails'
-end
-
-appraise 'rails4.1' do
-  gem 'rails', '~> 4.1.4'
-  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-  gem 'rack-mini-profiler', require: false
-  gem 'rspec-rails'
-end
-
 appraise 'rails4.2' do
   gem 'rails', '~> 4.2.4'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
