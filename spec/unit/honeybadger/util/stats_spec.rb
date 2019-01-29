@@ -36,7 +36,7 @@ describe Honeybadger::Util::Stats do
     context 'when mathn is required' do
       before(:all) { require 'mathn' }
 
-      it 'converts Rational to Float' do
+      it 'converts Rational to Float', if: RUBY_VERSION < '2.5.0' do
         expect(Honeybadger::Util::Stats.memory[:total]).to be_a Float
         expect(Honeybadger::Util::Stats.memory[:free]).to be_a Float
         expect(Honeybadger::Util::Stats.memory[:buffers]).to be_a Float
