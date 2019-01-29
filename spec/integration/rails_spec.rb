@@ -68,7 +68,6 @@ if RAILS_PRESENT
         Rails.application.routes.draw do
           get '/500', :to => 'rails#custom_error'
         end
-        puts "beforing"
       end
   
       after(:each) do

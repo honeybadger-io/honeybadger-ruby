@@ -49,7 +49,11 @@ class RailsController < ApplicationController
   end
 
   def custom_error
-    render plain: 'This is a custom error message from rails.'
+    if Rails::VERSION::MAJOR == 3
+      render inline: 'This is a custom error message from rails.'
+    else
+      render plain: 'This is a custom error message from rails.'
+    end
   end
 end
 
