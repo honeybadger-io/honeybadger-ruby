@@ -33,6 +33,22 @@ module Honeybadger
         requirement { defined?(::Rails.application) && ::Rails.application }
 
         execution do
+          if ::Rails.application.config.exceptions_app.is_a?(::ActionDispatch::Routing::RouteSet)
+            Honeybadger.configure do |config|
+              config.before_notify do |notice|
+                begin
+                  original_path = notice.send(:opts)[:rack_env]["ORIGINAL_FULLPATH"]
+                  route_resolver = ::Rails.application.routes.recognize_path(original_path)
+                  notice.component = route_resolver[:controller]
+                  notice.action = route_resolver[:action]
+                rescue ::ActionController::RoutingError
+                  # if rails can't find the route (like assets)
+                  # we just ignore and keep the old component / action
+                end
+              end
+            end
+          end
+
           require 'rack/request'
           if defined?(::ActionDispatch::DebugExceptions)
             # Rails 3.2.x+
