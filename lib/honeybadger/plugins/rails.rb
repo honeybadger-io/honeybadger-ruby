@@ -37,8 +37,7 @@ module Honeybadger
             Honeybadger.configure do |config|
               config.before_notify do |notice|
                 begin
-                  original_path = notice.send(:opts)[:rack_env]["ORIGINAL_FULLPATH"]
-                  route_resolver = ::Rails.application.routes.recognize_path(original_path)
+                  route_resolver = ::Rails.application.routes.recognize_path(notice.url)
                   notice.component = route_resolver[:controller]
                   notice.action = route_resolver[:action]
                 rescue ::ActionController::RoutingError
