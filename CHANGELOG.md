@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Issue a Notification from a Sidekiq job when either the `sidekiq.attempt_threshold` is reached OR if the job defined retry threshold is reached, whichever comes first.
 
+### Fixed
+- Get the right controller / action name in Rails, when using an exception app for custom error pages.
+
 ## [4.1.0] - 2018-10-16
 ### Added
 - Added flag `--skip-rails-load` to cli commands for optionally skipping Rails initialization when running from a Rails root.

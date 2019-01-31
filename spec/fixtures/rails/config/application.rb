@@ -22,6 +22,7 @@ class RailsApp < Rails::Application
   config.cache_classes = true
   config.serve_static_files = false
   config.consider_all_requests_local = false
+  config.exceptions_app = self.routes
 
   routes.append do
     get '/runtime_error', :to => 'rails#runtime_error'
@@ -45,6 +46,14 @@ class RailsController < ApplicationController
 
   def index
     render plain: 'This is a test Rails app used by the honeybadger gem test suite.'
+  end
+
+  def custom_error
+    if Rails::VERSION::MAJOR == 3
+      render inline: 'This is a custom error message from rails.'
+    else
+      render plain: 'This is a custom error message from rails.'
+    end
   end
 end
 
