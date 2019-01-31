@@ -7,12 +7,12 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [4.2.0] - 2019-01-31
 ### Changed
-- Issue a Notification from a Sidekiq job when either the `sidekiq.attempt_threshold` is reached OR if the job defined retry threshold is reached, whichever comes first.
+- Issue a Notification from a Sidekiq job when either the `sidekiq.attempt_threshold` is reached OR if the job defined retry threshold is reached, whichever comes first. -@mstruve
 - Updated supported Ruby/Rails versions (MRI >= 2.3.0, JRuby >= 9.2, Rails >= 4.2)
   https://docs.honeybadger.io/ruby/gem-reference/supported-versions.html
 
 ### Added
-- Get the right controller / action name in Rails, when using an exception app for custom error pages.
+- Get the right controller / action name in Rails, when using an exception app for custom error pages. -@fernandes
 
 ## [4.1.0] - 2018-10-16
 ### Added
