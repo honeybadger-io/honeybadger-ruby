@@ -5,8 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- Fix: Get the right controller / action name in Rails, when using an exception app for custom error pages.
 - Issue a Notification from a Sidekiq job when either the `sidekiq.attempt_threshold` is reached OR if the job defined retry threshold is reached, whichever comes first.
+
+### Fixed
+- Get the right controller / action name in Rails, when using an exception app for custom error pages.
 
 ## [4.1.0] - 2018-10-16
 ### Added
