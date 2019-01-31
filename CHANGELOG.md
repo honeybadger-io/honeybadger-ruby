@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.2.0] - 2019-01-31
 ### Changed
 - Issue a Notification from a Sidekiq job when either the `sidekiq.attempt_threshold` is reached OR if the job defined retry threshold is reached, whichever comes first.
 - Updated supported Ruby/Rails versions (MRI >= 2.3.0, JRuby >= 9.2, Rails >= 4.2)
