@@ -268,5 +268,17 @@ describe Honeybadger::Config do
         honeybadger.logger.error('foo')
       end
     end
+
+    it "configures multiple before_notify hooks" do
+      subject.configure do |config|
+        config.before_notify {|n| n }
+      end
+
+      subject.configure do |config|
+        config.before_notify {|n| n }
+      end
+
+      expect(subject.before_notify_hooks.size).to eq(2)
+    end
   end
 end

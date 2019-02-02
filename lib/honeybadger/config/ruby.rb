@@ -82,13 +82,15 @@ module Honeybadger
       end
 
       def before_notify(action = nil, &block)
-        (hash[:before_notify] ||= []).tap do |before_notify_hooks|
-          if action && validate_before_action(action)
-            before_notify_hooks << action
-          elsif block_given? && validate_before_action(block)
-            before_notify_hooks << block
-          end
+        hooks = Array(get(:before_notify)).dup
+
+        if action && validate_before_action(action)
+          hooks << action
+        elsif block_given? && validate_before_action(block)
+          hooks << block
         end
+
+        hash[:before_notify] = hooks
       end
 
       def backtrace_filter

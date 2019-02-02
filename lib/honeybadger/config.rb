@@ -72,9 +72,9 @@ module Honeybadger
     end
 
     def configure
-      ruby_config = Ruby.new(self)
-      yield(ruby_config)
-      self.ruby = ruby.merge(ruby_config).freeze
+      new_ruby = Ruby.new(self)
+      yield(new_ruby)
+      self.ruby = ruby.merge(new_ruby).freeze
       @logger = @backend = nil
       self
     end
