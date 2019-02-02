@@ -58,35 +58,5 @@ if RAILS_PRESENT
         expect(Honeybadger::Backend::Test.notifications[:notices]).to be_empty
       end
     end
-
-    context "with custom exception app" do
-      before(:each) do
-        Honeybadger.configure do |config|
-          config.api_key = 'gem testing'
-          config.backend = 'test'
-        end
-        Rails.application.routes.draw do
-          get '/500', :to => 'rails#custom_error'
-        end
-      end
-  
-      after(:each) do
-        Honeybadger::Backend::Test.notifications[:notices].clear
-        Rails.application.reload_routes!
-      end
-      
-      it "should report the right component / action" do
-        Honeybadger.flush do
-          get '/runtime_error'
-          expect(response.status).to eq(200)
-          expect(response.body).to include("This is a custom error message from rails.")
-        end
-  
-        expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
-        notice = Honeybadger::Backend::Test.notifications[:notices][0]
-        expect(notice.component).to eq('rails')
-        expect(notice.action).to eq('runtime_error')
-      end
-    end
   end
 end

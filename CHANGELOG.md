@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fix #301 - before_notify hooks are overridden on subsequent
   `Honeybadger.configure` calls.
+- Revert "Get the right controller / action name in Rails, when using an
+  exception app for custom error pages."
 
 ## [4.2.0] - 2019-01-31
 ### Changed
