@@ -106,6 +106,13 @@ describe Honeybadger::Config::Ruby do
 
       expect(subject.before_notify).to eq([callable])
     end
+
+    it "configures multiple hooks" do
+      subject.before_notify {|n| n }
+      subject.before_notify {|n| n }
+
+      expect(subject.before_notify.size).to eq(2)
+    end
   end
 
   describe "#exception_filter" do

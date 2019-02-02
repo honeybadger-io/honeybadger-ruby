@@ -4,6 +4,9 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Fix #301 - before_notify hooks are overridden on subsequent
+  `Honeybadger.configure` calls.
 
 ## [4.2.0] - 2019-01-31
 ### Changed
