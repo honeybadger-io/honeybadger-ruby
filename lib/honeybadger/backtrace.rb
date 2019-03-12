@@ -114,7 +114,7 @@ module Honeybadger
     attr_reader :lines, :application_lines
 
     def self.parse(ruby_backtrace, opts = {})
-      ruby_lines = split_multiline_backtrace(ruby_backtrace)
+      ruby_lines = split_multiline_backtrace(ruby_backtrace.to_a)
 
       lines = ruby_lines.collect do |unparsed_line|
         Line.parse(unparsed_line.to_s, opts)
@@ -171,10 +171,10 @@ module Honeybadger
     attr_writer :lines, :application_lines
 
     def self.split_multiline_backtrace(backtrace)
-      if backtrace.to_a.size == 1
-        backtrace.to_a.first.split(/\n\s*/)
+      if backtrace.size == 1
+        backtrace.first.split(/\n\s*/)
       else
-        backtrace.to_a
+        backtrace
       end
     end
   end
