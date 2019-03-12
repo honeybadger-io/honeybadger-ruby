@@ -44,13 +44,17 @@ describe Honeybadger::Backtrace do
     expect(line.method).to eq 'index'
   end
 
-  it "parses caller_locations into lines" do
-    backtrace = Honeybadger::Backtrace.parse(caller_locations)
+  it "infers types from backtace lines" do
+    array_thing = double(to_a: [
+      double(to_s: "app/models/user.rb:13:in `magic'"),
+      double(to_s: "app/controllers/users_controller.rb:8:in `index'")
+    ])
+    backtrace = Honeybadger::Backtrace.parse(array_thing, filters: [lambda {|l| l.sub('foo', 'bar') }])
     line = backtrace.lines.first
 
-    expect(line.number).not_to be_empty
-    expect(line.file).to match 'lib/rspec/core/example.rb'
-    expect(line.method).to eq 'instance_exec'
+    expect(line.number).to eq '13'
+    expect(line.file).to eq 'app/models/user.rb'
+    expect(line.method).to eq 'magic'
   end
 
   it "is equal with equal lines" do
