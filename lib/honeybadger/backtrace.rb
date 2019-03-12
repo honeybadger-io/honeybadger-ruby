@@ -117,7 +117,7 @@ module Honeybadger
       ruby_lines = split_multiline_backtrace(ruby_backtrace)
 
       lines = ruby_lines.collect do |unparsed_line|
-        Line.parse(unparsed_line, opts)
+        Line.parse(unparsed_line.to_s, opts)
       end.compact
 
       instance = new(lines)
@@ -174,7 +174,7 @@ module Honeybadger
       if backtrace.to_a.size == 1
         backtrace.to_a.first.split(/\n\s*/)
       else
-        backtrace
+        backtrace.to_a
       end
     end
   end

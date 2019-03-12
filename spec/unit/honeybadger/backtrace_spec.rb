@@ -44,6 +44,15 @@ describe Honeybadger::Backtrace do
     expect(line.method).to eq 'index'
   end
 
+  it "parses caller_locations into lines" do
+    backtrace = Honeybadger::Backtrace.parse(caller_locations)
+    line = backtrace.lines.first
+
+    expect(line.number).not_to be_empty
+    expect(line.file).to match 'lib/rspec/core/example.rb'
+    expect(line.method).to eq 'instance_exec'
+  end
+
   it "is equal with equal lines" do
     one = build_backtrace_array
     two = one.dup
