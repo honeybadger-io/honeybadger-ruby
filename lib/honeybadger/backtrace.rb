@@ -172,7 +172,7 @@ module Honeybadger
 
     def self.split_multiline_backtrace(backtrace)
       if backtrace.size == 1
-        backtrace.first.split(/\n\s*/)
+        backtrace.first.to_s.split(/\n\s*/)
       else
         backtrace
       end
