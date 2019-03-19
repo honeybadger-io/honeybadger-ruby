@@ -4,6 +4,10 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Fix a bug where some non-standard backtraces could not be parsed, resulting in
+  an error when sending error reports. Backtraces are now explicitly converted
+  to arrays, and lines are converted to strings.
 
 ## [4.2.1] - 2019-02-01
 ### Fixed
