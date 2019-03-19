@@ -44,6 +44,19 @@ describe Honeybadger::Backtrace do
     expect(line.method).to eq 'index'
   end
 
+  it "infers types from backtace lines" do
+    array_thing = double(to_a: [
+      double(to_s: "app/models/user.rb:13:in `magic'"),
+      double(to_s: "app/controllers/users_controller.rb:8:in `index'")
+    ])
+    backtrace = Honeybadger::Backtrace.parse(array_thing, filters: [lambda {|l| l.sub('foo', 'bar') }])
+    line = backtrace.lines.first
+
+    expect(line.number).to eq '13'
+    expect(line.file).to eq 'app/models/user.rb'
+    expect(line.method).to eq 'magic'
+  end
+
   it "is equal with equal lines" do
     one = build_backtrace_array
     two = one.dup
