@@ -90,7 +90,7 @@ WELCOME
       option :message,     required: true, type: :string, aliases: :'-m', desc: 'The error message.'
       option :action,      required: false, type: :string, aliases: :'-a', desc: 'The action.'
       option :component,   required: false, type: :string, aliases: :'-C', desc: 'The component.'
-      option :fingerprint, required: false, type: :string, aliases: :'-f', desc: 'The component.'
+      option :fingerprint, required: false, type: :string, aliases: :'-f', desc: 'The fingerprint.'
       option :tags,        required: false, type: :string, aliases: :'-t', desc: 'The tags.'
       option :url,         required: false, type: :string, aliases: :'-u', desc: 'The URL.'
       def notify
