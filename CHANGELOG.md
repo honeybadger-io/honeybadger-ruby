@@ -4,6 +4,9 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Ignore SignalExceptions caused by SIGTERM in Rake Tasks
+
 ### Fixed
 - Fix a bug where some non-standard backtraces could not be parsed, resulting in
   an error when sending error reports. Backtraces are now explicitly converted
