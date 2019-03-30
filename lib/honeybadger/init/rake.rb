@@ -26,11 +26,13 @@ module Honeybadger
     end
 
     def ignored_exception?(exception)
-      exception.is_a?(SignalException) &&
-        ( (exception.respond_to?(:signm) && exception.signm == "SIGTERM") ||
-          # jruby has a missing #signm implementation
-          ["TERM", "SIGTERM"].include?(exception.to_s)
-        )
+      exception.is_a?(SystemExit) ||
+        (exception.is_a?(SignalException) &&
+          ( (exception.respond_to?(:signm) && exception.signm == "SIGTERM") ||
+            # jruby has a missing #signm implementation
+            ["TERM", "SIGTERM"].include?(exception.to_s)
+          )
+    )
     end
 
     # This module brings Rake 0.8.7 error handling to 0.9.0 standards
