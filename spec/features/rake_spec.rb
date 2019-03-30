@@ -38,4 +38,16 @@ feature "Rescuing exceptions in a rake task" do
       end
     end
   end
+
+  context "SignalException" do
+    it "ignores SIGTERM" do
+      expect(run('rake honeybadger_os_sigterm')).not_to be_successfully_executed
+      assert_no_notification
+    end
+
+    it "reports non-SIGTERM" do
+      expect(run('rake honeybadger_os_sighup')).not_to be_successfully_executed
+      assert_notification('error' => {'class' => 'SignalException', 'message' => 'SignalException: SIGHUP'})
+    end
+  end
 end

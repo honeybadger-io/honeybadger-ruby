@@ -13,7 +13,9 @@ module Honeybadger
     end
 
     def display_error_message_with_honeybadger(ex)
-      Honeybadger.notify(ex, origin: :rake, component: reconstruct_command_line)
+      if !ignored_exception?(ex)
+        Honeybadger.notify(ex, origin: :rake, component: reconstruct_command_line)
+      end
       display_error_message_without_honeybadger(ex)
     ensure
       Honeybadger.context.clear!
@@ -21,6 +23,14 @@ module Honeybadger
 
     def reconstruct_command_line
       "rake #{ARGV.join( ' ' )}"
+    end
+
+    def ignored_exception?(exception)
+      exception.is_a?(SignalException) &&
+        ( (exception.respond_to?(:signm) && exception.signm == "SIGTERM") ||
+          # jruby has a missing #signm implementation
+          ["TERM", "SIGTERM"].include?(exception.to_s)
+        )
     end
 
     # This module brings Rake 0.8.7 error handling to 0.9.0 standards

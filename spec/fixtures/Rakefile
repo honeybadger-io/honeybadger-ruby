@@ -17,6 +17,20 @@ task :honeybadger_autodetect_from_terminal do
   raise_exception
 end
 
+# Should not notify as OS has sent SIGTERM
+task :honeybadger_os_sigterm do
+  stub_tty_output(false)
+  require 'honeybadger'
+  raise_signal_exception('TERM')
+end
+
+# Should not notify as OS has sent SIGHUP
+task :honeybadger_os_sighup do
+  stub_tty_output(false)
+  require 'honeybadger'
+  raise_signal_exception('SIGHUP')
+end
+
 def stub_tty_output(value)
   if value
     def STDOUT.tty?
@@ -31,4 +45,8 @@ end
 
 def raise_exception
   raise 'Jim has left the building :('
+end
+
+def raise_signal_exception(code)
+  raise SignalException, code
 end
