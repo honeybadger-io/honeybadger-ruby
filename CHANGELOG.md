@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Fix a bug where some non-standard backtraces could not be parsed, resulting in
   an error when sending error reports. Backtraces are now explicitly converted
   to arrays, and lines are converted to strings.
+- Fix a typo in throttle log message. -@mobilutz
 
 ## [4.2.1] - 2019-02-01
 ### Fixed
