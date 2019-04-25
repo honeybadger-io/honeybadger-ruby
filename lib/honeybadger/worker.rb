@@ -202,7 +202,7 @@ module Honeybadger
 
       case response.code
       when 429, 503
-        warn { sprintf('Error report failed: project is sending too many errors. id=%s code=%s throttle=1.25 interval=%s', msg.id, throttle_interval, response.code) }
+        warn { sprintf('Error report failed: project is sending too many errors. id=%s code=%s throttle=1.25 interval=%s', msg.id, response.code, throttle_interval) }
         add_throttle(1.25)
       when 402
         warn { sprintf('Error report failed: payment is required. id=%s code=%s', msg.id, response.code) }
