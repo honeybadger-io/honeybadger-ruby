@@ -103,6 +103,24 @@ describe "Sidekiq Dependency" do
               end
             end
           end
+
+          context "when the class info is present" do
+            let(:job) { { 'class' => 'HardWorker' } }
+
+            it "includes the class as a component" do
+              expect(Honeybadger).to receive(:notify).with(exception, { parameters: job_context, component: 'HardWorker', action: 'perform' }).once
+              sidekiq_config.error_handlers[0].call(exception, job_context)
+            end
+          end
+
+          context "when the worker is wrapped" do
+            let(:job) { { 'class' => 'HardWorker', 'wrapped' => 'WrappedWorker' } }
+
+            it "includes the class as a component" do
+              expect(Honeybadger).to receive(:notify).with(exception, { parameters: job_context, component: 'WrappedWorker', action: 'perform' }).once
+              sidekiq_config.error_handlers[0].call(exception, job_context)
+            end
+          end
         end
 
         context 'Sidekiq earlier than 4.2.3' do
