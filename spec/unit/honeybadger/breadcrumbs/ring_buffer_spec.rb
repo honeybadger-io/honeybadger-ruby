@@ -1,6 +1,6 @@
-require 'honeybadger/breadcrumb/ring_buffer'
+require 'honeybadger/breadcrumbs/ring_buffer'
 
-describe Breadcrumb::RingBuffer do
+describe Breadcrumbs::RingBuffer do
   describe "#add" do
     it 'adds items' do
       subject.add!(:a)

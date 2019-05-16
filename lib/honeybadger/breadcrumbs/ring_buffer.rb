@@ -1,4 +1,4 @@
-module Breadcrumb
+module Breadcrumbs
   class RingBuffer
     attr_reader :buffer
 
