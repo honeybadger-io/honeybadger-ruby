@@ -26,4 +26,10 @@ describe Breadcrumbs::Crumb do
       })
     end
   end
+
+  describe "#comparable" do
+    it 'can be compared on hash content' do
+      expect(subject == subject.dup).to be(true)
+    end
+  end
 end

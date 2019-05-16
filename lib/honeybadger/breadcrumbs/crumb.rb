@@ -3,6 +3,7 @@ module Breadcrumbs
     # Raw data structure for breadcrumbs.
     #
     attr_reader :category, :message, :metadata, :timestamp
+    include Comparable
 
     def initialize(category: :custom, message: nil, metadata: {})
       @category = category
@@ -18,6 +19,10 @@ module Breadcrumbs
         "metadata" => metadata,
         "timestamp" => timestamp
       }
+    end
+
+    def <=>(other)
+      to_hash <=> other.to_hash
     end
   end
 end
