@@ -5,10 +5,14 @@ require 'honeybadger/version'
 module Release
   CHANGELOG_FILE    = 'CHANGELOG.md'.freeze
   CHANGELOG_HEADING = '## [Unreleased]'
-  VERSION_FILE      = 'lib/honeybadger/version.rb'
+  EXIT_CMD          = 'bundle update honeybadger && git add -p'
 
   def self.run_before(version)
     bump_changelog(version)
+  end
+
+  def self.run_after(version)
+    Bundler.with_clean_env { system(EXIT_CMD) }
   end
 
   def self.bump_changelog(version)

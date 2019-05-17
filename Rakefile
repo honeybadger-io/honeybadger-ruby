@@ -58,6 +58,7 @@ namespace :bump do
     task bump do
       Release.run_before(version)
       Bump::Bump.run(bump, commit: false)
+      Release.run_after(version)
     end
   end
 
@@ -70,6 +71,7 @@ namespace :bump do
 
     Release.run_before(ENV['VERSION'])
     Bump::Bump.run('set', commit: false, version: ENV["VERSION"])
+    Release.run_after(ENV['VERSION'])
   end
 end
 
