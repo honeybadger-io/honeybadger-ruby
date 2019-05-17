@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Send a value for action when reporting a component for Sidekiq jobs -@stympy
 
 ## [4.2.2] - 2019-04-25
 ### Fixed

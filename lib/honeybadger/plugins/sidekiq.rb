@@ -35,7 +35,10 @@ module Honeybadger
 
                 return if retry_opt && retry_count < max_retries
                 opts = {parameters: params}
-                opts[:component] = job['wrapped'.freeze] || job['class'.freeze] if config[:'sidekiq.use_component']
+                if config[:'sidekiq.use_component']
+                  opts[:component] = job['wrapped'.freeze] || job['class'.freeze]
+                  opts[:action] = 'perform' if opts[:component]
+                end
                 Honeybadger.notify(ex, opts)
               }
             end
