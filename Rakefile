@@ -38,14 +38,22 @@ task spec: :'spec:all'
 task test: :spec
 task default: :spec
 
-desc "Bump CHANGELOG v#{Release.next_version(VERSION)}"
-task :bump_changelog, [:version] do |_, args|
-  Release.bump_changelog(args[:version])
+patch_version = Release.next_version(VERSION, 1)
+desc "Bump v#{VERSION} to v#{patch_version}"
+task :patch do
+  Release.run(patch_version)
 end
 
-desc "Bump v#{VERSION} to v#{Release.next_version(VERSION)}"
-task :bump do
-  Release.bump
+minor_version = Release.next_version(VERSION, 2)
+desc "Bump v#{VERSION} to v#{minor_version}"
+task :minor do
+  Release.run(minor_version)
+end
+
+major_version = Release.next_version(VERSION, 3)
+desc "Bump v#{VERSION} to v#{major_version}"
+task :major do
+  Release.run(major_version)
 end
 
 desc "Create tag v#{VERSION} and build and push #{GEM_FILE} to Rubygems"

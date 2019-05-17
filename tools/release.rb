@@ -8,17 +8,7 @@ module Release
   EXIT_CMD          = 'bundle update honeybadger && git add -p'
   VERSION_FILE      = 'lib/honeybadger/version.rb'
 
-  def self.bump_changelog(version = nil)
-    version = next_version(Honeybadger::VERSION) unless version.to_s =~ /\S/
-    contents = File.read(CHANGELOG_FILE)
-    unless contents =~ Regexp.new(Regexp.escape("## [#{version}]"))
-      File.write(CHANGELOG_FILE, contents.gsub(CHANGELOG_HEADING, "#{CHANGELOG_HEADING}\n\n## [#{version}] - #{Time.now.strftime("%Y-%m-%d")}"))
-    end
-  end
-
-  def self.bump
-    version = next_version(Honeybadger::VERSION)
-
+  def self.run(version)
     # Update the version file.
     File.write(VERSION_FILE, File.read(VERSION_FILE).gsub(Honeybadger::VERSION, version))
 
@@ -36,6 +26,15 @@ module Release
     segments = Gem::Version.new(version).segments.dup
     segments.pop while segments.any? { |s| String === s }
     segments[offset] = segments[offset].succ
+    (offset+1).upto(-1) {|o| segments[o] = 0 }
     segments.join('.')
+  end
+
+  def self.bump_changelog(version = nil)
+    version = next_version(Honeybadger::VERSION) unless version.to_s =~ /\S/
+    contents = File.read(CHANGELOG_FILE)
+    unless contents =~ Regexp.new(Regexp.escape("## [#{version}]"))
+      File.write(CHANGELOG_FILE, contents.gsub(CHANGELOG_HEADING, "#{CHANGELOG_HEADING}\n\n## [#{version}] - #{Time.now.strftime("%Y-%m-%d")}"))
+    end
   end
 end
