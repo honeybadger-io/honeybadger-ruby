@@ -7,6 +7,7 @@ require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
+require 'honeybadger/breadcrumbs'
 
 module Honeybadger
   # The Honeybadger agent contains all the methods for interacting with the
@@ -63,6 +64,7 @@ module Honeybadger
 
       @context = opts.delete(:context)
       @context ||= ContextManager.new if opts.delete(:local_context)
+      @breadcrumbs = Breadcrumbs::Collector.new
 
       @config ||= Config.new(opts)
 
@@ -229,6 +231,39 @@ module Honeybadger
     # @return [Hash, nil]
     def get_context
       context_manager.get_context
+    end
+
+    # @api private
+    # Used internally for adding breadcrumbs in integrations
+    attr_reader :breadcrumbs
+
+    # Appends a breadcrumb to the stack. Use this when you want to add some
+    # custom data to your breadcrumb trace in effort help when debugging. If
+    # there is an exeception reported to honeybadger, you can view all
+    # breadcrumbs leading up to the error event.
+    #
+    # @example
+    #   Honeybadger.add_breadcrumb("Send Email", metadata: { user: user.id, message: message })
+    #
+    # @param message [String] The message you want to send with the breadcrumb
+    # @param metadata [Hash] Any metadata that you want to pass along with the
+    #   breadcrumb. We only accept a hash with a depth level of one (no nested
+    #   hashes)
+    # @param category [Symbol] You can provide a custom catagory. This affects
+    #   how the breadcrumb is displayed, so we recommend that you pick a catagory
+    #   we know about.
+    #
+    # @return self
+    def add_breadcrumb(message, metadata: {}, category: :custom)
+      @breadcrumbs.add!(
+        Breadcrumbs::Crumb.new(
+          category: category,
+          message: message,
+          metadata: metadata
+        )
+      )
+
+      self
     end
 
     # Flushes all data from workers before returning. This is most useful in
