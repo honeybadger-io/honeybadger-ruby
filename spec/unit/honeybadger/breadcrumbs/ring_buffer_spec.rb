@@ -17,11 +17,25 @@ describe Breadcrumbs::RingBuffer do
     end
   end
 
+  describe "#<<" do
+    it 'delegates to add!' do
+      expect(subject.method(:<<)).to eq(subject.method(:add!))
+    end
+  end
+
   describe "#clear" do
     it 'clears data' do
       subject.add!(:a)
       subject.clear!
       expect(subject.buffer).to be_empty
+    end
+  end
+
+  describe "#each" do
+    it "enumerates over buffer" do
+      subject << :a
+      subject << :b
+      expect(subject.reduce([]) { |m, v| m << v }).to eq([:a, :b])
     end
   end
 end

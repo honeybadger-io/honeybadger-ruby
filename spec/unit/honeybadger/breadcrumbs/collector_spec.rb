@@ -21,5 +21,10 @@ describe Breadcrumbs::Collector do
       expect(buffer).to receive(:buffer).and_return(all_crumbs)
       expect(subject.crumbs).to eq(all_crumbs)
     end
+
+    it '#each' do
+      expect(buffer).to receive(:each)
+      subject.each
+    end
   end
 end

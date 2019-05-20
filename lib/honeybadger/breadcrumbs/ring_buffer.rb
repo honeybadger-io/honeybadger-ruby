@@ -1,5 +1,10 @@
 module Breadcrumbs
   class RingBuffer
+    # Simple ring buffer implementation that keeps item count constrained using
+    # a rolling window. Items from the front of the buffer are dropped as more
+    # are pushed on the end of the stack.
+    include Enumerable
+
     attr_reader :buffer
 
     def initialize(buffer_size = 40)
@@ -13,9 +18,19 @@ module Breadcrumbs
       @buffer.shift(1) if @ct > @buffer_size
     end
 
+    alias_method :<<, :add!
+
     def clear!
       @buffer = []
       @ct = 0
+    end
+
+    def to_a
+      @buffer
+    end
+
+    def each(&blk)
+      @buffer.each(&blk)
     end
   end
 end
