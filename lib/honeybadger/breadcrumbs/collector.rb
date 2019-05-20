@@ -5,12 +5,13 @@ module Breadcrumbs
     include Enumerable
     extend Forwardable
     # The Collector manages breadcrumbs and provides an interface for accessing
-    # and breadcrumbs
+    # and affecting breadcrumbs
     #
 
     def_delegators :@buffer, :clear!, :add!, :each
 
-    def initialize(buffer = RingBuffer.new)
+    def initialize(config, buffer = RingBuffer.new)
+      @config = config
       @buffer = buffer
     end
 

@@ -64,9 +64,10 @@ module Honeybadger
 
       @context = opts.delete(:context)
       @context ||= ContextManager.new if opts.delete(:local_context)
-      @breadcrumbs = Breadcrumbs::Collector.new
 
       @config ||= Config.new(opts)
+
+      @breadcrumbs = Breadcrumbs::Collector.new(config)
 
       init_worker
     end
@@ -250,8 +251,8 @@ module Honeybadger
     #   breadcrumb. We only accept a hash with a depth level of one (no nested
     #   hashes)
     # @param category [Symbol] You can provide a custom catagory. This affects
-    #   how the breadcrumb is displayed, so we recommend that you pick a catagory
-    #   we know about.
+    #   how the breadcrumb are displayed, so we recommend that you pick a known
+    #   catagory.
     #
     # @return self
     def add_breadcrumb(message, metadata: {}, category: :custom)
