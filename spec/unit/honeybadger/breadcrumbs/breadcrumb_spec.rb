@@ -1,7 +1,7 @@
 require 'timecop'
 require 'honeybadger/breadcrumbs/ring_buffer'
 
-describe Breadcrumbs::Crumb do
+describe Honeybadger::Breadcrumbs::Breadcrumb do
   let(:category) { :test }
   let(:message) { "A test message" }
   let(:metadata) {{ a: "foo" }}
@@ -16,13 +16,13 @@ describe Breadcrumbs::Crumb do
   its(:metadata) { should eq(metadata) }
   its(:timestamp) { should eq(DateTime.now) }
 
-  describe "#to_hash" do
+  describe "#to_h" do
     it "outputs hash data" do
-      expect(subject.to_hash).to eq({
-        "category" => category,
-        "message" => message,
-        "metadata" => metadata,
-        "timestamp" => DateTime.now
+      expect(subject.to_h).to eq({
+        category: category,
+        message: message,
+        metadata: metadata,
+        timestamp: DateTime.now
       })
     end
   end
@@ -30,6 +30,14 @@ describe Breadcrumbs::Crumb do
   describe "#comparable" do
     it 'can be compared on hash content' do
       expect(subject == subject.dup).to be(true)
+    end
+  end
+
+  describe "#ignore!" do
+    it "can be deactivated" do
+      expect(subject).to be_active
+      subject.ignore!
+      expect(subject).to_not be_active
     end
   end
 end

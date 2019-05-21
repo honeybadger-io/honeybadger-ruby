@@ -65,6 +65,9 @@ module Honeybadger
     # The exception cause if available.
     attr_reader :cause
 
+    # @return [Breadcrumbs::Collector] The collection of captured breadcrumbs
+    attr_reader :breadcrumbs
+
     # The backtrace from the given exception or hash.
     attr_accessor :backtrace
 
@@ -184,6 +187,8 @@ module Honeybadger
 
       self.session = opts[:session][:data] if opts[:session] && opts[:session][:data]
 
+      self.breadcrumbs = opts[:breadcrumbs] || Breadcrumbs::Collector.new(config)
+
       # Fingerprint must be calculated last since callback operates on `self`.
       self.fingerprint = fingerprint_from_opts(opts)
     end
@@ -200,6 +205,7 @@ module Honeybadger
       {
         api_key: s(api_key),
         notifier: NOTIFIER,
+        breadcrumbs: s(breadcrumbs.to_h),
         error: {
           token: id,
           class: s(error_class),
