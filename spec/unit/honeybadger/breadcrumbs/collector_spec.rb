@@ -49,9 +49,13 @@ describe Honeybadger::Breadcrumbs::Collector do
     end
 
     it 'contains trail summary' do
-      trail = [:a]
+      trail = [{}]
       expect(subject).to receive(:trail).and_return(trail)
       expect(subject.to_h).to match(hash_including({ trail: trail }))
+    end
+
+    it 'works with empty trail' do
+      expect(subject.to_h).to match(hash_including({ trail: [] }))
     end
 
     it 'contains enabled flag' do

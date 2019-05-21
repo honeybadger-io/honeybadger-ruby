@@ -50,7 +50,7 @@ module Honeybadger
       def to_h
         {
           enabled: @config[:'breadcrumbs.enabled'],
-          trail: trail
+          trail: trail.map(&:to_h)
         }
       end
     end
