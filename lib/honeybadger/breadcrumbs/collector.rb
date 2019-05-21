@@ -11,13 +11,25 @@ module Honeybadger
       # Most actions are delegated to the current buffer implementation. A
       # Buffer must implement all delegated methods to work with the Collector.
 
-      def_delegators :@buffer, :clear!, :each, :to_a
+      # Flush all breadcrumbs, delegates to buffer
+      def_delegator :@buffer, :clear!
+
+      # Iterate over all Breadcrumbs and satify Enumerable, delegates to buffer
+      # @yield [Object] sequentially gives breadcrumbs to the block
+      def_delegator :@buffer, :each
+
+      # Raw Array of Breadcrumbs, delegates to buffer
+      # @return [Array] Raw set of breadcrumbs
+      def_delegator :@buffer, :to_a
 
       def initialize(config, buffer = RingBuffer.new)
         @config = config
         @buffer = buffer
       end
 
+      # Add Breadcrumb to stack
+      #
+      # @return [self] Filtered breadcrumbs
       def add!(breadcrumb)
         return unless @config[:'breadcrumbs.enabled']
         @buffer.add!(breadcrumb)
@@ -27,11 +39,10 @@ module Honeybadger
 
       alias_method :<<, :add!
 
-      # Breadcrumb hash representation. Only contains active breadcrumbs. If
-      # you want to remove a breadcrumb from the trail, then you can
-      # selectively ignore breadcrumbs when building a notice.
+      # All active breadcrumbs you want to remove a breadcrumb from the trail,
+      # then you can selectively ignore breadcrumbs while building a notice.
       #
-      # @return [Array] Filtered breadcrumbs
+      # @return [Array] Active breadcrumbs
       def trail
         select(&:active?)
       end

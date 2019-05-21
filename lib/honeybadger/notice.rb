@@ -65,9 +65,6 @@ module Honeybadger
     # The exception cause if available.
     attr_reader :cause
 
-    # @return [Breadcrumbs::Collector] The collection of captured breadcrumbs
-    attr_reader :breadcrumbs
-
     # The backtrace from the given exception or hash.
     attr_accessor :backtrace
 
@@ -117,6 +114,9 @@ module Honeybadger
 
     # Deprecated: Excerpt from source file.
     attr_reader :source
+
+    # @return [Breadcrumbs::Collector] The collection of captured breadcrumbs
+    attr_accessor :breadcrumbs
 
     # @api private
     # Cache project path substitutions for backtrace lines.
