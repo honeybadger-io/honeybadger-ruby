@@ -34,6 +34,7 @@ module Honeybadger
   def_delegator :'Honeybadger::Agent.instance', :exception_filter
   def_delegator :'Honeybadger::Agent.instance', :exception_fingerprint
   def_delegator :'Honeybadger::Agent.instance', :backtrace_filter
+  def_delegator :'Honeybadger::Agent.instance', :add_breadcrumb
 
   # @!macro [attach] def_delegator
   #   @!method $2(...)
