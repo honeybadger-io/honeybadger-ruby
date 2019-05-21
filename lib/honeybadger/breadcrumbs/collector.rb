@@ -11,12 +11,21 @@ module Honeybadger
       # Most actions are delegated to the current buffer implementation. A
       # Buffer must implement all delegated methods to work with the Collector.
 
-      def_delegators :@buffer, :clear!, :add!, :<<, :each, :to_a
+      def_delegators :@buffer, :clear!, :each, :to_a
 
       def initialize(config, buffer = RingBuffer.new)
         @config = config
         @buffer = buffer
       end
+
+      def add!(breadcrumb)
+        return unless @config[:'breadcrumbs.enabled']
+        @buffer.add!(breadcrumb)
+
+        self
+      end
+
+      alias_method :<<, :add!
 
       # Breadcrumb hash representation. Only contains active breadcrumbs. If
       # you want to remove a breadcrumb from the trail, then you can
@@ -29,6 +38,7 @@ module Honeybadger
 
       def to_h
         {
+          enabled: @config[:'breadcrumbs.enabled'],
           trail: trail
         }
       end

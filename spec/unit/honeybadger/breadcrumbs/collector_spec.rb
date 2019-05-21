@@ -12,23 +12,50 @@ describe Honeybadger::Breadcrumbs::Collector do
       subject.clear!
     end
 
-    it '#add!' do
-      crumb = double("Crumb")
-      expect(buffer).to receive(:add!).with(crumb)
-      subject.add!(crumb)
-    end
-
     it '#each' do
       expect(buffer).to receive(:each)
       subject.each
     end
   end
 
+
+  describe "#add!" do
+    it "delegates to " do
+      crumb = double("Crumb")
+      expect(buffer).to receive(:add!).with(crumb)
+      subject.add!(crumb)
+    end
+
+    context "breadcrumbs disabled in config" do
+      let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, :'breadcrumbs.enabled' => false) }
+
+      it 'does not call buffer' do
+        crumb = double("Crumb")
+        expect(buffer).to_not receive(:add!)
+        subject.add!(crumb)
+      end
+    end
+  end
+
+  describe "#<<" do
+    it 'delegates to add!' do
+      expect(subject.method(:<<)).to eq(subject.method(:add!))
+    end
+  end
+
   describe "to_h" do
-    it 'returns collection summary' do
+    before do
+      allow(subject).to receive(:trail).and_return([])
+    end
+
+    it 'contains trail summary' do
       trail = [:a]
       expect(subject).to receive(:trail).and_return(trail)
-      expect(subject.to_h).to eq({ trail: trail })
+      expect(subject.to_h).to match(hash_including({ trail: trail }))
+    end
+
+    it 'contains enabled flag' do
+      expect(subject.to_h).to match(hash_including({ enabled: true }))
     end
   end
 

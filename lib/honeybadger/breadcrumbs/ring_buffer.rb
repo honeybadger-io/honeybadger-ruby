@@ -19,8 +19,6 @@ module Honeybadger
         @buffer.shift(1) if @ct > @buffer_size
       end
 
-      alias_method :<<, :add!
-
       def clear!
         @buffer = []
         @ct = 0

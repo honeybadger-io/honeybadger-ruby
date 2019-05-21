@@ -17,12 +17,6 @@ describe Honeybadger::Breadcrumbs::RingBuffer do
     end
   end
 
-  describe "#<<" do
-    it 'delegates to add!' do
-      expect(subject.method(:<<)).to eq(subject.method(:add!))
-    end
-  end
-
   describe "#clear" do
     it 'clears data' do
       subject.add!(:a)
@@ -33,8 +27,8 @@ describe Honeybadger::Breadcrumbs::RingBuffer do
 
   describe "#each" do
     it "enumerates over buffer" do
-      subject << :a
-      subject << :b
+      subject.add!(:a)
+      subject.add!(:b)
       expect(subject.reduce([]) { |m, v| m << v }).to eq([:a, :b])
     end
   end

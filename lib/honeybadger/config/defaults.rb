@@ -287,6 +287,11 @@ module Honeybadger
         description: 'Send exceptions when retrying job.',
         default: true,
         type: Boolean
+      },
+      :'breadcrumbs.enabled' => {
+        description: 'Enable/Disable breadcrumb functionality.',
+        default: true,
+        type: Boolean
       }
     }.freeze
 
