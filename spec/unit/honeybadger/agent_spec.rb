@@ -106,27 +106,27 @@ describe Honeybadger::Agent do
   end
 
   context "breadcrumbs" do
-    let(:breadcrumbs) { instance_double(Breadcrumbs::Collector) }
+    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
     let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
     subject { described_class.new(config) }
 
     before do
       Timecop.freeze
-      allow(Breadcrumbs::Collector).to receive(:new).and_return(breadcrumbs)
+      allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_return(breadcrumbs)
     end
 
     after { Timecop.return }
 
     describe "#add_breadcrumb" do
       it "adds breadcrumb to manager" do
-        crumb = Breadcrumbs::Crumb.new(category: :neat, message: "This is the message", metadata: {a: "b"})
+        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: :neat, message: "This is the message", metadata: {a: "b"})
         expect(breadcrumbs).to receive(:add!).with(crumb)
 
         subject.add_breadcrumb("This is the message", metadata: {a: "b"}, category: :neat)
       end
 
       it 'has sane defaults' do
-        crumb = Breadcrumbs::Crumb.new(category: :custom, message: "Basic Message", metadata: {})
+        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: :custom, message: "Basic Message", metadata: {})
         expect(breadcrumbs).to receive(:add!).with(crumb)
 
         subject.add_breadcrumb("Basic Message")

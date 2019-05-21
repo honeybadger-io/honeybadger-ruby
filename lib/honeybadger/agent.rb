@@ -258,7 +258,7 @@ module Honeybadger
     # @return self
     def add_breadcrumb(message, metadata: {}, category: :custom)
       @breadcrumbs.add!(
-        Breadcrumbs::Crumb.new(
+        Breadcrumbs::Breadcrumb.new(
           category: category,
           message: message,
           metadata: metadata
