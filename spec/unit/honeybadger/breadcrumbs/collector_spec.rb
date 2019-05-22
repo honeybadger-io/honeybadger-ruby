@@ -49,9 +49,10 @@ describe Honeybadger::Breadcrumbs::Collector do
     end
 
     it 'contains trail summary' do
-      trail = [{}]
+      trail = [buffer]
+      expect(buffer).to receive(:to_h).and_return({test: "buffer"})
       expect(subject).to receive(:trail).and_return(trail)
-      expect(subject.to_h).to match(hash_including({ trail: trail }))
+      expect(subject.to_h).to match(hash_including({ trail: [{test: "buffer"}] }))
     end
 
     it 'works with empty trail' do
