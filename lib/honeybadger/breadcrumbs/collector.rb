@@ -53,6 +53,18 @@ module Honeybadger
           trail: trail.map(&:to_h)
         }
       end
+
+      private
+
+      # @api private
+      # Since the collector is shared with the worker thread, there is a chance
+      # it can be cleared before we have prepared the request. We provide the
+      # ability to duplicate a collector which should also duplicate the buffer
+      # instance, as that holds the breadcrumbs.
+      def initialize_dup(source)
+        @buffer = source.instance_variable_get(:@buffer).dup
+        super
+      end
     end
   end
 end
