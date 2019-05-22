@@ -17,6 +17,7 @@ module Honeybadger
       display_error_message_without_honeybadger(ex)
     ensure
       Honeybadger.context.clear!
+      Honeybadger.breadcrumbs.clear!
     end
 
     def reconstruct_command_line

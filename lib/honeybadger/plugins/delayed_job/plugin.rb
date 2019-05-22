@@ -47,6 +47,7 @@ module Honeybadger
               raise error
             ensure
               ::Honeybadger.context.clear!
+              ::Honeybadger.breadcrumbs.clear!
             end
           end
         end

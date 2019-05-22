@@ -45,6 +45,7 @@ module Honeybadger
         end
       ensure
         agent.context.clear!
+        agent.breadcrumbs.clear!
       end
 
       private

@@ -7,6 +7,7 @@ module Honeybadger
       class Middleware
         def call(worker, msg, queue)
           Honeybadger.context.clear!
+          Honeybadger.breadcrumbs.clear!
           yield
         end
       end
