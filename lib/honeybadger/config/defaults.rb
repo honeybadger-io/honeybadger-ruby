@@ -1,4 +1,5 @@
 require 'socket'
+require 'honeybadger/breadcrumbs/active_support_notifications'
 
 module Honeybadger
   class Config
@@ -292,6 +293,11 @@ module Honeybadger
         description: 'Enable/Disable breadcrumb functionality.',
         default: true,
         type: Boolean
+      },
+      :'breadcrumbs.active_support_notifications' => {
+        description: 'Configuration for automatic Active Support Instrumentation events.',
+        default: Breadcrumbs::ACTIVE_SUPPORT_NOTIFICATIONS,
+        type: Hash
       }
     }.freeze
 
