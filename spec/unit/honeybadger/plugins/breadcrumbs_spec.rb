@@ -88,7 +88,6 @@ describe "Breadcrumbs Plugin" do
           described_class.send_breadcrumb_notification("noop", 88, {}, data)
         end
       end
-
     end
   end
 end

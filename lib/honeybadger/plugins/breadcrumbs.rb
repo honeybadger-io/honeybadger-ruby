@@ -1,4 +1,5 @@
 require 'honeybadger/plugin'
+require 'honeybadger/breadcrumbs/logging'
 
 module Honeybadger
   module Plugins
@@ -37,7 +38,10 @@ module Honeybadger
         #
         if defined?(::Rails.application) && ::Rails.application
           config[:'breadcrumbs.active_support_notifications'].each(&Breadcrumbs.method(:subscribe_to_notification))
+          ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector)
         end
+
+        ::Logger.prepend(Honeybadger::Breadcrumbs::LogWrapper)
       end
     end
   end

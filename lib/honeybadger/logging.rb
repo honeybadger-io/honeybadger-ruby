@@ -7,6 +7,7 @@ module Honeybadger
   # @api private
   module Logging
     PREFIX = '** [Honeybadger] '.freeze
+    LOGGER_PROG = "honeybadger".freeze
 
     # Logging helper methods. Requires a Honeybadger::Config @config instance
     # variable to exist and/or #logger to be defined. Each method is
@@ -93,7 +94,11 @@ module Honeybadger
         @logger = logger
       end
 
-      def_delegators :@logger, :level, :add, :debug?, :info?, :warn?, :error?
+      def add(severity, msg)
+        @logger.add(severity, msg, LOGGER_PROG)
+      end
+
+      def_delegators :@logger, :level, :debug?, :info?, :warn?, :error?
     end
 
     class FormattedLogger < StandardLogger

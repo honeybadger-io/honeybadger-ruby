@@ -15,6 +15,15 @@ describe Honeybadger::Logging::Base do
   end
 end
 
+describe Honeybadger::Logging::StandardLogger do
+  it "injects honeybadger as progname" do
+    logger_dbl = instance_double(Logger, add: nil)
+    logger = described_class.new(logger_dbl)
+    expect(logger_dbl).to receive(:add).with(Logger::Severity::INFO, "a message", "honeybadger")
+    logger.info("a message")
+  end
+end
+
 describe Honeybadger::Logging::BootLogger.instance do
   LOG_SEVERITIES.each do |severity|
     it { should respond_to severity }
