@@ -11,22 +11,22 @@ feature "Rescuing exceptions at exit" do
   end
 
   it "reports the exception to Honeybadger" do
-    expect(run(crash_cmd)).not_to be_successfully_executed
+    expect(run_command(crash_cmd)).not_to be_successfully_executed
     assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: badgers!'})
   end
 
   it "ignores SystemExit" do
-    expect(run(custom_crash_cmd("system_exit"))).not_to be_successfully_executed
+    expect(run_command(custom_crash_cmd("system_exit"))).not_to be_successfully_executed
     assert_no_notification
   end
 
   it "ignores SignalException of type SIGTERM" do
-    expect(run(custom_crash_cmd("sigterm"))).not_to be_successfully_executed
+    expect(run_command(custom_crash_cmd("sigterm"))).not_to be_successfully_executed
     assert_no_notification
   end
 
   it "reports SignalException of type other than SIGTERM" do
-    expect(run(custom_crash_cmd("hup"))).not_to be_successfully_executed
+    expect(run_command(custom_crash_cmd("hup"))).not_to be_successfully_executed
     assert_notification('error' => {'class' => 'SignalException', 'message' => 'SignalException: SIGHUP'})
   end
 
@@ -36,7 +36,7 @@ feature "Rescuing exceptions at exit" do
     end
 
     it "doesn't report the exception to Honeybadger" do
-      expect(run(crash_cmd)).not_to be_successfully_executed
+      expect(run_command(crash_cmd)).not_to be_successfully_executed
       assert_no_notification
     end
   end
