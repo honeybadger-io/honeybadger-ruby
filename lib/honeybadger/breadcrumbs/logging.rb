@@ -26,10 +26,12 @@ module Honeybadger
     module LogSubscriberInjector
       %w(info debug warn error fatal unknown).each do |level|
         define_method(level) do |*args|
-          Thread.current[:__hb_within_log_subscriber] = true
-          super(*args)
-        ensure
-          Thread.current[:__hb_within_log_subscriber] = false
+          begin
+            Thread.current[:__hb_within_log_subscriber] = true
+            super(*args)
+          ensure
+            Thread.current[:__hb_within_log_subscriber] = false
+          end
         end
       end
     end
