@@ -1,5 +1,5 @@
 require 'socket'
-require 'honeybadger/breadcrumbs/active_support_notifications'
+require 'honeybadger/breadcrumbs/active_support'
 
 module Honeybadger
   class Config
@@ -296,7 +296,7 @@ module Honeybadger
       },
       :'breadcrumbs.active_support_notifications' => {
         description: 'Configuration for automatic Active Support Instrumentation events.',
-        default: Breadcrumbs::ACTIVE_SUPPORT_NOTIFICATIONS,
+        default: Breadcrumbs::ActiveSupport.default_notifications,
         type: Hash
       }
     }.freeze
