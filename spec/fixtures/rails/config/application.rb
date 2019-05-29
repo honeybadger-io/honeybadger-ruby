@@ -18,6 +18,11 @@ class RailsApp < Rails::Application
     config.secret_key_base = 'test secret key base for test rails app'
   end
 
+  # Rails 6+
+  if Rails::VERSION::MAJOR >= 6
+    config.hosts << "www.example.com"
+  end
+
   config.eager_load = true
   config.cache_classes = true
   config.serve_static_files = false
