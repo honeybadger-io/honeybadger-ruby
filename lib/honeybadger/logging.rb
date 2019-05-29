@@ -94,16 +94,16 @@ module Honeybadger
         @logger = logger
       end
 
-      def add(severity, msg)
-        @logger.add(severity, msg, LOGGER_PROG)
+      def add(severity, msg, progname=LOGGER_PROG)
+        @logger.add(severity, msg, progname)
       end
 
       def_delegators :@logger, :level, :debug?, :info?, :warn?, :error?
     end
 
     class FormattedLogger < StandardLogger
-      def add(severity, msg)
-        super(severity, format_message(msg))
+      def add(severity, msg, progname=LOGGER_PROG)
+        super(severity, format_message(msg), progname)
       end
 
       private
