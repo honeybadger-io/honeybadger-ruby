@@ -96,7 +96,7 @@ describe Honeybadger::Logging::ConfigLogger do
       it "delegates ##{severity} to configured logger" do
         # Debug is logged at the info level.
         const = Logger::Severity.const_get((severity == :debug ? :info : severity).to_s.upcase)
-        expect(logger).to receive(:add).with(const, :foo)
+        expect(logger).to receive(:add).with(const, :foo, "honeybadger")
         subject.send(severity, :foo)
       end
     end
