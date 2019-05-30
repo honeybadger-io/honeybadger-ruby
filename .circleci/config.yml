@@ -52,6 +52,8 @@ jobs:
   "jruby":
     docker:
       - image: circleci/jruby:latest
+        environment:
+          BUNDLER_VERSION: 1.17.3
     steps:
       - checkout
       - <<: *restore
