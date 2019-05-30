@@ -1,6 +1,6 @@
 # Honeybadger for Ruby
 
-[![Build Status](https://secure.travis-ci.org/honeybadger-io/honeybadger-ruby.svg?branch=master)](http://travis-ci.org/honeybadger-io/honeybadger-ruby)
+[![CircleCI](https://circleci.com/gh/honeybadger-io/honeybadger-ruby.svg?style=svg)](https://circleci.com/gh/honeybadger-io/honeybadger-ruby)
 [![Gem Version](https://badge.fury.io/rb/honeybadger.svg)](http://badge.fury.io/rb/honeybadger)
 [![SemVer](https://api.dependabot.com/badges/compatibility_score?dependency-name=honeybadger&package-manager=bundler&version-scheme=semver)](https://dependabot.com/compatibility-score.html?dependency-name=honeybadger&package-manager=bundler&version-scheme=semver)
 
