@@ -33,26 +33,26 @@ appraise 'rails4.2' do
   gem 'rspec-rails'
 end
 
-  appraise 'rails5.0' do
-    gem 'rails', '~> 5.0.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-    gem 'rack-mini-profiler', require: false
-    gem 'rspec-rails'
-  end
+appraise 'rails5.0' do
+  gem 'rails', '~> 5.0.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
+end
 
-  appraise 'rails5.1' do
-    gem 'rails', '~> 5.1.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-    gem 'rack-mini-profiler', require: false
-    gem 'rspec-rails'
-  end
+appraise 'rails5.1' do
+  gem 'rails', '~> 5.1.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
+end
 
-  appraise 'rails5.2' do
-    gem 'rails', '~> 5.2.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-    gem 'rack-mini-profiler', require: false
-    gem 'rspec-rails'
-  end
+appraise 'rails5.2' do
+  gem 'rails', '~> 5.2.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
+end
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   # The latest officially supported Rails/Rack release
