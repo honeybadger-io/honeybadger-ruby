@@ -20,6 +20,7 @@ gemfile:
   - gemfiles/rails5.0.gemfile
   - gemfiles/rails5.1.gemfile
   - gemfiles/rails5.2.gemfile
+  - gemfiles/rails6.0.gemfile
 rvm:
   - 2.3.3
   - 2.4.0

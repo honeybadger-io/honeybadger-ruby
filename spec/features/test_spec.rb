@@ -4,7 +4,7 @@ feature "Running the test cli command" do
   scenario "in a standalone project" do
     it "displays expected debug output and sends notification" do
       set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
-      expect(run("honeybadger test")).to be_successfully_executed
+      expect(run_command("honeybadger test")).to be_successfully_executed
       expect(all_output).not_to match /Detected Rails/i
       expect(all_output).to match /asdf/
       expect(all_output).to match /Initializing Honeybadger/
@@ -16,7 +16,7 @@ feature "Running the test cli command" do
 
     context "with invalid configuration" do
       it "displays expected debug output" do
-        expect(run("honeybadger test --dry-run")).not_to be_successfully_executed
+        expect(run_command("honeybadger test --dry-run")).not_to be_successfully_executed
         expect(all_output).not_to match /Detected Rails/i
         expect(all_output).to match /API key is missing/i
       end
@@ -31,7 +31,7 @@ feature "Running the test cli command" do
 ---
 api_key: 'asdf'
 YML
-      expect(run("honeybadger test")).to be_successfully_executed
+      expect(run_command("honeybadger test")).to be_successfully_executed
       expect(all_output).to match /Detected Rails/i
       expect(all_output).to match /asdf/
       expect(all_output).to match /Initializing Honeybadger/
@@ -41,7 +41,7 @@ YML
 
     context "with invalid configuration" do
       it "displays expected debug output" do
-        expect(run("honeybadger test --dry-run")).not_to be_successfully_executed
+        expect(run_command("honeybadger test --dry-run")).not_to be_successfully_executed
         expect(all_output).to match /Detected Rails/i
         expect(all_output).to match /API key is missing/i
       end

@@ -6,7 +6,7 @@ feature "Rescuing exceptions in a rake task" do
   end
 
   it "reports the exception to Honeybadger" do
-    expect(run('rake honeybadger')).not_to be_successfully_executed
+    expect(run_command('rake honeybadger')).not_to be_successfully_executed
     assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
   end
 
@@ -16,14 +16,14 @@ feature "Rescuing exceptions in a rake task" do
     end
 
     it "doesn't report the exception to Honeybadger" do
-      expect(run('rake honeybadger')).not_to be_successfully_executed
+      expect(run_command('rake honeybadger')).not_to be_successfully_executed
       assert_no_notification
     end
   end
 
   context "shell is attached" do
     it "doesn't report the exception to Honeybadger" do
-      expect(run('rake honeybadger_autodetect_from_terminal')).not_to be_successfully_executed
+      expect(run_command('rake honeybadger_autodetect_from_terminal')).not_to be_successfully_executed
       assert_no_notification
     end
 
@@ -33,7 +33,7 @@ feature "Rescuing exceptions in a rake task" do
       end
 
       it "reports the exception to Honeybadger" do
-        expect(run('rake honeybadger_autodetect_from_terminal')).not_to be_successfully_executed
+        expect(run_command('rake honeybadger_autodetect_from_terminal')).not_to be_successfully_executed
         assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
       end
     end

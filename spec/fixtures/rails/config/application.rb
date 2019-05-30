@@ -9,15 +9,12 @@ module ActiveRecord
 end
 
 class RailsApp < Rails::Application
-  if Rails::VERSION::MAJOR == 3
-    # For Rails 3.2
-    config.secret_token = 'test secret token for test rails app'
-    config.active_support.deprecation = :notify
-  else
-    # For Rails 4.0+
-    config.secret_key_base = 'test secret key base for test rails app'
+  # Rails 6+
+  if Rails::VERSION::MAJOR >= 6
+    config.hosts << "www.example.com"
   end
 
+  config.secret_key_base = 'test secret key base for test rails app'
   config.eager_load = true
   config.cache_classes = true
   config.serve_static_files = false

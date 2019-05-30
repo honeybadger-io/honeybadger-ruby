@@ -33,24 +33,31 @@ appraise 'rails4.2' do
   gem 'rspec-rails'
 end
 
-if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
-  appraise 'rails5.0' do
-    gem 'rails', '~> 5.0.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-    gem 'rack-mini-profiler', require: false
-    gem 'rspec-rails'
-  end
+appraise 'rails5.0' do
+  gem 'rails', '~> 5.0.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
+end
 
-  appraise 'rails5.1' do
-    gem 'rails', '~> 5.1.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-    gem 'rack-mini-profiler', require: false
-    gem 'rspec-rails'
-  end
+appraise 'rails5.1' do
+  gem 'rails', '~> 5.1.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
+end
 
+appraise 'rails5.2' do
+  gem 'rails', '~> 5.2.0'
+  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'rack-mini-profiler', require: false
+  gem 'rspec-rails'
+end
+
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   # The latest officially supported Rails/Rack release
-  appraise 'rails5.2' do
-    gem 'rails', '~> 5.2.0'
+  appraise 'rails6.0' do
+    gem 'rails', '~> 6.0.0.rc1'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
@@ -70,13 +77,13 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
     # there. See https://github.com/rails/rails/pull/24066
     gem 'listen'
   end
+end
 
-  appraise 'rack' do
-    gem 'rack', '>= 2.0.0'
-  end
+appraise 'rack' do
+  gem 'rack', '>= 2.0.0'
+end
 
-  appraise 'sinatra' do
-    gem 'sinatra', '~> 2.0.0.beta1'
-    gem 'rack-test'
-  end
+appraise 'sinatra' do
+  gem 'sinatra', '~> 2.0.0.beta1'
+  gem 'rack-test'
 end
