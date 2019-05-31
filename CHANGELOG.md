@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.3.1] - 2019-05-30
 ### Fixed
 - Add Rails 6 RC1 Support
 
