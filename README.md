@@ -43,6 +43,15 @@ versions of [Rails](http://rubyonrails.org/).
 * The integration test suite can be run with `rake spec:features`.
 * The combined suite can be run with `rake`.
 
+### Releasing
+
+To release a new [minor] version:
+
+1. With a clean working tree, use `rake bump:minor` to bump the version, commit the changes, tag the release, and push to GitHub.
+2. Use `rake release` to run the tests, build the gem, and push to RubyGems.org.
+
+See `rake -T` for additional tasks.
+
 ### License
 
 The Honeybadger gem is MIT licensed. See the [LICENSE](https://raw.github.com/honeybadger-io/honeybadger-ruby/master/LICENSE) file in this repository for details.
