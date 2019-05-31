@@ -1,5 +1,6 @@
 require 'honeybadger/breadcrumbs/ring_buffer'
 require 'honeybadger/breadcrumbs/breadcrumb'
+require 'honeybadger/breadcrumbs/cleaner'
 require 'honeybadger/breadcrumbs/collector'
 
 module Honeybadger

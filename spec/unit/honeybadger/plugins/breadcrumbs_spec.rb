@@ -72,22 +72,6 @@ describe "Breadcrumbs Plugin" do
         expect(Honeybadger).to receive(:add_breadcrumb).with("message", {category: :custom, metadata: {duration: 100}})
         described_class.send_breadcrumb_notification("message", 100, config, {})
       end
-
-      it 'allows valid metadata values' do
-        [1, "me", true, false].each do |val|
-          data = {k: val}
-          expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: data))
-          described_class.send_breadcrumb_notification("noop", 88, {}, data)
-        end
-      end
-
-      it 'removes invalid metadata values' do
-        [{}, [1, 2], Class.new()].each do |val|
-          data = {k: val}
-          expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_excluding(metadata: data))
-          described_class.send_breadcrumb_notification("noop", 88, {}, data)
-        end
-      end
     end
   end
 end

@@ -134,6 +134,10 @@ module Honeybadger
         with_error_handling { hook.call(notice) }
       end
 
+      # Clean breadcrumbs after hooks (as they could have been mutated)
+      cleaner = Breadcrumbs::Cleaner.new(config)
+      notice.breadcrumbs.each(&cleaner.method(:clean!))
+
       unless notice.api_key =~ NOT_BLANK
         error { sprintf('Unable to send error report: API key is missing. id=%s', notice.id) }
         return false
@@ -257,13 +261,15 @@ module Honeybadger
     #
     # @return self
     def add_breadcrumb(message, metadata: {}, category: :custom)
-      @breadcrumbs.add!(
-        Breadcrumbs::Breadcrumb.new(
-          category: category,
-          message: message,
-          metadata: metadata
-        )
+      breadcrumb = Breadcrumbs::Breadcrumb.new(
+        category: category,
+        message: message,
+        metadata: metadata
       )
+
+      Breadcrumbs::Cleaner.new(config).clean!(breadcrumb)
+
+      @breadcrumbs.add!(breadcrumb)
 
       self
     end

@@ -103,6 +103,35 @@ describe Honeybadger::Agent do
       end
     end
 
+    describe "breadcrumbs" do
+      let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
+
+      subject { described_class.new(config) }
+
+      before do
+        allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_return(breadcrumbs)
+      end
+
+      it "passes along duplicated breadcrumbs" do
+        duped_breadcrumbs = double(each: [])
+        expect(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
+        expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(breadcrumbs: duped_breadcrumbs)).and_call_original
+
+        subject.notify(error_message: "passed breadcrumbs?")
+      end
+
+      it "cleans breadcrumbs after hook" do
+        breadcrumb, duped_breadcrumbs = [double, double]
+        allow(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
+        cleaner = instance_double(Honeybadger::Breadcrumbs::Cleaner)
+        expect(duped_breadcrumbs).to receive(:each).and_yield(breadcrumb)
+        expect(Honeybadger::Breadcrumbs::Cleaner).to receive(:new).with(config).and_return(cleaner)
+        expect(cleaner).to receive(:clean!).with(breadcrumb)
+
+        subject.notify(error_message: "cleaning breadcrumbs?")
+      end
+    end
   end
 
   context "breadcrumbs" do
@@ -130,6 +159,15 @@ describe Honeybadger::Agent do
         expect(breadcrumbs).to receive(:add!).with(crumb)
 
         subject.add_breadcrumb("Basic Message")
+      end
+
+      it 'cleans breadcrumb before adding' do
+        cleaner = instance_double(Honeybadger::Breadcrumbs::Cleaner)
+        allow(breadcrumbs).to receive(:add!)
+        expect(Honeybadger::Breadcrumbs::Cleaner).to receive(:new).with(config).and_return(cleaner)
+        expect(cleaner).to receive(:clean!).with(kind_of(Honeybadger::Breadcrumbs::Breadcrumb))
+
+        subject.add_breadcrumb("Breadcrumb")
       end
     end
   end

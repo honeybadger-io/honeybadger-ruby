@@ -13,7 +13,7 @@ module Honeybadger
         Honeybadger.add_breadcrumb(
           notification_config[:message] || name,
           category: notification_config[:category] || :custom,
-          metadata: data.each_with_object({}) { |(k, v), h| h[k] = v if allowed_metadata_type?(v) }
+          metadata: data
         )
       end
 
@@ -21,12 +21,6 @@ module Honeybadger
         ActiveSupport::Notifications.subscribe(name) do |_, started, finished, _, data|
           send_breadcrumb_notification(name, finished - started, notification_config, data)
         end
-      end
-
-      private
-
-      def self.allowed_metadata_type?(value)
-        [TrueClass, FalseClass, Numeric, String].any? { |t| value.is_a?(t) }
       end
     end
 
