@@ -47,8 +47,8 @@ versions of [Rails](http://rubyonrails.org/).
 
 To release a new [patch] version:
 
-1. With a clean working tree, use `rake bump:patch` to bump the version, commit the changes, tag the release, and push to GitHub.
-2. Use `rake release` to run the tests, build the gem, and push to RubyGems.org.
+1. With a clean working tree, use `rake bump:patch` to bump the version and stage the changes (you can make additional manual changes at this point if necessary).
+2. Use `rake release` to run the tests, commit/tag the release, build the gem, and push to GitHub/RubyGems.
 
 See `rake -T` for additional tasks.
 
