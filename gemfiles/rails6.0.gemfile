@@ -20,6 +20,7 @@ gem "rake"
 gem "listen", "~> 3.0.8"
 gem "bump", "~> 0.8.0"
 gem "rails", "~> 6.0.0.rc1"
+gem "sqlite3", "~> 1.4"
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
