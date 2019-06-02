@@ -9,28 +9,28 @@ end
 class BreadcrumbController < ApplicationController
   def active_record_event
     Thing.create(name: "a thing")
-    sync_notice
+    notice
   end
 
   def log_breadcrumb_event
     Rails.logger.info("test log event")
-    sync_notice
+    notice
   end
 
   def active_job_event
     Job.perform_later
-    sync_notice
+    notice
   end
 
   def cache_event
     Rails.cache.read("test read")
-    sync_notice
+    notice
   end
 
   private
 
-  def sync_notice
-    Honeybadger.notify(StandardError.new('test backend'), sync: true)
+  def notice
+    Honeybadger.notify(StandardError.new('test backend'))
   end
 end
 

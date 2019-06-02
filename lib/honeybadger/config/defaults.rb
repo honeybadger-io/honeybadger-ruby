@@ -74,6 +74,11 @@ module Honeybadger
         default: DEVELOPMENT_ENVIRONMENTS,
         type: Array
       },
+      sync_notices: {
+        description: 'Send all notices synchronously. This could affect your requests, so only enable this if you are sure what you are doing.',
+        default: false,
+        type: Boolean
+      },
       :'send_data_at_exit' => {
         description: 'Send remaining data when Ruby exits.',
         default: true,

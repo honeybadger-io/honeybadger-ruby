@@ -28,6 +28,7 @@ def load_rails_hooks(spec)
     Honeybadger.configure do |config|
       config.api_key = 'gem testing'
       config.backend = 'test'
+      config.sync_notices = true
     end
   end
 
