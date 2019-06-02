@@ -1,12 +1,11 @@
 require 'rails'
 require 'action_controller/railtie'
+require 'active_record/railtie'
+require 'active_job/railtie'
+
+ENV['DATABASE_URL'] = 'sqlite3::memory:'
 
 ActiveSupport::Deprecation.silenced = true
-
-module ActiveRecord
-  class RecordNotFound < StandardError
-  end
-end
 
 class RailsApp < Rails::Application
   if Rails::VERSION::MAJOR == 3
@@ -50,3 +49,5 @@ end
 
 Rails.env = 'production'
 Rails.logger = Logger.new('/dev/null')
+
+require_relative './breadcrumbs'

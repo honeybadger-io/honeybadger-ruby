@@ -25,7 +25,7 @@ module Honeybadger
           #
           "enqueue.active_job" => {
             message: "Active Job Enqueue",
-            category: :job,
+            category: :job
           },
           "perform_start.active_job" => {
             message: "Active Job Perform Start",

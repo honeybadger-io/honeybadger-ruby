@@ -19,6 +19,7 @@ gem "capistrano"
 gem "rake"
 gem "listen", "~> 3.0.8"
 gem "rails", "~> 4.2.4"
+gem "sqlite3", "< 1.4"
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"

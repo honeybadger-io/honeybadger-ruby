@@ -28,6 +28,7 @@ end
 
 appraise 'rails4.2' do
   gem 'rails', '~> 4.2.4'
+  gem 'sqlite3', '< 1.4'
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
@@ -36,6 +37,7 @@ end
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
   appraise 'rails5.0' do
     gem 'rails', '~> 5.0.0'
+    gem 'sqlite3', '< 1.4'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
@@ -43,6 +45,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
 
   appraise 'rails5.1' do
     gem 'rails', '~> 5.1.0'
+    gem 'sqlite3', '< 1.4'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
@@ -51,6 +54,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
   # The latest officially supported Rails/Rack release
   appraise 'rails5.2' do
     gem 'rails', '~> 5.2.0'
+    gem 'sqlite3', '< 1.4'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
@@ -61,6 +65,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
     gem 'rails', github: 'rails/rails'
     gem 'rack', github: 'rack/rack'
     gem 'arel', github: 'rails/arel'
+    gem "sqlite3", "~> 1.4"
     gem 'capistrano', '~> 3.0'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rspec-rails'
