@@ -1,6 +1,6 @@
 # Honeybadger for Ruby
 
-[![Build Status](https://secure.travis-ci.org/honeybadger-io/honeybadger-ruby.svg?branch=master)](http://travis-ci.org/honeybadger-io/honeybadger-ruby)
+[![CircleCI](https://circleci.com/gh/honeybadger-io/honeybadger-ruby.svg?style=svg)](https://circleci.com/gh/honeybadger-io/honeybadger-ruby)
 [![Gem Version](https://badge.fury.io/rb/honeybadger.svg)](http://badge.fury.io/rb/honeybadger)
 [![SemVer](https://api.dependabot.com/badges/compatibility_score?dependency-name=honeybadger&package-manager=bundler&version-scheme=semver)](https://dependabot.com/compatibility-score.html?dependency-name=honeybadger&package-manager=bundler&version-scheme=semver)
 
@@ -42,6 +42,15 @@ versions of [Rails](http://rubyonrails.org/).
 * The unit test suite can be run with `rake spec:units`.
 * The integration test suite can be run with `rake spec:features`.
 * The combined suite can be run with `rake`.
+
+### Releasing
+
+To release a new [patch] version:
+
+1. With a clean working tree, use `rake bump:patch` to bump the version and stage the changes (you can make additional manual changes at this point if necessary).
+2. Use `rake release` to run the tests, commit/tag the release, build the gem, and push to GitHub/RubyGems.
+
+See `rake -T` for additional tasks.
 
 ### License
 

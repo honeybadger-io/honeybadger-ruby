@@ -27,3 +27,5 @@ gem 'listen', '~> 3.0.8'
 platforms :ruby_25 do
   gem "mathn"
 end
+
+gem "bump", "~> 0.8.0"

@@ -15,15 +15,13 @@ gem "rspec-its"
 gem "ruby-prof", platforms: :mri, require: false
 gem "timecop"
 gem "webmock"
-gem "capistrano", "~> 3.0"
+gem "capistrano"
 gem "rake"
-gem "listen"
+gem "listen", "~> 3.0.8"
 gem "bump", "~> 0.8.0"
-gem "rails", github: "rails/rails"
-gem "rack", github: "rack/rack"
-gem "arel", github: "rails/arel"
-gem "sqlite3", "~> 1.4"
+gem "rails", "~> 6.0.0.rc1"
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
+gem "rack-mini-profiler", require: false
 gem "rspec-rails"
 
 platforms :ruby_25 do

@@ -18,6 +18,7 @@ gem "webmock"
 gem "capistrano"
 gem "rake"
 gem "listen", "~> 3.0.8"
+gem "bump", "~> 0.8.0"
 gem "rails", "~> 5.1.0"
 gem "sqlite3", "< 1.4"
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]

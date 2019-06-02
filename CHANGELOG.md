@@ -5,6 +5,14 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.3.1] - 2019-05-30
+### Fixed
+- Add Rails 6 RC1 Support
+
+## [4.3.0] - 2019-05-17
+### Added
+- Send a value for action when reporting a component for Sidekiq jobs -@stympy
+
 ## [4.2.2] - 2019-04-25
 ### Fixed
 - Fix a bug where some non-standard backtraces could not be parsed, resulting in

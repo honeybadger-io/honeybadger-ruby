@@ -18,6 +18,7 @@ gem "webmock"
 gem "capistrano"
 gem "rake"
 gem "listen", "~> 3.0.8"
+gem "bump", "~> 0.8.0"
 gem "sinatra", "~> 2.0.0.beta1"
 gem "rack-test"
 

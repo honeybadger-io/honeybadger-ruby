@@ -1,0 +1,71 @@
+version: 2
+references:
+  test: &test
+    run:
+      name: Run test suite
+      command: bundle exec appraisal rake
+  restore: &restore
+    restore_cache:
+      keys:
+        - v1-dependencies-{{ checksum "Gemfile.lock" }}
+        # fallback to using the latest cache if no exact match is found
+        - v1-dependencies-
+  bundle: &bundle
+    run:
+      name: install dependencies
+      command: |
+        bundle install --jobs=4 --retry=3 --path vendor/bundle
+        bundle exec appraisal install
+  save: &save
+    save_cache:
+      paths:
+        - ./vendor/bundle
+      key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+jobs:
+  "ruby-2.4":
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+      - <<: *restore
+      - <<: *bundle
+      - <<: *save
+      - <<: *test
+  "ruby-2.5":
+    docker:
+      - image: circleci/ruby:2.5
+    steps:
+      - checkout
+      - <<: *restore
+      - <<: *bundle
+      - <<: *save
+      - <<: *test
+  "ruby-2.6":
+    docker:
+      - image: circleci/ruby:2.6
+    steps:
+      - checkout
+      - <<: *restore
+      - <<: *bundle
+      - <<: *save
+      - <<: *test
+  "jruby":
+    docker:
+      - image: circleci/jruby:latest
+        environment:
+          BUNDLER_VERSION: 1.17.3
+    steps:
+      - checkout
+      - <<: *restore
+      - <<: *bundle
+      - <<: *save
+      - <<: *test
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "ruby-2.4"
+      - "ruby-2.5"
+      - "ruby-2.6"
+      - "jruby"
