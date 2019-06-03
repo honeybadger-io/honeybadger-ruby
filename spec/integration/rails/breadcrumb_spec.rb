@@ -3,10 +3,12 @@ require_relative '../rails_helper'
 describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
   load_rails_hooks(self)
 
-  around(:example) do |example|
-    ActiveRecord::Base.connection.execute("CREATE TABLE things (name char(200));")
-    example.run
-    ActiveRecord::Base.connection.execute("DROP TABLE things;")
+  unless SKIP_AR
+    around(:example) do |example|
+      ActiveRecord::Base.connection.execute("CREATE TABLE things (name char(200));")
+      example.run
+      ActiveRecord::Base.connection.execute("DROP TABLE things;")
+    end
   end
 
   RSpec::Matchers.define :contain_breadcrumb_including do |expected|
@@ -25,8 +27,8 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
     notice.as_json[:breadcrumbs][:trail]
   end
 
-  def puts_breadcrumbs(notice)
-    puts JSON.pretty_generate(get_trail(notice))
+  def puts_breadcrumbs
+    puts JSON.pretty_generate(get_trail(notices.first))
   end
 
   it "creates log event" do
@@ -38,13 +40,13 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
     })
   end
 
-  it "creates active_record event" do
+  it "creates active_record event", skip: SKIP_AR do
     get "/breadcrumbs/active_record_event"
     expect(notices.first).to contain_breadcrumb_including({
       category: "query",
       message: "Active Record SQL",
       metadata: include({
-        sql: "INSERT INTO \"things\" (\"name\") VALUES (?)"
+        sql: /INSERT INTO \"things\" \(\"name\"\)/
       })
     })
   end

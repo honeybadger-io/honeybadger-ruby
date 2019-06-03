@@ -1,9 +1,18 @@
 require 'rails'
 require 'action_controller/railtie'
-require 'active_record/railtie'
-require 'active_job/railtie'
 
-ENV['DATABASE_URL'] = 'sqlite3::memory:'
+unless SKIP_AR
+  require 'active_record/railtie'
+  require 'activerecord-jdbcsqlite3-adapter' if defined?(JRUBY_VERSION)
+  ENV['DATABASE_URL'] = 'sqlite3::memory:'
+else
+  module ActiveRecord
+    class RecordNotFound < StandardError
+    end
+  end
+end
+
+require 'active_job/railtie'
 
 ActiveSupport::Deprecation.silenced = true
 

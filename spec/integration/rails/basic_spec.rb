@@ -26,10 +26,7 @@ describe "Rails integration", if: RAILS_PRESENT, type: :request do
 
   context "default ignored exceptions" do
     it "doesn't report exception" do
-      Honeybadger.flush do
-        get "/record_not_found"
-        expect(response.status).to eq(404)
-      end
+      Honeybadger.flush { get "/record_not_found" }
 
       expect(Honeybadger::Backend::Test.notifications[:notices]).to be_empty
     end

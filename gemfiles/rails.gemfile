@@ -22,7 +22,7 @@ gem "bump", "~> 0.8.0"
 gem "rails", github: "rails/rails"
 gem "rack", github: "rack/rack"
 gem "arel", github: "rails/arel"
-gem "sqlite3", "~> 1.4"
+gem "sqlite3", "~> 1.4", platform: :mri
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rspec-rails"
 

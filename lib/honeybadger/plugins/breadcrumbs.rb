@@ -31,7 +31,9 @@ module Honeybadger
         # Rails specific breadcrumb events
         #
         if defined?(::Rails.application) && ::Rails.application
-          config[:'breadcrumbs.active_support_notifications'].each(&Breadcrumbs.method(:subscribe_to_notification))
+          config[:'breadcrumbs.active_support_notifications'].each do |name, config|
+            Breadcrumbs.subscribe_to_notification(name, config)
+          end
           ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector)
         end
 

@@ -271,6 +271,7 @@ module Honeybadger
 
       @breadcrumbs.add!(breadcrumb)
 
+
       self
     end
 

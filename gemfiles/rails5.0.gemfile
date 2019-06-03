@@ -20,7 +20,7 @@ gem "rake"
 gem "listen", "~> 3.0.8"
 gem "bump", "~> 0.8.0"
 gem "rails", "~> 5.0.0"
-gem "sqlite3", "< 1.4"
+gem "activerecord-nulldb-adapter"
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
