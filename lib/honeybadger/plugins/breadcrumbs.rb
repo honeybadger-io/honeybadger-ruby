@@ -8,6 +8,7 @@ module Honeybadger
         return if notification_config[:exclude_when] && notification_config[:exclude_when].call(data)
 
         data[:duration] = duration
+        data = data.slice(*notification_config[:select_keys]) if notification_config[:select_keys]
         data = notification_config[:transform].call(data) if notification_config[:transform]
 
         Honeybadger.add_breadcrumb(

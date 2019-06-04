@@ -46,6 +46,15 @@ describe "Breadcrumbs Plugin" do
         described_class.send_breadcrumb_notification("name", 33, config, {})
       end
 
+      it 'can filter metadata keys' do
+        data = {a: :b, c: :d}
+        selected_data = {a: :b}
+        config = { select_keys: [:a] }
+
+        expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: selected_data))
+        described_class.send_breadcrumb_notification("_", 0, config, data)
+      end
+
       it 'can transform data payload' do
         data     = {old: "data"}
         new_data = {new: "data"}

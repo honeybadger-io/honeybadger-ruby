@@ -8,9 +8,10 @@ module Honeybadger
           "sql.active_record" => {
             message: "Active Record SQL",
             category: :query,
+            select_keys: [:sql, :name, :connection_id, :cached],
             exclude_when: lambda do |data|
               # Ignore schema, begin, and commit transaction queries
-              data[:name] == "SCHEMA" || data[:sql].match?(/^(begin|commit) transaction$/)
+              data[:name] == "SCHEMA" || (data[:sql] && data[:sql].match?(/^(begin|commit) transaction$/))
             end
           },
 
@@ -18,6 +19,7 @@ module Honeybadger
           #
           "perform_action.action_cable" => {
             message: "Action Cable Perform Action",
+            select_keys: [:channel_class, :action],
             category: :render
           },
 
@@ -25,10 +27,12 @@ module Honeybadger
           #
           "enqueue.active_job" => {
             message: "Active Job Enqueue",
+            select_keys: [],
             category: :job
           },
           "perform_start.active_job" => {
             message: "Active Job Perform Start",
+            select_keys: [],
             category: :job,
           },
 
@@ -51,6 +55,7 @@ module Honeybadger
           },
           "process_action.action_controller" => {
             message: "Action Controller Action Process",
+            select_keys: [:controller, :action, :format, :method, :path, :status, :view_runtime, :db_runtime],
             category: :request,
           },
           "redirect_to.action_controller" => {
@@ -73,9 +78,7 @@ module Honeybadger
           #
           "deliver.action_mailer" => {
             message: "Action Mailer Deliver",
-            transform: lambda do |data|
-              data.slice(:mailer, :message_id, :from, :date)
-            end,
+            select_keys: [:mailer, :message_id, :from, :date],
             category: :render
           }
         }
