@@ -3,16 +3,16 @@ begin
   RAILS_PRESENT = true
 
   # We are unable to run Activerecord with rails edge on jruby as the sqlite
-  # adapters are not supported, so we are skipping activrecord specs just for
+  # adapter is not supported, so we are skipping activrecord specs just for
   # that runtime and Rails version
-  SKIP_AR = defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha"
+  SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha")
 
   require FIXTURES_PATH.join('rails', 'config', 'application.rb')
   require 'honeybadger/init/rails'
   require 'rspec/rails'
 rescue LoadError
   RAILS_PRESENT = false
-  SKIP_AR = true
+  SKIP_ACTIVE_RECORD = true
   puts 'Skipping Rails integration specs.'
 end
 
@@ -34,7 +34,6 @@ def load_rails_hooks(spec)
     Honeybadger.configure do |config|
       config.api_key = 'gem testing'
       config.backend = 'test'
-      config.sync_notices = true
     end
   end
 

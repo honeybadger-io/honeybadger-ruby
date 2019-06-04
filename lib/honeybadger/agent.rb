@@ -155,7 +155,7 @@ module Honeybadger
 
       info { sprintf('Reporting error id=%s', notice.id) }
 
-      if opts[:sync] || config.get(:sync_notices)
+      if opts[:sync]
         send_now(notice)
       else
         push(notice)

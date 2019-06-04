@@ -1,15 +1,18 @@
 require 'rails'
 require 'action_controller/railtie'
 
-unless SKIP_AR
-  require 'active_record/railtie'
-  require 'activerecord-jdbcsqlite3-adapter' if defined?(JRUBY_VERSION)
-  ENV['DATABASE_URL'] = 'sqlite3::memory:'
-else
+# Duplicating here as some specs don't use the rails helper
+SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha")
+
+if SKIP_ACTIVE_RECORD
   module ActiveRecord
     class RecordNotFound < StandardError
     end
   end
+else
+  require 'active_record/railtie'
+  require 'activerecord-jdbcsqlite3-adapter' if defined?(JRUBY_VERSION)
+  ENV['DATABASE_URL'] = 'sqlite3::memory:'
 end
 
 require 'active_job/railtie'

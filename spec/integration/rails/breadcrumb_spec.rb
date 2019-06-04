@@ -3,7 +3,7 @@ require_relative '../rails_helper'
 describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
   load_rails_hooks(self)
 
-  unless SKIP_AR
+  unless SKIP_ACTIVE_RECORD
     around(:example) do |example|
       ActiveRecord::Base.connection.execute("CREATE TABLE things (name char(200));")
       example.run
@@ -32,7 +32,7 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
   end
 
   it "creates log event" do
-    get "/breadcrumbs/log_breadcrumb_event"
+    Honeybadger.flush { get "/breadcrumbs/log_breadcrumb_event" }
     expect(notices.first).to contain_breadcrumb_including({
       category: "log",
       message: "test log event",
@@ -40,8 +40,8 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
     })
   end
 
-  it "creates active_record event", skip: SKIP_AR do
-    get "/breadcrumbs/active_record_event"
+  it "creates active_record event", skip: SKIP_ACTIVE_RECORD do
+    Honeybadger.flush { get "/breadcrumbs/active_record_event" }
     expect(notices.first).to contain_breadcrumb_including({
       category: "query",
       message: "Active Record SQL",
@@ -52,7 +52,7 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
   end
 
   it "creates active_job event" do
-    get "/breadcrumbs/active_job_event"
+    Honeybadger.flush { get "/breadcrumbs/active_job_event" }
     expect(notices.first).to contain_breadcrumb_including({
       category: "job",
       message: "Active Job Enqueue"
@@ -60,7 +60,7 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
   end
 
   it "creates cache event" do
-    get "/breadcrumbs/cache_event"
+    Honeybadger.flush { get "/breadcrumbs/cache_event" }
     expect(notices.first).to contain_breadcrumb_including({
       category: "query",
       message: "Active Support Cache Read"

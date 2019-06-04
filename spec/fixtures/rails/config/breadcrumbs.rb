@@ -1,4 +1,4 @@
-class Thing < ActiveRecord::Base; end unless SKIP_AR
+class Thing < ActiveRecord::Base; end unless SKIP_ACTIVE_RECORD
 
 class Job < ActiveJob::Base
   def perform
