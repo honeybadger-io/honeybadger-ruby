@@ -1,9 +1,13 @@
+require 'set'
+
 module Honeybadger
   module Breadcrumbs
     # @api private
     # Responsible for ensuring we are storing and sending sane breadcrumb data
     class Cleaner
-      VALID_TYPES = [TrueClass, FalseClass, Numeric, String].freeze
+      VALID_TYPES = Set[
+        TrueClass, FalseClass, BigDecimal, Integer, Float, String, Symbol
+      ].freeze
 
       def initialize(config)
         @config = config
@@ -22,7 +26,7 @@ module Honeybadger
       end
 
       def allowed_metadata_type?(value)
-        VALID_TYPES.any? { |t| value.is_a?(t) }
+        VALID_TYPES.include?(value.class)
       end
     end
   end

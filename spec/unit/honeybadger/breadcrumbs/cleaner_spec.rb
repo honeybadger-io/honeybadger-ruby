@@ -9,7 +9,7 @@ module Honeybadger::Breadcrumbs
     describe "#clean!" do
       context "metadata" do
         it "allows valid values" do
-          [1, "me", true, false].each do |val|
+          [1, :neat, "me", true, false].each do |val|
             breadcrumb = instance_double(Breadcrumb, metadata: {k: val})
             described_class.new(config).clean!(breadcrumb)
             expect(breadcrumb.metadata).to eq({k: val})
