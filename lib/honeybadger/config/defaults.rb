@@ -298,6 +298,11 @@ module Honeybadger
         description: 'Configuration for automatic Active Support Instrumentation events.',
         default: Breadcrumbs::ActiveSupport.default_notifications,
         type: Hash
+      },
+      :'breadcrumbs.logging.enabled' => {
+        description: 'Enable/Disable automatic breadcrumbs from log messages.',
+        default: true,
+        type: Boolean
       }
     }.freeze
 

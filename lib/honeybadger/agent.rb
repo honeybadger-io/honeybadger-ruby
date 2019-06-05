@@ -243,21 +243,24 @@ module Honeybadger
     # Used internally for adding breadcrumbs in integrations
     attr_reader :breadcrumbs
 
-    # Appends a breadcrumb to the stack. Use this when you want to add some
-    # custom data to your breadcrumb trace in effort help when debugging. If
-    # there is an exeception reported to honeybadger, you can view all
-    # breadcrumbs leading up to the error event.
+    # Appends a breadcrumb to the trace. Use this when you want to add some
+    # custom data to your breadcrumb trace in effort to help debugging. If a
+    # notice is reported to honeybadger, all breadcrumbs within the execution
+    # path will be appended to the notice. You will be able to view the
+    # breadcrumb trace in the Honeybadger interface to see what events led up
+    # to the notice.
     #
     # @example
-    #   Honeybadger.add_breadcrumb("Send Email", metadata: { user: user.id, message: message })
+    #   Honeybadger.add_breadcrumb("Email Sent", metadata: { user: user.id, message: message })
     #
     # @param message [String] The message you want to send with the breadcrumb
-    # @param metadata [Hash] Any metadata that you want to pass along with the
-    #   breadcrumb. We only accept a hash with a depth level of one (no nested
-    #   hashes)
-    # @param category [Symbol] You can provide a custom catagory. This affects
-    #   how the breadcrumb are displayed, so we recommend that you pick a known
-    #   catagory.
+    # @param params [Hash] extra options for breadcrumb building
+    # @option params [Hash] :metadata Any metadata that you want to pass along
+    #   with the breadcrumb. We only accept a hash with simple primatives as
+    #   values (Strings, Numbers, Booleans & Symbols) (optional)
+    # @option params [Symbol] :category You can provide a custom catagory. This
+    #   affects how the breadcrumb is displayed, so we recommend that you pick a
+    #   known catagory. (optional)
     #
     # @return self
     def add_breadcrumb(message, metadata: {}, category: :custom)
@@ -270,7 +273,6 @@ module Honeybadger
       Breadcrumbs::Cleaner.new(config).clean!(breadcrumb)
 
       @breadcrumbs.add!(breadcrumb)
-
 
       self
     end

@@ -10,9 +10,9 @@ describe "Breadcrumbs Plugin" do
     stub_const("ActiveSupport::Notifications", active_support)
   end
 
-  describe Honeybadger::Plugins::Breadcrumbs do
-    describe '.subscribe_to_notification' do
-      it 'registers with activesupport and delgates to send_breadcrumb_notification' do
+  describe Honeybadger::Plugins::RailsBreadcrumbs do
+    describe ".subscribe_to_notification" do
+      it "registers with activesupport and delgates to send_breadcrumb_notification" do
         name = "a.notification"
         config = { foo: "bar" }
         data = {a: :b}
@@ -26,50 +26,7 @@ describe "Breadcrumbs Plugin" do
     end
 
     describe ".send_breadcrumb_notification" do
-      it 'excludes events if :exclude_when proc returns true' do
-        data = {}
-        config = {
-          exclude_when: lambda do |d|
-            # Quick assertion to ensure it gets data
-            expect(d).to eq(data)
-            true
-          end
-        }
-
-        expect(Honeybadger).to_not receive(:add_breadcrumb)
-        described_class.send_breadcrumb_notification("name", 10, config, data)
-      end
-
-      it 'includes event if :exclude_proc returns true' do
-        config = { exclude_when: ->(_){ false } }
-        expect(Honeybadger).to receive(:add_breadcrumb)
-        described_class.send_breadcrumb_notification("name", 33, config, {})
-      end
-
-      it 'can filter metadata keys' do
-        data = {a: :b, c: :d}
-        selected_data = {a: :b}
-        config = { select_keys: [:a] }
-
-        expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: selected_data))
-        described_class.send_breadcrumb_notification("_", 0, config, data)
-      end
-
-      it 'can transform data payload' do
-        data     = {old: "data"}
-        new_data = {new: "data"}
-        config = {
-          transform: lambda do |d|
-            expect(d).to eq(data) # Quick assertion to ensure it gets data
-            new_data
-          end
-        }
-        expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: new_data))
-
-        described_class.send_breadcrumb_notification("name", 33, config, data)
-      end
-
-      it 'adds a breadcrumb with config' do
+      it "adds a breadcrumb with overridden config settings" do
         data = {cars: "trucks"}
         config = {message: "config message", category: :test}
 
@@ -77,10 +34,59 @@ describe "Breadcrumbs Plugin" do
         described_class.send_breadcrumb_notification("message", 99, config, data)
       end
 
-      it 'adds a breadcrumb with defaults' do
+      it "adds a breadcrumb with defaults" do
         expect(Honeybadger).to receive(:add_breadcrumb).with("message", {category: :custom, metadata: {duration: 100}})
         described_class.send_breadcrumb_notification("message", 100, config, {})
       end
+
+      describe ":exclude_when" do
+        it "excludes events if proc returns true" do
+          data = {}
+          config = {
+            exclude_when: lambda do |d|
+              expect(d).to eq(data)
+              true
+            end
+          }
+
+          expect(Honeybadger).to_not receive(:add_breadcrumb)
+          described_class.send_breadcrumb_notification("name", 10, config, data)
+        end
+
+        it "includes event if proc returns true" do
+          config = { exclude_when: ->(_){ false } }
+          expect(Honeybadger).to receive(:add_breadcrumb)
+          described_class.send_breadcrumb_notification("name", 33, config, {})
+        end
+      end
+
+      describe ":select_keys" do
+        it "can filter metadata" do
+          data = {a: :b, c: :d}
+          selected_data = {a: :b}
+          config = { select_keys: [:a] }
+
+          expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: selected_data))
+          described_class.send_breadcrumb_notification("_", 0, config, data)
+        end
+      end
+
+      describe ":transform" do
+        it "transforms data payload" do
+          data     = {old: "data"}
+          new_data = {new: "data"}
+          config = {
+            transform: lambda do |d|
+              expect(d).to eq(data)
+              new_data
+            end
+          }
+          expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: new_data))
+
+          described_class.send_breadcrumb_notification("name", 33, config, data)
+        end
+      end
+
     end
   end
 end

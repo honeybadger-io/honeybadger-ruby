@@ -1,5 +1,7 @@
 module Honeybadger
   module Breadcrumbs
+    # @api private
+    #
     module LogWrapper
       def add(severity, message = nil, progname = nil)
         message, progname = [progname, nil] if message.nil?
@@ -24,6 +26,13 @@ module Honeybadger
       end
     end
 
+    # @api private
+    #
+    # This module is designed to be prepended into the
+    # ActiveSupport::LogSubscriber for the sole purpose of silencing breadcrumb
+    # log events. Since we already have specific breadcrumb events for each
+    # class that provides LogSubscriber events, we want to filter out those
+    # logs as they just become noise.
     module LogSubscriberInjector
       %w(info debug warn error fatal unknown).each do |level|
         define_method(level) do |*args|

@@ -3,7 +3,75 @@ require 'honeybadger/breadcrumbs/logging'
 
 module Honeybadger
   module Plugins
-    class Breadcrumbs
+    # @api private
+    #
+    # This plugin pounces on the dynamic nature of Ruby / Rails to inject into
+    # the runtime and provide automatic breadcrumb events.
+    #
+    # === Log events
+    #
+    # All log messages within the execution path will automatically be appened
+    # to the breadcrumb trace. You can disable all log events in the
+    # Honeybadger config:
+    #
+    # @example
+    #
+    #   Honeybadger.configure do |config|
+    #     config.breadcrumbs.logging.enabled = false
+    #   end
+    #
+    # === ActiveSupport Breadcrumbs
+    #
+    # We hook into Rails's ActiveSupport Instrumentation system to provide
+    # automatic breadcrumb event generation. You can customize these events by
+    # passing a Hash into the honeybadger configuration. The simplest method is
+    # to alter the current defaults:
+    #
+    # @example
+    #   notifications = Honeybadger::Breadcrumbs::ActiveSupport.default_notifications
+    #   notifications.delete("sql.active_record")
+    #   notifications["enqueue.active_job"][:exclude_when] = lambda do |data|
+    #     data[:job].topic == "salmon_activity"
+    #   end
+    #
+    #   Honeybadger.configure do |config|
+    #     config.breadcrumbs.active_support_notifications = notifications
+    #   end
+    #
+    # See RailsBreadcrumbs.send_breadcrumb_notification for specifics on the
+    # options for customization
+    Plugin.register :breadcrumbs do
+      requirement { config[:'breadcrumbs.enabled'] }
+
+      execution do
+        # Rails specific breadcrumb events
+        #
+        if defined?(::Rails.application) && ::Rails.application
+          config[:'breadcrumbs.active_support_notifications'].each do |name, config|
+            RailsBreadcrumbs.subscribe_to_notification(name, config)
+          end
+          ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector) if config[:'breadcrumbs.logging.enabled']
+        end
+
+        ::Logger.prepend(Honeybadger::Breadcrumbs::LogWrapper) if config[:'breadcrumbs.logging.enabled']
+      end
+    end
+
+    class RailsBreadcrumbs
+      # @api private
+      # Used internally for sending out Rails Instrumentation breadcrumbs.
+      #
+      # @param [String] name The ActiveSupport instrumentation key
+      # @param [Number] duration The time spent in the instrumentation event
+      # @param [Hash] notifcation_config The instrumentation event configuration
+      # @param [Hash] data Custom metadata from the instrumentation event
+      #
+      # @option notifcation_config [String] :message A message that describes the event
+      # @option notifcation_config [Symbol] :category A key to group specific types of events
+      # @option notifcation_config [Array] :select_keys A set of keys that filters what data we select from the instrumentation data (optional)
+      # @option notifcation_config [Proc] :exclude_when A proc that accepts the data payload. A truthy return value will exclude this event from the payload (optional)
+      # @option notifcation_config [Proc] :transform A proc that accepts the data payload. The return value will replace the current data hash (optional)
+      #
       def self.send_breadcrumb_notification(name, duration, notification_config, data = {})
         return if notification_config[:exclude_when] && notification_config[:exclude_when].call(data)
 
@@ -18,6 +86,7 @@ module Honeybadger
         )
       end
 
+      # @api private
       def self.subscribe_to_notification(name, notification_config)
         ActiveSupport::Notifications.subscribe(name) do |_, started, finished, _, data|
           send_breadcrumb_notification(name, finished - started, notification_config, data)
@@ -25,21 +94,5 @@ module Honeybadger
       end
     end
 
-    Plugin.register :breadcrumbs do
-      requirement { config[:'breadcrumbs.enabled'] }
-
-      execution do
-        # Rails specific breadcrumb events
-        #
-        if defined?(::Rails.application) && ::Rails.application
-          config[:'breadcrumbs.active_support_notifications'].each do |name, config|
-            Breadcrumbs.subscribe_to_notification(name, config)
-          end
-          ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector)
-        end
-
-        ::Logger.prepend(Honeybadger::Breadcrumbs::LogWrapper)
-      end
-    end
   end
 end
