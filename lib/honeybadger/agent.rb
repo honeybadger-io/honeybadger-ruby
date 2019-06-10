@@ -134,10 +134,6 @@ module Honeybadger
         with_error_handling { hook.call(notice) }
       end
 
-      # Clean breadcrumbs after hooks (as they could have been mutated)
-      cleaner = Breadcrumbs::Cleaner.new(config)
-      notice.breadcrumbs.each(&cleaner.method(:clean!))
-
       unless notice.api_key =~ NOT_BLANK
         error { sprintf('Unable to send error report: API key is missing. id=%s', notice.id) }
         return false
@@ -258,21 +254,19 @@ module Honeybadger
     # @option params [Hash] :metadata Any metadata that you want to pass along
     #   with the breadcrumb. We only accept a hash with simple primatives as
     #   values (Strings, Numbers, Booleans & Symbols) (optional)
-    # @option params [Symbol] :category You can provide a custom catagory. This
+    # @option params [String] :category You can provide a custom category. This
     #   affects how the breadcrumb is displayed, so we recommend that you pick a
-    #   known catagory. (optional)
+    #   known category. (optional)
     #
     # @return self
-    def add_breadcrumb(message, metadata: {}, category: :custom)
-      breadcrumb = Breadcrumbs::Breadcrumb.new(
+    def add_breadcrumb(message, metadata: {}, category: "custom")
+      params = Util::Sanitizer.new(max_depth: 2).sanitize({
         category: category,
         message: message,
         metadata: metadata
-      )
+      })
 
-      Breadcrumbs::Cleaner.new(config).clean!(breadcrumb)
-
-      @breadcrumbs.add!(breadcrumb)
+      @breadcrumbs.add!(Breadcrumbs::Breadcrumb.new(params))
 
       self
     end

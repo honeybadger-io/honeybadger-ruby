@@ -205,7 +205,7 @@ module Honeybadger
       {
         api_key: s(api_key),
         notifier: NOTIFIER,
-        breadcrumbs: s(breadcrumbs.to_h),
+        breadcrumbs: sanitized_breadcrumbs,
         error: {
           token: id,
           class: s(error_class),
@@ -358,6 +358,12 @@ module Honeybadger
       object ||= {}.freeze
 
       Context(object)
+    end
+
+    # Sanitize at the depth of 4 since we are sanitizing the breadcrumb root
+    # hash data structure.
+    def sanitized_breadcrumbs
+      Util::Sanitizer.new(max_depth: 4).sanitize(breadcrumbs.to_h)
     end
 
     def construct_context_hash(opts, exception)

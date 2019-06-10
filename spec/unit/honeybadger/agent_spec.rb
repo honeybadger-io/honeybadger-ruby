@@ -120,17 +120,6 @@ describe Honeybadger::Agent do
 
         subject.notify(error_message: "passed breadcrumbs?")
       end
-
-      it "cleans breadcrumbs after hook" do
-        breadcrumb, duped_breadcrumbs = [double, double]
-        allow(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
-        cleaner = instance_double(Honeybadger::Breadcrumbs::Cleaner)
-        expect(duped_breadcrumbs).to receive(:each).and_yield(breadcrumb)
-        expect(Honeybadger::Breadcrumbs::Cleaner).to receive(:new).with(config).and_return(cleaner)
-        expect(cleaner).to receive(:clean!).with(breadcrumb)
-
-        subject.notify(error_message: "cleaning breadcrumbs?")
-      end
     end
   end
 
@@ -148,24 +137,25 @@ describe Honeybadger::Agent do
 
     describe "#add_breadcrumb" do
       it "adds breadcrumb to manager" do
-        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: :neat, message: "This is the message", metadata: {a: "b"})
+        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: "neat", message: "This is the message", metadata: {a: "b"})
         expect(breadcrumbs).to receive(:add!).with(crumb)
 
-        subject.add_breadcrumb("This is the message", metadata: {a: "b"}, category: :neat)
+        subject.add_breadcrumb("This is the message", metadata: {a: "b"}, category: "neat")
       end
 
       it 'has sane defaults' do
-        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: :custom, message: "Basic Message", metadata: {})
+        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: "custom", message: "Basic Message", metadata: {})
         expect(breadcrumbs).to receive(:add!).with(crumb)
 
         subject.add_breadcrumb("Basic Message")
       end
 
-      it 'cleans breadcrumb before adding' do
-        cleaner = instance_double(Honeybadger::Breadcrumbs::Cleaner)
+      it 'sanitizes breadcrumb before adding' do
+        sanitizer = instance_double(Honeybadger::Util::Sanitizer)
         allow(breadcrumbs).to receive(:add!)
-        expect(Honeybadger::Breadcrumbs::Cleaner).to receive(:new).with(config).and_return(cleaner)
-        expect(cleaner).to receive(:clean!).with(kind_of(Honeybadger::Breadcrumbs::Breadcrumb))
+        expect(Honeybadger::Util::Sanitizer).to receive(:new).with(max_depth: 2).and_return(sanitizer)
+        expect(sanitizer).to receive(:sanitize).with(hash_including({message: "Breadcrumb"}))
+        expect(Honeybadger::Breadcrumbs::Breadcrumb).to receive(:new)
 
         subject.add_breadcrumb("Breadcrumb")
       end

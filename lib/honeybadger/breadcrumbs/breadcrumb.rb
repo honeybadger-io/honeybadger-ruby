@@ -8,7 +8,7 @@ module Honeybadger
 
       include Comparable
 
-      def initialize(category: :custom, message: nil, metadata: {})
+      def initialize(category: "custom", message: nil, metadata: {})
         @active = true
         @timestamp = DateTime.now
 

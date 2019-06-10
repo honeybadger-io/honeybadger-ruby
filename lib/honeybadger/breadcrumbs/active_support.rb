@@ -7,7 +7,7 @@ module Honeybadger
           #
           "sql.active_record" => {
             message: "Active Record SQL",
-            category: :query,
+            category: "query",
             select_keys: [:sql, :name, :connection_id, :cached],
             exclude_when: lambda do |data|
               # Ignore schema, begin, and commit transaction queries
@@ -20,7 +20,7 @@ module Honeybadger
           "perform_action.action_cable" => {
             message: "Action Cable Perform Action",
             select_keys: [:channel_class, :action],
-            category: :render
+            category: "render"
           },
 
           # ActiveJob Actions
@@ -28,50 +28,50 @@ module Honeybadger
           "enqueue.active_job" => {
             message: "Active Job Enqueue",
             select_keys: [],
-            category: :job
+            category: "job"
           },
           "perform_start.active_job" => {
             message: "Active Job Perform Start",
             select_keys: [],
-            category: :job,
+            category: "job",
           },
 
           # ActiveSupport Actions
           #
           "cache_read.active_support" => {
             message: "Active Support Cache Read",
-            category: :query
+            category: "query"
           },
           "cache_fetch_hit.active_support" => {
             message: "Active Support Cache Fetch Hit",
-            category: :query
+            category: "query"
           },
 
           # Controller Actions
           #
           "halted_callback.action_controller" => {
             message: "Action Controller Callback Halted",
-            category: :request,
+            category: "request",
           },
           "process_action.action_controller" => {
             message: "Action Controller Action Process",
             select_keys: [:controller, :action, :format, :method, :path, :status, :view_runtime, :db_runtime],
-            category: :request,
+            category: "request",
           },
           "redirect_to.action_controller" => {
             message: "Action Controller Redirect",
-            category: :request,
+            category: "request",
           },
 
           # View Actions
           #
           "render_template.action_view" => {
             message: "Action View Template Render",
-            category: :render,
+            category: "render",
           },
           "render_partial.action_view" => {
             message: "Action View Partial Render",
-            category: :render,
+            category: "render",
           },
 
           # Mailer actions
@@ -79,7 +79,7 @@ module Honeybadger
           "deliver.action_mailer" => {
             message: "Action Mailer Deliver",
             select_keys: [:mailer, :message_id, :from, :date],
-            category: :render
+            category: "render"
           }
         }
       end
