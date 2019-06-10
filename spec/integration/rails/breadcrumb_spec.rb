@@ -27,10 +27,6 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
     notice.as_json[:breadcrumbs][:trail]
   end
 
-  def puts_breadcrumbs
-    puts JSON.pretty_generate(get_trail(notices.first))
-  end
-
   it "creates log event" do
     Honeybadger.flush { get "/breadcrumbs/log_breadcrumb_event" }
     expect(notices.first).to contain_breadcrumb_including({

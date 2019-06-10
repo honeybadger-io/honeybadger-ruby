@@ -60,7 +60,7 @@ describe "Breadcrumbs Plugin" do
         end
       end
 
-      # Skip this spec during Apprasal runs that don't have ActiveSupport loaded, or Ruby < 2.4
+      # Skip this spec during Apprasal runs that don't have ActiveSupport loaded
       describe ":select_keys", skip: !Hash.method_defined?(:slice) do
         it "can filter metadata" do
           data = {a: :b, c: :d}

@@ -63,14 +63,14 @@ module Honeybadger
       #
       # @param [String] name The ActiveSupport instrumentation key
       # @param [Number] duration The time spent in the instrumentation event
-      # @param [Hash] notifcation_config The instrumentation event configuration
+      # @param [Hash] notification_config The instrumentation event configuration
       # @param [Hash] data Custom metadata from the instrumentation event
       #
-      # @option notifcation_config [String] :message A message that describes the event
-      # @option notifcation_config [Symbol] :category A key to group specific types of events
-      # @option notifcation_config [Array] :select_keys A set of keys that filters what data we select from the instrumentation data (optional)
-      # @option notifcation_config [Proc] :exclude_when A proc that accepts the data payload. A truthy return value will exclude this event from the payload (optional)
-      # @option notifcation_config [Proc] :transform A proc that accepts the data payload. The return value will replace the current data hash (optional)
+      # @option notification_config [String] :message A message that describes the event
+      # @option notification_config [Symbol] :category A key to group specific types of events
+      # @option notification_config [Array] :select_keys A set of keys that filters what data we select from the instrumentation data (optional)
+      # @option notification_config [Proc] :exclude_when A proc that accepts the data payload. A truthy return value will exclude this event from the payload (optional)
+      # @option notification_config [Proc] :transform A proc that accepts the data payload. The return value will replace the current data hash (optional)
       #
       def self.send_breadcrumb_notification(name, duration, notification_config, data = {})
         return if notification_config[:exclude_when] && notification_config[:exclude_when].call(data)

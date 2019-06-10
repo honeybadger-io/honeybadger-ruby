@@ -241,7 +241,7 @@ module Honeybadger
 
     # Appends a breadcrumb to the trace. Use this when you want to add some
     # custom data to your breadcrumb trace in effort to help debugging. If a
-    # notice is reported to honeybadger, all breadcrumbs within the execution
+    # notice is reported to Honeybadger, all breadcrumbs within the execution
     # path will be appended to the notice. You will be able to view the
     # breadcrumb trace in the Honeybadger interface to see what events led up
     # to the notice.
