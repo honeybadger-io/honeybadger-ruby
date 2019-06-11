@@ -11,7 +11,6 @@ describe Honeybadger::Agent do
   end
 
   describe "#check_in" do
-
     it 'parses check_in id from a url' do
       stub_request(:get, "https://api.honeybadger.io/v1/check_in/1MqIo1").
          to_return(status: 200)
@@ -42,6 +41,20 @@ describe Honeybadger::Agent do
       instance = described_class.new(config)
 
       expect(instance.check_in('danny')).to eq(false)
+    end
+  end
+
+  describe "#clear!" do
+    it 'clears all transactional data' do
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+      instance.context({a: "context"})
+      instance.add_breadcrumb("Chomp")
+
+      instance.clear!
+
+      expect(instance.get_context).to be nil
+      expect(instance.breadcrumbs.to_a).to be_empty
     end
   end
 

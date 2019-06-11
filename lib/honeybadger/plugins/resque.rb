@@ -10,8 +10,7 @@ module Honeybadger
         def around_perform_with_honeybadger(*args)
           Honeybadger.flush { yield }
         ensure
-          Honeybadger.context.clear!
-          Honeybadger.breadcrumbs.clear!
+          Honeybadger.clear!
         end
 
         # Error notifications must be synchronous as the +on_failure+ hook is

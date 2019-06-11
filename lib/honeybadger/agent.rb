@@ -218,10 +218,10 @@ module Honeybadger
       self
     end
 
-    # @api private
-    # Used to clear context via `#context.clear!`.
-    def clear! # :nodoc:
+    # Clear all transaction scoped data.
+    def clear!
       context_manager.clear!
+      breadcrumbs.clear!
     end
 
     # Get global context for the current request.

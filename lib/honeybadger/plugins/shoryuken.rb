@@ -16,8 +16,7 @@ module Honeybadger
             raise e
           end
         ensure
-          Honeybadger.context.clear!
-          Honeybadger.breadcrumbs.clear!
+          Honeybadger.clear!
         end
 
         private

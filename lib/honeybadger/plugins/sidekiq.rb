@@ -6,8 +6,7 @@ module Honeybadger
     module Sidekiq
       class Middleware
         def call(worker, msg, queue)
-          Honeybadger.context.clear!
-          Honeybadger.breadcrumbs.clear!
+          Honeybadger.clear!
           yield
         end
       end
