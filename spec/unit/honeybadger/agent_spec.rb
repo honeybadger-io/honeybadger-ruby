@@ -122,12 +122,9 @@ describe Honeybadger::Agent do
 
       subject { described_class.new(config) }
 
-      before do
-        allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_return(breadcrumbs)
-      end
-
       it "passes along duplicated breadcrumbs" do
         duped_breadcrumbs = double(each: [])
+        expect(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
         expect(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
         expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(breadcrumbs: duped_breadcrumbs)).and_call_original
 
@@ -142,13 +139,30 @@ describe Honeybadger::Agent do
     subject { described_class.new(config) }
 
     before do
-      Timecop.freeze
-      allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_return(breadcrumbs)
+      Thread.current[:__hb_breadcrumbs] = nil
     end
 
-    after { Timecop.return }
+    describe "#breadcrumbs" do
+      it 'creates instance local breadcrumb' do
+        agent = described_class.new(local_context: true)
+        agent.breadcrumbs
+        expect(Thread.current[:__hb_breadcrumbs]).to be nil
+      end
+
+      it 'stores breadcrumbs in thread local' do
+        bc = subject.breadcrumbs
+        expect(Thread.current[:__hb_breadcrumbs]).to eq(bc)
+      end
+    end
 
     describe "#add_breadcrumb" do
+      before do
+        Timecop.freeze
+        allow(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
+      end
+
+      after { Timecop.return }
+
       it "adds breadcrumb to manager" do
         crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: "neat", message: "This is the message", metadata: {a: "b"})
         expect(breadcrumbs).to receive(:add!).with(crumb)

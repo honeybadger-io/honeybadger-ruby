@@ -63,11 +63,12 @@ module Honeybadger
       end
 
       @context = opts.delete(:context)
-      @context ||= ContextManager.new if opts.delete(:local_context)
+      if opts.delete(:local_context)
+        @context ||= ContextManager.new
+        @breadcrumbs = Breadcrumbs::Collector.new(config)
+      end
 
       @config ||= Config.new(opts)
-
-      @breadcrumbs = Breadcrumbs::Collector.new(config)
 
       init_worker
     end
@@ -236,8 +237,12 @@ module Honeybadger
     end
 
     # @api private
-    # Used internally for adding breadcrumbs in integrations
-    attr_reader :breadcrumbs
+    # Direct access to the Breadcrumbs::Collector instance
+    def breadcrumbs
+      return @breadcrumbs if @breadcrumbs
+
+      Thread.current[:__hb_breadcrumbs] ||= Breadcrumbs::Collector.new(config)
+    end
 
     # Appends a breadcrumb to the trace. Use this when you want to add some
     # custom data to your breadcrumb trace in effort to help debugging. If a
@@ -266,7 +271,7 @@ module Honeybadger
         metadata: metadata
       })
 
-      @breadcrumbs.add!(Breadcrumbs::Breadcrumb.new(params))
+      breadcrumbs.add!(Breadcrumbs::Breadcrumb.new(params))
 
       self
     end
