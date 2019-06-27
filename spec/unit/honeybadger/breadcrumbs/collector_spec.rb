@@ -43,6 +43,31 @@ describe Honeybadger::Breadcrumbs::Collector do
     end
   end
 
+  describe "#drop_previous_breadcrumb_if" do
+    it 'calls drop on buffer if block returns truthy' do
+      crumb = double("Crumb")
+      expect(subject).to receive(:previous).twice.and_return(crumb)
+      expect(buffer).to receive(:drop)
+      subject.drop_previous_breadcrumb_if do |c|
+        expect(c).to eq(crumb)
+        true
+      end
+    end
+
+    it 'does not call drop on buffer if block returns falsey' do
+      crumb = double("Crumb")
+      expect(subject).to receive(:previous).twice.and_return(crumb)
+      expect(buffer).to_not receive(:drop)
+      subject.drop_previous_breadcrumb_if { |c| false }
+    end
+
+    it 'does not call drop on buffer if buffer is empty' do
+      expect(subject).to receive(:previous).and_return(nil)
+      expect(buffer).to_not receive(:drop)
+      subject.drop_previous_breadcrumb_if { |c| true }
+    end
+  end
+
   describe "to_h" do
     before do
       allow(subject).to receive(:trail).and_return([])

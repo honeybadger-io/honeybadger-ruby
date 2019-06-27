@@ -64,6 +64,22 @@ module Honeybadger
 
       def notify_honeybadger(exception, env)
         return if ignored_user_agent?(env)
+
+        if config[:'breadcrumbs.enabled']
+          # Drop the last breadcrumb only if the message contains the error class name
+          agent.breadcrumbs.drop_previous_breadcrumb_if do |bc|
+            bc.category == "log" && bc.message.include?(exception.class.to_s)
+          end
+
+          agent.add_breadcrumb(
+            exception.class,
+            metadata: {
+              exception_message: exception.message
+            },
+            category: "error"
+          )
+        end
+
         agent.notify(exception)
       end
 

@@ -32,4 +32,21 @@ describe Honeybadger::Breadcrumbs::RingBuffer do
       expect(subject.reduce([]) { |m, v| m << v }).to eq([:a, :b])
     end
   end
+
+  describe "#drop" do
+    it 'removes the last inserted item' do
+      subject.add!(:a)
+      subject.add!(:b)
+      subject.drop
+      expect(subject.buffer).to eq([:a])
+    end
+  end
+
+  describe "#previous" do
+    it 'returns the last inserted item' do
+      subject.add!(:a)
+      subject.add!(:b)
+      expect(subject.previous).to eq(:b)
+    end
+  end
 end

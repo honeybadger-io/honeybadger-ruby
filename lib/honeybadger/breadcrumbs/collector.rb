@@ -22,6 +22,10 @@ module Honeybadger
       # @return [Array] Raw set of breadcrumbs
       def_delegator :@buffer, :to_a
 
+      # Last item added to the buffer
+      # @return [Breadcrumb]
+      def_delegator :@buffer, :previous
+
       def initialize(config, buffer = RingBuffer.new)
         @config = config
         @buffer = buffer
@@ -38,6 +42,14 @@ module Honeybadger
       end
 
       alias_method :<<, :add!
+
+      # @api private
+      # Removes the prevous breadcrumb from the buffer if the supplied
+      # block returns a falsy value
+      #
+      def drop_previous_breadcrumb_if
+        @buffer.drop if (previous && block_given? && yield(previous))
+      end
 
       # All active breadcrumbs you want to remove a breadcrumb from the trail,
       # then you can selectively ignore breadcrumbs while building a notice.

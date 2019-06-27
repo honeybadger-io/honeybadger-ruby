@@ -31,6 +31,14 @@ module Honeybadger
       def each(&blk)
         @buffer.each(&blk)
       end
+
+      def previous
+        @buffer.last
+      end
+
+      def drop
+        @buffer.pop
+      end
     end
   end
 end
