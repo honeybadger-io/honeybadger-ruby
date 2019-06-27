@@ -122,9 +122,14 @@ describe Honeybadger::Agent do
 
       subject { described_class.new(config) }
 
-      it "passes along duplicated breadcrumbs" do
+      it "stores notice breadcrumb and passes along duplicated breadcrumbs" do
         duped_breadcrumbs = double(each: [])
         expect(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
+        expect(subject).to receive(:add_breadcrumb).with(
+          "Honeybadger Notice",
+          metadata: { error_message: "passed breadcrumbs?" },
+          category: "notice"
+        )
         expect(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
         expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(breadcrumbs: duped_breadcrumbs)).and_call_original
 

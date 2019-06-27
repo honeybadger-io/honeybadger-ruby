@@ -124,6 +124,12 @@ module Honeybadger
 
       validate_notify_opts!(opts)
 
+      add_breadcrumb(
+        "Honeybadger Notice",
+        metadata: opts,
+        category: "notice"
+      ) if config[:'breadcrumbs.enabled']
+
       opts[:rack_env] ||= context_manager.get_rack_env
       opts[:global_context] ||= context_manager.get_context
       opts[:breadcrumbs] ||= breadcrumbs.dup
