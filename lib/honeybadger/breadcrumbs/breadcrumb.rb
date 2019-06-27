@@ -10,7 +10,7 @@ module Honeybadger
 
       def initialize(category: "custom", message: nil, metadata: {})
         @active = true
-        @timestamp = DateTime.now
+        @timestamp = Time.now.utc
 
         @category = category
         @message = message
@@ -22,7 +22,7 @@ module Honeybadger
           category: category,
           message: message,
           metadata: metadata,
-          timestamp: timestamp
+          timestamp: timestamp.iso8601(3)
         }
       end
 

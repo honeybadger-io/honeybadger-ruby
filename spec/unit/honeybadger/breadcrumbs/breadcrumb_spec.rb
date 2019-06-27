@@ -14,7 +14,7 @@ describe Honeybadger::Breadcrumbs::Breadcrumb do
   its(:category) { should eq(category) }
   its(:message) { should eq(message) }
   its(:metadata) { should eq(metadata) }
-  its(:timestamp) { should eq(DateTime.now) }
+  its(:timestamp) { should eq(Time.now.utc) }
 
   describe "#to_h" do
     it "outputs hash data" do
@@ -22,7 +22,7 @@ describe Honeybadger::Breadcrumbs::Breadcrumb do
         category: category,
         message: message,
         metadata: metadata,
-        timestamp: DateTime.now
+        timestamp: Time.now.utc.iso8601(3)
       })
     end
   end
