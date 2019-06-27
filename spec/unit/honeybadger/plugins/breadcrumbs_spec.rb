@@ -39,6 +39,32 @@ describe "Breadcrumbs Plugin" do
         described_class.send_breadcrumb_notification("message", 100, config, {})
       end
 
+      describe ":message" do
+        it "can allow a string" do
+          config = { message: "config message" }
+          expect(Honeybadger).to receive(:add_breadcrumb).with("config message", anything)
+          described_class.send_breadcrumb_notification("noop", 100, config, {})
+        end
+
+        it "allows for a proc" do
+          data = {}
+          config = {
+            message: lambda do |d|
+              expect(d).to eq(data)
+              "a dynamic message"
+            end
+          }
+
+          expect(Honeybadger).to receive(:add_breadcrumb).with("a dynamic message", anything)
+          described_class.send_breadcrumb_notification("noop", 100, config, data)
+        end
+
+        it "defaults to instrumentation name if not set" do
+          expect(Honeybadger).to receive(:add_breadcrumb).with("instrument name", anything)
+          described_class.send_breadcrumb_notification("instrument name", 100, {}, {})
+        end
+      end
+
       describe ":exclude_when" do
         it "excludes events if proc returns true" do
           data = {}
@@ -64,10 +90,10 @@ describe "Breadcrumbs Plugin" do
       describe ":select_keys", skip: !Hash.method_defined?(:slice) do
         it "can filter metadata" do
           data = {a: :b, c: :d}
-          selected_data = {a: :b}
+          removed_data = {c: :d}
           config = { select_keys: [:a] }
 
-          expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: selected_data))
+          expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: hash_not_including(removed_data)))
           described_class.send_breadcrumb_notification("_", 0, config, data)
         end
       end

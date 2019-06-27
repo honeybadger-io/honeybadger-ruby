@@ -6,12 +6,17 @@ module Honeybadger
           # ActiveRecord Actions
           #
           "sql.active_record" => {
-            message: "Active Record SQL",
+            message: lambda do |data|
+              # Disregard empty string names
+              name = data[:name] if data[:name] && !data[:name].strip.empty?
+
+              ["Active Record", name].join(" - ")
+            end,
             category: "query",
             select_keys: [:sql, :name, :connection_id, :cached],
             exclude_when: lambda do |data|
               # Ignore schema, begin, and commit transaction queries
-              data[:name] == "SCHEMA" || (data[:sql] && data[:sql].match?(/^(begin|commit) transaction$/))
+              data[:name] == "SCHEMA" || (data[:sql] && (data[:sql] =~ /^(begin|commit)( transaction)?$/i))
             end
           },
 
@@ -56,6 +61,11 @@ module Honeybadger
           "process_action.action_controller" => {
             message: "Action Controller Action Process",
             select_keys: [:controller, :action, :format, :method, :path, :status, :view_runtime, :db_runtime],
+            category: "request",
+          },
+          "start_processing.action_controller" => {
+            message: "Action Controller Start Process",
+            select_keys: [:controller, :action, :format, :method, :path],
             category: "request",
           },
           "redirect_to.action_controller" => {
