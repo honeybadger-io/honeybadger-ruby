@@ -1,3 +1,5 @@
+require 'time'
+
 module Honeybadger
   module Breadcrumbs
     class Breadcrumb
