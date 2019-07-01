@@ -40,7 +40,7 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
     Honeybadger.flush { get "/breadcrumbs/active_record_event" }
     expect(notices.first).to contain_breadcrumb_including({
       category: "query",
-      message: "Active Record SQL",
+      message: "Active Record - SQL",
       metadata: include({
         sql: /INSERT INTO \"things\" \(\"name\"\)/
       })
