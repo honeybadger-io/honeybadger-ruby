@@ -1,3 +1,5 @@
+require 'honeybadger/util/sql'
+
 module Honeybadger
   module Breadcrumbs
     class ActiveSupport
@@ -15,7 +17,8 @@ module Honeybadger
             category: "query",
             select_keys: [:sql, :name, :connection_id, :cached],
             transform: lambda do |data|
-              data[:sql] = sql_obfuscator(data[:sql])
+              adapter = ::ActiveRecord::Base.connection_config[:adapter]
+              data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
               data
             end,
             exclude_when: lambda do |data|
@@ -98,25 +101,6 @@ module Honeybadger
         }
       end
 
-      EscapedQuotes = /(\\"|\\')/.freeze
-      SQuotedData = /'(?:[^']|'')*'/.freeze
-      DQuotedData = /"(?:[^"]|"")*"/.freeze
-      NumericData = /\b\d+\b/.freeze
-      Newline = /\n/.freeze
-      Replacement = "?".freeze
-      EmptyReplacement = "".freeze
-      DoubleQuoters = /(postgres|sqlite|postgis)/.freeze
-
-      def self.sql_obfuscator(sql)
-        sql.dup.tap do |s|
-          s.gsub!(EscapedQuotes, EmptyReplacement)
-          s.gsub!(SQuotedData, Replacement)
-          s.gsub!(DQuotedData, Replacement) if ::ActiveRecord::Base.connection_pool.spec.config[:adapter] =~ DoubleQuoters
-          s.gsub!(NumericData, Replacement)
-          s.gsub!(Newline, EmptyReplacement)
-          s.squeeze!(' ')
-        end
-      end
     end
   end
 end
