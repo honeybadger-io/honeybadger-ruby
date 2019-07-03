@@ -291,7 +291,7 @@ module Honeybadger
       },
       :'breadcrumbs.enabled' => {
         description: 'Enable/Disable breadcrumb functionality.',
-        default: true,
+        default: false,
         type: Boolean
       },
       :'breadcrumbs.active_support_notifications' => {
