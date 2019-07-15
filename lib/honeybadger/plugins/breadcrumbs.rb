@@ -104,6 +104,5 @@ module Honeybadger
         end
       end
     end
-
   end
 end

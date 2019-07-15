@@ -1,6 +1,16 @@
 require_relative '../rails_helper'
 
 describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
+  # The plugin is defaulted to off, we need to make sure we re-load plugins
+  # after config as plugins only check requirement only at load time
+  before(:all) do
+    # Clear the thread local so it reload correctly
+    Thread.current[:__hb_breadcrumbs] = nil
+    Honeybadger.configure do |config|
+      config.breadcrumbs.enabled = true
+    end
+  end
+
   load_rails_hooks(self)
 
   unless SKIP_ACTIVE_RECORD
@@ -16,6 +26,10 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
       get_trail(actual).any? do |breadcrumb|
         include(expected).matches?(breadcrumb.to_h)
       end
+    end
+
+    failure_message do |actual|
+      "expected a trail from:\n\n #{JSON.pretty_generate(actual.breadcrumbs.to_h)}\n\nto contain:\n\n#{JSON.pretty_generate(expected)}"
     end
   end
 

@@ -31,6 +31,7 @@ class BreadcrumbController < ApplicationController
 
   def notice
     Honeybadger.notify(StandardError.new('test backend'))
+    head 200
   end
 end
 

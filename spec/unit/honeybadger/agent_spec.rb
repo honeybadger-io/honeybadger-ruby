@@ -118,7 +118,7 @@ describe Honeybadger::Agent do
 
     describe "breadcrumbs" do
       let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
-      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, :'breadcrumbs.enabled' => true) }
 
       subject { described_class.new(config) }
 
