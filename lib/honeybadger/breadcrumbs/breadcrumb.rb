@@ -16,7 +16,7 @@ module Honeybadger
 
         @category = category
         @message = message
-        @metadata = metadata
+        @metadata = metadata.is_a?(Hash) ? metadata : {}
       end
 
       def to_h

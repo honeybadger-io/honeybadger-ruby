@@ -87,6 +87,7 @@ module Honeybadger
 
         data = data.slice(*notification_config[:select_keys]) if notification_config[:select_keys]
         data = notification_config[:transform].call(data) if notification_config[:transform]
+        data = data.is_a?(Hash) ? data : {}
 
         data[:duration] = duration
 
