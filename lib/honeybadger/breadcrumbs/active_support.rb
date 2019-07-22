@@ -12,7 +12,7 @@ module Honeybadger
               # Disregard empty string names
               name = data[:name] if data[:name] && !data[:name].strip.empty?
 
-              ["Active Record", name].join(" - ")
+              ["Active Record", name].compact.join(" - ")
             end,
             category: "query",
             select_keys: [:sql, :name, :connection_id, :cached],
