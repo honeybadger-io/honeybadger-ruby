@@ -5,6 +5,12 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.4.0] - 2019-07-24
+### Added
+- Added the ability to store and send Breadcrumbs along with the notice.
+  Breadcrumbs are disabled by default in this version so they must be enabled
+  via the config (option `breadcrumbs.enabled`) to work.
+
 ## [4.3.1] - 2019-05-30
 ### Fixed
 - Add Rails 6 RC1 Support
