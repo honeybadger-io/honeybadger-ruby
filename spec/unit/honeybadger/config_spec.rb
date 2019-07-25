@@ -54,7 +54,7 @@ describe Honeybadger::Config do
     context "when options include logger" do
       it "overrides configured logger" do
         allow(NULL_LOGGER).to receive(:add)
-        expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/)
+        expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/, "honeybadger")
         config = Honeybadger::Config.new.init!(logger: NULL_LOGGER)
         config.logger.error('foo')
       end
@@ -263,7 +263,7 @@ describe Honeybadger::Config do
           config.logger = CONFIGURE_LOGGER
         end
 
-        expect(CONFIGURE_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/)
+        expect(CONFIGURE_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/, "honeybadger")
 
         honeybadger.logger.error('foo')
       end

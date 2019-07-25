@@ -61,7 +61,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    Honeybadger.context.clear!
+    Honeybadger.clear!
   end
 
   begin

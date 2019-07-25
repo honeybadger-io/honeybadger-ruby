@@ -28,6 +28,8 @@ end
 
 appraise 'rails4.2' do
   gem 'rails', '~> 4.2.4'
+  gem 'sqlite3', '< 1.4', platform: :mri
+  gem 'activerecord-jdbcsqlite3-adapter', '1.3.25', platform: :jruby
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
@@ -35,6 +37,8 @@ end
 
 appraise 'rails5.0' do
   gem 'rails', '~> 5.0.0'
+  gem 'sqlite3', '< 1.4', platform: :mri
+  gem 'activerecord-jdbcsqlite3-adapter', '~> 50', platform: :jruby
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
@@ -42,6 +46,8 @@ end
 
 appraise 'rails5.1' do
   gem 'rails', '~> 5.1.0'
+  gem 'sqlite3', '< 1.4', platform: :mri
+  gem 'activerecord-jdbcsqlite3-adapter', '~> 51', platform: :jruby
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
@@ -49,6 +55,8 @@ end
 
 appraise 'rails5.2' do
   gem 'rails', '~> 5.2.0'
+  gem 'sqlite3', '< 1.4', platform: :mri
+  gem 'activerecord-jdbcsqlite3-adapter', '~> 52', platform: :jruby
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
@@ -58,6 +66,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   # The latest officially supported Rails/Rack release
   appraise 'rails6.0' do
     gem 'rails', '~> 6.0.0.rc1'
+    gem 'sqlite3', '~> 1.4', platform: :mri
+    gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platform: :jruby
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
@@ -68,6 +78,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'rails', github: 'rails/rails'
     gem 'rack', github: 'rack/rack'
     gem 'arel', github: 'rails/arel'
+    gem 'sqlite3', '~> 1.4', platform: :mri
     gem 'capistrano', '~> 3.0'
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rspec-rails'

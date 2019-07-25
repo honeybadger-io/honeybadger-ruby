@@ -1,4 +1,5 @@
 require 'socket'
+require 'honeybadger/breadcrumbs/active_support'
 
 module Honeybadger
   class Config
@@ -285,6 +286,21 @@ module Honeybadger
       },
       :'resque.resque_retry.send_exceptions_when_retrying' => {
         description: 'Send exceptions when retrying job.',
+        default: true,
+        type: Boolean
+      },
+      :'breadcrumbs.enabled' => {
+        description: 'Enable/Disable breadcrumb functionality.',
+        default: false,
+        type: Boolean
+      },
+      :'breadcrumbs.active_support_notifications' => {
+        description: 'Configuration for automatic Active Support Instrumentation events.',
+        default: Breadcrumbs::ActiveSupport.default_notifications,
+        type: Hash
+      },
+      :'breadcrumbs.logging.enabled' => {
+        description: 'Enable/Disable automatic breadcrumbs from log messages.',
         default: true,
         type: Boolean
       }

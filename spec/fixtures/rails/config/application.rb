@@ -1,12 +1,23 @@
 require 'rails'
 require 'action_controller/railtie'
 
-ActiveSupport::Deprecation.silenced = true
+# Duplicating here as some specs don't use the rails helper
+SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha")
 
-module ActiveRecord
-  class RecordNotFound < StandardError
+if SKIP_ACTIVE_RECORD
+  module ActiveRecord
+    class RecordNotFound < StandardError
+    end
   end
+else
+  require 'active_record/railtie'
+  require 'activerecord-jdbcsqlite3-adapter' if defined?(JRUBY_VERSION)
+  ENV['DATABASE_URL'] = 'sqlite3::memory:'
 end
+
+require 'active_job/railtie'
+
+ActiveSupport::Deprecation.silenced = true
 
 class RailsApp < Rails::Application
   # Rails 6+
@@ -47,3 +58,5 @@ end
 
 Rails.env = 'production'
 Rails.logger = Logger.new('/dev/null')
+
+require_relative './breadcrumbs'

@@ -9,7 +9,7 @@ module Honeybadger
 
       def initialize(app, agent = nil)
         @app = app
-        @agent = agent.kind_of?(Agent) ? agent : Honeybadger::Agent.instance
+        @agent = agent.kind_of?(Agent) && agent
       end
 
       def replacement(with)
@@ -34,9 +34,12 @@ module Honeybadger
 
       private
 
-      attr_reader :agent
       def_delegator :agent, :config
       def_delegator :config, :logger
+
+      def agent
+        @agent || Honeybadger::Agent.instance
+      end
     end
   end
 end

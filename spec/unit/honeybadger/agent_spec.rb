@@ -11,7 +11,6 @@ describe Honeybadger::Agent do
   end
 
   describe "#check_in" do
-
     it 'parses check_in id from a url' do
       stub_request(:get, "https://api.honeybadger.io/v1/check_in/1MqIo1").
          to_return(status: 200)
@@ -42,6 +41,20 @@ describe Honeybadger::Agent do
       instance = described_class.new(config)
 
       expect(instance.check_in('danny')).to eq(false)
+    end
+  end
+
+  describe "#clear!" do
+    it 'clears all transactional data' do
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+      instance.context({a: "context"})
+      instance.add_breadcrumb("Chomp")
+
+      instance.clear!
+
+      expect(instance.get_context).to be nil
+      expect(instance.breadcrumbs.to_a).to be_empty
     end
   end
 
@@ -103,6 +116,82 @@ describe Honeybadger::Agent do
       end
     end
 
+    describe "breadcrumbs" do
+      let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, :'breadcrumbs.enabled' => true) }
+
+      subject { described_class.new(config) }
+
+      it "stores notice breadcrumb and passes along duplicated breadcrumbs" do
+        duped_breadcrumbs = double(each: [])
+        expect(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
+        expect(subject).to receive(:add_breadcrumb).with(
+          "Honeybadger Notice",
+          metadata: { error_message: "passed breadcrumbs?" },
+          category: "notice"
+        )
+        expect(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
+        expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(breadcrumbs: duped_breadcrumbs)).and_call_original
+
+        subject.notify(error_message: "passed breadcrumbs?")
+      end
+    end
+  end
+
+  context "breadcrumbs" do
+    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+    subject { described_class.new(config) }
+
+    before do
+      Thread.current[:__hb_breadcrumbs] = nil
+    end
+
+    describe "#breadcrumbs" do
+      it 'creates instance local breadcrumb' do
+        agent = described_class.new(local_context: true)
+        agent.breadcrumbs
+        expect(Thread.current[:__hb_breadcrumbs]).to be nil
+      end
+
+      it 'stores breadcrumbs in thread local' do
+        bc = subject.breadcrumbs
+        expect(Thread.current[:__hb_breadcrumbs]).to eq(bc)
+      end
+    end
+
+    describe "#add_breadcrumb" do
+      before do
+        Timecop.freeze
+        allow(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
+      end
+
+      after { Timecop.return }
+
+      it "adds breadcrumb to manager" do
+        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: "neat", message: "This is the message", metadata: {a: "b"})
+        expect(breadcrumbs).to receive(:add!).with(crumb)
+
+        subject.add_breadcrumb("This is the message", metadata: {a: "b"}, category: "neat")
+      end
+
+      it 'has sane defaults' do
+        crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: "custom", message: "Basic Message", metadata: {})
+        expect(breadcrumbs).to receive(:add!).with(crumb)
+
+        subject.add_breadcrumb("Basic Message")
+      end
+
+      it 'sanitizes breadcrumb before adding' do
+        sanitizer = instance_double(Honeybadger::Util::Sanitizer)
+        allow(breadcrumbs).to receive(:add!)
+        expect(Honeybadger::Util::Sanitizer).to receive(:new).with(max_depth: 2).and_return(sanitizer)
+        expect(sanitizer).to receive(:sanitize).with(hash_including({message: "Breadcrumb"}))
+        expect(Honeybadger::Breadcrumbs::Breadcrumb).to receive(:new)
+
+        subject.add_breadcrumb("Breadcrumb")
+      end
+    end
   end
 
   context do

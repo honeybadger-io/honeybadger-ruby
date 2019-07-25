@@ -46,7 +46,7 @@ module Honeybadger
               ) if job.attempts.to_i >= ::Honeybadger.config[:'delayed_job.attempt_threshold'].to_i
               raise error
             ensure
-              ::Honeybadger.context.clear!
+              ::Honeybadger.clear!
             end
           end
         end

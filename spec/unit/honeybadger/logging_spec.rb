@@ -15,6 +15,15 @@ describe Honeybadger::Logging::Base do
   end
 end
 
+describe Honeybadger::Logging::StandardLogger do
+  it "injects honeybadger as progname" do
+    logger_dbl = instance_double(Logger, add: nil)
+    logger = described_class.new(logger_dbl)
+    expect(logger_dbl).to receive(:add).with(Logger::Severity::INFO, "a message", "honeybadger")
+    logger.info("a message")
+  end
+end
+
 describe Honeybadger::Logging::BootLogger.instance do
   LOG_SEVERITIES.each do |severity|
     it { should respond_to severity }
@@ -65,7 +74,7 @@ describe Honeybadger::Logging::FormattedLogger do
     it { should respond_to severity }
 
     it "delegates ##{severity} to configured logger" do
-      expect(logger).to receive(:add).with(Logger::Severity.const_get(severity.to_s.upcase), :foo)
+      expect(logger).to receive(:add).with(Logger::Severity.const_get(severity.to_s.upcase), :foo, "honeybadger")
       subject.send(severity, :foo)
     end
   end
@@ -87,7 +96,7 @@ describe Honeybadger::Logging::ConfigLogger do
       it "delegates ##{severity} to configured logger" do
         # Debug is logged at the info level.
         const = Logger::Severity.const_get((severity == :debug ? :info : severity).to_s.upcase)
-        expect(logger).to receive(:add).with(const, :foo)
+        expect(logger).to receive(:add).with(const, :foo, "honeybadger")
         subject.send(severity, :foo)
       end
     end
@@ -103,7 +112,7 @@ describe Honeybadger::Logging::ConfigLogger do
 
     [:error, :fatal].each do |severity|
       it "delegates ##{severity} to configured logger" do
-        expect(logger).to receive(:add).with(Logger::Severity.const_get(severity.to_s.upcase), :foo)
+        expect(logger).to receive(:add).with(Logger::Severity.const_get(severity.to_s.upcase), :foo, "honeybadger")
         subject.send(severity, :foo)
       end
     end
@@ -115,7 +124,7 @@ describe Honeybadger::Logging::ConfigLogger do
         it "delegates ##{severity} to configured logger" do
           # Debug is logged at the info level.
           const = Logger::Severity.const_get((severity == :debug ? :info : severity).to_s.upcase)
-          expect(logger).to receive(:add).with(const, :foo)
+          expect(logger).to receive(:add).with(const, :foo, "honeybadger")
           subject.send(severity, :foo)
         end
       end

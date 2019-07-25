@@ -115,6 +115,9 @@ module Honeybadger
     # Deprecated: Excerpt from source file.
     attr_reader :source
 
+    # @return [Breadcrumbs::Collector] The collection of captured breadcrumbs
+    attr_accessor :breadcrumbs
+
     # @api private
     # Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
@@ -184,6 +187,8 @@ module Honeybadger
 
       self.session = opts[:session][:data] if opts[:session] && opts[:session][:data]
 
+      self.breadcrumbs = opts[:breadcrumbs] || Breadcrumbs::Collector.new(config)
+
       # Fingerprint must be calculated last since callback operates on `self`.
       self.fingerprint = fingerprint_from_opts(opts)
     end
@@ -200,6 +205,7 @@ module Honeybadger
       {
         api_key: s(api_key),
         notifier: NOTIFIER,
+        breadcrumbs: sanitized_breadcrumbs,
         error: {
           token: id,
           class: s(error_class),
@@ -352,6 +358,12 @@ module Honeybadger
       object ||= {}.freeze
 
       Context(object)
+    end
+
+    # Sanitize at the depth of 4 since we are sanitizing the breadcrumb root
+    # hash data structure.
+    def sanitized_breadcrumbs
+      Util::Sanitizer.new(max_depth: 4).sanitize(breadcrumbs.to_h)
     end
 
     def construct_context_hash(opts, exception)

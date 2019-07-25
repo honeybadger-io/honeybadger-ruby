@@ -28,4 +28,12 @@ describe Honeybadger::Config::Env do
 
     specify { expect(subject).not_to have_key(:'bad_option') }
   end
+
+  context "with ignorable type" do
+    before do
+      env['HONEYBADGER_BREADCRUMBS_ACTIVE_SUPPORT_NOTIFICATIONS'] = '{}'
+    end
+
+    specify { expect(subject).not_to have_key(:'breadcrumbs.active_support_notifications') }
+  end
 end
