@@ -81,7 +81,7 @@ module Honeybadger
       },
       max_queue_size: {
         description: 'Maximum number of items for each worker queue.',
-        default: 1000,
+        default: 100,
         type: Integer
       },
       plugins: {
