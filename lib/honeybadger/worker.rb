@@ -35,7 +35,7 @@ module Honeybadger
 
     def initialize(config)
       @config = config
-      @throttles = []
+      @throttle = 0
       @mutex = Mutex.new
       @marker = ConditionVariable.new
       @queue = Queue.new(config.max_queue_size)
@@ -121,7 +121,7 @@ module Honeybadger
     private
 
     attr_reader :config, :queue, :pid, :mutex, :marker,
-      :thread, :throttles
+      :thread, :throttle
 
     def_delegator :config, :backend
 
@@ -174,9 +174,9 @@ module Honeybadger
     end
 
     def throttle_interval
-      return 0 unless throttles[0]
       mutex.synchronize do
-        throttles.reduce(1) {|a,e| a*e }
+        return 0 if throttle == 0
+        throttle.times.reduce(1) {|a,_| a *= 1.25 }
       end
     end
 
@@ -185,15 +185,16 @@ module Honeybadger
       backend.notify(:notices, payload)
     end
 
-    def add_throttle(t)
+    def inc_throttle
       mutex.synchronize do
-        throttles.push(t)
+        @throttle += 1
       end
     end
 
-    def del_throttle
+    def dec_throttle
       mutex.synchronize do
-        throttles.shift
+        return nil if @throttle == 0
+        @throttle -= 1
       end
     end
 
@@ -202,8 +203,8 @@ module Honeybadger
 
       case response.code
       when 429, 503
-        warn { sprintf('Error report failed: project is sending too many errors. id=%s code=%s throttle=1.25 interval=%s', msg.id, response.code, throttle_interval) }
-        add_throttle(1.25)
+        throttle = inc_throttle
+        warn { sprintf('Error report failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s', msg.id, throttle, response.code, throttle_interval) }
       when 402
         warn { sprintf('Error report failed: payment is required. id=%s code=%s', msg.id, response.code) }
         suspend(3600)
@@ -211,7 +212,7 @@ module Honeybadger
         warn { sprintf('Error report failed: API key is invalid. id=%s code=%s', msg.id, response.code) }
         suspend(3600)
       when 201
-        if throttle = del_throttle
+        if throttle = dec_throttle
           info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s throttle=%s interval=%s', msg.id, msg.id, response.code, throttle_interval, response.code) }
         else
           info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s', msg.id, msg.id, response.code) }

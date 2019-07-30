@@ -237,7 +237,7 @@ describe Honeybadger::Worker do
       end
 
       context "and a throttle is set" do
-        before { instance.send(:add_throttle, 1.25) }
+        before { instance.send(:inc_throttle) }
 
         it "removes throttle" do
           expect { handle_response }.to change(instance, :throttle_interval).by(-1.25)
