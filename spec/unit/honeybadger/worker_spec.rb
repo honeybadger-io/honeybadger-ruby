@@ -195,7 +195,7 @@ describe Honeybadger::Worker do
       let(:response) { Honeybadger::Backend::Response.new(429) }
 
       it "adds throttle" do
-        expect { handle_response }.to change(instance, :throttle_interval).by(1.25)
+        expect { handle_response }.to change(instance, :throttle_interval).by(0.05)
       end
     end
 
@@ -240,7 +240,7 @@ describe Honeybadger::Worker do
         before { instance.send(:inc_throttle) }
 
         it "removes throttle" do
-          expect { handle_response }.to change(instance, :throttle_interval).by(-1.25)
+          expect { handle_response }.to change(instance, :throttle_interval).by(-0.05)
         end
       end
 

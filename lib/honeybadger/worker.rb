@@ -31,11 +31,18 @@ module Honeybadger
       end
     end
 
+    # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
+
+    # The number to multiply the current throttle interval by, resulting in an
+    # exponential backoff. 1.05 will reach an interval of 2 minutes after
+    # around 100 429 responses from the server.
+    THROTTLE_MULTIPLIER = 1.05
 
     def initialize(config)
       @config = config
       @throttle = 0
+      @throttle_interval = 0
       @mutex = Mutex.new
       @marker = ConditionVariable.new
       @queue = Queue.new(config.max_queue_size)
@@ -121,7 +128,7 @@ module Honeybadger
     private
 
     attr_reader :config, :queue, :pid, :mutex, :marker,
-      :thread, :throttle
+      :thread, :throttle, :throttle_interval
 
     def_delegator :config, :backend
 
@@ -173,28 +180,29 @@ module Honeybadger
       sleep(1)
     end
 
-    def throttle_interval
-      mutex.synchronize do
-        return 0 if throttle == 0
-        throttle.times.reduce(1) {|a,_| a *= 1.25 }
-      end
-    end
-
     def notify_backend(payload)
       debug { sprintf('worker notifying backend id=%s', payload.id) }
       backend.notify(:notices, payload)
     end
 
+    def calc_throttle_interval
+      (throttle.times.reduce(1) {|a,_| a *= THROTTLE_MULTIPLIER } - 1).round(3)
+    end
+
     def inc_throttle
       mutex.synchronize do
         @throttle += 1
+        @throttle_interval = calc_throttle_interval
+        throttle
       end
     end
 
     def dec_throttle
       mutex.synchronize do
-        return nil if @throttle == 0
+        return nil if throttle == 0
         @throttle -= 1
+        @throttle_interval = calc_throttle_interval
+        throttle
       end
     end
 
