@@ -12,6 +12,8 @@ if SKIP_ACTIVE_RECORD
 else
   require 'active_record/railtie'
   require 'activerecord-jdbcsqlite3-adapter' if defined?(JRUBY_VERSION)
+  require 'active_support'
+  require 'active_support/core_ext/enumerable'
   ENV['DATABASE_URL'] = 'sqlite3::memory:'
 end
 

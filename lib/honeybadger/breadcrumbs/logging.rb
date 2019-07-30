@@ -5,7 +5,7 @@ module Honeybadger
     module LogWrapper
       def add(severity, message = nil, progname = nil)
         message, progname = [progname, nil] if message.nil?
-        message = message && message.strip
+        message = message && message.to_s.strip
         unless should_ignore_log?(message, progname)
           Honeybadger.add_breadcrumb(message, category: :log, metadata: {
             severity: format_severity(severity),

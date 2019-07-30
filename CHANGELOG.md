@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Allow non-strings to be passed to breadcrumbs logger
 
 ## [4.4.0] - 2019-07-24
 ### Added
