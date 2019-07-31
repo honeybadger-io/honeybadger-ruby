@@ -14,23 +14,6 @@ module Honeybadger
     # Sub-class thread so we have a named thread (useful for debugging in Thread.list).
     class Thread < ::Thread; end
 
-    # A queue which enforces a maximum size.
-    class Queue < ::Queue
-      attr_reader :max_size
-
-      def initialize(max_size)
-        @mutex = Mutex.new
-        @max_size = max_size
-        super()
-      end
-
-      def push(msg)
-        @mutex.synchronize do
-          super unless size >= max_size
-        end
-      end
-    end
-
     # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
 
@@ -45,13 +28,19 @@ module Honeybadger
       @throttle_interval = 0
       @mutex = Mutex.new
       @marker = ConditionVariable.new
-      @queue = Queue.new(config.max_queue_size)
+      @queue = Queue.new
       @shutdown = false
       @start_at = nil
     end
 
     def push(msg)
       return false unless start
+
+      if queue.size > config.max_queue_size
+        warn(sprintf('Dropping notice; reached max queue size of %s', queue.size))
+        return
+      end
+
       queue.push(msg)
     end
 
