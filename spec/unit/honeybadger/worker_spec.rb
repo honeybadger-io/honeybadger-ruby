@@ -23,17 +23,27 @@ describe Honeybadger::Worker do
   context "when an exception happens in the worker loop" do
     before do
       allow(instance.send(:queue)).to receive(:pop).and_raise('fail')
-      instance.push(obj)
-      instance.flush
-      sleep(0.05)
     end
 
     it "does not raise when shutting down" do
+      instance.push(obj)
+
       expect { instance.shutdown }.not_to raise_error
     end
 
     it "exits the loop" do
+      instance.push(obj)
+      instance.flush
+
       expect(instance.send(:thread)).not_to be_alive
+    end
+
+    it "logs the error" do
+      allow(config.logger).to receive(:error)
+      expect(config.logger).to receive(:error).with(/error/i)
+
+      instance.push(obj)
+      instance.flush
     end
   end
 
@@ -58,8 +68,9 @@ describe Honeybadger::Worker do
       expect(instance.send(:thread)).to be_alive
     end
 
-    it "sleeps for a short period" do
-      expect(instance).to receive(:sleep).with(1..5)
+    it "logs the error" do
+      allow(config.logger).to receive(:error)
+      expect(config.logger).to receive(:error).with(/error/i)
       flush
     end
   end
@@ -101,6 +112,24 @@ describe Honeybadger::Worker do
       it "rejects push" do
         expect(instance.send(:queue)).not_to receive(:push)
         expect(instance.push(obj)).to eq false
+      end
+    end
+
+    context "when queue is full" do
+      before do
+        allow(config).to receive(:max_queue_size).and_return(5)
+        5.times { instance.push(obj) }
+      end
+
+      it "rejects the push" do
+        expect(instance.send(:queue)).not_to receive(:push)
+        expect(instance.push(obj)).to eq false
+      end
+
+      it "warns the logger" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).to receive(:warn).with(/reached max/i)
+        instance.push(obj)
       end
     end
   end
@@ -149,6 +178,12 @@ describe Honeybadger::Worker do
   describe "#shutdown" do
     before { subject.start }
 
+    it "blocks until queue is processed" do
+      expect(subject.send(:backend)).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
+      subject.push(obj)
+      subject.shutdown
+    end
+
     it "stops the thread" do
       subject.shutdown
       expect(subject.send(:thread)).not_to be_alive
@@ -156,6 +191,73 @@ describe Honeybadger::Worker do
 
     it "clears the pid" do
       expect { subject.shutdown }.to change(subject, :pid).to(nil)
+    end
+
+    context "when previously throttled" do
+      before do
+        100.times { subject.send(:inc_throttle) }
+        subject.push(obj)
+        sleep(0.01) # Pause to allow throttle to activate
+      end
+
+      it "shuts down immediately" do
+        expect(subject.send(:backend)).not_to receive(:notify)
+        subject.push(obj)
+        subject.shutdown
+      end
+
+      it "does not warn the logger when the queue is empty" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).not_to receive(:warn)
+        subject.shutdown
+      end
+
+      it "warns the logger when queue has items" do
+        subject.push(obj)
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).to receive(:warn).with(/throttled/i)
+        subject.shutdown
+      end
+    end
+
+    context "when throttled during shutdown" do
+      before do
+        allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429) )
+      end
+
+      it "shuts down immediately" do
+        expect(instance.send(:backend)).to receive(:notify).exactly(1).times
+        5.times { subject.push(obj) }
+        subject.shutdown
+      end
+
+      it "does not warn the logger when the queue is empty" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).not_to receive(:warn).with(/throttled/)
+
+        subject.push(obj)
+        subject.shutdown
+      end
+
+      it "warns the logger when the queue has additional items" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).to receive(:warn).with(/throttled/i)
+
+        subject.push(obj)
+        subject.push(obj)
+        subject.shutdown
+      end
+    end
+
+    context "when suspended during shutdown" do
+      before do
+        allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(403) )
+      end
+
+      it "won't start again in the future" do
+        subject.push(obj)
+        expect { instance.shutdown }.not_to change(subject, :start_at).from(nil)
+      end
     end
   end
 
