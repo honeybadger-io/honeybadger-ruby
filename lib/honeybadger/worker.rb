@@ -57,7 +57,6 @@ module Honeybadger
       end
 
       return true if force
-
       return true unless thread&.alive?
 
       if throttled?
@@ -68,7 +67,6 @@ module Honeybadger
       info { sprintf('Waiting to report %s error(s) to Honeybadger', queue.size) } unless queue.empty?
 
       queue.push(SHUTDOWN)
-
       !!thread.join
     ensure
       queue.clear
