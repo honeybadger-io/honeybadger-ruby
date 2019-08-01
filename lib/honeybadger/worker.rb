@@ -17,10 +17,10 @@ module Honeybadger
     # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
 
-    # The number to multiply the current throttle interval by, resulting in an
-    # exponential backoff. 1.05 will reach an interval of 2 minutes after
-    # around 100 429 responses from the server.
-    THROTTLE_MULTIPLIER = 1.05
+    # The base number for the exponential backoff formula when calculating the
+    # throttle interval. `1.05 ** throttle` will reach an interval of 2 minutes
+    # after around 100 429 responses from the server.
+    BASE_THROTTLE = 1.05
 
     def initialize(config)
       @config = config
@@ -195,7 +195,7 @@ module Honeybadger
     end
 
     def calc_throttle_interval
-      ((THROTTLE_MULTIPLIER ** throttle) - 1).round(3)
+      ((BASE_THROTTLE ** throttle) - 1).round(3)
     end
 
     def inc_throttle
