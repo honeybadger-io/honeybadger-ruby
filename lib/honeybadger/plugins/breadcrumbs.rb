@@ -89,7 +89,7 @@ module Honeybadger
         data = notification_config[:transform].call(data) if notification_config[:transform]
         data = data.is_a?(Hash) ? data : {}
 
-        data[:duration] = duration
+        data[:duration] = duration if duration
 
         Honeybadger.add_breadcrumb(
           message,
@@ -101,8 +101,8 @@ module Honeybadger
       # @api private
       def self.subscribe_to_notification(name, notification_config)
         ActiveSupport::Notifications.subscribe(name) do |_, started, finished, _, data|
-          duration = finished && started ? finished - started : nil
-          
+          duration = finished - started if finished && started
+
           send_breadcrumb_notification(name, duration, notification_config, data)
         end
       end

@@ -12,13 +12,23 @@ describe "Breadcrumbs Plugin" do
 
   describe Honeybadger::Plugins::RailsBreadcrumbs do
     describe ".subscribe_to_notification" do
+      let(:name) { "a.notification" }
+      let(:config) {{ foo: "bar" }}
+      let(:data) {{a: :b}}
+
       it "registers with activesupport and delgates to send_breadcrumb_notification" do
-        name = "a.notification"
-        config = { foo: "bar" }
-        data = {a: :b}
         expect(described_class).to receive(:send_breadcrumb_notification).with(name, 10, config, data)
         expect(active_support).to receive(:subscribe).with(name) do |&block|
           block.call("noop", 10, 20, "noop", data)
+        end
+
+        described_class.subscribe_to_notification(name, config)
+      end
+
+      it "reports nil duration if finish time is nil" do
+        expect(described_class).to receive(:send_breadcrumb_notification).with(name, nil, config, data)
+        expect(active_support).to receive(:subscribe).with(name) do |&block|
+          block.call("noop", 100, nil, "noop", data)
         end
 
         described_class.subscribe_to_notification(name, config)
@@ -37,6 +47,11 @@ describe "Breadcrumbs Plugin" do
       it "adds a breadcrumb with defaults" do
         expect(Honeybadger).to receive(:add_breadcrumb).with("message", {category: :custom, metadata: {duration: 100}})
         described_class.send_breadcrumb_notification("message", 100, config, {})
+      end
+
+      it "ignores nil duration" do
+        expect(Honeybadger).to receive(:add_breadcrumb).with("message", {category: :custom, metadata: {}})
+        described_class.send_breadcrumb_notification("message", nil, config, {})
       end
 
       describe ":message" do
