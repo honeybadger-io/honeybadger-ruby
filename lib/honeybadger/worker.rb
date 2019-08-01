@@ -195,7 +195,7 @@ module Honeybadger
     end
 
     def calc_throttle_interval
-      (throttle.times.reduce(1) {|a,_| a *= THROTTLE_MULTIPLIER } - 1).round(3)
+      ((THROTTLE_MULTIPLIER ** throttle) - 1).round(3)
     end
 
     def inc_throttle
