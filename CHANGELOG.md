@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.4.2] - 2019-08-01
 ### Fixed
 - Handle ActiveSupport::Notifications passing nil started or finished time
   -@pcreux
