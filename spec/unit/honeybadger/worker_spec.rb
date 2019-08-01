@@ -140,8 +140,8 @@ describe Honeybadger::Worker do
     end
 
     it "changes the pid to the current pid" do
-      allow(Process).to receive(:pid).and_return(101)
-      expect { subject.start }.to change(subject, :pid).to(101)
+      allow(Process).to receive(:pid).and_return(101, 102)
+      expect { subject.start }.to change(subject, :pid).from(101).to(102)
     end
 
     context "when shutdown" do
@@ -187,10 +187,6 @@ describe Honeybadger::Worker do
     it "stops the thread" do
       subject.shutdown
       expect(subject.send(:thread)).not_to be_alive
-    end
-
-    it "clears the pid" do
-      expect { subject.shutdown }.to change(subject, :pid).to(nil)
     end
 
     context "when previously throttled" do
@@ -247,34 +243,6 @@ describe Honeybadger::Worker do
         subject.push(obj)
         subject.shutdown
       end
-    end
-
-    context "when suspended during shutdown" do
-      before do
-        allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(403) )
-      end
-
-      it "won't start again in the future" do
-        expect {
-          subject.push(obj)
-          subject.shutdown
-        }.not_to change(subject, :start_at)
-      end
-    end
-  end
-
-  describe "#shutdown!" do
-    before { subject.start }
-
-    it "kills the thread" do
-      subject.shutdown!
-      expect(subject.send(:thread)).not_to be_alive
-    end
-
-    it "logs debug info" do
-      allow(config.logger).to receive(:debug)
-      expect(config.logger).to receive(:debug).with(/kill/i)
-      subject.shutdown!
     end
   end
 

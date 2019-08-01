@@ -323,7 +323,7 @@ module Honeybadger
     # @example
     #   Honeybadger.stop # => nil
     def stop(force = false)
-      worker.send(force ? :shutdown! : :shutdown)
+      worker.shutdown(force)
       true
     end
 

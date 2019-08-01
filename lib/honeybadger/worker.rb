@@ -31,6 +31,7 @@ module Honeybadger
       @queue = Queue.new
       @shutdown = false
       @start_at = nil
+      @pid = Process.pid
     end
 
     def push(msg)
@@ -48,54 +49,30 @@ module Honeybadger
       handle_response(msg, notify_backend(msg))
     end
 
-    def shutdown
+    def shutdown(force = false)
       d { 'shutting down worker' }
 
       mutex.synchronize do
         @shutdown = true
-        @start_at = nil
-        @pid = nil
       end
 
-      return true unless thread
+      return true if force
+
+      return true unless thread&.alive?
 
       if throttled?
-        warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 0
-        shutdown!
+        warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } unless queue.empty?
         return true
       end
 
-      info { sprintf('Waiting to report %s error(s) to Honeybadger', queue.size) } if queue.size >  0
+      info { sprintf('Waiting to report %s error(s) to Honeybadger', queue.size) } unless queue.empty?
 
       queue.push(SHUTDOWN)
 
-      result = true
-      if thread != Thread.current
-        begin
-          result = !!thread.join
-        ensure
-          shutdown! unless result
-        end
-      end
-
-      result
-    end
-
-    def shutdown!
-      mutex.synchronize do
-        @shutdown = true
-        @pid = nil
-        queue.clear
-      end
-
-      d { 'killing worker thread' }
-
-      if thread
-        Thread.kill(thread)
-        thread.join # Allow ensure blocks to execute.
-      end
-
-      true
+      !!thread.join
+    ensure
+      queue.clear
+      kill!
     end
 
     # Blocks until queue is processed up to this point in time.
@@ -135,20 +112,39 @@ module Honeybadger
       mutex.synchronize { @shutdown }
     end
 
+    def suspended?
+      mutex.synchronize { start_at && Time.now.to_i < start_at }
+    end
+
     def can_start?
-      return true unless shutdown?
-      mutex.synchronize { start_at && Time.now.to_i >= start_at }
+      return false if shutdown?
+      return false if suspended?
+      true
     end
 
     def throttled?
       mutex.synchronize { throttle > 0 }
     end
 
+    def kill!
+      d { 'killing worker thread' }
+
+      if thread
+        Thread.kill(thread)
+        thread.join # Allow ensure blocks to execute.
+      end
+
+      true
+    end
+
     def suspend(interval)
-      mutex.synchronize { @start_at = Time.now.to_i + interval } unless shutdown?
+      mutex.synchronize do
+        @start_at = Time.now.to_i + interval
+        queue.clear
+      end
 
       # Must be performed last since this may kill the current thread.
-      shutdown!
+      kill!
     end
 
     def run
@@ -178,7 +174,7 @@ module Honeybadger
 
       if shutdown? && throttled?
         warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
-        shutdown!
+        kill!
         return
       end
 
