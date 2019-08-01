@@ -53,6 +53,7 @@ module Honeybadger
 
       mutex.synchronize do
         @shutdown = true
+        @start_at = nil
         @pid = nil
       end
 

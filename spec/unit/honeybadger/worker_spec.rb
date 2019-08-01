@@ -222,11 +222,11 @@ describe Honeybadger::Worker do
 
     context "when throttled during shutdown" do
       before do
-        allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429) )
+        allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429) )
       end
 
       it "shuts down immediately" do
-        expect(instance.send(:backend)).to receive(:notify).exactly(1).times
+        expect(subject.send(:backend)).to receive(:notify).exactly(1).times
         5.times { subject.push(obj) }
         subject.shutdown
       end
@@ -251,12 +251,14 @@ describe Honeybadger::Worker do
 
     context "when suspended during shutdown" do
       before do
-        allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(403) )
+        allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(403) )
       end
 
       it "won't start again in the future" do
-        subject.push(obj)
-        expect { instance.shutdown }.not_to change(subject, :start_at).from(nil)
+        expect {
+          subject.push(obj)
+          subject.shutdown
+        }.not_to change(subject, :start_at)
       end
     end
   end
