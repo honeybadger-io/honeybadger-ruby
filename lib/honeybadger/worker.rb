@@ -190,7 +190,7 @@ module Honeybadger
     end
 
     def notify_backend(payload)
-      debug { sprintf('worker notifying backend id=%s', payload.id) }
+      d { sprintf('worker notifying backend id=%s', payload.id) }
       backend.notify(:notices, payload)
     end
 
@@ -216,7 +216,7 @@ module Honeybadger
     end
 
     def handle_response(msg, response)
-      debug { sprintf('worker response code=%s message=%s', response.code, response.message.to_s.dump) }
+      d { sprintf('worker response code=%s message=%s', response.code, response.message.to_s.dump) }
 
       case response.code
       when 429, 503
