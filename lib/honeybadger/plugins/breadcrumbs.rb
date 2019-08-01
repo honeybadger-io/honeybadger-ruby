@@ -101,7 +101,9 @@ module Honeybadger
       # @api private
       def self.subscribe_to_notification(name, notification_config)
         ActiveSupport::Notifications.subscribe(name) do |_, started, finished, _, data|
-          send_breadcrumb_notification(name, finished - started, notification_config, data)
+          duration = finished && started ? finished - started : nil
+          
+          send_breadcrumb_notification(name, duration, notification_config, data)
         end
       end
     end
