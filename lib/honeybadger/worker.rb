@@ -38,7 +38,7 @@ module Honeybadger
       return false unless start
 
       if queue.size >= config.max_queue_size
-        warn(sprintf('Unable to report error; reached max queue size of %s. id=%s', queue.size, msg.id))
+        warn { sprintf('Unable to report error; reached max queue size of %s. id=%s', queue.size, msg.id) }
         return false
       end
 
