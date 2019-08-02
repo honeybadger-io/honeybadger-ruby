@@ -211,7 +211,7 @@ module Honeybadger
     end
 
     def handle_response(msg, response)
-      d { sprintf('worker response code=%s message=%s', response.code, response.message.to_s.dump) }
+      d { sprintf('worker response id=%s code=%s message=%s', msg.id, response.code, response.message.to_s.dump) }
 
       case response.code
       when 429, 503
