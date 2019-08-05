@@ -55,6 +55,17 @@ module Honeybadger
     # The Regexp used to strip invalid characters from individual tags.
     TAG_SANITIZER = /[^\w]/.freeze
 
+    # @api private
+    class Cause
+      attr_accessor :error_class, :error_message, :backtrace
+
+      def initialize(cause)
+        self.error_class = cause.class.name
+        self.error_message = cause.message
+        self.backtrace = cause.backtrace
+      end
+    end
+
     # The unique ID of this notice which can be used to reference the error in
     # Honeybadger.
     attr_reader :id
@@ -64,6 +75,13 @@ module Honeybadger
 
     # The exception cause if available.
     attr_reader :cause
+    def cause=(cause)
+      @cause = cause
+      @causes = unwrap_causes(cause)
+    end
+
+    # @return [Cause] A list of exception causes (see {Cause})
+    attr_reader :causes
 
     # The backtrace from the given exception or hash.
     attr_accessor :backtrace
@@ -163,15 +181,13 @@ module Honeybadger
       @request_sanitizer = Util::Sanitizer.new(filters: params_filters)
 
       @exception = unwrap_exception(opts[:exception])
-      @cause = opts[:cause] || exception_cause(@exception) || $!
-
-      @causes = unwrap_causes(@cause)
 
       self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
       self.error_message = exception_attribute(:error_message, 'No message provided') do |exception|
         "#{exception.class.name}: #{exception.message}"
       end
       self.backtrace = exception_attribute(:backtrace, caller)
+      self.cause = opts.key?(:cause) ? opts[:cause] : (exception_cause(@exception) || $!)
 
       self.context = construct_context_hash(opts, exception)
       self.local_variables = local_variables_from_exception(exception, config)
@@ -213,7 +229,7 @@ module Honeybadger
           backtrace: s(parse_backtrace(backtrace)),
           fingerprint: fingerprint_hash,
           tags: s(tags),
-          causes: s(causes)
+          causes: s(prepare_causes(causes))
         },
         request: request,
         server: {
@@ -256,8 +272,8 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :opts, :stats, :now, :pid, :causes,
-      :request_sanitizer, :rack_env
+    attr_reader :config, :opts, :stats, :now, :pid, :request_sanitizer,
+      :rack_env
 
     def ignore_by_origin?
       return false if opts[:origin] != :rake
@@ -492,21 +508,32 @@ module Honeybadger
     #
     # cause - The first cause to unwrap.
     #
-    # Returns Array causes (in Hash payload format).
+    # Returns the Array of Cause instances.
     def unwrap_causes(cause)
       causes, c, i = [], cause, 0
 
       while c && i < MAX_EXCEPTION_CAUSES
-        causes << {
-          class: c.class.name,
-          message: c.message,
-          backtrace: parse_backtrace(c.backtrace || caller)
-        }
+        causes << Cause.new(c)
         i += 1
         c = exception_cause(c)
       end
 
       causes
+    end
+
+    # Convert list of causes into payload format.
+    #
+    # causes - Array of Cause instances.
+    #
+    # Returns the Array of causes in Hash payload format.
+    def prepare_causes(causes)
+      causes.map {|c|
+        {
+          class: c.error_class,
+          message: c.error_message,
+          backtrace: parse_backtrace(c.backtrace)
+        }
+      }
     end
 
     def params_filters

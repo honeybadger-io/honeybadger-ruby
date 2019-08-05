@@ -4,6 +4,15 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added `Notice#causes`, which allows cause data to be mutated in
+  `before_notify` callbacks (useful for filtering purposes).
+- Added `Notice#cause=`, which allows the cause to be changed or disabled
+  in `before_notify` callbacks.
+
+### Fixed
+- `Honeybadger.notify(exception, cause: nil)` will now prevent the cause from
+  being reported.
 
 ## [4.4.2] - 2019-08-01
 ### Fixed

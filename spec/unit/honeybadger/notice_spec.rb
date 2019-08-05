@@ -820,6 +820,12 @@ describe Honeybadger::Notice do
       def cause=(e); @continued_exception = e; end
     end
 
+    def build_cause(message: 'expected cause', backtrace: caller)
+      StandardError.new(message).tap do |cause|
+        cause.set_backtrace(backtrace)
+      end
+    end
+
     [CauseError, OriginalExceptionError, ContinuedExceptionError].each do |error_class|
       context "when raising #{error_class} without a cause" do
         it "includes empty cause in payload" do
@@ -832,11 +838,11 @@ describe Honeybadger::Notice do
       context "when raising #{error_class} with a cause" do
         it "includes the cause in the payload" do
           exception = error_class.new('badgers!')
-          exception.cause = StandardError.new('cause!')
+          exception.cause = build_cause
           causes = build_notice(exception: exception).as_json[:error][:causes]
           expect(causes.size).to eq 1
           expect(causes[0][:class]).to eq 'StandardError'
-          expect(causes[0][:message]).to eq 'cause!'
+          expect(causes[0][:message]).to eq 'expected cause'
           expect(causes[0][:backtrace]).not_to be_empty
         end
 
@@ -844,7 +850,7 @@ describe Honeybadger::Notice do
           exception = e = error_class.new('badgers!')
 
           0.upto(6) do
-            e.cause = c = error_class.new('cause!')
+            e.cause = c = error_class.new('expected cause')
             e = c
           end
 
@@ -855,8 +861,8 @@ describe Honeybadger::Notice do
         context "and the :cause option is also present" do
           it "prefers the option" do
             exception = error_class.new('badgers!')
-            exception.cause = StandardError.new('cause!')
-            causes = build_notice(exception: exception, cause: StandardError.new('this cause was passed explicitly')).as_json[:error][:causes]
+            exception.cause = build_cause
+            causes = build_notice(exception: exception, cause: build_cause(message: 'this cause was passed explicitly')).as_json[:error][:causes]
 
             expect(causes.size).to eq 1
             expect(causes[0][:class]).to eq 'StandardError'
@@ -868,7 +874,7 @@ describe Honeybadger::Notice do
         context "and there is a current exception" do
           it "prefers the notice's exception's cause" do
             exception = error_class.new('badgers!')
-            exception.cause = StandardError.new('cause!')
+            exception.cause = build_cause
 
             begin
               raise StandardError.new('this should not be the cause')
@@ -878,7 +884,7 @@ describe Honeybadger::Notice do
 
             expect(causes.size).to eq 1
             expect(causes[0][:class]).to eq 'StandardError'
-            expect(causes[0][:message]).to eq 'cause!'
+            expect(causes[0][:message]).to eq 'expected cause'
             expect(causes[0][:backtrace]).not_to be_empty
           end
         end
@@ -892,53 +898,128 @@ describe Honeybadger::Notice do
           expect(causes.size).to eq 0
         end
       end
+    end
 
-      context "when there is a current global exception" do
-        it "uses the global cause" do
-          begin
-            raise StandardError.new('this should be the cause')
-          rescue
-            causes = build_notice.as_json[:error][:causes]
-          end
-
-          expect(causes.size).to eq 1
-          expect(causes[0][:class]).to eq 'StandardError'
-          expect(causes[0][:message]).to eq 'this should be the cause'
-          expect(causes[0][:backtrace]).not_to be_empty
+    context "when there is a current global exception" do
+      it "uses the global cause" do
+        begin
+          raise StandardError.new('expected current cause')
+        rescue
+          causes = build_notice.as_json[:error][:causes]
         end
+
+        expect(causes.size).to eq 1
+        expect(causes[0][:class]).to eq 'StandardError'
+        expect(causes[0][:message]).to eq 'expected current cause'
+        expect(causes[0][:backtrace]).not_to be_empty
+      end
+    end
+
+    context "when the cause has no backtrace" do
+      it "includes cause with an empty backtrace in payload" do
+        exception = CauseError.new('error message')
+        exception.cause = build_cause(backtrace: nil)
+
+        causes = build_notice(exception: exception).as_json[:error][:causes]
+
+        expect(causes.size).to eq(1)
+        expect(causes[0][:class]).to eq('StandardError')
+        expect(causes[0][:message]).to eq('expected cause')
+        expect(causes[0][:backtrace]).to eq([])
+      end
+    end
+
+    context "when the :cause option is present" do
+      it "uses the cause option" do
+        begin
+          raise StandardError.new('unexpected current cause')
+        rescue
+          causes = build_notice(cause: build_cause).as_json[:error][:causes]
+        end
+
+        expect(causes.size).to eq 1
+        expect(causes[0][:class]).to eq 'StandardError'
+        expect(causes[0][:message]).to eq 'expected cause'
+        expect(causes[0][:backtrace]).not_to be_empty
       end
 
-      context "when the :cause option is present" do
-        it "uses the cause option" do
-          begin
-            raise StandardError.new('this should not be the cause')
-          rescue
-            causes = build_notice(cause: StandardError.new('this should be the cause')).as_json[:error][:causes]
-          end
-
-          expect(causes.size).to eq 1
-          expect(causes[0][:class]).to eq 'StandardError'
-          expect(causes[0][:message]).to eq 'this should be the cause'
-          expect(causes[0][:backtrace]).not_to be_empty
+      it "allows nil to disable cause" do
+        begin
+          raise StandardError.new('unexpected current cause')
+        rescue
+          causes = build_notice(cause: nil).as_json[:error][:causes]
         end
+
+        expect(causes.size).to eq 0
       end
+    end
+  end
 
-      context "when halted" do
-        it ".halted? returns true" do
-          notice = build_notice(component: 'users_controller')
-          notice.halt!
+  describe "#cause=" do
+    it "overrides the existing cause" do
+      notice = build_notice(cause: StandardError.new('unexpected cause'))
+      notice.cause = StandardError.new('expected cause')
 
-          expect(notice.halted?).to eq(true)
-        end
-      end
+      causes = notice.as_json[:error][:causes]
 
-      context "when not halted" do
-        it ".halted? returns false" do
-          notice = build_notice(component: 'users_controller')
-          expect(notice.halted?).to eq(false)
-        end
-      end
+      expect(causes.size).to eq 1
+      expect(causes[0][:message]).to eq 'expected cause'
+    end
 
+    it "removes cause when nil" do
+      notice = build_notice(cause: StandardError.new('unexpected cause'))
+      notice.cause = nil
+
+      expect(notice.as_json[:error][:causes]).to eq([])
+    end
+
+    it "changes the current cause" do
+      notice = build_notice(cause: StandardError.new('unexpected cause'))
+      cause = StandardError.new('expected cause')
+
+      notice.cause = cause
+
+      expect(notice.cause).to eq(cause)
+    end
+  end
+
+  describe "#causes" do
+    it "returns cause data" do
+      cause = StandardError.new('expected cause')
+      cause.set_backtrace(caller)
+      notice = build_notice(cause: cause)
+
+      expect(notice.causes.size).to eq(1)
+      expect(notice.causes[0].error_message).to eq('expected cause')
+      expect(notice.causes[0].error_class).to eq('StandardError')
+      expect(notice.causes[0].backtrace).to eq(caller)
+    end
+
+    it "allows override of cause data" do
+      notice = build_notice(cause: StandardError.new('unexpected cause'))
+
+      notice.causes[0].error_message = 'expected cause'
+      notice.causes[0].error_class = 'expected class'
+
+      causes = notice.as_json[:error][:causes]
+      expect(causes[0][:message]).to eq 'expected cause'
+      expect(causes[0][:class]).to eq 'expected class'
+    end
+  end
+
+  context "when halted" do
+    it ".halted? returns true" do
+      notice = build_notice(component: 'users_controller')
+      notice.halt!
+
+      expect(notice.halted?).to eq(true)
+    end
+  end
+
+  context "when not halted" do
+    it ".halted? returns false" do
+      notice = build_notice(component: 'users_controller')
+      expect(notice.halted?).to eq(false)
     end
   end
 end
