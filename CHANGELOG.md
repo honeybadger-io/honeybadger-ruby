@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.5.0] - 2019-08-05
 ### Changed
 - Default `max_queue_size` has been reduced from 1000 to 100.
 
