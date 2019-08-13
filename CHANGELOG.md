@@ -5,11 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
-- When `breadcrumbs` are enabled ensure we call the original `Logger#add` with the original arguments
-
-### Fixed
 - Logging breadcrumbs will not crash anymore when logging is done using a block
-  form.
+  form. -@Bajena
+- When `breadcrumbs` are enabled ensure we call the original `Logger#add` with
+  the original arguments -@JanStevens
 
 ## [4.5.0] - 2019-08-05
 ### Changed
