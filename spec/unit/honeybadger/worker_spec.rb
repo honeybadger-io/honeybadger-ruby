@@ -241,6 +241,10 @@ describe Honeybadger::Worker do
 
         subject.push(obj)
         subject.push(obj)
+        subject.push(obj)
+        subject.push(obj)
+        subject.push(obj)
+
         subject.shutdown
       end
     end
