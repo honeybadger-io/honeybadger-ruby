@@ -4,6 +4,7 @@ module Honeybadger
     #
     module LogWrapper
       def add(severity, message = nil, progname = nil)
+        org_severity, org_message, org_progname = severity, message, progname
         message, progname = [progname, nil] if message.nil?
         message = message && message.to_s.strip
         unless should_ignore_log?(message, progname)
@@ -13,7 +14,7 @@ module Honeybadger
           })
         end
 
-        super
+        super(org_severity, org_message, org_progname)
       end
 
       private

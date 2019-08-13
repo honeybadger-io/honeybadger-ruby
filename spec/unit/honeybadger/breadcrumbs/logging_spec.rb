@@ -5,7 +5,12 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
     Class.new do
       prepend Honeybadger::Breadcrumbs::LogWrapper
 
-      def add(_, *args)
+      attr_reader :severity, :message, :progname
+
+      def add(severity, message, progname)
+        @severity = severity
+        @message = message
+        @progname = progname
       end
 
       def format_severity(str)
@@ -26,6 +31,13 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
   it 'handles non-string objects' do
     expect(Honeybadger).to receive(:add_breadcrumb).with("{}", anything)
     subject.add("DEBUG", {})
+  end
+
+  it 'does not mutate the message' do
+    subject.add("DEBUG", {}, 'Honeybadger')
+    expect(subject.severity).to eq('DEBUG')
+    expect(subject.message).to eq({})
+    expect(subject.progname).to eq('Honeybadger')
   end
 
   describe "ignores messages on" do
