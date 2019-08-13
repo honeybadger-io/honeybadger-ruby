@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- When `breadcrumbs` are enabled ensure we call the original `Logger#add` with the original arguments
 
 ## [4.5.0] - 2019-08-05
 ### Changed
