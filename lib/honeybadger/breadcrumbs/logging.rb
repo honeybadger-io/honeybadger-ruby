@@ -35,10 +35,10 @@ module Honeybadger
     # logs as they just become noise.
     module LogSubscriberInjector
       %w(info debug warn error fatal unknown).each do |level|
-        define_method(level) do |*args|
+        define_method(level) do |*args, &block|
           begin
             Thread.current[:__hb_within_log_subscriber] = true
-            super(*args)
+            super(*args, &block)
           ensure
             Thread.current[:__hb_within_log_subscriber] = false
           end

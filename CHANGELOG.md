@@ -5,6 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Logging breadcrumbs will not crash anymore when logging is done using a block
+  form.
+
 ## [4.5.0] - 2019-08-05
 ### Changed
 - Default `max_queue_size` has been reduced from 1000 to 100.
