@@ -102,6 +102,7 @@ module Honeybadger
     # @option opts [Array]     :backtrace The backtrace of the error (optional).
     # @option opts [String]    :fingerprint The grouping fingerprint of the exception (optional).
     # @option opts [Boolean]   :force (false) Always report the exception when true, even when ignored (optional).
+    # @option opts [Boolean]   :sync (false) Send data synchronously (skips the worker) (optional).
     # @option opts [String]    :tags The comma-separated list of tags (optional).
     # @option opts [Hash]      :context The context to associate with the exception (optional).
     # @option opts [String]    :controller The controller name (such as a Rails controller) (optional).
