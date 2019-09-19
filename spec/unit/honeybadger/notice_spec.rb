@@ -508,6 +508,15 @@ describe Honeybadger::Notice do
       expect(message.bytesize).to be > 65536
       expect(65536...65556).to cover notice.as_json[:error][:message].bytesize
     end
+
+    it 'filters breadcrumbs' do
+      config[:'request.filter_keys'] = ['password']
+      notice = build_notice(breadcrumbs: {
+        trail: [{ metadata: { password: "my-password" } }]
+      })
+
+      expect(notice.as_json[:breadcrumbs][:trail][0][:metadata][:password]).to eq "[FILTERED]"
+    end
   end
 
   describe 'public attributes' do
