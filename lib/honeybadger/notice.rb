@@ -376,10 +376,15 @@ module Honeybadger
       Context(object)
     end
 
-    # Sanitize at the depth of 4 since we are sanitizing the breadcrumb root
-    # hash data structure.
+    # Sanitize metadata to keep it at a single level and remove any filtered
+    # parameters
     def sanitized_breadcrumbs
-      Util::Sanitizer.new(max_depth: 4, filters: params_filters).sanitize(breadcrumbs.to_h)
+      sanitizer = Util::Sanitizer.new(max_depth: 1, filters: params_filters)
+      breadcrumbs.each do |breadcrumb|
+        breadcrumb.metadata = sanitizer.sanitize(breadcrumb.metadata)
+      end
+
+      breadcrumbs.to_h
     end
 
     def construct_context_hash(opts, exception)
