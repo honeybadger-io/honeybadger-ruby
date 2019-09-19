@@ -379,7 +379,7 @@ module Honeybadger
     # Sanitize at the depth of 4 since we are sanitizing the breadcrumb root
     # hash data structure.
     def sanitized_breadcrumbs
-      Util::Sanitizer.new(max_depth: 4).sanitize(breadcrumbs.to_h)
+      Util::Sanitizer.new(max_depth: 4, filters: params_filters).sanitize(breadcrumbs.to_h)
     end
 
     def construct_context_hash(opts, exception)
