@@ -240,8 +240,16 @@ module Honeybadger
           stats: stats,
           time: now,
           pid: pid
-        }
+        },
+        plugins: @plugin_output
       }
+    end
+
+    # @api private
+    # Add data to payload from plugins
+    def add_plugin_output(name, data)
+      @plugin_output ||= {}
+      @plugin_output[name] = data
     end
 
     # Converts the notice to JSON.
