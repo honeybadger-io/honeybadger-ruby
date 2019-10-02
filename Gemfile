@@ -21,7 +21,7 @@ gem 'capistrano'
 gem 'rake'
 
 # Lock these deps for Ruby >= 2.1.0 support.
-gem 'listen', '~> 3.0.8'
+gem 'listen', '~> 3.2.0'
 
 # mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
 platforms :ruby_25 do
