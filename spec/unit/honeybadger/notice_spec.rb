@@ -510,6 +510,26 @@ describe Honeybadger::Notice do
     end
   end
 
+  describe "#update_output" do
+    it 'allows affecting json output' do
+      notice = build_notice
+      notice.update_output do |json|
+        json[:test] = "value"
+      end
+
+      expect(notice.as_json[:test]).to eq("value")
+    end
+
+    it 'handles multiple updaters' do
+      notice = build_notice
+      notice.update_output { |json| json[:one] = "two" }
+      notice.update_output { |json| json[:error][:token] = "000" }
+
+      expect(notice.as_json[:one]).to eq("two")
+      expect(notice.as_json[:error][:token]).to eq("000")
+    end
+  end
+
   describe 'public attributes' do
     it 'assigns the same values from each opt and setter method' do
       opts = {

@@ -218,7 +218,7 @@ module Honeybadger
       request[:context] = s(context)
       request[:local_variables] = local_variables if local_variables
 
-      {
+      base = {
         api_key: s(api_key),
         notifier: NOTIFIER,
         breadcrumbs: sanitized_breadcrumbs,
@@ -240,16 +240,18 @@ module Honeybadger
           stats: stats,
           time: now,
           pid: pid
-        },
-        plugins: @plugin_output
+        }
       }
+
+      output_updaters.each_with_object(base) do |updater, memo|
+        updater.call(memo)
+      end
     end
 
     # @api private
     # Add data to payload from plugins
-    def add_plugin_output(name, data)
-      @plugin_output ||= {}
-      @plugin_output[name] = data
+    def update_output(&updater)
+      (@output_updaters ||= []) << updater
     end
 
     # Converts the notice to JSON.
@@ -292,6 +294,10 @@ module Honeybadger
     def ignore_by_callbacks?
       config.exception_filter &&
         config.exception_filter.call(self)
+    end
+
+    def output_updaters
+      @output_updaters || []
     end
 
     # Gets a property named "attribute" of an exception, either from

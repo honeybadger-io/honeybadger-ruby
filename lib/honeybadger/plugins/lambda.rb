@@ -11,7 +11,9 @@ module Honeybadger
         Honeybadger.configure do |config|
           config.force_sync = true
           config.before_notify do |notice|
-            notice.add_plugin_output(:lambda, Util::Lambda.normalized_data)
+            notice.update_output do |json|
+              json[:lambda] = Util::Lambda.normalized_data
+            end
           end
         end
       end
