@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Added parameter filtering to breadcrumb metadata (#329)
 
 ## [4.5.1] - 2019-08-13
 ### Fixed

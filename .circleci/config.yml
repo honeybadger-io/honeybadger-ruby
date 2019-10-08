@@ -51,7 +51,7 @@ jobs:
       - <<: *test
   "jruby":
     docker:
-      - image: circleci/jruby:9-jdk
+      - image: circleci/jruby:9.2.7-jdk
         environment:
           BUNDLER_VERSION: 1.17.3
     steps:

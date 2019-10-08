@@ -508,6 +508,19 @@ describe Honeybadger::Notice do
       expect(message.bytesize).to be > 65536
       expect(65536...65556).to cover notice.as_json[:error][:message].bytesize
     end
+
+    it 'filters breadcrumb metadata' do
+      config[:'request.filter_keys'] = ['password']
+      config[:'breadcrumbs.enabled'] = true
+      coll = Honeybadger::Breadcrumbs::Collector.new(config)
+      bc = Honeybadger::Breadcrumbs::Breadcrumb.new(message: "test", metadata: { deep: {}, password: "my-password" })
+      coll.add!(bc)
+      notice = build_notice(breadcrumbs: coll)
+
+      metadata = notice.as_json[:breadcrumbs][:trail][0][:metadata]
+      expect(metadata[:password]).to eq "[FILTERED]"
+      expect(metadata[:deep]).to eq "[DEPTH]"
+    end
   end
 
   describe 'public attributes' do
