@@ -58,6 +58,9 @@ jobs:
       JRUBY_OPTS: "--dev"
     steps:
       - checkout
+      - run:
+          name: "list files before restore"
+          command: ls
       - <<: *restore
       - <<: *bundle
       - <<: *save
