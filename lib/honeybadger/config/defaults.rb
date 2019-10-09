@@ -89,6 +89,11 @@ module Honeybadger
         default: nil,
         type: Array
       },
+      sync: {
+        description: 'Enable all notices to be sent synchronously. Default is false.',
+        default: false,
+        type: Boolean
+      },
       :'skipped_plugins' => {
         description: 'An optional list of plugins to skip.',
         default: nil,

@@ -125,6 +125,13 @@ describe Honeybadger::Notice do
     expect(notice.session).to be_empty
   end
 
+  it 'includes details in payload' do
+    data = {"test" => {v1: 100}}
+    notice = build_notice(details: data)
+    expect(notice.details).to eq(data)
+    expect(JSON.parse(notice.to_json)['details']['test']['v1']).to eq(100)
+  end
+
   it "uses the caller as the backtrace for an exception without a backtrace" do
     notice = build_notice(exception: StandardError.new('error'), backtrace: nil)
     assert_array_starts_with caller, notice.backtrace

@@ -136,6 +136,9 @@ module Honeybadger
     # @return [Breadcrumbs::Collector] The collection of captured breadcrumbs
     attr_accessor :breadcrumbs
 
+    # Custom details data
+    attr_accessor :details
+
     # @api private
     # Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
@@ -200,6 +203,7 @@ module Honeybadger
       self.params    = opts[:parameters] || opts[:params]           || request_hash[:params] || {}
       self.session   = opts[:session]    || request_hash[:session]  || {}
       self.cgi_data  = opts[:cgi_data]   || request_hash[:cgi_data] || {}
+      self.details   = opts[:details]    || {}
 
       self.session = opts[:session][:data] if opts[:session] && opts[:session][:data]
 
@@ -231,6 +235,7 @@ module Honeybadger
           tags: s(tags),
           causes: s(prepare_causes(causes))
         },
+        details: s(details),
         request: request,
         server: {
           project_root: s(config[:root]),

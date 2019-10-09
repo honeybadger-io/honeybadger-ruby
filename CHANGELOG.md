@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Added parameter filtering to breadcrumb metadata (#329)
 
+### Added
+- Added `lambda` plugin which forces sync mode (to make sure that we are not
+  sending notices in another thread) and adds extra lambda details to the
+  Notice. (honeybadger-ruby-internal#1)
+
 ## [4.5.1] - 2019-08-13
 ### Fixed
 - Logging breadcrumbs will not crash anymore when logging is done using a block
