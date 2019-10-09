@@ -4,6 +4,10 @@ references:
     run:
       name: Run test suite
       command: bundle exec appraisal rake
+  build_lock: &build_lock
+    run:
+      name: Build Gemfile.lock file
+      command: bundle lock
   restore: &restore
     restore_cache:
       keys:
@@ -58,9 +62,7 @@ jobs:
       JRUBY_OPTS: "--dev"
     steps:
       - checkout
-      - run:
-          name: "list files before restore"
-          command: ls
+      - <<: *build_lock
       - <<: *restore
       - <<: *bundle
       - <<: *save
