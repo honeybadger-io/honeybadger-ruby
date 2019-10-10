@@ -15,7 +15,8 @@ references:
       keys:
         - v2-dependencies-{{.Environment.CIRCLE_JOB}}-{{ checksum "Gemfile.lock" }}
         # fallback to using the latest cache if no exact match is found
-        - v2-dependencies-
+        - v2-dependencies-{{.Environment.CIRCLE_JOB}}
+        - v2-dependencies
   bundle: &bundle
     run:
       name: install dependencies
@@ -43,7 +44,6 @@ jobs:
   "ruby-2.5":
     docker:
       - image: circleci/ruby:2.5
-    parallelism: 3
     steps:
       - checkout
       - <<: *build_lock
