@@ -42,9 +42,6 @@ namespace :spec do
 
   desc 'Runs unit and feature specs'
   task all: [:units, :integrations, :features]
-
-  desc 'Runs core specs'
-  task core: [:units, :integrations]
 end
 
 desc 'Alias for spec:all (default task)'

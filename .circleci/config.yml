@@ -34,6 +34,7 @@ jobs:
       - image: circleci/ruby:2.4
     steps:
       - checkout
+      - <<: *build_lock
       - <<: *restore
       - <<: *bundle
       - <<: *save
@@ -43,6 +44,7 @@ jobs:
       - image: circleci/ruby:2.5
     steps:
       - checkout
+      - <<: *build_lock
       - <<: *restore
       - <<: *bundle
       - <<: *save
@@ -52,6 +54,7 @@ jobs:
       - image: circleci/ruby:2.6
     steps:
       - checkout
+      - <<: *build_lock
       - <<: *restore
       - <<: *bundle
       - <<: *save
@@ -75,4 +78,7 @@ workflows:
   version: 2
   build:
     jobs:
+      - "ruby-2.4"
+      - "ruby-2.5"
+      - "ruby-2.6"
       - "jruby"
