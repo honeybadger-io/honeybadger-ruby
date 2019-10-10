@@ -1,13 +1,9 @@
 version: 2
 references:
-  features: &features
-    run:
-      name: Run features specs
-      command: bundle exec rake spec:features
   test: &test
     run:
-      name: Run unit & integration specs with appraisal
-      command: bundle exec appraisal rake spec:core
+      name: Run tests
+      command: "bundle exec $(circleci tests split .circleci/spec-cmds)"
   build_lock: &build_lock
     run:
       name: Build Gemfile.lock file
@@ -15,9 +11,9 @@ references:
   restore: &restore
     restore_cache:
       keys:
-        - v1-dependencies-{{ checksum "Gemfile.lock" }}
+        - v2-dependencies-{{ checksum "Gemfile.lock" }}
         # fallback to using the latest cache if no exact match is found
-        - v1-dependencies-
+        - v2-dependencies-
   bundle: &bundle
     run:
       name: install dependencies
@@ -29,7 +25,7 @@ references:
       paths:
         - ./vendor/bundle
         - ./gemfiles/vendor/bundle
-      key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+      key: v2-dependencies-{{ checksum "Gemfile.lock" }}
 jobs:
   "ruby-2.4":
     docker:
@@ -64,13 +60,13 @@ jobs:
         environment:
           BUNDLER_VERSION: 1.17.3
           JRUBY_OPTS: "--dev"
+    parallelism: 3
     steps:
       - checkout
       - <<: *build_lock
       - <<: *restore
       - <<: *bundle
       - <<: *save
-      - <<: *features
       - <<: *test
 
 workflows:

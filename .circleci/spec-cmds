@@ -1,0 +1,3 @@
+rake spec:features
+appraisal rake spec:unit
+appraisal rake spec:integration
