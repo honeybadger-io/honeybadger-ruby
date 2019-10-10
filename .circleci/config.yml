@@ -32,6 +32,7 @@ jobs:
   "ruby-2.4":
     docker:
       - image: circleci/ruby:2.4
+    parallelism: 3
     steps:
       - checkout
       - <<: *build_lock
@@ -42,6 +43,7 @@ jobs:
   "ruby-2.5":
     docker:
       - image: circleci/ruby:2.5
+    parallelism: 3
     steps:
       - checkout
       - <<: *build_lock
@@ -52,6 +54,7 @@ jobs:
   "ruby-2.6":
     docker:
       - image: circleci/ruby:2.6
+    parallelism: 3
     steps:
       - checkout
       - <<: *build_lock
