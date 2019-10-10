@@ -1,4 +1,5 @@
 require 'aruba/rspec'
+require 'aruba/config/jruby'
 require 'fileutils'
 require 'logger'
 require 'pathname'

@@ -1,9 +1,13 @@
 version: 2
 references:
+  features: &features
+    run:
+      name: Run features specs
+      command: bundle exec rake spec:features
   test: &test
     run:
-      name: Run test suite
-      command: bundle exec appraisal rake
+      name: Run unit & integration specs with appraisal
+      command: bundle exec appraisal rake spec:core
   build_lock: &build_lock
     run:
       name: Build Gemfile.lock file
@@ -24,6 +28,7 @@ references:
     save_cache:
       paths:
         - ./vendor/bundle
+        - ./gemfiles/vendor/bundle
       key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 jobs:
   "ruby-2.4":
@@ -58,14 +63,14 @@ jobs:
       - image: circleci/jruby:9.2.7-jdk
         environment:
           BUNDLER_VERSION: 1.17.3
-    environment:
-      JRUBY_OPTS: "--dev"
+          JRUBY_OPTS: "--dev"
     steps:
       - checkout
       - <<: *build_lock
       - <<: *restore
       - <<: *bundle
       - <<: *save
+      - <<: *features
       - <<: *test
 
 workflows:
