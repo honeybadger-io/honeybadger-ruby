@@ -1,9 +1,9 @@
 version: 2
 references:
   test: &test
+    store_test_results:
+      path: ./tmp/results
     run:
-      store_test_results:
-        path: ./tmp/results
       name: Run tests
       command: |
         echo "--format progress" >> .rspec
@@ -25,12 +25,11 @@ references:
     run:
       name: install dependencies
       command: |
-        bundle install --jobs=4 --retry=3 --path vendor/bundle
+        bundle install --jobs=4 --retry=3 --path gemfiles/vendor/bundle
         bundle exec appraisal install --jobs=4 --retry=3
   save: &save
     save_cache:
       paths:
-        - ./vendor/bundle
         - ./gemfiles/vendor/bundle
       key: v2-dependencies-{{.Environment.CIRCLE_JOB}}-{{ checksum "Gemfile.lock" }}
 jobs:
