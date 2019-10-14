@@ -1,8 +1,9 @@
 version: 2
 references:
-  test: &test
+  store_results: &store_results
     store_test_results:
       path: ./tmp/results
+  test: &test
     run:
       name: Run tests
       command: |
@@ -63,6 +64,7 @@ jobs:
       - <<: *bundle
       - <<: *save
       - <<: *test
+      - <<: *store_results
   "jruby":
     docker:
       - image: circleci/jruby:9.2.7-jdk
