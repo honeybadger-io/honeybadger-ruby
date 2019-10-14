@@ -15,6 +15,7 @@ gem 'rspec-its'
 gem 'ruby-prof', platforms: :mri, require: false
 gem 'timecop'
 gem 'webmock'
+gem 'rspec_junit_formatter'
 
 # Required by feature specs.
 gem 'capistrano'

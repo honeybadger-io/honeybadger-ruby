@@ -1,3 +1,3 @@
-rake spec:features
-appraisal rake spec:units
-appraisal rake spec:integrations
+TEST_OUTPUT_NAME=basic-features bundle exec rake spec:features[~framework:rails]
+TEST_OUTPUT_NAME=rails-features bundle exec appraisal rake spec:features[framework:rails]
+TEST_OUTPUT_NAME=core bundle exec appraisal rake spec:core

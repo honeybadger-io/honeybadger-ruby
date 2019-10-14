@@ -2,10 +2,13 @@ version: 2
 references:
   test: &test
     run:
+      store_test_results: tmp/results
       name: Run tests
       command: |
-        bundle exec appraisal rake spec:core &
-        bundle exec rake spec:features
+        echo "--format progress" >> .rspec
+        echo "--format RspecJunitFormatter" >> .rspec
+        echo "--out tmp/results/<%= ENV['TEST_OUTPUT_NAME'] %>/results.xml" >> .rspec
+        cat .circleci/spec-cmds | parallel --ungroup -j 3
   build_lock: &build_lock
     run:
       name: Build Gemfile.lock file
@@ -22,7 +25,7 @@ references:
       name: install dependencies
       command: |
         bundle install --jobs=4 --retry=3 --path vendor/bundle
-        bundle exec appraisal install
+        bundle exec appraisal install --jobs=4 --retry=3
   save: &save
     save_cache:
       paths:
@@ -33,7 +36,6 @@ jobs:
   "ruby-2.4":
     docker:
       - image: circleci/ruby:2.4
-    parallelism: 3
     steps:
       - checkout
       - <<: *build_lock
@@ -78,7 +80,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - "ruby-2.4"
-      - "ruby-2.5"
+      # - "ruby-2.4"
+      # - "ruby-2.5"
       - "ruby-2.6"
-      - "jruby"
+      # - "jruby"

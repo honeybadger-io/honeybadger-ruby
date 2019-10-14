@@ -25,19 +25,17 @@ namespace :spec do
   desc 'Run unit specs'
   RSpec::Core::RakeTask.new(:units) do |t|
     t.pattern = 'spec/unit/**/*_spec.rb'
-    t.rspec_opts = '--require spec_helper'
   end
 
   desc 'Run integration specs'
   RSpec::Core::RakeTask.new(:integrations) do |t|
     t.pattern = 'spec/integration/**/*_spec.rb'
-    t.rspec_opts = '--require spec_helper'
   end
 
   desc 'Run feature specs'
-  RSpec::Core::RakeTask.new(:features) do |t|
-    t.pattern = 'spec/features/**/*_spec.rb'
-    t.rspec_opts = '--require spec_helper'
+  RSpec::Core::RakeTask.new(:features, [:tag]) do |t, args|
+    t.pattern = "spec/features/**/*_spec.rb"
+    t.rspec_opts = "--tag #{args[:tag]}" if args[:tag]
   end
 
   desc 'Runs unit and feature specs'
