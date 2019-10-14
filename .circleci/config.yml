@@ -2,13 +2,14 @@ version: 2
 references:
   test: &test
     run:
-      store_test_results: tmp/results
+      store_test_results:
+        path: ./tmp/results
       name: Run tests
       command: |
         echo "--format progress" >> .rspec
         echo "--format RspecJunitFormatter" >> .rspec
         echo "--out tmp/results/<%= ENV['TEST_OUTPUT_NAME'] %>/results.xml" >> .rspec
-        cat .circleci/spec-cmds | parallel --ungroup -j 3
+        cat .circleci/spec-cmds | parallel -j 3
   build_lock: &build_lock
     run:
       name: Build Gemfile.lock file
