@@ -88,4 +88,11 @@ RSpec.configure do |config|
   else
     config.filter_run_excluding framework: ->(v) { !v || v != :ruby }
   end
+
+  if ENV['CI']
+    config.add_formatter(
+      RspecJunitFormatter,
+      "tmp/results/#{::CIHelpers.results_name}/results.xml"
+    )
+  end
 end
