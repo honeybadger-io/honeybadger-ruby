@@ -9,8 +9,8 @@ references:
       command: |
         echo "--format progress" >> .rspec
         echo "--format RspecJunitFormatter" >> .rspec
-        echo "--out tmp/results/<%= ENV['TEST_OUTPUT_NAME'] %>/results.xml" >> .rspec
-        cat .circleci/spec-cmds | parallel -j 3
+        echo "--out tmp/results/<%= CIHelpers.results_name %>/results.xml" >> .rspec
+        cat .circleci/spec-cmds | parallel -j 2
   build_lock: &build_lock
     run:
       name: Build Gemfile.lock file
@@ -18,10 +18,10 @@ references:
   restore: &restore
     restore_cache:
       keys:
-        - v2-dependencies-{{.Environment.CIRCLE_JOB}}-{{ checksum "Gemfile.lock" }}
+        - v3-dependencies-{{.Environment.CIRCLE_JOB}}-{{ checksum "Gemfile.lock" }}
         # fallback to using the latest cache if no exact match is found
-        - v2-dependencies-{{.Environment.CIRCLE_JOB}}
-        - v2-dependencies
+        - v3-dependencies-{{.Environment.CIRCLE_JOB}}
+        - v3-dependencies
   bundle: &bundle
     run:
       name: install dependencies
@@ -32,7 +32,7 @@ references:
     save_cache:
       paths:
         - ./gemfiles/vendor/bundle
-      key: v2-dependencies-{{.Environment.CIRCLE_JOB}}-{{ checksum "Gemfile.lock" }}
+      key: v3-dependencies-{{.Environment.CIRCLE_JOB}}-{{ checksum "Gemfile.lock" }}
 jobs:
   "ruby-2.4":
     docker:

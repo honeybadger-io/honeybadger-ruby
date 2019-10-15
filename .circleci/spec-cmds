@@ -1,3 +1,4 @@
-TEST_OUTPUT_NAME=basic-features bundle exec rake spec:features[~framework:rails]
-TEST_OUTPUT_NAME=rails-features bundle exec appraisal rake spec:features[framework:rails]
-TEST_OUTPUT_NAME=core bundle exec appraisal rake spec:core
+TEST_OUTPUT_NAME=unit bundle exec appraisal rake spec:units
+TEST_OUTPUT_NAME=integration bundle exec appraisal rake spec:integrations
+TEST_OUTPUT_NAME=features bundle exec rake spec:features[~framework:rails]
+for rt in $(bundle exec appraisal list | grep rails); do TEST_OUTPUT_NAME=features bundle exec appraisal $rt rake spec:features[framework:rails]; done;
