@@ -91,7 +91,7 @@ RSpec.configure do |config|
 
   if ENV['CIRCLECI']
     config.add_formatter(
-      RspecJunitFormatter,
+      "rspec_junit_formatter",
       "tmp/results/#{::CIHelpers.results_name}/results.xml"
     )
   end
