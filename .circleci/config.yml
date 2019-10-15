@@ -6,7 +6,7 @@ references:
   test: &test
     run:
       name: Run tests
-      command: CI=true cat .circleci/spec-cmds | parallel -j 2
+      command: CI=true BUNDLE_PATH=vendor/bundle cat .circleci/spec-cmds | parallel -j 2
   build_lock: &build_lock
     run:
       name: Build Gemfile.lock file
