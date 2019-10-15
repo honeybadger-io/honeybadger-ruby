@@ -1,8 +1,8 @@
 class CIHelpers
   def self.results_name
     [
-      ENV['TEST_OUTPUT_NAME']
-      gemfile
+      ENV['TEST_OUTPUT_NAME'],
+      gemfile,
     ].compact.join(" - ")
   end
 
