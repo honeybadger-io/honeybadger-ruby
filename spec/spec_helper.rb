@@ -6,6 +6,7 @@ require 'pathname'
 require 'pry'
 require 'rspec/its'
 require 'webmock/rspec'
+require 'rspec_junit_formatter'
 
 # We don't want this bleeding through in tests. (i.e. from CircleCi)
 ENV['RACK_ENV'] = nil
@@ -91,7 +92,7 @@ RSpec.configure do |config|
 
   if ENV['CIRCLECI']
     config.add_formatter(
-      "rspec_junit_formatter",
+      RspecJunitFormatter,
       "tmp/results/#{::CIHelpers.results_name}/results.xml"
     )
   end
