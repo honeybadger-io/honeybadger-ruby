@@ -9,7 +9,7 @@ references:
       command: |
         echo "--format progress" >> .rspec
         echo "--format RspecJunitFormatter" >> .rspec
-        echo "--out tmp/results/<%= CIHelpers.results_name %>/results.xml" >> .rspec
+        echo "--out tmp/results/<%= ::CIHelpers.results_name %>/results.xml" >> .rspec
         cat .circleci/spec-cmds | parallel -j 2
   build_lock: &build_lock
     run:
