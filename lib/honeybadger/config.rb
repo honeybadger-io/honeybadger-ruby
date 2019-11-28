@@ -79,10 +79,10 @@ module Honeybadger
       self
     end
 
-    def backtrace_filter
+    def backtrace_filter(&block)
       if block_given?
         warn('DEPRECATED: backtrace_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#backtrace_filter')
-        self[:backtrace_filter] = Proc.new
+        self[:backtrace_filter] = block
       end
 
       self[:backtrace_filter]
@@ -92,19 +92,19 @@ module Honeybadger
       (ruby[:before_notify] || []).clone
     end
 
-    def exception_filter
+    def exception_filter(&block)
       if block_given?
         warn('DEPRECATED: exception_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_filter')
-        self[:exception_filter] = Proc.new
+        self[:exception_filter] = block
       end
 
       self[:exception_filter]
     end
 
-    def exception_fingerprint
+    def exception_fingerprint(&block)
       if block_given?
         warn('DEPRECATED: exception_fingerprint is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_fingerprint')
-        self[:exception_fingerprint] = Proc.new
+        self[:exception_fingerprint] = block
       end
 
       self[:exception_fingerprint]

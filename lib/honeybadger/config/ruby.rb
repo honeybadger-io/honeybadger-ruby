@@ -93,28 +93,28 @@ module Honeybadger
         hash[:before_notify] = hooks
       end
 
-      def backtrace_filter
+      def backtrace_filter(&block)
         if block_given?
           logger.warn('DEPRECATED: backtrace_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#backtrace_filter')
-          hash[:backtrace_filter] = Proc.new if block_given?
+          hash[:backtrace_filter] = block if block_given?
         end
 
         get(:backtrace_filter)
       end
 
-      def exception_filter
+      def exception_filter(&block)
         if block_given?
           logger.warn('DEPRECATED: exception_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_filter')
-          hash[:exception_filter] = Proc.new
+          hash[:exception_filter] = block
         end
 
         get(:exception_filter)
       end
 
-      def exception_fingerprint
+      def exception_fingerprint(&block)
         if block_given?
           logger.warn('DEPRECATED: exception_fingerprint is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_fingerprint')
-          hash[:exception_fingerprint] = Proc.new
+          hash[:exception_fingerprint] = block
         end
 
         get(:exception_fingerprint)
