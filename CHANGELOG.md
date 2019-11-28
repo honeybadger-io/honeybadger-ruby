@@ -5,6 +5,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Replace empty `Proc.new` with explicit block param to suppress warnings
+  in Ruby 2.7
+
 ## [4.5.2] - 2019-10-09
 ### Changed
 - Added parameter filtering to breadcrumb metadata (#329)
