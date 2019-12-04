@@ -98,7 +98,7 @@ describe TestWorker do
         described_class.around_perform_with_honeybadger do
           Honeybadger.context(badgers: true)
         end
-      }.not_to change { Thread.current[:__honeybadger_context] }.from(nil)
+      }.not_to change { Honeybadger::ContextManager.current.get_context }.from(nil)
     end
 
     it "raises exceptions" do
