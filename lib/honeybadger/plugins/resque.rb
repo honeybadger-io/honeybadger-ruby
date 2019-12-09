@@ -9,7 +9,9 @@ module Honeybadger
         # errors reported within jobs get sent before the worker dies.
         def around_perform_with_honeybadger(*args)
           Honeybadger.flush { yield }
-        ensure
+        end
+
+        def after_perform_with_honeybadger(*args)
           Honeybadger.clear!
         end
 
@@ -17,6 +19,8 @@ module Honeybadger
         # executed after +around_perform+.
         def on_failure_with_honeybadger(e, *args)
           Honeybadger.notify(e, parameters: { job_arguments: args }, sync: true) if send_exception_to_honeybadger?(e, args)
+        ensure
+          Honeybadger.clear!
         end
 
         def send_exception_to_honeybadger?(e, args)
