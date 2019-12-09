@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.5.3] - 2019-12-09
 ### Fixed
 - Include Context in Notices for failed Resque jobs
 
