@@ -5,6 +5,10 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.5.4] - 2019-12-09
+### Fixed
+- Re-released to remove vendor cruft
+
 ## [4.5.3] - 2019-12-09
 ### Fixed
 - Include Context in Notices for failed Resque jobs
