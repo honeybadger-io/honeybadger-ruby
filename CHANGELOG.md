@@ -4,9 +4,17 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
+### Fixed
 - Replace empty `Proc.new` with explicit block param to suppress warnings
   in Ruby 2.7
+
+## [4.5.4] - 2019-12-09
+### Fixed
+- Re-released to remove vendor cruft
+
+## [4.5.3] - 2019-12-09
+### Fixed
+- Include Context in Notices for failed Resque jobs
 
 ## [4.5.2] - 2019-10-09
 ### Changed

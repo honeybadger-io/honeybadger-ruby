@@ -30,6 +30,13 @@ describe TestWorker do
 
     it_behaves_like "reports exceptions"
 
+    it "clears the context" do
+      expect {
+        Honeybadger.context(badgers: true)
+        described_class.on_failure_with_honeybadger(error, 1, 2, 3)
+      }.not_to change { Honeybadger::ContextManager.current.get_context }.from(nil)
+    end
+
     describe "with worker not extending Resque::Plugins::Retry" do
       context "when send exceptions on retry enabled" do
         before { ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying'] = true }
@@ -93,12 +100,11 @@ describe TestWorker do
   end
 
   describe "::around_perform_with_honeybadger" do
-    it "clears the context" do
-      expect {
-        described_class.around_perform_with_honeybadger do
-          Honeybadger.context(badgers: true)
-        end
-      }.not_to change { Thread.current[:__honeybadger_context] }.from(nil)
+    it "flushes pending errors before worker dies" do
+      expect(Honeybadger).to receive(:flush)
+
+      described_class.around_perform_with_honeybadger do
+      end
     end
 
     it "raises exceptions" do
@@ -106,7 +112,16 @@ describe TestWorker do
         described_class.around_perform_with_honeybadger do
           fail 'foo'
         end
-      }.to raise_error(RuntimeError)
+      }.to raise_error(RuntimeError, /foo/)
+    end
+  end
+
+  describe "::after_perform_with_honeybadger" do
+    it "clears the context" do
+      expect {
+        Honeybadger.context(badgers: true)
+        described_class.after_perform_with_honeybadger
+      }.not_to change { Honeybadger::ContextManager.current.get_context }.from(nil)
     end
   end
 end
