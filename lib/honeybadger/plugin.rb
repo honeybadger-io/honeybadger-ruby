@@ -66,11 +66,11 @@ module Honeybadger
       #   +snake_case+. The name is inferred from the current file name if omitted.
       #
       # @return nil
-      def register(name = nil)
+      def register(name = nil, &block)
         name ||= name_from_caller(caller) or
           raise(ArgumentError, 'Plugin name is required, but was nil.')
         instances[key = name.to_sym] and fail("Already registered: #{name}")
-        instances[key] = new(name).tap { |d| d.instance_eval(&Proc.new) }
+        instances[key] = new(name).tap { |d| d.instance_eval(&block) }
       end
 
       # @api private
@@ -136,8 +136,8 @@ module Honeybadger
     #   end
     #
     # @return nil
-    def requirement
-      @requirements << Proc.new
+    def requirement(&block)
+      @requirements << block
     end
 
     # Define an execution block. Execution blocks will be executed if all
@@ -161,8 +161,8 @@ module Honeybadger
     #   end
     #
     # @return nil
-    def execution
-      @executions << Proc.new
+    def execution(&block)
+      @executions << block
     end
 
     # @api private
