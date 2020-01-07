@@ -26,15 +26,6 @@ appraise 'resque' do
   gem 'mock_redis'
 end
 
-appraise 'rails4.2' do
-  gem 'rails', '~> 4.2.4'
-  gem 'sqlite3', '< 1.4', platform: :mri
-  gem 'activerecord-jdbcsqlite3-adapter', '1.3.25', platform: :jruby
-  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
-  gem 'rack-mini-profiler', require: false
-  gem 'rspec-rails'
-end
-
 appraise 'rails5.0' do
   gem 'rails', '~> 5.0.0'
   gem 'sqlite3', '< 1.4', platform: :mri
