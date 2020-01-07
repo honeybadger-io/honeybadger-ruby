@@ -49,6 +49,15 @@ jobs:
       - <<: *bundle
       - <<: *save
       - <<: *test
+  "ruby-2.7":
+    docker:
+      - image: circleci/ruby:2.7
+    steps:
+      - checkout
+      - <<: *restore
+      - <<: *bundle
+      - <<: *save
+      - <<: *test
   "jruby":
     docker:
       - image: circleci/jruby:9.2.7-jdk
@@ -68,4 +77,5 @@ workflows:
       - "ruby-2.4"
       - "ruby-2.5"
       - "ruby-2.6"
+      - "ruby-2.7"
       - "jruby"
