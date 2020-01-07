@@ -37,34 +37,6 @@ describe Honeybadger::Logging::BootLogger.instance do
   end
 end
 
-describe Honeybadger::Logging::Helper do
-  let(:logger) { Logger.new('/dev/null') }
-  let(:config) { double('Honeybadger::Config', logger: logger) }
-
-  class HelperSubject
-    include Honeybadger::Logging::Helper
-
-    def initialize(config)
-      @config = config
-    end
-
-    def log_debug(msg); debug(msg); end
-    def log_info(msg); info(msg); end
-    def log_warn(msg); warn(msg); end
-    def log_error(msg); error(msg); end
-  end
-
-  subject { HelperSubject.new(config) }
-
-  it "doesn't rely on Integer logger.level" do
-    allow(logger).to receive(:level).and_return(:info)
-    subject.log_debug('debug message')
-    subject.log_info('info message')
-    subject.log_warn('warn message')
-    subject.log_error('error message')
-  end
-end
-
 describe Honeybadger::Logging::FormattedLogger do
   let(:logger) { Logger.new('/dev/null') }
 
