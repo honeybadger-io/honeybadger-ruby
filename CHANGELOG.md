@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.5.6] - 2020-01-08
 ### Fixed
 - Fix remaining Ruby 2.7 deprecation warnings
 
