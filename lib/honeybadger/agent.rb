@@ -278,7 +278,7 @@ module Honeybadger
         metadata: metadata
       })
 
-      breadcrumbs.add!(Breadcrumbs::Breadcrumb.new(params))
+      breadcrumbs.add!(Breadcrumbs::Breadcrumb.new(**params))
 
       self
     end

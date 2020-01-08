@@ -187,7 +187,7 @@ module Honeybadger
 
       def valid_encoding(string)
         return string if valid_encoding?(string)
-        string.encode(Encoding::UTF_8, ENCODE_OPTS)
+        string.encode(Encoding::UTF_8, **ENCODE_OPTS)
       end
 
       def recursive?(data)
