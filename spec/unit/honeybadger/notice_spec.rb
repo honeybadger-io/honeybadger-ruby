@@ -755,7 +755,7 @@ describe Honeybadger::Notice do
 
         context "with an application trace" do
           before do
-            exception.__honeybadger_bindings_stack.unshift(double('Binding', :eval => nil))
+            exception.__honeybadger_bindings_stack.unshift(double('Binding', :eval => nil, :source_location => []))
             config[:root] = File.dirname(__FILE__)
           end
 

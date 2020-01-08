@@ -186,7 +186,7 @@ describe Honeybadger::Agent do
         sanitizer = instance_double(Honeybadger::Util::Sanitizer)
         allow(breadcrumbs).to receive(:add!)
         expect(Honeybadger::Util::Sanitizer).to receive(:new).with(max_depth: 2).and_return(sanitizer)
-        expect(sanitizer).to receive(:sanitize).with(hash_including({message: "Breadcrumb"}))
+        expect(sanitizer).to receive(:sanitize).with(hash_including({message: "Breadcrumb"})).and_return({})
         expect(Honeybadger::Breadcrumbs::Breadcrumb).to receive(:new)
 
         subject.add_breadcrumb("Breadcrumb")
