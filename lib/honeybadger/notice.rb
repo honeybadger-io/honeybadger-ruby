@@ -444,7 +444,7 @@ module Honeybadger
       return {} if exception.__honeybadger_bindings_stack.empty?
 
       if config[:root]
-        binding = exception.__honeybadger_bindings_stack.find { |b| b.eval('__FILE__') =~ /^#{Regexp.escape(config[:root].to_s)}/ }
+        binding = exception.__honeybadger_bindings_stack.find { |b| b.source_location[0] =~ /^#{Regexp.escape(config[:root].to_s)}/ }
       end
 
       binding ||= exception.__honeybadger_bindings_stack[0]
