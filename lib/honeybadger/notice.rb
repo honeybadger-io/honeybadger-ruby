@@ -42,6 +42,10 @@ module Honeybadger
   # @api private
   MAX_EXCEPTION_CAUSES = 5
 
+  # @api private
+  # Binding#source_location was added in Ruby 2.6.
+  BINDING_HAS_SOURCE_LOCATION = Binding.method_defined?(:source_location)
+
   class Notice
     extend Forwardable
 
@@ -444,7 +448,13 @@ module Honeybadger
       return {} if exception.__honeybadger_bindings_stack.empty?
 
       if config[:root]
-        binding = exception.__honeybadger_bindings_stack.find { |b| b.source_location[0] =~ /^#{Regexp.escape(config[:root].to_s)}/ }
+        binding = exception.__honeybadger_bindings_stack.find { |b|
+          if BINDING_HAS_SOURCE_LOCATION
+            b.source_location[0]
+          else
+            b.eval('__FILE__')
+          end =~ /^#{Regexp.escape(config[:root].to_s)}/
+        }
       end
 
       binding ||= exception.__honeybadger_bindings_stack[0]
