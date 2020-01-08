@@ -54,12 +54,8 @@ module Honeybadger
         test_backend = TestBackend.new(Honeybadger.config.backend)
         Honeybadger.config.backend = test_backend
 
-        at_exit do
-          # Exceptions will already be reported when exiting.
-          verify_test unless $!
-        end
-
         run_test
+        verify_test
       end
 
       private
