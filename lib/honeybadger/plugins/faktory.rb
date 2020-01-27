@@ -28,9 +28,10 @@ module Honeybadger
               if job = params[:job]
                 if (threshold = config[:'faktory.attempt_threshold'].to_i) > 0
                   retry_opt = job['retry'].to_i
-                  retry_count = job['failure']['retry_count'].to_i
+                  current_retry = job['failure']['retry_count'].to_i
+                  limit = [retry_opt - 1, threshold].min
 
-                  return if retry_count < [retry_opt - 1, threshold].min
+                  return if current_retry < limit
                 end
 
                 opts[:component] = job['jobtype']
