@@ -279,6 +279,11 @@ module Honeybadger
         default: 0,
         type: Integer
       },
+      :'faktory.attempt_threshold' => {
+        description: 'The number of attempts before notifications will be sent.',
+        default: 0,
+        type: Integer
+      },
       :'sidekiq.use_component' => {
         description: 'Automatically set the component to the class of the job. Helps with grouping.',
         default: true,
