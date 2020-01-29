@@ -70,6 +70,14 @@ describe Honeybadger::Agent do
       instance.notify(error_message: 'testing backtrace generation')
     end
 
+    it "does not mutate passed in opts" do
+      opts = {error_message: 'test'}
+      prev = opts.dup
+      instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
+      instance.notify("test", opts)
+      expect(prev).to eq(opts)
+    end
+
     it "calls all of the before notify hooks before sending" do
       hooks = [spy("hook one", arity: 1), spy("hook two", arity: 1), spy("hook three", arity: 1)]
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
