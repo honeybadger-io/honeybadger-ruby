@@ -115,6 +115,8 @@ module Honeybadger
     # @return [String] UUID reference to the notice within Honeybadger.
     # @return [false] when ignored.
     def notify(exception_or_opts, opts = {})
+      opts = opts.dup
+
       if exception_or_opts.is_a?(Exception)
         opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
