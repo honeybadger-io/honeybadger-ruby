@@ -12,7 +12,7 @@ module Honeybadger
             DelayedJobBadger = Honeybadger::Agent.new
             DelayedJobBadger.configure do |config|
               config.api_key = 'bc540c1e'
-              config.env = Rails.env
+              config.env = ENV['ENV_NAME']
             end
 
             begin
