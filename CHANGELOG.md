@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Dup notify opts before mutating (#345)
 ### Changed
+- Breadcrumbs on by default
 - Added Faktory plugin -@scottrobertson
 
 ## [4.5.6] - 2020-01-08

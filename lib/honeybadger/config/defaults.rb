@@ -300,8 +300,8 @@ module Honeybadger
         type: Boolean
       },
       :'breadcrumbs.enabled' => {
-        description: 'Enable/Disable breadcrumb functionality.',
-        default: false,
+        description: 'Disable breadcrumb functionality.',
+        default: true,
         type: Boolean
       },
       :'breadcrumbs.active_support_notifications' => {
