@@ -5,6 +5,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- Fixed issue where Sidekiq.attempt_threshold was triggering 2 attempts ahead
+  of the setting
 - Dup notify opts before mutating (#345)
 ### Changed
 - Added Faktory plugin -@scottrobertson

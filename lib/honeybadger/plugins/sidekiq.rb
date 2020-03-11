@@ -25,20 +25,30 @@ module Honeybadger
             ::Sidekiq.configure_server do |sidekiq|
               sidekiq.error_handlers << lambda {|ex, params|
                 job = params[:job] || params
-                retry_count = job['retry_count'.freeze].to_i
-                retry_opt = job['retry'.freeze]
-                max_retries = if retry_opt.is_a?(Integer)
-                  [retry_opt - 1, config[:'sidekiq.attempt_threshold'].to_i].min
-                else
-                  config[:'sidekiq.attempt_threshold'].to_i
+                job_retry = job['retry'.freeze]
+
+                if (threshold = config[:'sidekiq.attempt_threshold'].to_i) > 0 && job_retry
+                  # We calculate the job attempts to determine the need to
+                  # skip. Sidekiq's first job execution will have nil for the
+                  # 'retry_count' job key. The first retry will have 0 set for
+                  # the 'retry_count' key, incrementing on each execution
+                  # afterwards.
+                  retry_count = job['retry_count'.freeze]
+                  attempt = retry_count ? retry_count + 1 : 0
+
+                  # Ensure we account for modified max_retries setting
+                  retry_limit = job_retry == true ? (sidekiq.options[:max_retries] || 25) : job_retry.to_i
+                  limit = [retry_limit, threshold].min
+
+                  return if attempt < limit
                 end
 
-                return if retry_opt && retry_count < max_retries
                 opts = {parameters: params}
                 if config[:'sidekiq.use_component']
                   opts[:component] = job['wrapped'.freeze] || job['class'.freeze]
                   opts[:action] = 'perform' if opts[:component]
                 end
+
                 Honeybadger.notify(ex, opts)
               }
             end
