@@ -10,8 +10,17 @@ jobs:
     strategy:
       matrix:
         gemfile:
+          - delayed_job.gemfile
           - rack.gemfile
+          - rack_1.gemfile
+          - rails.gemfile
+          - rails5.0.gemfile
+          - rails5.1.gemfile
+          - rails5.2.gemfile
+          - rails6.0.gemfile
+          - resque.gemfile
           - sinatra.gemfile
+          - sinatra_1.gemfile
           - standalone.gemfile
     steps:
     - uses: actions/checkout@v1
