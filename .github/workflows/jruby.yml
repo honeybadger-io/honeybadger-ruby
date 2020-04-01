@@ -48,6 +48,7 @@ jobs:
       env:
         GEMFILE: ${{ matrix.gemfile }}
       run: |
+        source $HOME/.rvm/scripts/rvm
         export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/${GEMFILE}"
         gem install bundler
         bundle config path vendor/bundle
