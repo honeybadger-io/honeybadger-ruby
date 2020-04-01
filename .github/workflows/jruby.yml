@@ -27,7 +27,6 @@ jobs:
 
     - name: Set up JRuby
       run: |
-        export JRUBY_OPTS="--1.9"
         source $HOME/.rvm/scripts/rvm
         rvm install jruby
         rvm --default use jruby
