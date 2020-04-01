@@ -36,6 +36,10 @@ jobs:
       with:
         ruby-version: 2.6.x
 
+    - name: Install SQLite shared library
+      run: |
+        sudo apt-get -yqq install libsqlite3-dev
+
     - name: Cache
       uses: actions/cache@v1
       with:
