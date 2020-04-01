@@ -21,10 +21,15 @@ jobs:
       with:
         java-version: 1.8
 
+    - name: Set up RVM
+      run: |
+        curl -sSL https://get.rvm.io | bash
+
     - name: Set up JRuby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: jruby
+      run: |
+        source $HOME/.rvm/scripts/rvm
+        rvm install jruby --binary
+        rvm --default use jruby
 
     - name: Install SQLite shared library
       run: |
