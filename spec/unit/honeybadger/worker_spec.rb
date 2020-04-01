@@ -7,7 +7,7 @@ require 'honeybadger/backend'
 require 'honeybadger/notice'
 
 describe Honeybadger::Worker do
-  let(:instance) { described_class.new(config) }
+  let!(:instance) { described_class.new(config) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
   let(:obj) { double('Badger', id: :foo, to_json: '{}') }
 
@@ -141,8 +141,8 @@ describe Honeybadger::Worker do
     end
 
     it "changes the pid to the current pid" do
-      allow(Process).to receive(:pid).and_return(101, 102)
-      expect { subject.start }.to change(subject, :pid).from(101).to(102)
+      allow(Process).to receive(:pid).and_return(:expected)
+      expect { subject.start }.to change(subject, :pid).to(:expected)
     end
 
     context "when shutdown" do
