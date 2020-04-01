@@ -35,6 +35,7 @@ describe Honeybadger::Worker do
       instance.push(obj)
       instance.flush
 
+      sleep(0.1)
       expect(instance.send(:thread)).not_to be_alive
     end
 
@@ -186,6 +187,8 @@ describe Honeybadger::Worker do
 
     it "stops the thread" do
       subject.shutdown
+
+      sleep(0.1)
       expect(subject.send(:thread)).not_to be_alive
     end
 
