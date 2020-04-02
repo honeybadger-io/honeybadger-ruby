@@ -44,14 +44,19 @@ module Honeybadger
 
               block.call(job)
             rescue Exception => error
-              DelayedJobBadger.notify(
-                :component     => component,
-                :action        => action,
-                :error_class   => error.class.name,
-                :error_message => "#{ error.class.name }: #{ error.message }",
-                :backtrace     => error.backtrace,
-                :exception     => error
-              ) if job.attempts.to_i >= DelayedJobBadger.config[:'delayed_job.attempt_threshold'].to_i
+              acceptable_errors = job.payload_object.respond_to?(:acceptable_errors) ? job.payload_object.acceptable_errors : []
+              # Skip reporting temporarily failed jobs that have an acceptable exception
+              if job.attempts.to_i >= DelayedJobBadger.config[:'delayed_job.attempt_threshold'].to_i &&
+                (job.failed_at.present? || acceptable_errors.exclude?(error.class.name))
+                DelayedJobBadger.notify(
+                  :component     => component,
+                  :action        => action,
+                  :error_class   => error.class.name,
+                  :error_message => "#{ error.class.name }: #{ error.message }",
+                  :backtrace     => error.backtrace,
+                  :exception     => error
+                )
+              end
               raise error
             ensure
               DelayedJobBadger.context.clear!
