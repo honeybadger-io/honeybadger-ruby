@@ -4,10 +4,6 @@ require 'honeybadger/ruby'
 module Honeybadger
   module Plugins
     module DelayedJob
-      ACCEPTABLE_EXCEPTIONS = [
-        'Intuit::Error::InternalServerError',
-        'Square::Error::InternalServerError',
-      ]
       class Plugin < ::Delayed::Plugin
         callbacks do |lifecycle|
           lifecycle.around(:invoke_job) do |job, &block|
@@ -48,9 +44,10 @@ module Honeybadger
 
               block.call(job)
             rescue Exception => error
+              acceptable_errors = job.payload_object.respond_to?(:acceptable_errors) ? job.payload_object.acceptable_errors : []
               # Skip reporting temporarily failed jobs that have an acceptable exception
               if job.attempts.to_i >= DelayedJobBadger.config[:'delayed_job.attempt_threshold'].to_i &&
-                (job.failed_at.present? || ACCEPTABLE_EXCEPTIONS.exclude?(error.class.name))
+                (job.failed_at.present? || acceptable_errors.exclude?(error.class.name))
                 DelayedJobBadger.notify(
                   :component     => component,
                   :action        => action,
