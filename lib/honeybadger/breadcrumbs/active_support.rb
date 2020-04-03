@@ -18,7 +18,7 @@ module Honeybadger
             select_keys: [:sql, :name, :connection_id, :cached],
             transform: lambda do |data|
               if data[:sql]
-                adapter = ::ActiveRecord::Base.connection_config[:adapter]
+                adapter = ::ActiveRecord::Base.connection_db_config.configuration_hash[:adapter]
                 data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
               end
               data

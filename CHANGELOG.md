@@ -5,6 +5,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Fix Rails 6.1 deprecation warning with ActiveRecord::Base.connection_config
+
 ## [4.6.0] - 2020-03-12
 ### Fixed
 - Fixed issue where Sidekiq.attempt_threshold was triggering 2 attempts ahead
