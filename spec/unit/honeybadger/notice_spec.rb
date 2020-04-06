@@ -64,6 +64,20 @@ describe Honeybadger::Notice do
     expect(build_notice(controller: 'users_controller').controller).to eq 'users_controller'
   end
 
+  it "aliases component method as controller" do
+    notice = build_notice
+    notice.component = 'users_controller'
+
+    expect(notice.controller).to eq 'users_controller'
+  end
+
+  it "aliases component= method as controller=" do
+    notice = build_notice
+    notice.controller = 'users_controller'
+
+    expect(notice.component).to eq 'users_controller'
+  end
+
   it "aliases the params as parameters" do
     expect(build_notice(parameters: {foo: 'foo'}).params).to eq({foo: 'foo'})
     expect(build_notice(params: {bar: 'bar'}).parameters).to eq({bar: 'bar'})
