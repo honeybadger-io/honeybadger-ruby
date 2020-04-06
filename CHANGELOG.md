@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Alias Notice#controller= as Notice#component=
 
 - Fix Rails 6.1 deprecation warning with ActiveRecord::Base.connection_config
 

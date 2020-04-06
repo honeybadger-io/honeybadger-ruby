@@ -118,6 +118,7 @@ module Honeybadger
     # The component (if any) which was used in this request (usually the controller).
     attr_accessor :component
     alias_method :controller, :component
+    alias_method :controller=, :component=
 
     # The action (if any) that was called in this request.
     attr_accessor :action
