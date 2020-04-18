@@ -63,12 +63,14 @@ module Honeybadger
       end
 
       @context = opts.delete(:context)
-      if opts.delete(:local_context)
+      local_context = opts.delete(:local_context)
+
+      @config ||= Config.new(opts)
+
+      if local_context
         @context ||= ContextManager.new
         @breadcrumbs = Breadcrumbs::Collector.new(config)
       end
-
-      @config ||= Config.new(opts)
 
       init_worker
     end
