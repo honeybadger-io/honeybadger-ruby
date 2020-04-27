@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Alias Notice#controller= as Notice#component=
 
 - Fix Rails 6.1 deprecation warning with ActiveRecord::Base.connection_config
+- Fix agent where breadcrumbs.enabled = true and local_context = true
 
 ## [4.6.0] - 2020-03-12
 ### Fixed

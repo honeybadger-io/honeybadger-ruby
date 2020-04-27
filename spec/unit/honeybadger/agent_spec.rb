@@ -147,7 +147,7 @@ describe Honeybadger::Agent do
   end
 
   context "breadcrumbs" do
-    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
+    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector, clear!: nil) }
     let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
     subject { described_class.new(config) }
 
@@ -156,10 +156,19 @@ describe Honeybadger::Agent do
     end
 
     describe "#breadcrumbs" do
-      it 'creates instance local breadcrumb' do
-        agent = described_class.new(local_context: true)
-        agent.breadcrumbs
-        expect(Thread.current[:__hb_breadcrumbs]).to be nil
+      context 'when local_context: true' do
+        let(:config) { { local_context: true } }
+
+        it 'creates instance local breadcrumb' do
+          subject.breadcrumbs
+          expect(Thread.current[:__hb_breadcrumbs]).to be nil
+        end
+
+        it 'instantiates the breadcrumb collector with the right config' do
+          allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_call_original
+          subject.breadcrumbs
+          expect(Honeybadger::Breadcrumbs::Collector).to have_received(:new).with(instance_of(Honeybadger::Config))
+        end
       end
 
       it 'stores breadcrumbs in thread local' do
