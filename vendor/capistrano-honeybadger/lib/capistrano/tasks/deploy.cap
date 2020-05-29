@@ -24,6 +24,7 @@ namespace :honeybadger do
 
         api_key = fetch(:honeybadger_api_key, ENV['HONEYBADGER_API_KEY'])
         options += ['--api-key', api_key] if api_key
+        options << '--skip-rails-load' if fetch(:honeybadger_skip_rails_load_on_deployment_notice, false)
 
         if fetch(:honeybadger_async_notify, false)
           ::SSHKit.config.command_map.prefix[:honeybadger].push(:nohup)
