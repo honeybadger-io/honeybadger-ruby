@@ -10,7 +10,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Fix agent where breadcrumbs.enabled = true and local_context = true
 
 ### Added
-- Add option to skip rails load on deployment notification (#355) -@NielsKSchjoedt
+- Add `honeybadger_skip_rails_load` Capistrano option to skip rails load on
+  deployment notification (#355) -@NielsKSchjoedt
 
 ## [4.6.0] - 2020-03-12
 ### Fixed
