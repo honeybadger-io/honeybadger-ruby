@@ -5,16 +5,19 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
-- Alias Notice#controller= as Notice#component=
-
-- Fix Rails 6.1 deprecation warning with ActiveRecord::Base.connection_config
+- Alias `Notice#controller=` as `Notice#component=`
+- Fix Rails 6.1 deprecation warning with `ActiveRecord::Base.connection_config`
 - Fix agent where breadcrumbs.enabled = true and local_context = true
+
+### Added
+- Add option to skip rails load on deployment notification (#355) -@NielsKSchjoedt
 
 ## [4.6.0] - 2020-03-12
 ### Fixed
 - Fixed issue where Sidekiq.attempt_threshold was triggering 2 attempts ahead
   of the setting
 - Dup notify opts before mutating (#345)
+
 ### Changed
 - Breadcrumbs on by default
 - Added Faktory plugin -@scottrobertson
