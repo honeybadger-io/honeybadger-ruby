@@ -13,7 +13,7 @@ module Honeybadger
                       'ActionController::UnknownFormat',
                       'ActionController::InvalidAuthenticityToken',
                       'ActionController::InvalidCrossOriginRequest',
-                      'ActionDispatch::ParamsParser::ParseError',
+                      'ActionDispatch::Http::Parameters::ParseError',
                       'ActionController::BadRequest',
                       'ActionController::ParameterMissing',
                       'ActiveRecord::RecordNotFound',
