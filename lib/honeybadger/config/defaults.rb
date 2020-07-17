@@ -17,7 +17,7 @@ module Honeybadger
                       # and may be removed here once support for Rails 5.2 is dropped.
                       # https://github.com/rails/rails/commit/e16c765ac6dcff068ff2e5554d69ff345c003de1
                       # https://github.com/honeybadger-io/honeybadger-ruby/pull/358
-                      'ActionDispatch::ParamsParser::ParseError'
+                      'ActionDispatch::ParamsParser::ParseError',
                       'ActionDispatch::Http::Parameters::ParseError',
                       'ActionController::BadRequest',
                       'ActionController::ParameterMissing',
