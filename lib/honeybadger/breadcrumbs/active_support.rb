@@ -17,8 +17,9 @@ module Honeybadger
             category: "query",
             select_keys: [:sql, :name, :connection, :connection_id, :cached],
             transform: lambda do |data|
-              if data[:sql] && data[:connection]
-                adapter = data.delete(:connection).adapter_name.downcase
+              if data[:sql]
+                connection = data.delete(:connection) || ::ActiveRecord::Base.connection
+                adapter = connection.adapter_name.downcase
                 data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
               end
               data
