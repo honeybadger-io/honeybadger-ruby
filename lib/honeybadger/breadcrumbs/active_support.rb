@@ -15,10 +15,11 @@ module Honeybadger
               ["Active Record", name].compact.join(" - ")
             end,
             category: "query",
-            select_keys: [:sql, :name, :connection_id, :cached],
+            select_keys: [:sql, :name, :connection, :connection_id, :cached],
             transform: lambda do |data|
               if data[:sql]
-                adapter = active_record_connection_db_config[:adapter]
+                connection = data.delete(:connection) || ::ActiveRecord::Base.connection
+                adapter = connection.adapter_name.downcase
                 data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
               end
               data
@@ -101,16 +102,6 @@ module Honeybadger
             category: "render"
           }
         }
-      end
-
-      private_class_method def self.active_record_connection_db_config
-        if ::ActiveRecord::Base.respond_to?(:connection_db_config)
-          # >= Rails 6.1
-          ::ActiveRecord::Base.connection_db_config.configuration_hash
-        else
-          # < Rails 6.1
-          ::ActiveRecord::Base.connection_config
-        end
       end
     end
   end
