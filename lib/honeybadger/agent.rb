@@ -70,6 +70,8 @@ module Honeybadger
       if local_context
         @context ||= ContextManager.new
         @breadcrumbs = Breadcrumbs::Collector.new(config)
+      else
+        @breadcrumbs = nil
       end
 
       init_worker
