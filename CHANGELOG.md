@@ -7,13 +7,13 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - ActiveRecord SQL Breadcrumb event pulls adapter from supplied connection,
   allowing for multiple databases.
+- Fix Rails deprecation of `ActionDispatch::ParamsParser::ParseError`
 
 ## [4.7.0] - 2020-06-02
 ### Fixed
 - Alias `Notice#controller=` as `Notice#component=`
 - Fix Rails 6.1 deprecation warning with `ActiveRecord::Base.connection_config`
 - Fix agent where breadcrumbs.enabled = true and local_context = true
-- Fix Rails deprecation of `ActionDispatch::ParamsParser::ParseError`
 
 ### Added
 - Add `honeybadger_skip_rails_load` Capistrano option to skip rails load on
