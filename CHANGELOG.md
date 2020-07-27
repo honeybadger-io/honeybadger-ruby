@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - ActiveRecord SQL Breadcrumb event pulls adapter from supplied connection,
   allowing for multiple databases.
 - Fix Rails deprecation of `ActionDispatch::ParamsParser::ParseError`
+- Deal with invalid UTF-8 byte sequences during SQL obfuscation
 
 ## [4.7.0] - 2020-06-02
 ### Fixed
