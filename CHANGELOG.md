@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](http://semver.org/).
   allowing for multiple databases.
 - Fix Rails deprecation of `ActionDispatch::ParamsParser::ParseError`
 - Deal with invalid UTF-8 byte sequences during SQL obfuscation
+- Fix Ruby 2.7 deprication notice in sql.rb
 
 ## [4.7.0] - 2020-06-02
 ### Fixed

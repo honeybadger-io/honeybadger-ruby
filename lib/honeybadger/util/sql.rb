@@ -24,7 +24,9 @@ module Honeybadger
       def self.force_utf_8(string)
         string.encode(
           Encoding.find('UTF-8'),
-          {invalid: :replace, undef: :replace, replace: ''}
+          invalid: :replace, 
+          undef: :replace, 
+          replace: ''
         )
       end
     end
