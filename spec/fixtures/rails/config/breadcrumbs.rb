@@ -8,6 +8,7 @@ end
 
 class BreadcrumbController < ApplicationController
   def active_record_event
+    ActiveRecord::Base.connection.execute("SELECT '\x83ݔj'")
     Thing.create(name: "a thing")
     notice
   end
