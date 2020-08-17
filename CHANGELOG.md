@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.7.2] - 2020-08-17
 ### Fixed
 - Remove usage of `ActiveRecord::Base.connection` (thanks @jcoyne for testing)
 - Check for UTF-8 in ActiveRecord breadcrumb exclusion filter
