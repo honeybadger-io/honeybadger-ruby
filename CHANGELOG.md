@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Remove usage of `ActiveRecord::Base.connection` (thanks @jcoyne for testing)
+- Check for UTF-8 in ActiveRecord breadcrumb exclusion filter
 
 ## [4.7.1] - 2020-08-11
 ### Fixed
