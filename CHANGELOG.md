@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Remove usage of `ActiveRecord::Base.connection` (thanks @jcoyne for testing)
 
 ## [4.7.1] - 2020-08-11
 ### Fixed
