@@ -14,18 +14,16 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - 2.4.x
           - 2.5.x
           - 2.6.x
           - 2.7.x
+          - 3.0.x
         gemfile:
           - binding_of_caller.gemfile
           - delayed_job.gemfile
           - rack.gemfile
           - rack_1.gemfile
           - rails.gemfile
-          - rails5.0.gemfile
-          - rails5.1.gemfile
           - rails5.2.gemfile
           - rails6.0.gemfile
           - resque.gemfile
