@@ -17,10 +17,9 @@ gem "timecop"
 gem "webmock"
 gem "capistrano"
 gem "rake"
-gem "listen", "~> 3.2.1"
 gem "bump", "~> 0.9.0"
 gem "rails", "~> 5.2.0"
-gem "sqlite3", "< 1.4", platform: :mri
+gem "sqlite3", "~> 1.4", platform: :mri
 gem "activerecord-jdbcsqlite3-adapter", "~> 52", platform: :jruby
 gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
 gem "rack-mini-profiler", require: false

@@ -18,8 +18,6 @@ jobs:
           - rack.gemfile
           - rack_1.gemfile
           - rails.gemfile
-          - rails5.0.gemfile
-          - rails5.1.gemfile
           - rails5.2.gemfile
           - rails6.0.gemfile
           - resque.gemfile
