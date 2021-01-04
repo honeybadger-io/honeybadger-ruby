@@ -11,13 +11,7 @@ module Honeybadger
           load 'honeybadger/tasks.rb'
         end
 
-        initializer 'honeybadger.install_middleware' do |app|
-          app.config.middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
-          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer)
-          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback)
-        end
-
-        config.after_initialize do
+        initializer 'honeybadger.init' do |_app|
           Honeybadger.init!({
             :root           => ::Rails.root.to_s,
             :env            => ::Rails.env,
@@ -25,6 +19,15 @@ module Honeybadger
             :logger         => Logging::FormattedLogger.new(::Rails.logger),
             :framework      => :rails
           })
+        end
+
+        initializer 'honeybadger.install_middleware' do |app|
+          app.config.middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
+          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer)
+          app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback)
+        end
+
+        config.after_initialize do
           Honeybadger.load_plugins!
         end
       end
