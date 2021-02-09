@@ -30,6 +30,11 @@ jobs:
           - sinatra.gemfile
           - sinatra_1.gemfile
           - standalone.gemfile
+        exclude:
+          - gemfile: rails.gemfile
+            ruby: 2.5.x
+          - gemfile: rails.gemfile
+            ruby: 2.6.x
     steps:
     - uses: actions/checkout@v1
 
