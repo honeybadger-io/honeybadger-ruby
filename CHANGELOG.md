@@ -5,6 +5,8 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Don't enable Lambda plugin in non-Lambda execution environments
+
 ## [4.7.2] - 2020-08-17
 ### Fixed
 - Remove usage of `ActiveRecord::Base.connection` (thanks @jcoyne for testing)
