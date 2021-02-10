@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.7.3] - 2021-02-10
 ### Fixed
 - Don't enable Lambda plugin in non-Lambda execution environments
 
