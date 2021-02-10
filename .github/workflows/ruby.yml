@@ -46,10 +46,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install SQLite shared library
-      run: |
-        sudo apt-get -yqq install libsqlite3-dev
-
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
