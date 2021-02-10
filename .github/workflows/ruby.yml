@@ -30,13 +30,20 @@ jobs:
           - sinatra.gemfile
           - sinatra_1.gemfile
           - standalone.gemfile
+        exclude:
+          - gemfile: rails.gemfile
+            ruby: 2.5.x
+          - gemfile: rails.gemfile
+            ruby: 2.6.x
+          - gemfile: rails5.2.gemfile
+            ruby: 3.0.x
     steps:
     - uses: actions/checkout@v1
 
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: ${{ matrix.ruby }}
 
     - name: Install SQLite shared library
       run: |
