@@ -14,7 +14,7 @@ module Honeybadger
 
       class << self
         def lambda_execution?
-          !!ENV["AWS_EXECUTION_ENV"]
+          !!ENV["AWS_LAMBDA_FUNCTION_NAME"]
         end
 
         def normalized_data
