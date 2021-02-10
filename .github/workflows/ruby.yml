@@ -52,7 +52,7 @@ jobs:
         sudo apt-get -yqq install libsqlite3-dev
 
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
