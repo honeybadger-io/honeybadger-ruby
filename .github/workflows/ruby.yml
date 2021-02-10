@@ -32,20 +32,20 @@ jobs:
           - standalone.gemfile
         exclude:
           - gemfile: rails.gemfile
-            ruby: 2.5.x
+            ruby: '2.5'
           - gemfile: rails.gemfile
-            ruby: 2.6.x
+            ruby: '2.6'
           - gemfile: rails5.2.gemfile
-            ruby: 3.0.x
-            
-    # Has to be top level to cache properly  
+            ruby: '3.0'
+
+    # Has to be top level to cache properly
     env:
       BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
-      BUNDLE_JOBS: 4  
+      BUNDLE_JOBS: 4
       BUNDLE_PATH: "vendor/bundle"
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Install SQLite shared library
       run: |
         sudo apt-get -yqq install libsqlite3-dev
