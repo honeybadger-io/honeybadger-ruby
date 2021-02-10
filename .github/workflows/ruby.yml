@@ -37,6 +37,10 @@ jobs:
             ruby: 2.6.x
           - gemfile: rails5.2.gemfile
             ruby: 3.0.x
+            
+    # Has to be top level to cache properly  
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}  
     steps:
     - uses: actions/checkout@v2
     
@@ -51,7 +55,5 @@ jobs:
         bundler-cache: true
 
     - name: Build and test
-      env:
-        GEMFILE: ${{ matrix.gemfile }}
       run: |
         bundle exec rake
