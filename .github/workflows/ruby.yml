@@ -40,7 +40,10 @@ jobs:
             
     # Has to be top level to cache properly  
     env:
-      BUNDLE_GEMFILE: ${{ matrix.gemfile }}  
+      GEMFILE: ${{ matrix.gemfile }}
+      BUNDLE_GEMFILE: "${GITHUB_WORKSPACE}/gemfiles/${GEMFILE}"
+      BUNDLE_JOBS: 4  
+      BUNDLE_PATH: "vendor/bundle"
     steps:
     - uses: actions/checkout@v2
     
