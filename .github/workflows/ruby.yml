@@ -14,10 +14,10 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - 2.5.x
-          - 2.6.x
-          - 2.7.x
-          - 3.0.x
+          - '2.5'
+          - '2.6'
+          - '2.7'
+          - '3.0'
         gemfile:
           - binding_of_caller.gemfile
           - delayed_job.gemfile
@@ -32,37 +32,26 @@ jobs:
           - standalone.gemfile
         exclude:
           - gemfile: rails.gemfile
-            ruby: 2.5.x
+            ruby: '2.5'
           - gemfile: rails.gemfile
-            ruby: 2.6.x
+            ruby: '2.6'
           - gemfile: rails5.2.gemfile
-            ruby: 3.0.x
+            ruby: '3.0'
+
+    # Has to be top level to cache properly
+    env:
+      BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
+      BUNDLE_JOBS: 4
+      BUNDLE_PATH: "vendor/bundle"
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-
-    - name: Install SQLite shared library
-      run: |
-        sudo apt-get -yqq install libsqlite3-dev
-
-    - name: Cache
-      uses: actions/cache@v1
-      with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-
+        bundler-cache: true
 
     - name: Build and test
-      env:
-        GEMFILE: ${{ matrix.gemfile }}
       run: |
-        export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/${GEMFILE}"
-        gem install bundler
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
         bundle exec rake
