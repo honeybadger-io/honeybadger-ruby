@@ -1,4 +1,8 @@
 begin
+  # Require these early to work around https://github.com/jruby/jruby#6547 
+  #   can be pulled out > 9.2.14 of jruby.
+  require 'i18n'
+  require 'i18n/backend/simple'
   require 'rails'
   RAILS_PRESENT = true
 

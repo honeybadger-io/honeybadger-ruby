@@ -2,15 +2,6 @@
 
 source "https://rubygems.org"
 
-git "https://github.com/rails/rails.git" do
-  gem "activesupport"
-  gem "activemodel"
-  gem "activerecord"
-  gem "activejob"
-  gem "railties"
-  gem "actionpack"
-end
-
 gem "allocation_stats", platforms: :mri, require: false
 gem "appraisal", "~> 2.1"
 gem "aruba", "~> 0.14"
@@ -22,6 +13,12 @@ gem "webmock"
 gem "capistrano", "~> 3.0"
 gem "rake"
 gem "bump", "~> 0.9.0"
+gem "activesupport", github: "rails"
+gem "activemodel", github: "rails"
+gem "activerecord", github: "rails"
+gem "activejob", github: "rails"
+gem "railties", github: "rails"
+gem "actionpack", github: "rails"
 gem "rack", github: "rack/rack"
 gem "arel", github: "rails/arel"
 gem "sqlite3", "~> 1.4", platform: :mri
