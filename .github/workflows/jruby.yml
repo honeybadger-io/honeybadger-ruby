@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master, jruby ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, jruby ]
 
 jobs:
   build:
