@@ -7,6 +7,7 @@ git "https://github.com/rails/rails.git" do
   gem "activemodel"
   gem "activerecord"
   gem "railties"
+  gem "actionpack"
 end
 
 gem "allocation_stats", platforms: :mri, require: false

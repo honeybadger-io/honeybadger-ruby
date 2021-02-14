@@ -15,13 +15,12 @@ gem 'webmock'
 gem 'capistrano'
 gem 'rake'
 
-gem "bump", "~> 0.9.0"
-
 # mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
 platforms :ruby_25 do
   gem "mathn"
 end
 
+gem "bump", "~> 0.9.0"
 
 group :development do
   gem 'guard'
