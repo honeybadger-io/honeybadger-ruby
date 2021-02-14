@@ -1,6 +1,6 @@
 # minimal rails gems required to run rails
 # https://github.com/rails/rails/blob/main/rails.gemspec
-RAILS_GEMS = %w[activesupport activemodel activerecord railties actionpack]
+RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties actionpack]
 
 appraise 'standalone' do
 end

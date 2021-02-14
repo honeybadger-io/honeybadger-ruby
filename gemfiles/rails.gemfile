@@ -6,6 +6,7 @@ git "https://github.com/rails/rails.git" do
   gem "activesupport"
   gem "activemodel"
   gem "activerecord"
+  gem "activejob"
   gem "railties"
   gem "actionpack"
 end
