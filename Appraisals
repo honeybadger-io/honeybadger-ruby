@@ -1,3 +1,7 @@
+# minimal rails gems required to run rails
+# https://github.com/rails/rails/blob/main/rails.gemspec
+RAILS_GEMS = %w[activesupport activemodel activerecord railties]
+
 appraise 'standalone' do
 end
 
@@ -27,7 +31,7 @@ appraise 'resque' do
 end
 
 appraise 'rails5.2' do
-  gem 'rails', '~> 5.2.0'
+  RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 5.2" }
   gem 'sqlite3', '~> 1.4', platform: :mri
   gem 'activerecord-jdbcsqlite3-adapter', '~> 52', platform: :jruby
   gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
@@ -38,7 +42,7 @@ end
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   # The latest officially supported Rails/Rack release
   appraise 'rails6.0' do
-    gem 'rails', '~> 6.0.0'
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.0" }
     gem 'sqlite3', '~> 1.4', platform: :mri
     gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platform: :jruby
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
@@ -48,7 +52,10 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
 
   # Rails edge
   appraise 'rails' do
-    gem 'rails', github: 'rails/rails'
+    git 'https://github.com/rails/rails.git' do
+      RAILS_GEMS.each { |rails_gem| gem rails_gem }
+    end
+
     gem 'rack', github: 'rack/rack'
     gem 'arel', github: 'rails/arel'
     gem 'sqlite3', '~> 1.4', platform: :mri
