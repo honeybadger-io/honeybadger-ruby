@@ -18,6 +18,8 @@ jobs:
           - '2.6'
           - '2.7'
           - '3.0'
+          - 'jruby-9.2.14.0'
+          - 'jruby-head'
         gemfile:
           - binding_of_caller.gemfile
           - delayed_job.gemfile
