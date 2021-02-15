@@ -43,6 +43,7 @@ jobs:
       BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
       BUNDLE_JOBS: 4
       BUNDLE_PATH: "vendor/bundle"
+      BUNDLE_WITHOUT: "development"
     steps:
     - uses: actions/checkout@v2
 

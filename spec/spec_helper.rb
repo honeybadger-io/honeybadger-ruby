@@ -2,7 +2,6 @@ require 'aruba/rspec'
 require 'fileutils'
 require 'logger'
 require 'pathname'
-require 'pry'
 require 'rspec/its'
 require 'webmock/rspec'
 

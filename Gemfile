@@ -5,11 +5,6 @@ gemspec
 gem 'allocation_stats', platforms: :mri, require: false
 gem 'appraisal', '~> 2.1'
 gem 'aruba', '~> 0.14'
-gem 'guard'
-gem 'guard-rspec'
-gem 'pry'
-gem 'pry-byebug', platforms: :mri
-gem 'rdoc'
 gem 'rspec', '~> 3.0'
 gem 'rspec-its'
 gem 'ruby-prof', platforms: :mri, require: false
@@ -26,3 +21,11 @@ platforms :ruby_25 do
 end
 
 gem "bump", "~> 0.9.0"
+
+group :development do
+  gem 'guard'
+  gem 'guard-rspec'
+  gem 'pry'
+  gem 'pry-byebug', platforms: :mri
+  gem 'rdoc'
+end
