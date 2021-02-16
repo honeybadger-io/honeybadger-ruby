@@ -58,12 +58,12 @@ jobs:
         bundler-cache: true
 
     - name: Build and test regular ruby
-      if: ${{ matrix.ruby != "jruby-9.2.14.0" }}
+      if: matrix.ruby != "jruby-9.2.14.0"
       run: |
         bundle exec rake
 
     - name: Build and test jruby
-      if: ${{ matrix.ruby == "jruby-9.2.14.0" }}
+      if: matrix.ruby == "jruby-9.2.14.0"
       run: |
         bundle exec rake spec:integrations spec:units
 
