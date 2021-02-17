@@ -7,33 +7,6 @@ on:
     branches: [ master ]
 
 jobs:
-  jruby:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ruby:
-          - 'jruby-9.2.14.0'
-        gemfile:
-          - rails6.0.gemfile
-
-    # Has to be top level to cache properly
-    env:
-      BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
-      BUNDLE_JOBS: 4
-      BUNDLE_PATH: "vendor/bundle"
-      BUNDLE_WITHOUT: "development"
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up JRuby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler: '2.2.9'
-        bundler-cache: true
-
-    - name: Build and test jruby
-      run: |
-        bundle exec rake spec:integrations spec:units
 
   ruby:
     runs-on: ubuntu-latest
@@ -78,3 +51,31 @@ jobs:
     - name: Build and test regular ruby
       run: |
         bundle exec rake
+
+  jruby:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby:
+          - 'jruby-9.2.14.0'
+        gemfile:
+          - rails6.0.gemfile
+
+    # Has to be top level to cache properly
+    env:
+      BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
+      BUNDLE_JOBS: 4
+      BUNDLE_PATH: "vendor/bundle"
+      BUNDLE_WITHOUT: "development"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JRuby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler: '2.2.9'
+        bundler-cache: true
+
+    - name: Build and test jruby
+      run: |
+        bundle exec rake spec:integrations spec:units
