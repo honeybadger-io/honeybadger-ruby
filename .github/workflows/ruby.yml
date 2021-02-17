@@ -21,7 +21,7 @@ jobs:
           - delayed_job.gemfile
           - rack.gemfile
           - rack_1.gemfile
-          - rails.gemfile
+          # - rails.gemfile
           - rails5.2.gemfile
           - rails6.0.gemfile
           - resque.gemfile
@@ -29,14 +29,14 @@ jobs:
           - sinatra_1.gemfile
           - standalone.gemfile
         exclude:
-          - gemfile: rails.gemfile
-            ruby: '2.5'
-          - gemfile: rails.gemfile
-            ruby: '2.6'
+          # - gemfile: rails.gemfile
+          #   ruby: '2.5'
+          # - gemfile: rails.gemfile
+          #   ruby: '2.6'
           - gemfile: rails5.2.gemfile
             ruby: '3.0'
-          - gemfile: rails.gemfile
-            ruby: 'jruby-9.2.14.0'
+          # - gemfile: rails.gemfile
+          #   ruby: 'jruby-9.2.14.0'
           - gemfile: rails5.2.gemfile
             ruby: 'jruby-9.2.14.0'
 
