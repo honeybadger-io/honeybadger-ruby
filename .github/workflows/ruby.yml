@@ -21,7 +21,6 @@ jobs:
           - delayed_job.gemfile
           - rack.gemfile
           - rack_1.gemfile
-          - rails.gemfile
           - rails5.2.gemfile
           - rails6.0.gemfile
           - resque.gemfile
@@ -29,16 +28,8 @@ jobs:
           - sinatra_1.gemfile
           - standalone.gemfile
         exclude:
-          - gemfile: rails.gemfile
-            ruby: '2.5'
-          - gemfile: rails.gemfile
-            ruby: '2.6'
           - gemfile: rails5.2.gemfile
             ruby: '3.0'
-          - gemfile: rails.gemfile
-            ruby: 'jruby-9.2.14.0'
-          - gemfile: rails5.2.gemfile
-            ruby: 'jruby-9.2.14.0'
 
     # Has to be top level to cache properly
     env:
@@ -72,7 +63,6 @@ jobs:
           - delayed_job.gemfile
           - rack.gemfile
           - rack_1.gemfile
-          - rails.gemfile
           - rails5.2.gemfile
           - rails6.0.gemfile
           - resque.gemfile
@@ -80,8 +70,6 @@ jobs:
           - sinatra_1.gemfile
           - standalone.gemfile
         exclude:
-          - gemfile: rails.gemfile
-            ruby: 'jruby-9.2.14.0'
           - gemfile: rails5.2.gemfile
             ruby: 'jruby-9.2.14.0'
 
@@ -104,3 +92,32 @@ jobs:
       run: |
         bundle exec rake spec:integrations spec:units
 
+  master-rails:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby:
+          - '2.7'
+          - '3.0'
+        gemfile:
+          - rails.gemfile
+
+    # Has to be top level to cache properly
+    env:
+      BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
+      BUNDLE_JOBS: 4
+      BUNDLE_PATH: "vendor/bundle"
+      BUNDLE_WITHOUT: "development"
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler: '2.2.9'
+        bundler-cache: true
+
+    - name: Build and test master rails
+      run: |
+        bundle exec rake
