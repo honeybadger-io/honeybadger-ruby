@@ -52,10 +52,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
 
   # Rails edge
   appraise 'rails' do
-    git 'https://github.com/rails/rails.git' do
-      RAILS_GEMS.each { |rails_gem| gem rails_gem }
-    end
-
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, github: 'rails' }
     gem 'rack', github: 'rack/rack'
     gem 'arel', github: 'rails/arel'
     gem 'sqlite3', '~> 1.4', platform: :mri
