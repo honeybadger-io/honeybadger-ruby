@@ -59,19 +59,8 @@ jobs:
         ruby:
           - 'jruby-9.2.14.0'
         gemfile:
-          - binding_of_caller.gemfile
-          - delayed_job.gemfile
-          - rack.gemfile
-          - rack_1.gemfile
-          - rails5.2.gemfile
           - rails6.0.gemfile
-          - resque.gemfile
           - sinatra.gemfile
-          - sinatra_1.gemfile
-          - standalone.gemfile
-        exclude:
-          - gemfile: rails5.2.gemfile
-            ruby: 'jruby-9.2.14.0'
 
     # Has to be top level to cache properly
     env:
