@@ -59,6 +59,6 @@ class RailsController < ApplicationController
 end
 
 Rails.env = 'production'
-Rails.logger = Logger.new('/dev/null')
+Rails.logger = Logger.new(File::NULL)
 
 require_relative './breadcrumbs'

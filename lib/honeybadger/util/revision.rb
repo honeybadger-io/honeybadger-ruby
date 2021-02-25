@@ -26,7 +26,7 @@ module Honeybadger
 
         def from_git
           return nil unless File.directory?('.git')
-          `git rev-parse HEAD`.strip rescue nil
+          `git rev-parse HEAD 2> #{File::NULL}`.strip rescue nil
         end
       end
     end

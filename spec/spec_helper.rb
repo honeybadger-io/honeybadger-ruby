@@ -22,7 +22,7 @@ Dir[File.expand_path('../support/**/*.rb', __FILE__)].each {|f| require f}
 
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
-NULL_LOGGER = Logger.new('/dev/null')
+NULL_LOGGER = Logger.new(File::NULL)
 NULL_LOGGER.level = Logger::Severity::DEBUG
 
 Aruba.configure do |config|
