@@ -38,7 +38,7 @@ describe Honeybadger::Logging::BootLogger.instance do
 end
 
 describe Honeybadger::Logging::FormattedLogger do
-  let(:logger) { Logger.new('/dev/null') }
+  let(:logger) { Logger.new(File::NULL) }
 
   subject { described_class.new(logger) }
 
@@ -54,7 +54,7 @@ end
 
 describe Honeybadger::Logging::ConfigLogger do
   let(:config) { Honeybadger::Config.new(debug: true, :'logging.tty_level' => tty_level) }
-  let(:logger) { Logger.new('/dev/null') }
+  let(:logger) { Logger.new(File::NULL) }
   let(:tty_level) { 'ERROR' }
 
   subject { described_class.new(config, logger) }
