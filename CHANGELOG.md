@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Suppress any error output from the `git rev-parse` command. ([#394](https://github.com/honeybadger-io/honeybadger-ruby/pull/394))
 
 ## [4.7.3] - 2021-02-10
 ### Fixed
