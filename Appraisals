@@ -1,6 +1,6 @@
 # minimal rails gems required to run rails
 # https://github.com/rails/rails/blob/main/rails.gemspec
-RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties actionpack]
+RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties actionpack activerecord-jdbcsqlite3-adapter]
 
 appraise 'standalone' do
 end
@@ -53,7 +53,10 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   appraise 'rails6.1' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
     gem 'sqlite3', '~> 1.4', platform: :mri
-    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platform: :jruby
+
+    # 6.1 is currently only supported on master branch for jruby/activerecord-jdbc-adapter
+    # When this changes, from: `git: 'jruby/activerecord-jdbc-adapter'` to `"61"`
+    gem 'activerecord-jdbcsqlite3-adapter', git: 'jruby/activerecord-jdbc-adapter', platform: :jruby
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
