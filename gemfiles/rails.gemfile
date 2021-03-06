@@ -19,7 +19,6 @@ gem "activerecord", github: "rails"
 gem "activejob", github: "rails"
 gem "railties", github: "rails"
 gem "actionpack", github: "rails"
-gem "activerecord-jdbcsqlite3-adapter", github: "jruby/activerecord-jdbc-adapter", platform: :jruby
 gem "rack", github: "rack/rack"
 gem "arel", github: "rails/arel"
 gem "sqlite3", "~> 1.4", platform: :mri
