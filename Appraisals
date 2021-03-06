@@ -50,6 +50,15 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'rspec-rails'
   end
 
+  appraise 'rails6.1' do
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
+    gem 'sqlite3', '~> 1.4', platform: :mri
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platform: :jruby
+    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    gem 'rack-mini-profiler', require: false
+    gem 'rspec-rails'
+  end
+
   # Rails edge
   appraise 'rails' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, github: 'rails' }
