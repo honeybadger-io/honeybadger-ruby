@@ -56,10 +56,12 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
 
     # 6.1 is currently only supported on master branch for jruby/activerecord-jdbc-adapter
     # When this changes, from: `git: 'jruby/activerecord-jdbc-adapter'` to `"61"`
-    gem 'activerecord-jdbcsqlite3-adapter', git: 'jruby/activerecord-jdbc-adapter', platform: :jruby
+    # gem 'activerecord-jdbcsqlite3-adapter', git: 'jruby/activerecord-jdbc-adapter', platform: :jruby
+    gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platform: :jruby
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
+    gem 'listen'
   end
 
   # Rails edge
@@ -69,6 +71,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'arel', github: 'rails/arel'
     gem 'sqlite3', '~> 1.4', platform: :mri
     gem 'capistrano', '~> 3.0'
+
+    gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platform: :jruby
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rspec-rails'
 
