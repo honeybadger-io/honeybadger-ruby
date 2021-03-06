@@ -72,6 +72,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'sqlite3', '~> 1.4', platform: :mri
     gem 'capistrano', '~> 3.0'
 
+    # This can be deleted when activerecord-jdbc-adapter gets a 61 release.
+    # For some reason this is required here even tho we dont test jruby on rails master.
     gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platform: :jruby
     gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
     gem 'rspec-rails'
