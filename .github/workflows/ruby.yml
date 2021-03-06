@@ -24,6 +24,7 @@ jobs:
           - rack_1.gemfile
           - rails5.2.gemfile
           - rails6.0.gemfile
+          - rails6.1.gemfile
           - resque.gemfile
           - sinatra.gemfile
           - sinatra_1.gemfile
@@ -60,6 +61,7 @@ jobs:
           - 'jruby-9.2.14.0'
         gemfile:
           - rails6.0.gemfile
+          - rails6.1.gemfile
 
     # Has to be top level to cache properly
     env:
