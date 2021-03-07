@@ -49,8 +49,10 @@ jobs:
         bundler-cache: true
 
     - name: Build and test regular ruby
+      # Use 2 processes since GH actions has only 2 cores.
+      # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
       run: |
-        bundle exec rake
+        bundle exec rake parallel:spec[2]
 
   jruby:
     runs-on: ubuntu-latest

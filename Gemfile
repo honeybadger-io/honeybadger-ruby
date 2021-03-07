@@ -7,6 +7,7 @@ gem 'appraisal', '~> 2.1'
 gem 'aruba', '~> 0.14'
 gem 'rspec', '~> 3.0'
 gem 'rspec-its'
+gem 'parallel_tests'
 gem 'ruby-prof', platforms: :mri, require: false
 gem 'timecop'
 gem 'webmock'
