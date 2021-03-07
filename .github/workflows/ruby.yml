@@ -52,7 +52,7 @@ jobs:
       # Use 2 processes since GH actions has only 2 cores.
       # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
       run: |
-        bundle exec rake parallel:spec[2]
+        bundle exec parallel_test -n 2 -e "rake spec"
 
   jruby:
     runs-on: ubuntu-latest
