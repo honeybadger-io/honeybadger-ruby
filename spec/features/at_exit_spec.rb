@@ -1,5 +1,5 @@
 feature "Rescuing exceptions at exit" do
-  let(:crash_cmd) { "ruby #{ FIXTURES_PATH.join('ruby_crash.rb') }"}
+  let(:crash_cmd) { "ruby #{ FIXTURES_PATH.join('ruby_crash.rb') }" }
 
   def custom_crash_cmd(crash_type)
     "ruby #{ FIXTURES_PATH.join('ruby_custom_crash.rb') } #{ crash_type }"

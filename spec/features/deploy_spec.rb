@@ -1,9 +1,7 @@
 require 'honeybadger'
 
 feature "Running the deploy cli command" do
-  before do
-    set_environment_variable('HONEYBADGER_BACKEND', 'debug')
-  end
+  before { set_environment_variable('HONEYBADGER_BACKEND', 'debug') }
 
   it "notifies Honeybadger of the deploy" do
     output = capture(:stdout) { Honeybadger::CLI.start(%w[deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user]) }

@@ -44,13 +44,13 @@ RSpec.configure do |config|
   end
 
   config.before(:all, type: :feature) do
+    require "honeybadger/cli"
     feature_dir = File.join("tmp/features")
     FileUtils.mkdir_p(feature_dir)
     Dir.chdir(feature_dir)
   end
 
   config.before(:each, type: :feature) do
-    require "honeybadger/cli"
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')
     set_environment_variable('HONEYBADGER_LOGGING_PATH', 'STDOUT')
   end
