@@ -4,7 +4,6 @@ gemspec
 
 gem 'allocation_stats', platforms: :mri, require: false
 gem 'appraisal', '~> 2.1'
-gem 'aruba', '~> 0.14'
 gem 'rspec', '~> 3.0'
 gem 'rspec-its'
 gem 'ruby-prof', platforms: :mri, require: false
