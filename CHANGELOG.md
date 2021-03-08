@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Suppress any error output from the `git rev-parse` command. ([#394](https://github.com/honeybadger-io/honeybadger-ruby/pull/394))
 
+### Added
+- Support deployment tracking in code (#397, @danleyden)
+
 ## [4.7.3] - 2021-02-10
 ### Fixed
 - Don't enable Lambda plugin in non-Lambda execution environments
