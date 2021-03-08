@@ -47,7 +47,7 @@ feature "Running the notify CLI command" do
   context "when Rails is detected via the presence of environment.rb" do
     before do
       @config_path = File.join(Dir.pwd, 'config')
-      Dir.mkdir(@config_path) unless File.exists?(@config_path)
+      FileUtils.mkdir_p(@config_path) unless File.exists?(@config_path)
       File.open(File.join(@config_path, 'environment.rb'), 'w')
     end
 

@@ -21,7 +21,7 @@ feature "Installing honeybadger via the cli" do
     end
 
     it "creates the configuration file" do
-      FileUtils.rm config_file
+      FileUtils.rm config_file if File.exist?(config_file)
 
       expect {
         run_command('honeybadger install asdf')
