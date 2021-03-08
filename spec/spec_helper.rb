@@ -1,4 +1,3 @@
-# require 'aruba/rspec'
 require 'fileutils'
 require 'logger'
 require 'pathname'
@@ -38,7 +37,6 @@ RSpec.configure do |config|
   config.alias_example_group_to :feature, type: :feature
   config.alias_example_group_to :scenario
 
-  # config.include Aruba::Api, type: :feature
   config.include FeatureHelpers, type: :feature
 
   def set_environment_variable(var, value)
