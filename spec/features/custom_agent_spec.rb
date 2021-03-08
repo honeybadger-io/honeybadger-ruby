@@ -1,5 +1,5 @@
 feature "Creating a custom agent" do
-  let(:crash_cmd) { "#{ FIXTURES_PATH.join('ruby_custom.rb') }" }
+  let(:crash_cmd) { "ruby #{ FIXTURES_PATH.join('ruby_custom.rb') }" }
 
   it "reports the exception to Honeybadger" do
     cmd = run_command(crash_cmd)
