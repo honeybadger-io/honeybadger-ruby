@@ -30,7 +30,7 @@ feature "Running the deploy cli command" do
 
   context "when Rails is not detected due to a missing environment.rb" do
     it "skips rails initialization without logging" do
-      output = capture(:stdout) { Honeybadger::CLI.start(%w[honeybadger deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user --skip-rails-load]) }
+      output = capture(:stdout) { Honeybadger::CLI.start(%w[deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user --skip-rails-load]) }
       expect(output).not_to match(/Skipping Rails initialization/i)
     end
   end
