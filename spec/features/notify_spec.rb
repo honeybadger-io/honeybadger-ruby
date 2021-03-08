@@ -64,7 +64,7 @@ feature "Running the notify CLI command" do
       output = capture(:stdout) { Honeybadger::CLI.start(%W[notify --message #{error_message} --skip-rails-load=false]) }
       expect(output).to_not match(/Skipping Rails initialization/i)
 
-      ouput = capture(:stdout) { Honeybadger::CLI.start(%W[notify --message #{error_message}]) }
+      output = capture(:stdout) { Honeybadger::CLI.start(%W[notify --message #{error_message}]) }
       expect(output).to_not match(/Skipping Rails initialization/i)
     end
   end
