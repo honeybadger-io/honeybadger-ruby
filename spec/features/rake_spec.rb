@@ -6,8 +6,9 @@ feature "Rescuing exceptions in a rake task" do
   end
 
   it "reports the exception to Honeybadger" do
-    expect(run_command('rake honeybadger')).not_to be_successfully_executed
-    assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
+    cmd = run_command('rake honeybadger')
+    expect(cmd).not_to be_successfully_executed
+    assert_notification(cmd.output, 'error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
   end
 
   context "rake reporting is disabled" do
@@ -16,15 +17,17 @@ feature "Rescuing exceptions in a rake task" do
     end
 
     it "doesn't report the exception to Honeybadger" do
-      expect(run_command('rake honeybadger')).not_to be_successfully_executed
-      assert_no_notification
+      cmd = run_command('rake honeybadger')
+      expect(cmd).not_to be_successfully_executed
+      assert_no_notification(cmd.output)
     end
   end
 
   context "shell is attached" do
     it "doesn't report the exception to Honeybadger" do
-      expect(run_command('rake honeybadger_autodetect_from_terminal')).not_to be_successfully_executed
-      assert_no_notification
+      cmd = run_command('rake honeybadger_autodetect_from_terminal')
+      expect(cmd).not_to be_successfully_executed
+      assert_no_notification(cmd.output)
     end
 
     context "rake reporting is enabled" do
@@ -33,8 +36,9 @@ feature "Rescuing exceptions in a rake task" do
       end
 
       it "reports the exception to Honeybadger" do
-        expect(run_command('rake honeybadger_autodetect_from_terminal')).not_to be_successfully_executed
-        assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
+        cmd = run_command('rake honeybadger_autodetect_from_terminal')
+        expect(cmd).not_to be_successfully_executed
+        assert_notification(cmd.output, 'error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: Jim has left the building :('})
       end
     end
   end

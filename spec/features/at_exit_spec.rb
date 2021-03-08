@@ -1,5 +1,5 @@
 feature "Rescuing exceptions at exit" do
-  let(:crash_cmd) { "ruby #{ FIXTURES_PATH.join('ruby_crash.rb') }" }
+  let(:crash_cmd) { "ruby #{ FIXTURES_PATH.join('ruby_crash.rb') }"}
 
   def custom_crash_cmd(crash_type)
     "ruby #{ FIXTURES_PATH.join('ruby_custom_crash.rb') } #{ crash_type }"
@@ -11,23 +11,27 @@ feature "Rescuing exceptions at exit" do
   end
 
   it "reports the exception to Honeybadger" do
-    expect(run_command(crash_cmd)).not_to be_successfully_executed
-    assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: badgers!'})
+    cmd = run_command(crash_cmd)
+    expect(cmd).not_to be_successfully_executed
+    assert_notification(cmd.output, 'error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: badgers!'})
   end
 
   it "ignores SystemExit" do
-    expect(run_command(custom_crash_cmd("system_exit"))).not_to be_successfully_executed
-    assert_no_notification
+    cmd = run_command(custom_crash_cmd("system_exit"))
+    expect(cmd).not_to be_successfully_executed
+    assert_no_notification(cmd.output)
   end
 
   it "ignores SignalException of type SIGTERM" do
-    expect(run_command(custom_crash_cmd("sigterm"))).not_to be_successfully_executed
-    assert_no_notification
+    cmd = run_command(custom_crash_cmd("sigterm"))
+    expect(cmd).not_to be_successfully_executed
+    assert_no_notification(cmd.output)
   end
 
   it "reports SignalException of type other than SIGTERM" do
-    expect(run_command(custom_crash_cmd("hup"))).not_to be_successfully_executed
-    assert_notification('error' => {'class' => 'SignalException', 'message' => 'SignalException: SIGHUP'})
+    cmd = run_command(custom_crash_cmd("hup"))
+    expect(cmd).not_to be_successfully_executed
+    assert_notification(cmd.output, 'error' => {'class' => 'SignalException', 'message' => 'SignalException: SIGHUP'})
   end
 
   context "at_exit is disabled" do
@@ -36,8 +40,9 @@ feature "Rescuing exceptions at exit" do
     end
 
     it "doesn't report the exception to Honeybadger" do
-      expect(run_command(crash_cmd)).not_to be_successfully_executed
-      assert_no_notification
+      cmd = run_command(crash_cmd)
+      expect(cmd).not_to be_successfully_executed
+      assert_no_notification(cmd.output)
     end
   end
 end

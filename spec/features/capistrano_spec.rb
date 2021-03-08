@@ -4,7 +4,8 @@ feature "capistrano task" do
   end
 
   it "outputs the honeybadger task" do
-    expect(run_command('bundle exec cap -T')).to be_successfully_executed
-    expect(all_output).to match(/honeybadger\:deploy/i)
+    cmd = run_command("bundle exec cap -T")
+    expect(cmd).to be_successfully_executed
+    expect(cmd.output).to match(/honeybadger:deploy/i)
   end
 end
