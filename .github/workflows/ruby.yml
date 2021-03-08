@@ -50,7 +50,7 @@ jobs:
 
     - name: Build and test regular ruby
       run: |
-        bundle exec rake
+        bundle exec rake spec
 
   jruby:
     runs-on: ubuntu-latest
