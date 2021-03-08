@@ -47,7 +47,13 @@ RSpec.configure do |config|
     require "honeybadger/cli"
     feature_dir = File.join("tmp/features")
     FileUtils.mkdir_p(feature_dir)
+
+    @_original_pwd = Dir.pwd
     Dir.chdir(feature_dir)
+  end
+
+  config.after(:all, type: :feature) do
+    Dir.chdir(@_original_pwd)
   end
 
   config.before(:each, type: :feature) do
