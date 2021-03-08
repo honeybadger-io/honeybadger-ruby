@@ -44,6 +44,34 @@ describe Honeybadger::Agent do
     end
   end
 
+  describe '#track_deployment' do
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+    subject(:instance) { described_class.new(config) }
+
+    it 'returns true for successful deployment tracking' do
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
+         to_return(status: 200)
+
+      expect(instance.track_deployment).to eq(true)
+    end
+
+    it 'returns false for unsuccessful deployment tracking' do
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
+         to_return(status: 400)
+
+      expect(instance.track_deployment).to eq(false)
+    end
+
+    it 'passes the revision to the servce' do
+      allow_any_instance_of(Honeybadger::Util::HTTP).to receive(:compress) { |_, body| body }
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
+         with(body: { env: nil, revision: '1234', local_username: nil, repository: nil }).
+         to_return(status: 200)
+
+      expect(instance.track_deployment(revision: '1234')).to eq(true)
+    end
+  end
+
   describe "#clear!" do
     it 'clears all transactional data' do
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)

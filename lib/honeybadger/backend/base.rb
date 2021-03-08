@@ -99,6 +99,15 @@ module Honeybadger
         raise NotImplementedError, 'must define #check_in on subclass.'
       end
 
+      # Track a deployment
+      # @example
+      #   backend.track_deployment({ revision: 'be2ceb6' })
+      #
+      # @param [#to_json] payload The JSON payload containing all deployment data.
+      def track_deployment(payload)
+        notify(:deploys, payload)
+      end
+
       private
 
       attr_reader :config
