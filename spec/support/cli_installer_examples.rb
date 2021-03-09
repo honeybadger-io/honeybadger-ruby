@@ -1,3 +1,5 @@
+require 'honeybadger'
+
 shared_examples 'cli installer' do |rails|
   let(:config) { Honeybadger::Config.new(api_key: 'asdf', config_path: config_file) }
 
