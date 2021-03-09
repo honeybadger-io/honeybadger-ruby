@@ -9,6 +9,7 @@ feature "cli installer in projects", type: :feature do
 
     before(:each) do
       set_environment_variable('HONEYBADGER_BACKEND', 'debug')
+      set_environment_variable('HONEYBADGER_BACKEND', 'asdf')
       set_environment_variable('HONEYBADGER_LOGGING_PATH', 'STDOUT')
       set_environment_variable("DEBUG_BACKEND_STATUS", "201")
       FileUtils.rm_f config_file if File.exist?(config_file)
