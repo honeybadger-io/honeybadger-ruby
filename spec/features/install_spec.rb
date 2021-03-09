@@ -100,7 +100,7 @@ feature "cli installer in projects", type: :feature do
   end
 
   scenario "in a Rails project", framework: :rails do
-    let(:config_file) { Pathname(FEATURES_DIR).join('config', 'honeybadger.yml') }
+    let(:config_file) { Pathname(File.join(FEATURES_DIR, "rails")).join('config', 'honeybadger.yml') }
 
     it_behaves_like "cli installer", true
   end
