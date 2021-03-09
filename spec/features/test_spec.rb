@@ -1,4 +1,4 @@
-require 'honeybadger'
+# require 'honeybadger'
 
 feature "Running the test cli command" do
   scenario "in a standalone project" do
@@ -29,7 +29,7 @@ feature "Running the test cli command" do
   end
 
   scenario "in a rails project", framework: :rails do
-    let(:config_file) { Pathname(current_dir).join('config', 'honeybadger.yml') }
+    let(:config_file) { Pathname(FEATURES_DIR).join('config', 'honeybadger.yml') }
 
     it "displays expected debug output and sends notification" do
       File.write(config_file, <<-YML)

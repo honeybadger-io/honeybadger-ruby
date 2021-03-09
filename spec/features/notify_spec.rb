@@ -1,8 +1,8 @@
 feature "Running the notify CLI command" do
   let(:error_message) { "Test error message" }
-  before do
+  before(:each) do
     set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
-    set_environment_variable('HONEYBADGER_LOGGING_LEVEL', 'DEBUG')
+    set_environment_variable('HONEYBADGER_LOGGING_LEVEL', 'debug')
   end
 
   it "requires the --message flag" do
@@ -69,3 +69,4 @@ feature "Running the notify CLI command" do
     end
   end
 end
+

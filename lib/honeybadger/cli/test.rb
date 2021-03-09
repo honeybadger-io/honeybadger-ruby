@@ -2,6 +2,7 @@ require 'erb'
 require 'forwardable'
 require 'honeybadger/cli/main'
 require 'pathname'
+require 'json'
 
 module Honeybadger
   module CLI
@@ -219,7 +220,9 @@ MSG
       end
 
       def generate_success_message(response)
-        notice_id = JSON.parse(response.body)['id']
+        notice_id = nil
+        notice_id = JSON.parse(response.body)['id'] if response.body
+
         notice_url = "https://app.honeybadger.io/notice/#{notice_id}"
 
         unless options[:install]

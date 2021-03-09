@@ -24,7 +24,7 @@ feature "Running the deploy cli command" do
       expect(cmd).not_to be_successfully_executed
       expect(cmd.output).to match(/request failed/i)
 
-      set_environment_variable('DEBUG_BACKEND_STATUS', nil)
+      ENV.delete("DEBUG_BACKEND_STATUS")
     end
   end
 

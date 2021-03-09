@@ -1,4 +1,3 @@
-require 'aruba/rspec'
 require 'fileutils'
 require 'logger'
 require 'pathname'
@@ -20,17 +19,12 @@ end
 
 Dir[File.expand_path('../support/**/*.rb', __FILE__)].each {|f| require f}
 
+ROOT_DIR = File.expand_path("../", __dir__)
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
+FEATURES_DIR = Pathname.new(File.join(TMP_DIR, "features"))
 NULL_LOGGER = Logger.new(File::NULL)
 NULL_LOGGER.level = Logger::Severity::DEBUG
-
-Aruba.configure do |config|
-  t = RUBY_PLATFORM == 'java' ? 120 : 12
-  config.working_directory = 'tmp/features'
-  config.exit_timeout = t
-  config.io_wait_timeout = t
-end
 
 RSpec.configure do |config|
   Kernel.srand config.seed
@@ -58,8 +52,15 @@ RSpec.configure do |config|
   config.before(:each, type: :feature) do
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')
     set_environment_variable('HONEYBADGER_LOGGING_PATH', 'STDOUT')
+    set_environment_variable("DEBUG_BACKEND_STATUS", "200")
+    FileUtils.rm_rf(FEATURES_DIR)
+    FileUtils.mkdir_p(FEATURES_DIR)
+    Dir.chdir(FEATURES_DIR)
   end
 
+  config.after(:each, type: :feature) do
+    Dir.chdir(ROOT_DIR)
+  end
 
   config.include Helpers
 
@@ -81,8 +82,15 @@ RSpec.configure do |config|
   end
 
   config.before(:each, framework: :rails) do
-    FileUtils.cp_r(FIXTURES_PATH.join('rails'), current_dir)
-    cd('rails')
+    set_environment_variable('HONEYBADGER_BACKEND', 'debug')
+    set_environment_variable('HONEYBADGER_LOGGING_PATH', 'STDOUT')
+    set_environment_variable("DEBUG_BACKEND_STATUS", "201")
+    FileUtils.cp_r(FIXTURES_PATH.join('rails'), FEATURES_DIR)
+    Dir.chdir(File.join(FEATURES_DIR, "rails"))
+  end
+
+  config.after(:each, framework: :rails) do
+    Dir.chdir(ROOT_DIR)
   end
 
   if ENV['BUNDLE_GEMFILE'] =~ /rails/

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 # minimal rails gems required to run rails
 # https://github.com/rails/rails/blob/main/rails.gemspec
-RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties actionpack]
+RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties actionpack].freeze
 
 appraise 'standalone' do
 end
@@ -31,10 +33,10 @@ appraise 'resque' do
 end
 
 appraise 'rails5.2' do
-  RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 5.2" }
+  RAILS_GEMS.each { |rails_gem| gem rails_gem, '~> 5.2' }
   gem 'sqlite3', '~> 1.4', platform: :mri
   gem 'activerecord-jdbcsqlite3-adapter', '~> 52', platform: :jruby
-  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'better_errors', require: false, platforms: %i[ruby_20 ruby_21]
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
 end
@@ -42,10 +44,10 @@ end
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   # The latest officially supported Rails/Rack release
   appraise 'rails6.0' do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.0" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, '~> 6.0' }
     gem 'sqlite3', '~> 1.4', platform: :mri
     gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platform: :jruby
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    gem 'better_errors', require: false, platforms: %i[ruby_20 ruby_21]
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
   end
@@ -57,7 +59,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'arel', github: 'rails/arel'
     gem 'sqlite3', '~> 1.4', platform: :mri
     gem 'capistrano', '~> 3.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    gem 'better_errors', require: false, platforms: %i[ruby_20 ruby_21]
     gem 'rspec-rails'
 
     # Listen is a soft-dependency in Rails 5. Guard requires listen (which makes

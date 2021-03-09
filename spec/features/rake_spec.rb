@@ -1,6 +1,6 @@
 feature "Rescuing exceptions in a rake task" do
   before do
-    FileUtils.cp(FIXTURES_PATH.join('Rakefile'), current_dir)
+    FileUtils.cp(FIXTURES_PATH.join('Rakefile'), FEATURES_DIR)
     set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
     set_environment_variable('HONEYBADGER_LOGGING_LEVEL', 'DEBUG')
   end

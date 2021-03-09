@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gemspec
 
 gem 'allocation_stats', platforms: :mri, require: false
 gem 'appraisal', '~> 2.1'
-gem 'aruba', '~> 0.14'
 gem 'rspec', '~> 3.0'
 gem 'rspec-its'
 gem 'ruby-prof', platforms: :mri, require: false
@@ -17,10 +18,10 @@ gem 'rake'
 
 # mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
 platforms :ruby_25 do
-  gem "mathn"
+  gem 'mathn'
 end
 
-gem "bump", "~> 0.9.0"
+gem 'bump', '~> 0.9.0'
 
 group :development do
   gem 'guard'

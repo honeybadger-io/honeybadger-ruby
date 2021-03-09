@@ -1,6 +1,6 @@
 feature "capistrano task" do
   before do
-    FileUtils.cp(FIXTURES_PATH.join('Capfile'), current_dir)
+    FileUtils.cp(FIXTURES_PATH.join('Capfile'), FEATURES_DIR)
   end
 
   it "outputs the honeybadger task" do
