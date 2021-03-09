@@ -45,12 +45,11 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler: '2.2.9'
         bundler-cache: true
 
     - name: Build and test regular ruby
       run: |
-        bundle exec rake spec
+        bundle exec rake
 
   jruby:
     runs-on: ubuntu-latest
@@ -73,7 +72,6 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler: '2.2.9'
         bundler-cache: true
 
     - name: Build and test jruby
