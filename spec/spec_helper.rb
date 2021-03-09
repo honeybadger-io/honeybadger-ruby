@@ -1,3 +1,4 @@
+require 'aruba/rspec'
 require 'fileutils'
 require 'logger'
 require 'pathname'
@@ -23,6 +24,13 @@ TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
 NULL_LOGGER = Logger.new(File::NULL)
 NULL_LOGGER.level = Logger::Severity::DEBUG
+
+Aruba.configure do |config|
+  t = RUBY_PLATFORM == 'java' ? 120 : 12
+  config.working_directory = 'tmp/features'
+  config.exit_timeout = t
+  config.io_wait_timeout = t
+end
 
 RSpec.configure do |config|
   Kernel.srand config.seed
@@ -50,16 +58,6 @@ RSpec.configure do |config|
   config.before(:each, type: :feature) do
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')
     set_environment_variable('HONEYBADGER_LOGGING_PATH', 'STDOUT')
-
-    feature_dir = File.join("tmp/features")
-    FileUtils.mkdir_p(feature_dir)
-
-    @_original_pwd = Dir.pwd
-    Dir.chdir(feature_dir)
-  end
-
-  config.after(:each, type: :feature) do
-    Dir.chdir(@_original_pwd)
   end
 
 

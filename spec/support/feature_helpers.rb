@@ -51,7 +51,7 @@ module FeatureHelpers
   # @param {string} command - the command to run
   # @param {string} script_path [nil] - Path to the script to run.
   # @return {FeatureHelpers::TestCommand} - +.exit_code+ is 0-255 integer, +.output+ is the stdout / stderr.
-  def run_command(command, script_path = nil)
+  def run_thor_command(command, script_path = nil)
     gem_dir = File.expand_path("#{File.dirname(__FILE__)}/..")
     lib_path = "#{gem_dir}/lib"
     ruby_lib = ENV['RUBYLIB'].nil? ? lib_path : "#{lib_path}:#{ENV['RUBYLIB']}"
@@ -68,18 +68,5 @@ module FeatureHelpers
     r.close
 
     FeatureHelpers::TestCommand.new(exit_code: exit_status.exitstatus, output: output)
-  end
-end
-
-# Custom matchers similar to Aruba.
-RSpec::Matchers.define :be_successfully_executed do
-  match do |actual|
-    actual.exit_code == 0
-  end
-end
-
-RSpec::Matchers.define :not_be_successfully_executed do
-  match do |actual|
-    actual.exit_code != 1
   end
 end
