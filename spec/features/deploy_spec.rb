@@ -11,20 +11,18 @@ feature "Running the deploy cli command" do
   context "when the options are invalid" do
     it "notifies the user" do
       output = capture(:stdout) { expect{Honeybadger::CLI.start(%w[deploy --api-key= --environment=test-env --revision=test-rev --repository=test-repo --user=test-user])}.to raise_error(SystemExit) }
-      expect(output).to match(/No value provided for required options '--api-key'/)
+      expect(output).to match(/required.+api-key/i)
     end
   end
 
   context "when there is a server error" do
+    before { set_environment_variable('DEBUG_BACKEND_STATUS', '500') }
+
     it "notifies the user" do
-      set_environment_variable('DEBUG_BACKEND_STATUS', '500')
-      # Needs to be run via run_command since it must actually hit the
-      # server [Honeybadger::CLI.start()] will not produce the error.
+
       cmd = run_command("honeybadger deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user")
       expect(cmd).not_to be_successfully_executed
       expect(cmd.output).to match(/request failed/i)
-
-      ENV.delete("DEBUG_BACKEND_STATUS")
     end
   end
 
