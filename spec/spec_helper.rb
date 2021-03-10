@@ -1,4 +1,5 @@
 require 'aruba/rspec'
+require 'aruba/api'
 require 'fileutils'
 require 'logger'
 require 'pathname'
@@ -47,6 +48,10 @@ RSpec.configure do |config|
 
   config.include Aruba::Api, type: :feature
   config.include FeatureHelpers, type: :feature
+
+  config.before(:all, type: :feature) do
+    require "honeybadger/cli"
+  end
 
   config.before(:each, type: :feature) do
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')

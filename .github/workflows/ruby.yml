@@ -46,7 +46,6 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler: '2.2.9'
         bundler-cache: true
 
     - name: Build and test regular ruby
@@ -75,7 +74,6 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler: '2.2.9'
         bundler-cache: true
 
     - name: Build and test jruby
