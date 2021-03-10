@@ -24,8 +24,8 @@ module FeatureHelpers
     expand_path('.')
   end
 
-  def assert_no_notification
-    expect(all_output).not_to match(/notifying debug backend of feature=notices/)
+  def assert_no_notification(output = all_output)
+    expect(output).not_to match(/notifying debug backend of feature=notices/)
   end
 
   def assert_notification(expected = {})
