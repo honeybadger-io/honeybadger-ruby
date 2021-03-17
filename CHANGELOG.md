@@ -5,6 +5,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
+  default ignore list.
+
 ## [4.8.0] - 2021-03-16
 ### Fixed
 - Suppress any error output from the `git rev-parse` command. ([#394](https://github.com/honeybadger-io/honeybadger-ruby/pull/394))
