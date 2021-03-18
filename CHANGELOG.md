@@ -4,9 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
 - Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
-  default ignore list.
+  default ignore list. (#402, @jrochkind)
 
 ## [4.8.0] - 2021-03-16
 ### Fixed
