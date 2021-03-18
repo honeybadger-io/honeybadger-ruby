@@ -23,6 +23,7 @@ module Honeybadger
                       'ActionController::ParameterMissing',
                       'ActiveRecord::RecordNotFound',
                       'ActionController::UnknownAction',
+                      'ActionDispatch::Http::MimeNegotiation::InvalidType',
                       'Rack::QueryParser::ParameterTypeError',
                       'Rack::QueryParser::InvalidParameterError',
                       'CGI::Session::CookieStore::TamperedWithCookie',
