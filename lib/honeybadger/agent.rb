@@ -204,7 +204,7 @@ module Honeybadger
     #   otherwise.
     def track_deployment(env: nil, revision: nil, local_username: nil, repository: nil)
       opts = {
-        env: env || config[:env],
+        environment: env || config[:env],
         revision: revision || config[:revision],
         local_username: local_username,
         repository: repository
