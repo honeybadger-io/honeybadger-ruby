@@ -195,16 +195,16 @@ module Honeybadger
     # @example
     #   Honeybadger.track_deployment(revision: 'be2ceb6')
     #
-    # @param [String] :env The environment name. Defaults to the current configured environment.
+    # @param [String] :environment The environment name. Defaults to the current configured environment.
     # @param [String] :revision The VCS revision being deployed. Defaults to the currently configured revision.
     # @param [String] :local_username The name of the user who performed the deploy.
     # @param [String] :repository The base URL of the VCS repository. It should be HTTPS-style.
     #
     # @return [Boolean] true if the deployment was successfully tracked and false
     #   otherwise.
-    def track_deployment(env: nil, revision: nil, local_username: nil, repository: nil)
+    def track_deployment(environment: nil, revision: nil, local_username: nil, repository: nil)
       opts = {
-        environment: env || config[:env],
+        environment: environment || config[:env],
         revision: revision || config[:revision],
         local_username: local_username,
         repository: repository
