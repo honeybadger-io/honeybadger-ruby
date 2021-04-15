@@ -5,7 +5,7 @@ module Honeybadger
   module Plugins
     module Sidekiq
       class Middleware
-        def call(worker, msg, queue)
+        def call(_worker, _msg, _queue)
           Honeybadger.clear!
           yield
         end
@@ -23,7 +23,7 @@ module Honeybadger
 
           if defined?(::Sidekiq::VERSION) && ::Sidekiq::VERSION > '3'
             ::Sidekiq.configure_server do |sidekiq|
-              sidekiq.error_handlers << lambda {|ex, params|
+              sidekiq.error_handlers << lambda { |ex, params|
                 job = params[:job] || params
                 job_retry = job['retry'.freeze]
 
@@ -37,13 +37,15 @@ module Honeybadger
                   attempt = retry_count ? retry_count + 1 : 0
 
                   # Ensure we account for modified max_retries setting
-                  retry_limit = job_retry == true ? (sidekiq.options[:max_retries] || 25) : job_retry.to_i
+                  default_max_retry_attempts = defined?(::Sidekiq::JobRetry::DEFAULT_MAX_RETRY_ATTEMPTS) ? ::Sidekiq::JobRetry::DEFAULT_MAX_RETRY_ATTEMPTS : 25
+                  retry_limit = job_retry == true ? (sidekiq.options[:max_retries] || default_max_retry_attempts) : job_retry.to_i
+
                   limit = [retry_limit, threshold].min
 
                   return if attempt < limit
                 end
 
-                opts = {parameters: params}
+                opts = { parameters: params }
                 if config[:'sidekiq.use_component']
                   opts[:component] = job['wrapped'.freeze] || job['class'.freeze]
                   opts[:action] = 'perform' if opts[:component]
