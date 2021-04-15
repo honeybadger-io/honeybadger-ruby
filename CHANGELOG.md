@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
   default ignore list. (#402, @jrochkind)
+- Replaced fixed number for retries in Sidekiq Plugin with Sidekiq::JobRetry constant
 - Properly set environment in deployment tracking (#404, @stmllr)
 
 ## [4.8.0] - 2021-03-16
