@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- `Honeybadger.context` now accepts a block; the local context Hash will be added only
+  to exceptions that occur within the block.
 - Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
   default ignore list. (#402, @jrochkind)
 - Replaced fixed number for retries in Sidekiq Plugin with Sidekiq::JobRetry constant

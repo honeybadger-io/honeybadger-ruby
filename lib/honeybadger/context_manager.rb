@@ -24,8 +24,31 @@ module Honeybadger
     def set_context(hash)
       @mutex.synchronize do
         @context ||= {}
-        @context.update(Context(hash))
+        @context.update(Context(hash)) unless block_given?
       end
+
+      return nil unless block_given?
+
+      begin
+        yield
+        nil
+      rescue => raised
+        # Add local context only to exceptions raised in the block
+        unless raised.respond_to? :to_honeybadger_context
+          class << raised
+            def add_block_context(block_context)
+              (@hb_block_contexts ||= []).prepend(block_context)
+            end
+
+            def to_honeybadger_context
+              (@hb_block_contexts || []).reduce({}) {|all, item| all.update(item) }
+            end
+          end
+        end
+        raised.add_block_context(Context(hash))
+        raise
+      end
+
     end
 
     def get_context

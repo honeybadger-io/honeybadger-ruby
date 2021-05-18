@@ -213,10 +213,15 @@ module Honeybadger
       response.success?
     end
 
-    # Save global context for the current request.
+    # Save global context for the current request, or for a specific block.
     #
     # @example
     #   Honeybadger.context({my_data: 'my value'})
+    #
+    #   # Block-level context:
+    #   Honeybadger.context({local_data: 'my value'}) do
+    #     # Only exceptions raised here will have `local_data` added
+    #   end
     #
     #   # Inside a Rails controller:
     #   before_action do
@@ -250,8 +255,10 @@ module Honeybadger
     #   (optional).
     #
     # @return [self] so that method calls can be chained.
-    def context(context = nil)
-      context_manager.set_context(context) unless context.nil?
+    def context(context = nil, &block)
+      raise ArgumentError, 'The context Hash must be provided with a block' if block_given? && context.nil?
+      context_manager.set_context(context, &block) unless context.nil?
+
       self
     end
 

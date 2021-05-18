@@ -61,6 +61,43 @@ describe Honeybadger do
     it "clears the context" do
       expect { described_class.context.clear! }.to change { described_class.get_context }.from(c).to(nil)
     end
+
+    it "attaches block-level context to exception raised in block" do
+      begin
+        described_class.context(level1: true) do
+          described_class.context(level2: true) do
+            raise StandardError, "Something bad"
+          end
+        end
+      rescue => raised
+        expect(described_class.get_context).to eq({ foo: :bar})
+        expect(raised.to_honeybadger_context).to eq({ level1: true, level2: true })
+      end
+
+      begin
+        described_class.context(level3: true) do
+          described_class.context(level4: true) do
+            # No exception raised
+          end
+        end
+        raise StandardError, "Something bad"
+      rescue => raised
+        expect(described_class.get_context).to eq({ foo: :bar})
+        expect(raised).not_to respond_to(:to_honeybadger_context)
+      end
+    end
+
+    it "overwrites block-level context correctly" do
+      begin
+        described_class.context(item: false) do
+          described_class.context(item: true) do
+            raise StandardError, "Something bad"
+          end
+        end
+      rescue => raised
+        expect(raised.to_honeybadger_context).to eq({ item: true })
+      end
+    end
   end
 
   describe "#notify" do
