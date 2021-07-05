@@ -20,7 +20,7 @@ platforms :ruby_25 do
   gem "mathn"
 end
 
-gem "bump", "~> 0.9.0"
+gem "bump", "~> 0.10.0"
 
 group :development do
   gem 'guard'
