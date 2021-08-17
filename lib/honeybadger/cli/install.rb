@@ -43,6 +43,8 @@ module Honeybadger
             exit(1)
           end
 
+          default_env = defined?(::Rails.application) ? "Rails.env" : "ENV['RUBY_ENV'] || ENV['RACK_ENV']"
+          default_root = defined?(::Rails.application) ? "Rails.root" : "Dir.pwd"
           File.open(path, 'w+') do |file|
             file.write(<<-CONFIG)
 ---
@@ -51,20 +53,23 @@ module Honeybadger
 api_key: '#{api_key}'
 
 # The environment your app is running in.
-env: #{defined?(::Rails.application) ? "<%= Rails.env %>" : "<%= ENV['RUBY_ENV'] || ENV['RACK_ENV'] %>"}
+env: "<%= #{default_env} %>"
 
 # The absolute path to your project folder.
-root: <%= Dir.pwd %>
+root: "<%= #{default_root} %>"
 
-# By default, Honeybadger will not report errors in these environments.
+# Honeybadger won't report errors in these environments.
 development_environments:
 - test
 - development
 - cucumber
 
-# The current Git revision of your project. 
-# Leave this as null, and we'll set it to the last commit hash.
-revision: null
+# By default, Honeybadger won't report errors in the development_environments.
+# You can override this by explicitly setting report_data to true or false.
+# report_data: true
+
+# The current Git revision of your project. Defaults to the last commit hash.
+# revision: null
 
 # Enable verbose debug logging (useful for troubleshooting).
 debug: false
