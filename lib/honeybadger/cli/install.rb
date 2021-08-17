@@ -46,7 +46,28 @@ module Honeybadger
           File.open(path, 'w+') do |file|
             file.write(<<-CONFIG)
 ---
+# For advanced options, see https://docs.honeybadger.io/lib/ruby/gem-reference/configuration
+
 api_key: '#{api_key}'
+
+# The environment your app is running in.
+env: "<%= Rails.env %>"
+
+# The absolute path to your project folder.
+root: <%= Dir.pwd %>
+
+# By default, Honeybadger will not report errors in these environments.
+development_environments:
+- test
+- development
+- cucumber
+
+# The current Git revision of your project. 
+# Leave this as null, and we'll set this to the last commit hash.
+revision: null
+
+# Enable verbose debug logging (useful for troubleshooting).
+debug: false
 CONFIG
           end
         end
