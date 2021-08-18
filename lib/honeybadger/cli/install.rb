@@ -44,7 +44,7 @@ module Honeybadger
           end
 
           default_env = defined?(::Rails.application) ? "Rails.env" : "ENV['RUBY_ENV'] || ENV['RACK_ENV']"
-          default_root = defined?(::Rails.application) ? "Rails.root" : "Dir.pwd"
+          default_root = defined?(::Rails.application) ? "Rails.root.to_s" : "Dir.pwd"
           File.open(path, 'w+') do |file|
             file.write(<<-CONFIG)
 ---
