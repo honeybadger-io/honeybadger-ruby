@@ -19,9 +19,9 @@ gem "activerecord", "~> 7.0"
 gem "activejob", "~> 7.0"
 gem "railties", "~> 7.0"
 gem "actionpack", "~> 7.0"
-gem "sqlite3", "~> 1.4", platform: :mri
-gem "activerecord-jdbcsqlite3-adapter", "~> 60", platform: :jruby
-gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
+gem "sqlite3", "~> 1.4", platforms: :mri
+gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
 
