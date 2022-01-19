@@ -4,7 +4,11 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
 - Add more items to the default config file
+
+### Fixed
+- Fix a Ruby 3.1 bug that breaks regexp classes in honeybadger.yml (#415)
 
 ## [4.9.0] - 2021-06-28
 ### Fixed
@@ -53,7 +57,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fixed issue where Sidekiq.attempt_threshold was triggering 2 attempts ahead
   of the setting
-- Dup notify opts before mutating (#345)
+- Dupe notify opts before mutating (#345)
 
 ### Changed
 - Breadcrumbs on by default
