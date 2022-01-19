@@ -25,6 +25,7 @@ jobs:
           - rails5.2.gemfile
           - rails6.0.gemfile
           - rails6.1.gemfile
+          - rails7.0.gemfile
           - resque.gemfile
           - sinatra.gemfile
           - sinatra_1.gemfile
@@ -63,6 +64,7 @@ jobs:
         gemfile:
           - rails6.0.gemfile
           - rails6.1.gemfile
+          - rails7.0.gemfile
 
     # Has to be top level to cache properly
     env:
