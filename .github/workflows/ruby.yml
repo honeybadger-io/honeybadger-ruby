@@ -64,7 +64,8 @@ jobs:
         gemfile:
           - rails6.0.gemfile
           - rails6.1.gemfile
-          - rails7.0.gemfile
+          # TODO
+          # - rails7.0.gemfile
 
     # Has to be top level to cache properly
     env:
