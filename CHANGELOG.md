@@ -8,7 +8,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Add more items to the default config file
 
 ### Fixed
-- Fix a Ruby 3.1 bug that breaks regexp classes in honeybadger.yml (#415)
+- Fix a Ruby 3.1 bug that breaks regexp classes in honeybadger.yml (#418)
 
 ## [4.9.0] - 2021-06-28
 ### Fixed
