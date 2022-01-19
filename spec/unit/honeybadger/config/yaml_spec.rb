@@ -101,9 +101,17 @@ logging:
     end
   end
 
+  context "when the YAML content contains a Ruby class" do
+    before { allow(path).to receive(:read).and_return(yaml) }
+    let(:yaml) { "foo: !ruby/regexp '/credit_card/i'" }
+
+    it { should eq({ foo: /credit_card/i }) }
+  end
+
   context "when an unknown error occurs" do
     before do
-      allow(YAML).to receive(:load).and_raise(RuntimeError)
+      method = YAML.respond_to?(:unsafe_load) ? :unsafe_load : :load
+      allow(YAML).to receive(method).and_raise(RuntimeError)
     end
 
     it "re-raises the exception" do
