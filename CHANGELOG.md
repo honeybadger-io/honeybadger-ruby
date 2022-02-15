@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
-- Allow special characters in tags. Also Support space-delimited tags:
+- Allow special characters in tags. Also support space-delimited tags:
   "one two three" and "one, two, three" are equivalent
 
 ## [4.10.0] - 2022-01-19
