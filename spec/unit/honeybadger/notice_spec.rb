@@ -809,21 +809,25 @@ describe Honeybadger::Notice do
   context "adding tags" do
     context "directly" do
       it "converts String to tags Array" do
-        expect(build_notice(tags: ' foo  , bar, ,  $baz   ').tags).to eq(%w(foo bar baz))
+        expect(build_notice(tags: ' foo  , bar, ,  baz   ').tags).to eq(%w(foo bar baz))
       end
 
       it "accepts an Array" do
-        expect(build_notice(tags: [' foo  ', ' bar', ' ', '  $baz   ']).tags).to eq(%w(foo bar baz))
+        expect(build_notice(tags: [' foo  ', ' bar', ' ', '  baz   ']).tags).to eq(%w(foo bar baz))
+      end
+
+      it "accepts whitespace-delimited tags" do
+        expect(build_notice(tags: [' foo bar  baz']).tags).to eq(%w(foo bar baz))
       end
     end
 
     context "from context" do
       it "converts String to tags Array" do
-        expect(build_notice(context: { tags: ' foo  , , bar,  $baz   ' }).tags).to eq(%w(foo bar baz))
+        expect(build_notice(context: { tags: ' foo  , , bar,  baz   ' }).tags).to eq(%w(foo bar baz))
       end
 
       it "accepts an Array" do
-        expect(build_notice(tags: [' foo  ', ' bar', ' ', '  $baz   ']).tags).to eq(%w(foo bar baz))
+        expect(build_notice(tags: [' foo  ', ' bar', ' ', '  baz   ']).tags).to eq(%w(foo bar baz))
       end
     end
 
@@ -835,6 +839,10 @@ describe Honeybadger::Notice do
 
     it "converts nil to empty Array" do
       expect(build_notice(tags: nil).tags).to eq([])
+    end
+
+    it "allows non-word characters in tags while stripping whitespace" do
+      expect(build_notice(tags: 'word,  with_underscore ,with space, with-dash,with$special*char').tags).to eq(%w(word with_underscore with space with-dash with$special*char))
     end
   end
 

@@ -53,11 +53,11 @@ module Honeybadger
 
     # @api private
     # The String character used to split tag strings.
-    TAG_SEPERATOR = ','.freeze
+    TAG_SEPERATOR = /,|\s/.freeze
 
     # @api private
     # The Regexp used to strip invalid characters from individual tags.
-    TAG_SANITIZER = /[^\w]/.freeze
+    TAG_SANITIZER = /\s/.freeze
 
     # @api private
     class Cause
