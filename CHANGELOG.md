@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.11.0] - 2022-02-15
 ### Fixed
 - Allow special characters in tags. Also support space-delimited tags:
   "one two three" and "one, two, three" are equivalent
