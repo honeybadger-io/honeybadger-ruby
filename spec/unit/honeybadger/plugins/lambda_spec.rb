@@ -1,7 +1,7 @@
 require 'honeybadger/plugins/lambda'
 require 'honeybadger/config'
 
-describe "Lambda Plugin", :focus do
+describe "Lambda Plugin" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: :test, api_key: "noop") }
 
   before do

@@ -26,8 +26,8 @@ module Honeybadger
             original_method.call(*args)
           rescue => e
             Honeybadger.notify(e)
-            # Bubble the error up to AWS Lambda, but mark as reported
-            # to avoid duplicates in local emulated environments
+            # Bubble the error up to Lambda, but disable other reporting to avoid duplicates in local emulated environments
+            # Since the process immediately exits, nothing else is affected
             Honeybadger.config[:'exceptions.notify_at_exit'] = false
             raise
           end
