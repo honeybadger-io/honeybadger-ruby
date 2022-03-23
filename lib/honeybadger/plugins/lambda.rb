@@ -20,10 +20,10 @@ module Honeybadger
         # end
         def hb_lambda(handler_name)
           original_method = method(handler_name)
-          self.define_singleton_method(handler_name) do |*args|
-            Honeybadger.context({ aws_request_id: args[0][:context].aws_request_id }) if args[0][:context].respond_to?(:aws_request_id)
+          self.define_singleton_method(handler_name) do |event:, context:|
+            Honeybadger.context({ aws_request_id: context.aws_request_id }) if context.respond_to?(:aws_request_id)
 
-            original_method.call(*args)
+            original_method.call(event: event, context: context)
           rescue => e
             Honeybadger.notify(e)
             # Bubble the error up to Lambda, but disable other reporting to avoid duplicates in local emulated environments
