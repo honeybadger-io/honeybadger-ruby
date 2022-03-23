@@ -48,7 +48,7 @@ module Honeybadger
         # So we provide a decorator for both cases
         main = TOPLEVEL_BINDING.eval("self")
         main.extend(LambdaExtension)
-        Class.include(LambdaExtension)
+        ::Class.include(LambdaExtension)
 
         (config[:before_notify] ||= []) << lambda do |notice|
           data = Util::Lambda.normalized_data
