@@ -2,7 +2,7 @@ require 'forwardable'
 
 module Honeybadger
   # +Honeybadger::Plugin+ defines the API for registering plugins with
-  # Honeybadger. Each plugin has requirements which must be satisified before
+  # Honeybadger. Each plugin has requirements which must be satisfied before
   # executing the plugin's execution block(s). This allows us to detect
   # optional dependencies and load the plugin for each dependency only if it's
   # present in the application.
@@ -62,7 +62,7 @@ module Honeybadger
       #     execution { }
       #   end
       #
-      # @param [String] name The optional name of the plugin. Should use
+      # @param [String, Symbol] name The optional name of the plugin. Should use
       #   +snake_case+. The name is inferred from the current file name if omitted.
       #
       # @return nil

@@ -1,7 +1,7 @@
 require 'honeybadger/plugins/lambda'
 require 'honeybadger/config'
 
-describe "Lambda Plugin" do
+describe "Lambda Plugin", :focus do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: :test, api_key: "noop") }
 
   before do
@@ -17,6 +17,30 @@ describe "Lambda Plugin" do
     expect(config[:sync]).to eq false
     Honeybadger::Plugin.instances[:lambda].load!(config)
     expect(config[:sync]).to eq true
+  end
+
+  it 'auto-captures errors from class methods when decorator is used' do
+    expect(Honeybadger).to receive(:notify)
+    Honeybadger::Plugin.instances[:lambda].load!(config)
+    klass = Class.new do
+      hb_lambda def self.test_handler(event:, context:)
+        raise "An exception"
+      end
+    end
+    expect { klass.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
+  end
+
+  it 'auto-captures errors from main methods when decorator is used' do
+    expect(Honeybadger).to receive(:notify)
+    Honeybadger::Plugin.instances[:lambda].load!(config)
+
+    main = TOPLEVEL_BINDING.eval("self")
+    main.instance_eval do
+      hb_lambda def test_handler(event:, context:)
+        raise "An exception"
+      end
+    end
+    expect { main.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
   end
 
   describe "notice injection" do
