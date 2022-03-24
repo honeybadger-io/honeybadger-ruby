@@ -16,6 +16,7 @@ jobs:
           - '2.6'
           - '2.7'
           - '3.0'
+          - '3.1'
         gemfile:
           - binding_of_caller.gemfile
           - delayed_job.gemfile
@@ -24,6 +25,7 @@ jobs:
           - rails5.2.gemfile
           - rails6.0.gemfile
           - rails6.1.gemfile
+          - rails7.0.gemfile
           - resque.gemfile
           - sinatra.gemfile
           - sinatra_1.gemfile
@@ -31,6 +33,10 @@ jobs:
         exclude:
           - gemfile: rails5.2.gemfile
             ruby: '3.0'
+          - gemfile: rails5.2.gemfile
+            ruby: '3.1'
+          - gemfile: rails7.0.gemfile
+            ruby: '2.6'
 
     # Has to be top level to cache properly
     env:
@@ -60,6 +66,8 @@ jobs:
         gemfile:
           - rails6.0.gemfile
           - rails6.1.gemfile
+          # TODO
+          # - rails7.0.gemfile
 
     # Has to be top level to cache properly
     env:

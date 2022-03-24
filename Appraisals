@@ -32,36 +32,44 @@ end
 
 appraise 'rails5.2' do
   RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 5.2" }
-  gem 'sqlite3', '~> 1.4', platform: :mri
-  gem 'activerecord-jdbcsqlite3-adapter', '~> 52', platform: :jruby
-  gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+  gem 'sqlite3', '~> 1.4', platforms: :mri
+  gem 'activerecord-jdbcsqlite3-adapter', '~> 52', platforms: :jruby
+  gem 'better_errors', require: false, platforms: :mri
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
 end
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
-  # The latest officially supported Rails/Rack release
   appraise 'rails6.0' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.0" }
-    gem 'sqlite3', '~> 1.4', platform: :mri
-    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platform: :jruby
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    gem 'sqlite3', '~> 1.4', platforms: :mri
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platforms: :jruby
+    gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
   end
 
   appraise 'rails6.1' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
-    gem 'sqlite3', '~> 1.4', platform: :mri
+    gem 'sqlite3', '~> 1.4', platforms: :mri
 
     # 6.1 is currently only supported on master branch for jruby/activerecord-jdbc-adapter
     # When this changes, from: `git: 'jruby/activerecord-jdbc-adapter'` to `"61"`
-    # gem 'activerecord-jdbcsqlite3-adapter', git: 'jruby/activerecord-jdbc-adapter', platform: :jruby
-    gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platform: :jruby
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    # gem 'activerecord-jdbcsqlite3-adapter', git: 'jruby/activerecord-jdbc-adapter', platforms: :jruby
+    gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platforms: :jruby
+    gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
     gem 'listen'
+  end
+
+  appraise 'rails7.0' do
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 7.0" }
+    gem 'sqlite3', '~> 1.4', platforms: :mri
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platforms: :jruby
+    gem 'better_errors', require: false, platforms: :mri
+    gem 'rack-mini-profiler', require: false
+    gem 'rspec-rails'
   end
 
   # Rails edge
@@ -69,9 +77,9 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     RAILS_GEMS.each { |rails_gem| gem rails_gem, github: 'rails' }
     gem 'rack', github: 'rack/rack'
     gem 'arel', github: 'rails/arel'
-    gem 'sqlite3', '~> 1.4', platform: :mri
+    gem 'sqlite3', '~> 1.4', platforms: :mri
     gem 'capistrano', '~> 3.0'
-    gem 'better_errors', require: false, platforms: [:ruby_20, :ruby_21]
+    gem 'better_errors', require: false, platforms: :mri
     gem 'rspec-rails'
 
     # Listen is a soft-dependency in Rails 5. Guard requires listen (which makes

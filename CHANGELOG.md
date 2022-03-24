@@ -7,6 +7,23 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
 
+## [4.11.0] - 2022-02-15
+### Fixed
+- Allow special characters in tags. Also support space-delimited tags:
+  "one two three" and "one, two, three" are equivalent
+
+## [4.10.0] - 2022-01-19
+### Added
+- Add more items to the default config file
+
+### Fixed
+- Fix a Ruby 3.1 bug that breaks regexp classes in honeybadger.yml (#418)
+
+## [4.9.0] - 2021-06-28
+### Fixed
+- Replaced fixed number for retries in Sidekiq Plugin with Sidekiq::JobRetry constant
+- Properly set environment in deployment tracking (#404, @stmllr)
+
 ### Added
 - Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
   default ignore list. (#402, @jrochkind)
@@ -49,7 +66,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fixed issue where Sidekiq.attempt_threshold was triggering 2 attempts ahead
   of the setting
-- Dup notify opts before mutating (#345)
+- Dupe notify opts before mutating (#345)
 
 ### Changed
 - Breadcrumbs on by default

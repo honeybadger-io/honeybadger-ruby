@@ -65,7 +65,7 @@ describe Honeybadger::Agent do
     it 'passes the revision to the servce' do
       allow_any_instance_of(Honeybadger::Util::HTTP).to receive(:compress) { |_, body| body }
       stub_request(:post, "https://api.honeybadger.io/v1/deploys").
-         with(body: { env: nil, revision: '1234', local_username: nil, repository: nil }).
+         with(body: { environment: nil, revision: '1234', local_username: nil, repository: nil }).
          to_return(status: 200)
 
       expect(instance.track_deployment(revision: '1234')).to eq(true)
