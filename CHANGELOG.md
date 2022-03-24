@@ -4,6 +4,10 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
+
+### Added
 - Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
   default ignore list. (#402, @jrochkind)
 
