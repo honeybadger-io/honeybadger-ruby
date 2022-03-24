@@ -19,36 +19,40 @@ describe "Lambda Plugin" do
     expect(config[:sync]).to eq true
   end
 
-  it 'auto-captures errors from class methods when decorator is used' do
-    expect(Honeybadger).to receive(:notify)
-    Honeybadger::Plugin.instances[:lambda].load!(config)
-    klass = Class.new do
-      hb_lambda def self.test_handler(event:, context:)
-        raise "An exception"
+  describe "hb_lambda decorator" do
+    it 'auto-captures errors from class methods when decorator is used' do
+      expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
+      Honeybadger::Plugin.instances[:lambda].load!(config)
+      klass = Class.new do
+        extend ::Honeybadger::Plugins::LambdaExtension
+        hb_lambda def self.test_handler(event:, context:)
+          raise "An exception"
+        end
       end
+
+      expect { klass.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
     end
-    expect { klass.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
-  end
 
-  it 'auto-captures errors from main methods when decorator is used' do
-    expect(Honeybadger).to receive(:notify)
-    Honeybadger::Plugin.instances[:lambda].load!(config)
+    it 'auto-captures errors from main methods when decorator is used' do
+      expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
+      Honeybadger::Plugin.instances[:lambda].load!(config)
 
-    main = TOPLEVEL_BINDING.eval("self")
-    main.instance_eval do
-      hb_lambda def test_handler(event:, context:)
-        raise "An exception"
+      main = TOPLEVEL_BINDING.eval("self")
+      main.instance_eval do
+        hb_lambda def test_handler(event:, context:)
+          raise "An exception"
+        end
       end
+      expect { main.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
     end
-    expect { main.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
   end
 
   describe "notice injection" do
-    let(:lambda_data) {{
+    let(:lambda_data) { {
       "function" => "lambda_fn",
       "handler" => "the.handler",
       "memory" => 128
-    }}
+    } }
 
     before do
       expect(Honeybadger::Util::Lambda).to receive(:trace_id).and_return("abc123")

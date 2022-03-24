@@ -13,7 +13,9 @@ module Honeybadger
         #   # Handler code
         # end
         #
-        # class Lambda
+        # class MyLambdaApp
+        #   extend ::Honeybadger::Plugins::LambdaExtension
+        #
         #   hb_lambda def self.my_lambda_handler(event:, context:)
         #     # Handler code
         #   end
@@ -43,12 +45,8 @@ module Honeybadger
       execution do
         config[:sync] = true
 
-        # AWS Lambda handlers may be top-level methods or class methods
-        # See https://docs.aws.amazon.com/lambda/latest/dg/ruby-handler.html
-        # So we provide a decorator for both cases
         main = TOPLEVEL_BINDING.eval("self")
         main.extend(LambdaExtension)
-        ::Class.include(LambdaExtension)
 
         (config[:before_notify] ||= []) << lambda do |notice|
           data = Util::Lambda.normalized_data
