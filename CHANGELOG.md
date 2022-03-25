@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
 
 ## [4.11.0] - 2022-02-15
 ### Fixed

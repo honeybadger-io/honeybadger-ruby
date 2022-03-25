@@ -74,7 +74,7 @@ module Honeybadger
           agent.add_breadcrumb(
             exception.class,
             metadata: {
-              exception_message: exception.message
+              message: exception.message
             },
             category: "error"
           )
