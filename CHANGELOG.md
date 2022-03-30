@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.12.0] - 2022-03-30
 ### Added
 - Added `hb_wrap_handler` to automatically capture AWS Lambda handler errors
 
