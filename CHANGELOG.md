@@ -4,6 +4,9 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added `hb_wrap_handler` to automatically capture AWS Lambda handler errors
+
 ### Fixed
 - Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
 
