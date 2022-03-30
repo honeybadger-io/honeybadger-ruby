@@ -19,13 +19,14 @@ describe "Lambda Plugin" do
     expect(config[:sync]).to eq true
   end
 
-  describe "hb_lambda decorator" do
+  describe "hb_wrap_handler decorator" do
     it 'auto-captures errors from class methods when decorator is used' do
       expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
       Honeybadger::Plugin.instances[:lambda].load!(config)
       klass = Class.new do
         extend ::Honeybadger::Plugins::LambdaExtension
-        hb_lambda def self.test_handler(event:, context:)
+        hb_wrap_handler :test_handler
+        def self.test_handler(event:, context:)
           raise "An exception"
         end
       end
@@ -39,9 +40,10 @@ describe "Lambda Plugin" do
 
       main = TOPLEVEL_BINDING.eval("self")
       main.instance_eval do
-        hb_lambda def test_handler(event:, context:)
+        def test_handler(event:, context:)
           raise "An exception"
         end
+        hb_wrap_handler :test_handler
       end
       expect { main.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
     end

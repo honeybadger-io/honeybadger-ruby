@@ -4,39 +4,43 @@ require 'honeybadger/util/lambda'
 module Honeybadger
   module Plugins
     module LambdaExtension
-      unless self.respond_to?(:hb_lambda)
-        # Decorator for Lambda handlers so exceptions can be automatically captured
+      unless self.respond_to?(:hb_wrap_handler)
+        # Wrap Lambda handlers so exceptions can be automatically captured
         #
         # Usage:
         #
-        # hb_lambda def my_lambda_handler(event:, context:)
-        #   # Handler code
+        # # Automatically included in the top-level main object
+        # hb_wrap_handler :my_handler_1, :my_handler_2
+        #
+        # def my_handler_1(event:, context:)
         # end
         #
         # class MyLambdaApp
         #   extend ::Honeybadger::Plugins::LambdaExtension
         #
-        #   hb_lambda def self.my_lambda_handler(event:, context:)
-        #     # Handler code
+        #   hb_wrap_handler :my_handler_1, :my_handler_2
+        #
+        #   def self.my_handler_1(event:, context:)
         #   end
         # end
-        def hb_lambda(handler_name)
-          original_method = method(handler_name)
-          self.define_singleton_method(handler_name) do |event:, context:|
-            Honeybadger.context({ aws_request_id: context.aws_request_id }) if context.respond_to?(:aws_request_id)
+        def hb_wrap_handler(*handler_names)
+          mod = Module.new do
+            handler_names.each do |handler|
+              define_method(handler) do |event:, context:|
+                Honeybadger.context({ aws_request_id: context.aws_request_id }) if context.respond_to?(:aws_request_id)
 
-            original_method.call(event: event, context: context)
-          rescue => e
-            Honeybadger.notify(e)
-            # Bubble the error up to Lambda, but disable other reporting to avoid duplicates in local emulated environments
-            # Since the process immediately exits, nothing else is affected
-            Honeybadger.config[:'exceptions.notify_at_exit'] = false
-            raise
+                super(event: event, context: context)
+              rescue => e
+                Honeybadger.notify(e)
+                raise
+              end
+            end
           end
+
+          self.singleton_class.prepend(mod)
         end
       end
     end
-
 
     # @api private
     Plugin.register :lambda do
@@ -44,6 +48,7 @@ module Honeybadger
 
       execution do
         config[:sync] = true
+        config[:'exceptions.notify_at_exit'] = false
 
         main = TOPLEVEL_BINDING.eval("self")
         main.extend(LambdaExtension)

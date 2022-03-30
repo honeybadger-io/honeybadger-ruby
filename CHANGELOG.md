@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Improved AWS Lambda integration with `hb_lambda` decorator
+- Added `hb_wrap_handler` to automatically capture AWS Lambda handler errors
 
 ### Fixed
 - Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
