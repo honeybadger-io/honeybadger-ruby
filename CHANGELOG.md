@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Improved AWS Lambda integration with `hb_lambda` decorator
 
+### Fixed
+- Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
+
 ## [4.11.0] - 2022-02-15
 ### Fixed
 - Allow special characters in tags. Also support space-delimited tags:
