@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Fix Lambda plugin: support Ruby <2.5 (#428)
 
 ## [4.12.0] - 2022-03-30
 ### Added
