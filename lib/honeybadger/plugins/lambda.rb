@@ -39,6 +39,7 @@ module Honeybadger
         end
 
         self.singleton_class.prepend(mod)
+        Kernel.singleton_class.prepend(mod) if self == TOPLEVEL_BINDING.eval("self")
       end
     end
 
