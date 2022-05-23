@@ -7,8 +7,8 @@ module Honeybadger
             from_capistrano(root) ||
             from_git
 
-          revision.strip!
-          return nil unless revision =~ /\S/
+          revision = revision.to_s.strip
+          return unless revision =~ /\S/
 
           revision
         end
@@ -20,7 +20,7 @@ module Honeybadger
         #
         # See https://devcenter.heroku.com/articles/dyno-metadata
         def from_heroku
-          ENV['HEROKU_SLUG_COMMIT'].dup
+          ENV['HEROKU_SLUG_COMMIT']
         end
 
         def from_capistrano(root)
