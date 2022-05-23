@@ -18,4 +18,9 @@ describe Honeybadger::Util::Revision do
     ENV['HEROKU_SLUG_COMMIT'] = 'heroku revision'
     expect(Honeybadger::Util::Revision.detect).to eq('heroku revision')
   end
+
+  it "removes empty string revision" do
+    allow(Honeybadger::Util::Revision).to receive(:from_git).and_return(" ")
+    expect(Honeybadger::Util::Revision.detect).to eq(nil)
+  end
 end
