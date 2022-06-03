@@ -52,11 +52,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   appraise 'rails6.1' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
     gem 'sqlite3', '~> 1.4', platforms: :mri
-
-    # 6.1 is currently only supported on master branch for jruby/activerecord-jdbc-adapter
-    # When this changes, from: `git: 'jruby/activerecord-jdbc-adapter'` to `"61"`
-    # gem 'activerecord-jdbcsqlite3-adapter', git: 'jruby/activerecord-jdbc-adapter', platforms: :jruby
-    gem 'activerecord-jdbcsqlite3-adapter', github: 'jruby/activerecord-jdbc-adapter', platforms: :jruby
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 61', platforms: :jruby
     gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
