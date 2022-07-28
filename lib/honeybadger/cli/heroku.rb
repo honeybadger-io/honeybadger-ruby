@@ -93,7 +93,7 @@ module Honeybadger
       end
 
       def run(cmd)
-        Bundler.with_clean_env { `#{cmd}` }
+        Bundler.with_unbundled_env { `#{cmd}` }
       end
 
       def heroku_var(var, app_name, default = nil)
