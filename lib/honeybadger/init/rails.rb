@@ -17,7 +17,7 @@ module Honeybadger
           app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback)
         end
 
-        config.after_initialize do
+        config.before_initialize do
           Honeybadger.init!({
             :root           => ::Rails.root.to_s,
             :env            => ::Rails.env,
@@ -25,6 +25,9 @@ module Honeybadger
             :logger         => Logging::FormattedLogger.new(::Rails.logger),
             :framework      => :rails
           })
+        end
+
+        config.after_initialize do
           Honeybadger.load_plugins!
         end
       end
