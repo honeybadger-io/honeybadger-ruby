@@ -28,6 +28,7 @@ def load_rails_hooks(spec)
     # Because we create a new Agent after each spec run, we need to make sure
     # that rerun the after_initialize hook to initilize our Agent
     if RailsApp.initialized?
+      ActiveSupport.run_load_hooks(:before_initialize, RailsApp)
       ActiveSupport.run_load_hooks(:after_initialize, RailsApp)
     else
       RailsApp.initialize!
