@@ -28,7 +28,7 @@ module Honeybadger
         return {} unless defined?(::Rack::Request)
         return {} unless env
 
-        hash, request = {}, ::Rack::Request.new(env)
+        hash, request = {}, ::Rack::Request.new(env.dup)
 
         hash[:url] = extract_url(request)
         hash[:params] = extract_params(request)
