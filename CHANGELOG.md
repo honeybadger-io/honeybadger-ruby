@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Fix a bug where the auto-detected revision is blank instead of nil
+- Fix inadvertent creation of invalid sessions (#441)
 
 ## [4.12.1] - 2022-04-01
 ### Fixed
