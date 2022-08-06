@@ -29,6 +29,16 @@ module Honeybadger
         end
       end
 
+      class ErrorSubscriber
+        def report(exception, handled:, severity:, context: {}, source: nil)
+          return if source && config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
+
+          tags = ['reporter:rails.error_subscriber', "severity:#{severity}", "handled:#{handled}"]
+          tags << "source:#{source}" if source
+          Honeybadger.notify(exception, context: context, tags: tags)
+        end
+      end
+
       Plugin.register :rails_exceptions_catcher do
         requirement { defined?(::Rails.application) && ::Rails.application }
 
@@ -40,6 +50,11 @@ module Honeybadger
           elsif defined?(::ActionDispatch::ShowExceptions)
             # Rails 3.0.x and 3.1.x
             ::ActionDispatch::ShowExceptions.prepend(ExceptionsCatcher)
+          end
+
+          if defined?(::ActiveSupport::ErrorReporter)
+            # Rails 7
+            ::ActiveSupport::ErrorReporter.register(ErrorSubscriber)
           end
         end
       end
