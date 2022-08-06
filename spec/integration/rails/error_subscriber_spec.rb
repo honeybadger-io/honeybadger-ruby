@@ -6,6 +6,18 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
   load_rails_hooks(self)
 
   it "reports exceptions" do
+    Rails.error.handle(severity: :warning, context: {key: 'value'}) do
+      raise RuntimeError, "Oh no"
+    end
+
+    expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
+    notice = Honeybadger::Backend::Test.notifications[:notices].first
+    expect(notice.error_class).to eq("RuntimeError")
+    expect(notice.context).to eq({key: 'value'})
+    expect(notice.tags).to eq(["reporter:rails.error_subscriber", "severity:warning", "handled:true"])
+  end
+
+  it "reports exceptions with source", if: RAILS_ERROR_SOURCE_SUPPORTED do
     Rails.error.handle(severity: :warning, context: {key: 'value'}, source: "task") do
       raise RuntimeError, "Oh no"
     end
@@ -14,12 +26,10 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
     expect(notice.context).to eq({key: 'value'})
-    tags = ["reporter:rails.error_subscriber", "severity:warning", "handled:true"]
-    tags << "source:task" if RAILS_ERROR_SOURCE_SUPPORTED
-    expect(notice.tags).to eq(tags)
+    expect(notice.tags).to eq(["reporter:rails.error_subscriber", "severity:warning", "handled:true", "source:task"])
   end
 
-  it "doesn't report ignored sources", if: RAILS_ERROR_SOURCE_SUPPORTED do
+  it "doesn't report errors from ignored sources", if: RAILS_ERROR_SOURCE_SUPPORTED do
     Honeybadger.configure do |config|
       config[:'rails.subscriber_ignore_sources'] += [/ignored/]
     end
