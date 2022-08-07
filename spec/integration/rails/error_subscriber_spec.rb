@@ -6,26 +6,30 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
   load_rails_hooks(self)
 
   it "reports exceptions" do
-    Rails.error.handle(severity: :warning, context: {key: 'value'}) do
-      raise RuntimeError, "Oh no"
+    Honeybadger.flush do
+      Rails.error.handle(severity: :warning, context: { key: 'value' }) do
+        raise RuntimeError, "Oh no"
+      end
     end
 
     expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
-    expect(notice.context).to eq({key: 'value'})
+    expect(notice.context).to eq({ key: 'value' })
     expect(notice.tags).to eq(["reporter:rails.error_subscriber", "severity:warning", "handled:true"])
   end
 
   it "reports exceptions with source", if: RAILS_ERROR_SOURCE_SUPPORTED do
-    Rails.error.handle(severity: :warning, context: {key: 'value'}, source: "task") do
-      raise RuntimeError, "Oh no"
+    Honeybadger.flush do
+      Rails.error.handle(severity: :warning, context: { key: 'value' }, source: "task") do
+        raise RuntimeError, "Oh no"
+      end
     end
 
     expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
-    expect(notice.context).to eq({key: 'value'})
+    expect(notice.context).to eq({ key: 'value' })
     expect(notice.tags).to eq(["reporter:rails.error_subscriber", "severity:warning", "handled:true", "source:task"])
   end
 
@@ -34,8 +38,10 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
       config[:'rails.subscriber_ignore_sources'] += [/ignored/]
     end
 
-    Rails.error.handle(severity: :warning, context: {key: 'value'}, source: "ignored_source") do
-      raise RuntimeError, "Oh no"
+    Honeybadger.flush do
+      Rails.error.handle(severity: :warning, context: { key: 'value' }, source: "ignored_source") do
+        raise RuntimeError, "Oh no"
+      end
     end
 
     expect(Honeybadger::Backend::Test.notifications[:notices]).to be_empty

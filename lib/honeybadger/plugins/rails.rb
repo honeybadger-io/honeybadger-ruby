@@ -30,7 +30,7 @@ module Honeybadger
       end
 
       class ErrorSubscriber
-        def report(exception, handled:, severity:, context: {}, source: nil)
+        def self.report(exception, handled:, severity:, context: {}, source: nil)
           return if source && config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
 
           tags = ['reporter:rails.error_subscriber', "severity:#{severity}", "handled:#{handled}"]
@@ -54,7 +54,7 @@ module Honeybadger
 
           if defined?(::ActiveSupport::ErrorReporter)
             # Rails 7
-            ::ActiveSupport::ErrorReporter.register(ErrorSubscriber)
+            ::Rails.error.subscribe(ErrorSubscriber)
           end
         end
       end
