@@ -83,7 +83,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
   # Rails edge
   appraise 'rails' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, github: 'rails' }
-    gem 'rack', github: 'rack/rack'
+    gem 'rack', github: 'rack/rack', branch: '2-2-stable' # Rack's main branch is Rack 3, but ActionPack currently requires Rack 2
     gem 'arel', github: 'rails/arel'
     gem 'sqlite3', '~> 1.4', platforms: :mri
     gem 'capistrano', '~> 3.0'
