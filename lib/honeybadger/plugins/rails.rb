@@ -31,11 +31,12 @@ module Honeybadger
 
       class ErrorSubscriber
         def self.report(exception, handled:, severity:, context: {}, source: nil)
-          return if source && config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
+          return if source && ::Honeybadger.config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
 
           tags = ['reporter:rails.error_subscriber', "severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
           Honeybadger.notify(exception, context: context, tags: tags)
+          exception.instance_variable_set(:@__hb_handled, true)
         end
       end
 
