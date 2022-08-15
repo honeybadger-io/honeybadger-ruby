@@ -12,7 +12,7 @@ module Release
   end
 
   def self.run_after(version)
-    Bundler.with_clean_env { system(EXIT_CMD) }
+    Bundler.with_unbundled_env { system(EXIT_CMD) }
   end
 
   def self.bump_changelog(version)
