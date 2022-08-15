@@ -9,6 +9,9 @@ adheres to [Semantic Versioning](http://semver.org/).
   report errors raised during startup. Config added via `Honeybadger.configure`
   is added later in the Rails initialization process.
 
+### Added
+- Support Rails 7 error reporting interface (#443)
+
 ## [4.12.2] - 2022-08-15
 ### Fixed
 - Fix a bug where the auto-detected revision is blank instead of nil
