@@ -19,7 +19,7 @@ gem "activerecord", github: "rails"
 gem "activejob", github: "rails"
 gem "railties", github: "rails"
 gem "actionpack", github: "rails"
-gem "rack", github: "rack/rack"
+gem "rack", github: "rack/rack", branch: "2-2-stable"
 gem "arel", github: "rails/arel"
 gem "sqlite3", "~> 1.4", platforms: :mri
 gem "better_errors", require: false, platforms: :mri

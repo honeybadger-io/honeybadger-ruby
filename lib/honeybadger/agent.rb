@@ -122,6 +122,7 @@ module Honeybadger
       opts = opts.dup
 
       if exception_or_opts.is_a?(Exception)
+        return nil if exception_or_opts.instance_variable_get(:@__hb_handled)
         opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
         opts.merge!(exception_or_opts.to_hash)
