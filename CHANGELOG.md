@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Honeybadger is now initialized before Rails' initializers, allowing you to report errors raised during startup.
 
 ## [4.12.2] - 2022-08-15
 ### Fixed
