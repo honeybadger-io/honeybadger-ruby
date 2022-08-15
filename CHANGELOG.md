@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.12.2] - 2022-08-15
 ### Fixed
 - Fix a bug where the auto-detected revision is blank instead of nil
 - Fix inadvertent creation of invalid sessions (#441)
