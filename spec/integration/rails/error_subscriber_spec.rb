@@ -22,13 +22,11 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
   it "does not report exceptions again if they have already been handled by the subscriber" do
     expect do
       Honeybadger.flush do
-        Rails.error.record(context: { key: 'value' }) do
-          raise RuntimeError, "Oh no"
-        end
-      end
+        Rails.error.record(context: { key: 'value' }) { raise RuntimeError, "Oh no" }
       rescue => e
         Honeybadger.notify(e)
         raise
+      end
     end.to raise_error(RuntimeError, "Oh no")
 
     expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
