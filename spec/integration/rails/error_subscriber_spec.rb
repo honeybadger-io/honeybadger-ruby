@@ -16,7 +16,7 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
     expect(notice.context).to eq({ key: 'value' })
-    expect(notice.tags).to eq(["severity:warning"])
+    expect(notice.tags).to eq(["severity:warning", "handled:true"])
   end
 
   it "does not report exceptions again if they have already been handled by the subscriber" do
@@ -33,7 +33,7 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
     expect(notice.context).to eq({ key: 'value' })
-    expect(notice.tags).to eq(["severity:error"])
+    expect(notice.tags).to eq(["severity:error", "handled:false"])
   end
 
   it "reports exceptions with source", if: RAILS_ERROR_SOURCE_SUPPORTED do
@@ -47,7 +47,7 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
     expect(notice.context).to eq({ key: 'value' })
-    expect(notice.tags).to eq(["severity:warning", "source:task"])
+    expect(notice.tags).to eq(["severity:warning", "handled:true", "source:task"])
   end
 
   it "doesn't report errors from ignored sources", if: RAILS_ERROR_SOURCE_SUPPORTED do
