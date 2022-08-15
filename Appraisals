@@ -37,9 +37,6 @@ appraise 'rails5.2' do
   gem 'better_errors', require: false, platforms: :mri
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
-
-  # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-  gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 end
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
@@ -50,9 +47,6 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
-
-    # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-    gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
   end
 
   appraise 'rails6.1' do
@@ -63,9 +57,6 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
     gem 'listen'
-
-    # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-    gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
   end
 
   appraise 'rails7.0' do
@@ -75,9 +66,6 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
-
-    # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-    gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
   end
 
   # Rails edge
@@ -89,9 +77,6 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'capistrano', '~> 3.0'
     gem 'better_errors', require: false, platforms: :mri
     gem 'rspec-rails'
-
-    # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-    gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
     # Listen is a soft-dependency in Rails 5. Guard requires listen (which makes
     # it present when generating a new Rails app), so Rails expects it to be

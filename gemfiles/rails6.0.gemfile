@@ -24,7 +24,6 @@ gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
-gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 group :development do
   gem "guard"
