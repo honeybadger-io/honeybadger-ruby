@@ -63,12 +63,16 @@ module Honeybadger
       end
 
       @context = opts.delete(:context)
-      if opts.delete(:local_context)
-        @context ||= ContextManager.new
-        @breadcrumbs = Breadcrumbs::Collector.new(config)
-      end
+      local_context = opts.delete(:local_context)
 
       @config ||= Config.new(opts)
+
+      if local_context
+        @context ||= ContextManager.new
+        @breadcrumbs = Breadcrumbs::Collector.new(config)
+      else
+        @breadcrumbs = nil
+      end
 
       init_worker
     end
@@ -118,6 +122,7 @@ module Honeybadger
       opts = opts.dup
 
       if exception_or_opts.is_a?(Exception)
+        return nil if exception_or_opts.instance_variable_get(:@__hb_handled)
         opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
         opts.merge!(exception_or_opts.to_hash)
@@ -183,6 +188,29 @@ module Honeybadger
       # this is to allow check ins even if a url is passed
       check_in_id = id.to_s.strip.gsub(/\/$/, '').split('/').last
       response = backend.check_in(check_in_id)
+      response.success?
+    end
+
+    # Track a new deployment
+    #
+    # @example
+    #   Honeybadger.track_deployment(revision: 'be2ceb6')
+    #
+    # @param [String] :environment The environment name. Defaults to the current configured environment.
+    # @param [String] :revision The VCS revision being deployed. Defaults to the currently configured revision.
+    # @param [String] :local_username The name of the user who performed the deploy.
+    # @param [String] :repository The base URL of the VCS repository. It should be HTTPS-style.
+    #
+    # @return [Boolean] true if the deployment was successfully tracked and false
+    #   otherwise.
+    def track_deployment(environment: nil, revision: nil, local_username: nil, repository: nil)
+      opts = {
+        environment: environment || config[:env],
+        revision: revision || config[:revision],
+        local_username: local_username,
+        repository: repository
+      }
+      response = backend.track_deployment(opts)
       response.success?
     end
 

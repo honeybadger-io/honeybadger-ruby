@@ -19,12 +19,45 @@ describe "Lambda Plugin" do
     expect(config[:sync]).to eq true
   end
 
+  describe "hb_wrap_handler decorator" do
+    it 'auto-captures errors from class methods when decorator is used' do
+      expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
+      Honeybadger::Plugin.instances[:lambda].load!(config)
+
+      klass = Class.new do
+        extend ::Honeybadger::Plugins::LambdaExtension
+
+        def self.test_handler(event:, context:)
+          raise "An exception"
+        end
+        hb_wrap_handler :test_handler
+      end
+
+      expect { klass.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
+    end
+
+    it 'auto-captures errors from main methods when decorator is used' do
+      expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
+      Honeybadger::Plugin.instances[:lambda].load!(config)
+
+      main = TOPLEVEL_BINDING.eval("self")
+      main.instance_eval do
+        def test_handler(event:, context:)
+          raise "An exception"
+        end
+        hb_wrap_handler :test_handler
+      end
+
+      expect { main.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
+    end
+  end
+
   describe "notice injection" do
-    let(:lambda_data) {{
+    let(:lambda_data) { {
       "function" => "lambda_fn",
       "handler" => "the.handler",
       "memory" => 128
-    }}
+    } }
 
     before do
       expect(Honeybadger::Util::Lambda).to receive(:trace_id).and_return("abc123")

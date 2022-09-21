@@ -55,4 +55,12 @@ describe Honeybadger::Backend::Base do
       expect { subject.check_in(10) }.to raise_error NotImplementedError
     end
   end
+
+  describe "#track_deployment" do
+    it "defers the request to notify with the feature set as deploys" do
+      opts = double(:opts)
+      expect(subject).to receive(:notify).with(:deploys, opts)
+      subject.track_deployment(opts)
+    end
+  end
 end

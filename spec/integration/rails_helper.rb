@@ -1,4 +1,8 @@
 begin
+  # Require these early to work around https://github.com/jruby/jruby#6547 
+  #   can be pulled out > 9.2.14 of jruby.
+  require 'i18n'
+  require 'i18n/backend/simple'
   require 'rails'
   RAILS_PRESENT = true
 
@@ -24,6 +28,7 @@ def load_rails_hooks(spec)
     # Because we create a new Agent after each spec run, we need to make sure
     # that rerun the after_initialize hook to initilize our Agent
     if RailsApp.initialized?
+      ActiveSupport.run_load_hooks(:before_initialize, RailsApp)
       ActiveSupport.run_load_hooks(:after_initialize, RailsApp)
     else
       RailsApp.initialize!

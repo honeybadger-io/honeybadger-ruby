@@ -5,9 +5,9 @@ feature "Running the notify CLI command" do
   end
 
   it "requires the --message flag" do
-    expect(run_command('honeybadger notify')).to be_successfully_executed
-    expect(all_output).to match('--message')
-    assert_no_notification
+    output = capture(:stderr) { Honeybadger::CLI.start(%w[notify]) }
+    expect(output).to match('--message')
+    assert_no_notification(output)
   end
 
   context "with a message" do
@@ -42,7 +42,7 @@ feature "Running the notify CLI command" do
   context "when Rails is detected via the presence of environment.rb" do
     before do
       config_path = File.join(Dir.pwd, 'tmp', 'features', 'config')
-      Dir.mkdir(config_path) unless File.exists?(config_path)
+      Dir.mkdir(config_path) unless File.exist?(config_path)
       File.open(File.join(config_path, 'environment.rb'), 'w')
     end
 

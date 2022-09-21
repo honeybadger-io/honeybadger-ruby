@@ -242,11 +242,9 @@ describe Honeybadger::Worker do
         allow(config.logger).to receive(:warn)
         expect(config.logger).to receive(:warn).with(/throttled/i)
 
-        subject.push(obj)
-        subject.push(obj)
-        subject.push(obj)
-        subject.push(obj)
-        subject.push(obj)
+        30.times do
+          subject.push(obj)
+        end
 
         subject.shutdown
       end

@@ -13,11 +13,17 @@ module Honeybadger
                       'ActionController::UnknownFormat',
                       'ActionController::InvalidAuthenticityToken',
                       'ActionController::InvalidCrossOriginRequest',
+                      # ActionDispatch::ParamsParser::ParseError was removed in Rails 6.0
+                      # and may be removed here once support for Rails 5.2 is dropped.
+                      # https://github.com/rails/rails/commit/e16c765ac6dcff068ff2e5554d69ff345c003de1
+                      # https://github.com/honeybadger-io/honeybadger-ruby/pull/358
                       'ActionDispatch::ParamsParser::ParseError',
+                      'ActionDispatch::Http::Parameters::ParseError',
                       'ActionController::BadRequest',
                       'ActionController::ParameterMissing',
                       'ActiveRecord::RecordNotFound',
                       'ActionController::UnknownAction',
+                      'ActionDispatch::Http::MimeNegotiation::InvalidType',
                       'Rack::QueryParser::ParameterTypeError',
                       'Rack::QueryParser::InvalidParameterError',
                       'CGI::Session::CookieStore::TamperedWithCookie',
@@ -293,6 +299,11 @@ module Honeybadger
         description: 'Enable Sinatra auto-initialization.',
         default: true,
         type: Boolean
+      },
+      :'rails.subscriber_ignore_sources' => {
+        description: "Sources (strings or regexes) that should be ignored when using the Rails' (7+) native error reporter.",
+        default: [],
+        type: Array
       },
       :'resque.resque_retry.send_exceptions_when_retrying' => {
         description: 'Send exceptions when retrying job.',

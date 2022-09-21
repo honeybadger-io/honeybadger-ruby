@@ -254,8 +254,8 @@ describe Honeybadger::Config do
   describe "#configure" do
     context "when the app has already been initialized" do
       it "overrides the logger with the configured logger" do
-        INIT_LOGGER = Logger.new('/dev/null')
-        CONFIGURE_LOGGER = Logger.new('/dev/null')
+        INIT_LOGGER = Logger.new(File::NULL)
+        CONFIGURE_LOGGER = Logger.new(File::NULL)
 
         honeybadger = Honeybadger::Config.new.init!(logger: INIT_LOGGER)
 

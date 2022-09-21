@@ -1,8 +1,8 @@
 require 'aruba/rspec'
+require 'aruba/api'
 require 'fileutils'
 require 'logger'
 require 'pathname'
-require 'pry'
 require 'rspec/its'
 require 'webmock/rspec'
 
@@ -23,7 +23,7 @@ Dir[File.expand_path('../support/**/*.rb', __FILE__)].each {|f| require f}
 
 TMP_DIR = Pathname.new(File.expand_path('../../tmp', __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path('../fixtures/', __FILE__))
-NULL_LOGGER = Logger.new('/dev/null')
+NULL_LOGGER = Logger.new(File::NULL)
 NULL_LOGGER.level = Logger::Severity::DEBUG
 
 Aruba.configure do |config|
@@ -48,6 +48,10 @@ RSpec.configure do |config|
 
   config.include Aruba::Api, type: :feature
   config.include FeatureHelpers, type: :feature
+
+  config.before(:all, type: :feature) do
+    require "honeybadger/cli"
+  end
 
   config.before(:each, type: :feature) do
     set_environment_variable('HONEYBADGER_BACKEND', 'debug')

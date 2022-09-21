@@ -10,6 +10,7 @@ describe Honeybadger do
   it { should be_a Module }
   it { should respond_to :notify }
   it { should respond_to :start }
+  it { should respond_to :track_deployment }
 
   it { should define(:Rack) }
 

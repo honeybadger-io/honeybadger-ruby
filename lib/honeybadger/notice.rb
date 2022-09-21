@@ -53,11 +53,11 @@ module Honeybadger
 
     # @api private
     # The String character used to split tag strings.
-    TAG_SEPERATOR = ','.freeze
+    TAG_SEPERATOR = /,|\s/.freeze
 
     # @api private
     # The Regexp used to strip invalid characters from individual tags.
-    TAG_SANITIZER = /[^\w]/.freeze
+    TAG_SANITIZER = /\s/.freeze
 
     # @api private
     class Cause
@@ -118,6 +118,7 @@ module Honeybadger
     # The component (if any) which was used in this request (usually the controller).
     attr_accessor :component
     alias_method :controller, :component
+    alias_method :controller=, :component=
 
     # The action (if any) that was called in this request.
     attr_accessor :action

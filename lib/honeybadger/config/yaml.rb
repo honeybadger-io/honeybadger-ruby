@@ -26,7 +26,11 @@ module Honeybadger
 
       def self.load_yaml(path)
         begin
-          yaml = YAML.load(ERB.new(path.read).result)
+          # This uses `YAML.unsafe_load` to support loading arbitrary Ruby
+          # classes, such as !ruby/regexp. This was the default behavior prior
+          # to Psych 4. https://bugs.ruby-lang.org/issues/17866
+          method = YAML.respond_to?(:unsafe_load) ? :unsafe_load : :load
+          yaml = YAML.send(method, ERB.new(path.read).result)
         rescue => e
           config_error = ConfigError.new(e.to_s)
 

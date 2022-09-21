@@ -44,6 +44,34 @@ describe Honeybadger::Agent do
     end
   end
 
+  describe '#track_deployment' do
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+    subject(:instance) { described_class.new(config) }
+
+    it 'returns true for successful deployment tracking' do
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
+         to_return(status: 200)
+
+      expect(instance.track_deployment).to eq(true)
+    end
+
+    it 'returns false for unsuccessful deployment tracking' do
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
+         to_return(status: 400)
+
+      expect(instance.track_deployment).to eq(false)
+    end
+
+    it 'passes the revision to the servce' do
+      allow_any_instance_of(Honeybadger::Util::HTTP).to receive(:compress) { |_, body| body }
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
+         with(body: { environment: nil, revision: '1234', local_username: nil, repository: nil }).
+         to_return(status: 200)
+
+      expect(instance.track_deployment(revision: '1234')).to eq(true)
+    end
+  end
+
   describe "#clear!" do
     it 'clears all transactional data' do
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
@@ -76,6 +104,14 @@ describe Honeybadger::Agent do
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
       instance.notify("test", opts)
       expect(prev).to eq(opts)
+    end
+
+    it "does not report an already reported exception" do
+      instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
+      exception = RuntimeError.new
+      exception.instance_variable_set(:@__hb_handled, true)
+      expect(instance.notify(exception)).to be_nil
+      expect(Honeybadger::Notice).to_not receive(:new)
     end
 
     it "calls all of the before notify hooks before sending" do
@@ -147,7 +183,7 @@ describe Honeybadger::Agent do
   end
 
   context "breadcrumbs" do
-    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
+    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector, clear!: nil) }
     let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
     subject { described_class.new(config) }
 
@@ -156,10 +192,19 @@ describe Honeybadger::Agent do
     end
 
     describe "#breadcrumbs" do
-      it 'creates instance local breadcrumb' do
-        agent = described_class.new(local_context: true)
-        agent.breadcrumbs
-        expect(Thread.current[:__hb_breadcrumbs]).to be nil
+      context 'when local_context: true' do
+        let(:config) { { local_context: true } }
+
+        it 'creates instance local breadcrumb' do
+          subject.breadcrumbs
+          expect(Thread.current[:__hb_breadcrumbs]).to be nil
+        end
+
+        it 'instantiates the breadcrumb collector with the right config' do
+          allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_call_original
+          subject.breadcrumbs
+          expect(Honeybadger::Breadcrumbs::Collector).to have_received(:new).with(instance_of(Honeybadger::Config))
+        end
       end
 
       it 'stores breadcrumbs in thread local' do

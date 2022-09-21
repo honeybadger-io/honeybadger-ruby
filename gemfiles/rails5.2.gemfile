@@ -4,12 +4,7 @@ source "https://rubygems.org"
 
 gem "allocation_stats", platforms: :mri, require: false
 gem "appraisal", "~> 2.1"
-gem "aruba", "~> 0.14"
-gem "guard"
-gem "guard-rspec"
-gem "pry"
-gem "pry-byebug", platforms: :mri
-gem "rdoc"
+gem "aruba", "~> 2.0"
 gem "rspec", "~> 3.0"
 gem "rspec-its"
 gem "ruby-prof", platforms: :mri, require: false
@@ -17,14 +12,26 @@ gem "timecop"
 gem "webmock"
 gem "capistrano"
 gem "rake"
-gem "listen", "~> 3.2.1"
-gem "bump", "~> 0.8.0"
-gem "rails", "~> 5.2.0"
-gem "sqlite3", "< 1.4", platform: :mri
-gem "activerecord-jdbcsqlite3-adapter", "~> 52", platform: :jruby
-gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
+gem "bump", "~> 0.10.0"
+gem "activesupport", "~> 5.2"
+gem "activemodel", "~> 5.2"
+gem "activerecord", "~> 5.2"
+gem "activejob", "~> 5.2"
+gem "railties", "~> 5.2"
+gem "actionpack", "~> 5.2"
+gem "sqlite3", "~> 1.4", platforms: :mri
+gem "activerecord-jdbcsqlite3-adapter", "~> 52", platforms: :jruby
+gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
+
+group :development do
+  gem "guard"
+  gem "guard-rspec"
+  gem "pry"
+  gem "pry-byebug", platforms: :mri
+  gem "rdoc"
+end
 
 platforms :ruby_25 do
   gem "mathn"

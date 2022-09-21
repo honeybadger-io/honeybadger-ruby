@@ -8,11 +8,92 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Replace deployhook with release webhook (#444)
   See https://blog.heroku.com/deployhooks-sunset
 
+## [5.0.0.beta1] - 2022-08-15
+### Changed
+- Honeybadger is now initialized before Rails' initializers, allowing you to
+  report errors raised during startup. Config added via `Honeybadger.configure`
+  is added later in the Rails initialization process.
+
+### Added
+- Support Rails 7 error reporting interface (#443)
+
+## [4.12.2] - 2022-08-15
+### Fixed
+- Fix a bug where the auto-detected revision is blank instead of nil
+- Fix inadvertent creation of invalid sessions (#441)
+
+## [4.12.1] - 2022-04-01
+### Fixed
+- Fix Lambda plugin: support Ruby <2.5 (#428)
+
+## [4.12.0] - 2022-03-30
+### Added
+- Added `hb_wrap_handler` to automatically capture AWS Lambda handler errors
+
+### Fixed
+- Change `:exception_message` key name to just `:exception` for error breadcrumb metadata.
+
+## [4.11.0] - 2022-02-15
+### Fixed
+- Allow special characters in tags. Also support space-delimited tags:
+  "one two three" and "one, two, three" are equivalent
+
+## [4.10.0] - 2022-01-19
+### Added
+- Add more items to the default config file
+
+### Fixed
+- Fix a Ruby 3.1 bug that breaks regexp classes in honeybadger.yml (#418)
+
+## [4.9.0] - 2021-06-28
+### Fixed
+- Replaced fixed number for retries in Sidekiq Plugin with Sidekiq::JobRetry constant
+- Properly set environment in deployment tracking (#404, @stmllr)
+
+### Added
+- Added 'ActionDispatch::Http::MimeNegotiation::InvalidType' (Rails 6.1) to
+  default ignore list. (#402, @jrochkind)
+
+## [4.8.0] - 2021-03-16
+### Fixed
+- Suppress any error output from the `git rev-parse` command. ([#394](https://github.com/honeybadger-io/honeybadger-ruby/pull/394))
+
+### Added
+- Support deployment tracking in code (#397, @danleyden)
+
+## [4.7.3] - 2021-02-10
+### Fixed
+- Don't enable Lambda plugin in non-Lambda execution environments
+
+## [4.7.2] - 2020-08-17
+### Fixed
+- Remove usage of `ActiveRecord::Base.connection` (thanks @jcoyne for testing)
+- Check for UTF-8 in ActiveRecord breadcrumb exclusion filter
+
+## [4.7.1] - 2020-08-11
+### Fixed
+- ActiveRecord SQL Breadcrumb event pulls adapter from supplied connection,
+  allowing for multiple databases.
+- Fix Rails deprecation of `ActionDispatch::ParamsParser::ParseError`
+- Deal with invalid UTF-8 byte sequences during SQL obfuscation
+- Fix Ruby 2.7 deprecation notice in sql.rb
+
+## [4.7.0] - 2020-06-02
+### Fixed
+- Alias `Notice#controller=` as `Notice#component=`
+- Fix Rails 6.1 deprecation warning with `ActiveRecord::Base.connection_config`
+- Fix agent where breadcrumbs.enabled = true and local_context = true
+
+### Added
+- Add `honeybadger_skip_rails_load` Capistrano option to skip rails load on
+  deployment notification (#355) -@NielsKSchjoedt
+
 ## [4.6.0] - 2020-03-12
 ### Fixed
 - Fixed issue where Sidekiq.attempt_threshold was triggering 2 attempts ahead
   of the setting
-- Dup notify opts before mutating (#345)
+- Dupe notify opts before mutating (#345)
+
 ### Changed
 - Breadcrumbs on by default
 - Added Faktory plugin -@scottrobertson

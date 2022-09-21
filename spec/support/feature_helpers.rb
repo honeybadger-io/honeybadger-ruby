@@ -1,16 +1,31 @@
 require 'json'
 
 module FeatureHelpers
+ # https://github.com/erikhuda/thor/blob/011dc48b5ea92767445b062f971664235973c8b4/spec/helper.rb#L49
+  def capture(stream)
+    begin
+      stream = stream.to_s
+      eval "$#{stream} = StringIO.new"
+      yield
+      result = eval("$#{stream}").string
+    ensure
+      eval("$#{stream} = #{stream.upcase}")
+    end
+
+    result
+  end
+
   # These override some deprecated Aruba helpers which are still useful to us.
   def all_output
     all_commands.map { |c| c.output }.join("\n")
   end
+
   def current_dir
     expand_path('.')
   end
 
-  def assert_no_notification
-    expect(all_output).not_to match(/notifying debug backend of feature=notices/)
+  def assert_no_notification(output = all_output)
+    expect(output).not_to match(/notifying debug backend of feature=notices/)
   end
 
   def assert_notification(expected = {})

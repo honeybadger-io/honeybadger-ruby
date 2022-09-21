@@ -196,7 +196,7 @@ WELCOME
 # What can I do?
 
   - Retry the command.
-  - Make sure you can connect to api.honeybadger.io (`ping api.honeybadger.io`).
+  - Make sure you can connect to api.honeybadger.io (`curl https://api.honeybadger.io/v1/notices`).
   - If you continue to see this message, email us at support@honeybadger.io
     (don't forget to attach this output!)
 

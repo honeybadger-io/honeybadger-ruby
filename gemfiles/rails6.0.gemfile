@@ -4,12 +4,7 @@ source "https://rubygems.org"
 
 gem "allocation_stats", platforms: :mri, require: false
 gem "appraisal", "~> 2.1"
-gem "aruba", "~> 0.14"
-gem "guard"
-gem "guard-rspec"
-gem "pry"
-gem "pry-byebug", platforms: :mri
-gem "rdoc"
+gem "aruba", "~> 2.0"
 gem "rspec", "~> 3.0"
 gem "rspec-its"
 gem "ruby-prof", platforms: :mri, require: false
@@ -17,14 +12,26 @@ gem "timecop"
 gem "webmock"
 gem "capistrano"
 gem "rake"
-gem "listen", "~> 3.2.1"
-gem "bump", "~> 0.8.0"
-gem "rails", "~> 6.0.0.rc1"
-gem "sqlite3", "~> 1.4", platform: :mri
-gem "activerecord-jdbcsqlite3-adapter", github: "jruby/activerecord-jdbc-adapter", platform: :jruby
-gem "better_errors", require: false, platforms: [:ruby_20, :ruby_21]
+gem "bump", "~> 0.10.0"
+gem "activesupport", "~> 6.0"
+gem "activemodel", "~> 6.0"
+gem "activerecord", "~> 6.0"
+gem "activejob", "~> 6.0"
+gem "railties", "~> 6.0"
+gem "actionpack", "~> 6.0"
+gem "sqlite3", "~> 1.4", platforms: :mri
+gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
+
+group :development do
+  gem "guard"
+  gem "guard-rspec"
+  gem "pry"
+  gem "pry-byebug", platforms: :mri
+  gem "rdoc"
+end
 
 platforms :ruby_25 do
   gem "mathn"

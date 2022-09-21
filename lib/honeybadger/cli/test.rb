@@ -175,7 +175,7 @@ To fix this issue, please try the following:
 
   - Make sure the gem is configured properly.
   - Retry executing this command a few times.
-  - Make sure you can connect to #{host} (`ping #{host}`).
+  - Make sure you can connect to #{host} (`curl https://#{host}/v1/notices`).
   - Email support@honeybadger.io for help. Include as much debug info as you
     can for a faster resolution!
 
@@ -256,7 +256,7 @@ love: making developers awesome.
 Happy 'badgering!
 
 Sincerely,
-Ben, Josh and Starr
+The Honeybadger Crew
 https://www.honeybadger.io/about/
 
 ⚡ --- End --------------------------------------------------------------------

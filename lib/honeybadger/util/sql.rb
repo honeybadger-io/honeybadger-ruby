@@ -11,7 +11,7 @@ module Honeybadger
       DoubleQuoters = /(postgres|sqlite|postgis)/.freeze
 
       def self.obfuscate(sql, adapter)
-        sql.dup.tap do |s|
+        force_utf_8(sql.dup).tap do |s|
           s.gsub!(EscapedQuotes, EmptyReplacement)
           s.gsub!(SQuotedData, Replacement)
           s.gsub!(DQuotedData, Replacement) if adapter =~ DoubleQuoters
@@ -19,6 +19,15 @@ module Honeybadger
           s.gsub!(Newline, EmptyReplacement)
           s.squeeze!(' ')
         end
+      end
+
+      def self.force_utf_8(string)
+        string.encode(
+          Encoding.find('UTF-8'),
+          invalid: :replace, 
+          undef: :replace, 
+          replace: ''
+        )
       end
     end
   end
