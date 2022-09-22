@@ -4,6 +4,9 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Replace deployhook with release webhook (#444)
+  See https://blog.heroku.com/deployhooks-sunset
 
 ## [5.0.0.beta1] - 2022-08-15
 ### Changed
