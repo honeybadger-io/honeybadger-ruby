@@ -122,7 +122,9 @@ module Honeybadger
       opts = opts.dup
 
       if exception_or_opts.is_a?(Exception)
-        return nil if exception_or_opts.instance_variable_get(:@__hb_handled)
+        already_reported_notice_id = exception_or_opts.instance_variable_get(:@__hb_notice_id)
+        return already_reported_notice_id if already_reported_notice_id
+
         opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
         opts.merge!(exception_or_opts.to_hash)
@@ -172,6 +174,7 @@ module Honeybadger
         push(notice)
       end
 
+      exception_or_opts.instance_variable_set(:@__hb_notice_id, notice.id) if exception_or_opts.is_a?(Exception)
       notice.id
     end
 

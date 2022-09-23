@@ -36,7 +36,6 @@ module Honeybadger
           tags = ["severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
           Honeybadger.notify(exception, context: context, tags: tags)
-          exception.instance_variable_set(:@__hb_handled, true)
         end
       end
 

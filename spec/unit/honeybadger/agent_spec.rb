@@ -109,8 +109,9 @@ describe Honeybadger::Agent do
     it "does not report an already reported exception" do
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
       exception = RuntimeError.new
-      exception.instance_variable_set(:@__hb_handled, true)
-      expect(instance.notify(exception)).to be_nil
+      notice_id = '4g09ko4f'
+      exception.instance_variable_set(:@__hb_notice_id, notice_id)
+      expect(instance.notify(exception)).to be notice_id
       expect(Honeybadger::Notice).to_not receive(:new)
     end
 
