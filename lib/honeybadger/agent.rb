@@ -174,7 +174,10 @@ module Honeybadger
         push(notice)
       end
 
-      exception_or_opts.instance_variable_set(:@__hb_notice_id, notice.id) if exception_or_opts.is_a?(Exception)
+      if exception_or_opts.is_a?(Exception)
+        exception_or_opts.instance_variable_set(:@__hb_notice_id, notice.id) unless exception_or_opts.frozen?
+      end
+
       notice.id
     end
 
