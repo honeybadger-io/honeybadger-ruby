@@ -25,6 +25,7 @@ gem "sqlite3", "~> 1.4", platforms: :mri
 gem "better_errors", require: false, platforms: :mri
 gem "rspec-rails"
 gem "listen"
+gem "tzinfo-data"
 
 group :development do
   gem "guard"
