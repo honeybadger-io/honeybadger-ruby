@@ -52,7 +52,7 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
 
   it "doesn't report errors from ignored sources", if: RAILS_ERROR_SOURCE_SUPPORTED do
     Honeybadger.configure do |config|
-      config[:'rails.subscriber_ignore_sources'] += [/ignored/]
+      config.rails.subscriber_ignore_sources += [/ignored/]
     end
 
     Honeybadger.flush do

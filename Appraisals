@@ -37,6 +37,7 @@ appraise 'rails5.2' do
   gem 'better_errors', require: false, platforms: :mri
   gem 'rack-mini-profiler', require: false
   gem 'rspec-rails'
+  gem 'tzinfo-data' # Needed for timezones to work on Windows
 end
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
@@ -57,6 +58,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
     gem 'listen'
+    gem 'tzinfo-data' # Needed for timezones to work on Windows
   end
 
   appraise 'rails7.0' do
@@ -66,6 +68,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
+    gem 'tzinfo-data' # Needed for timezones to work on Windows
   end
 
   # Rails edge
@@ -82,6 +85,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     # it present when generating a new Rails app), so Rails expects it to be
     # there. See https://github.com/rails/rails/pull/24066
     gem 'listen'
+    gem 'tzinfo-data' # Needed for timezones to work on Windows
   end
 end
 
