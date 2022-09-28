@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Replace deployhook with release webhook (#444)
   See https://blog.heroku.com/deployhooks-sunset
 
+### Changed
+- `Honeybadger.notify` is now idempotent; it will skip reporting exception objects that have already been reported before, and simply return the existing notice ID.
+
 ## [5.0.0.beta1] - 2022-08-15
 ### Changed
 - Honeybadger is now initialized before Rails' initializers, allowing you to
