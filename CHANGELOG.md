@@ -4,21 +4,22 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Fixed
-- Replace deployhook with release webhook (#444)
-  See https://blog.heroku.com/deployhooks-sunset
 
+## [5.0.0] - 2022-10-18
 ### Changed
-- `Honeybadger.notify` is now idempotent; it will skip reporting exception objects that have already been reported before, and simply return the existing notice ID.
-
-## [5.0.0.beta1] - 2022-08-15
-### Changed
+- `Honeybadger.notify` is now idempotent; it will skip reporting exception
+  objects that have already been reported before, and simply return the existing
+  notice ID.
 - Honeybadger is now initialized before Rails' initializers, allowing you to
   report errors raised during startup. Config added via `Honeybadger.configure`
   is added later in the Rails initialization process.
 
 ### Added
 - Support Rails 7 error reporting interface (#443)
+
+### Fixed
+- Replace deployhook with release webhook (#444)
+  See https://blog.heroku.com/deployhooks-sunset
 
 ## [4.12.2] - 2022-08-15
 ### Fixed
