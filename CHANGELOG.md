@@ -4,7 +4,11 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
+- Ignore Sidekiq::JobRetry skip exception. Since support was added for Rails 7
+  error reporting interface these exeptions are being reported in addition to
+  the exception that caused the job to be retried. Mike Perham says these
+  exceptions can safely be ignored.
+  See https://github.com/rails/rails/pull/43625#issuecomment-1071574110
 ## [5.0.0] - 2022-10-18
 ### Changed
 - `Honeybadger.notify` is now idempotent; it will skip reporting exception
