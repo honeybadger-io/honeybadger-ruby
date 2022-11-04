@@ -39,6 +39,7 @@ module Honeybadger
 
       def check_in(id)
         check_ins << id
+        super
       end
     end
   end

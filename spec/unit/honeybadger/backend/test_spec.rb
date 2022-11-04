@@ -39,5 +39,9 @@ describe Honeybadger::Backend::Test do
     it "saves check_in for review" do
       expect { instance.check_in(10) }.to change { instance.check_ins }.from([]).to([10])
     end
+
+    it "should return a Honeybadger::Backend::Response" do
+      expect(instance.check_in(10)).to be_a Honeybadger::Backend::Response
+    end
   end
 end

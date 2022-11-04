@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- `Honeybadger.check_in` would raise an exception when used with the test backend (#449)
 
 ## [5.0.1] - 2022-10-27
 ### Fixed
