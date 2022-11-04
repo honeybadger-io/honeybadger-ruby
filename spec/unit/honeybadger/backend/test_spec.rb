@@ -9,8 +9,9 @@ describe Honeybadger::Backend::Test do
 
   subject { instance }
 
-  after do
+  before do
     Honeybadger::Backend::Test.notifications.clear
+    Honeybadger::Backend::Test.check_ins.clear
   end
 
   it { should respond_to :notifications }
