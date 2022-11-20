@@ -238,11 +238,21 @@ module Honeybadger
     end
 
     def log_level(key = :'logging.level')
-      case self[key].to_s
+      level = self[key].to_s.strip
+
+      # Use the rails log level if the user doesn't pass a log_level.
+      level = Rails.application.config.log_level if defined?(Rails) && level.empty?
+
+      # https://guides.rubyonrails.org/debugging_rails_applications.html#sending-messages
+      case level
       when /\A(0|debug)\z/i then Logger::DEBUG
       when /\A(1|info)\z/i  then Logger::INFO
       when /\A(2|warn)\z/i  then Logger::WARN
       when /\A(3|error)\z/i then Logger::ERROR
+
+      # These 2 are unsupported by Honeybadger, but supported by Rails logger.
+      when /\A(4|fatal)\z/i then Logger::ERROR
+      when /\A(5|unknown)\z/i then Logger::ERROR
       else
         Logger::INFO
       end

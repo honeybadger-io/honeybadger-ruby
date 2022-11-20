@@ -24,6 +24,13 @@ describe "Rails integration", if: RAILS_PRESENT, type: :request do
     expect(Honeybadger.config.get(:env)).to eq(Rails.env)
   end
 
+  it "sets the log level from the Rails application" do
+    RailsApp.application.config.log_level = :fatal
+
+    # expect(Honeybadger.config.get(:log_level)).to eq(Honeybadger::Logger::Error)
+    expect(false).to eq(true)
+  end
+
   context "default ignored exceptions" do
     it "doesn't report exception" do
       Honeybadger.flush { get "/record_not_found" }
