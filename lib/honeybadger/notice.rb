@@ -235,7 +235,7 @@ module Honeybadger
           token: id,
           class: s(error_class),
           message: s(error_message),
-          backtrace: s(parse_backtrace(backtrace)),
+          backtrace: s(parsed_backtrace),
           fingerprint: fingerprint_hash,
           tags: s(tags),
           causes: s(prepare_causes(causes))
@@ -278,6 +278,11 @@ module Honeybadger
     # Determines if this notice will be discarded.
     def halted?
       !!@halted
+    end
+
+    # Get the parsed exception backtrace.
+    def parsed_backtrace
+      @parsed_backtrace ||= parse_backtrace(backtrace)
     end
 
     private
