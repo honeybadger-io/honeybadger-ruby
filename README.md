@@ -10,7 +10,7 @@ When an uncaught exception occurs, Honeybadger will POST the relevant data to th
 
 ## Documentation and Support
 
-For comprehensive documentation and support, [check out our documentation site](https://docs.honeybadger.io/ruby/index.html).
+For comprehensive documentation and support, [check out our documentation site](https://docs.honeybadger.io/lib/ruby/).
 
 ## Changelog
 
