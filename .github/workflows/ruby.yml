@@ -55,7 +55,7 @@ jobs:
         bundle exec rake
 
   jruby:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 # ubuntu-latest is currently 22.04, which doesn't have a supported JRuby 9 build yet
     strategy:
       matrix:
         ruby:
