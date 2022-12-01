@@ -280,7 +280,10 @@ module Honeybadger
       !!@halted
     end
 
-    # Get the parsed exception backtrace.
+    # The parsed exception backtrace. Lines in this backtrace that are from installed gems
+    # have the base path for gem installs replaced by "[GEM_ROOT]", while those in the project
+    # have "[PROJECT_ROOT]".
+    # @return [Array<{:number, :file, :method => String}>]
     def parsed_backtrace
       @parsed_backtrace ||= parse_backtrace(backtrace)
     end
