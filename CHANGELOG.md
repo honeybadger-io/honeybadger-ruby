@@ -4,6 +4,7 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Expose `notice.parsed_backtrace` (#454)
 
 ## [5.0.2] - 2022-11-04
 ### Fixed

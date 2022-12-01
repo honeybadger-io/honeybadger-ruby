@@ -655,6 +655,20 @@ describe Honeybadger::Notice do
     end
   end
 
+  describe "#parsed_backtrace" do
+    let(:backtrace) { ["my/file/backtrace.rb:3:in `magic'"] }
+
+    let(:exception) { build_exception({ backtrace: backtrace }) }
+
+    it "returns the parsed backtrace" do
+      expect(Honeybadger::Backtrace).to receive(:parse).once.and_call_original
+      notice =  build_notice({exception: exception, config: config})
+      expect(notice.parsed_backtrace.first[:number]).to eq '3'
+      expect(notice.parsed_backtrace.first[:file]).to eq 'my/file/backtrace.rb'
+      expect(notice.parsed_backtrace.first[:method]).to eq 'magic'
+    end
+  end
+
   describe "#to_json" do
     context "when local variables are found" do
       it "sends local_variables in request payload" do
