@@ -144,6 +144,14 @@ module Honeybadger
     # Custom details data
     attr_accessor :details
 
+    # The parsed exception backtrace. Lines in this backtrace that are from installed gems
+    # have the base path for gem installs replaced by "[GEM_ROOT]", while those in the project
+    # have "[PROJECT_ROOT]".
+    # @return [Array<{:number, :file, :method => String}>]
+    def parsed_backtrace
+      @parsed_backtrace ||= parse_backtrace(backtrace)
+    end
+
     # @api private
     # Cache project path substitutions for backtrace lines.
     PROJECT_ROOT_CACHE = {}
@@ -278,14 +286,6 @@ module Honeybadger
     # Determines if this notice will be discarded.
     def halted?
       !!@halted
-    end
-
-    # The parsed exception backtrace. Lines in this backtrace that are from installed gems
-    # have the base path for gem installs replaced by "[GEM_ROOT]", while those in the project
-    # have "[PROJECT_ROOT]".
-    # @return [Array<{:number, :file, :method => String}>]
-    def parsed_backtrace
-      @parsed_backtrace ||= parse_backtrace(backtrace)
     end
 
     private
