@@ -30,6 +30,14 @@ appraise 'resque' do
   gem 'mock_redis'
 end
 
+appraise 'sidekiq' do
+  gem 'sidekiq', '~> 6'
+end
+
+appraise 'sidekiq7' do
+  gem 'sidekiq', '~> 7'
+end
+
 appraise 'rails5.2' do
   RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 5.2" }
   gem 'sqlite3', '~> 1.4', platforms: :mri
