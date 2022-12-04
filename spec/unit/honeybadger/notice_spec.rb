@@ -105,7 +105,7 @@ describe Honeybadger::Notice do
     end
   end
 
-  it "includes Exception#detailed_message in the error message when available" do
+  it "uses Exception#detailed_message for the error message when available" do
     exception = begin
       1.time {} # Doesn't really matter the code that causes it, since we override #detailed_message anyway
     rescue => e
