@@ -5,7 +5,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 - Expose `notice.parsed_backtrace` (#454)
-- Support SIdekiq 7 (#458)
+- Support Sidekiq 7 (#458)
 
 ## [5.0.2] - 2022-11-04
 ### Fixed
