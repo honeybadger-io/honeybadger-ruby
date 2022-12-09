@@ -31,18 +31,22 @@ module Honeybadger
 
       class ErrorSubscriber
         def self.report(exception, handled:, severity:, context: {}, source: nil)
-          if ::Rails::VERSION::MAJOR > 7 && ::Rails::VERSION::MINOR < 1
+          if ::Rails::VERSION::MAJOR == 7 && ::Rails::VERSION::MINOR < 1
             # We need the `source` parameter to ignore certain reports (see comment on rails.subscriber_ignore_sources config).
             # Since `source` was added in 7.1, on 7.0 we'll only report errors the user manually catches and reports
             # Other errors will be caught by our integrations (eg middleware, error handlers)
             return unless handled
           end
 
-          return if source && ::Honeybadger.config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
+          return if source_ignored?(source)
 
           tags = ["severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
           Honeybadger.notify(exception, context: context, tags: tags)
+        end
+
+        def self.source_ignored?(source)
+          source && ::Honeybadger.config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
         end
       end
 
