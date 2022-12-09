@@ -1,8 +1,11 @@
 require_relative '../rails_helper'
 
-RAILS_ERROR_SOURCE_SUPPORTED = defined?(::Rails::VERSION) && ::Rails::VERSION::STRING >= '7.1'
+RAILS_ERROR_REPORTER_SUPPORTED = defined?(::ActiveSupport::ErrorReporter)
+return unless RAILS_ERROR_REPORTER_SUPPORTED
 
-describe "Rails error subscriber integration", if: defined?(::ActiveSupport::ErrorReporter) do
+RAILS_ERROR_SOURCE_SUPPORTED = ::Rails::VERSION::STRING >= '7.1'
+
+describe "Rails error subscriber integration" do
   load_rails_hooks(self)
 
   it "always reports handled exceptions on Rails < 7.1 (source not supported)", if: !RAILS_ERROR_SOURCE_SUPPORTED do

@@ -48,6 +48,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
+    gem 'tzinfo-data' # Needed for timezones to work on Windows
   end
 
   appraise 'rails6.1' do
