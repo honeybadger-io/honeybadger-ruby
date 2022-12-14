@@ -28,6 +28,8 @@ jobs:
           - resque.gemfile
           - sinatra.gemfile
           - sinatra_1.gemfile
+          - sidekiq.gemfile
+          - sidekiq7.gemfile
           - standalone.gemfile
         exclude:
           - gemfile: rails5.2.gemfile
