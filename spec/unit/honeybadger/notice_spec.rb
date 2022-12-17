@@ -105,6 +105,33 @@ describe Honeybadger::Notice do
     end
   end
 
+  it "uses Exception#detailed_message for the error message when available" do
+    exception = begin
+      1.time {} # Doesn't really matter the code that causes it, since we override #detailed_message anyway
+    rescue => e
+      e
+    end
+
+    def exception.detailed_message
+      <<~MSG
+        test.rb:1:in `<main>': undefined method `time' for 1:Integer (#{self.class.name})
+        
+        1.time {}
+         ^^^^^
+        Did you mean?  times
+      MSG
+    end
+
+    notice_from_exception = build_notice({ exception: exception })
+    expect(notice_from_exception.send(:error_message)).to eq <<~EXPECTED
+      NoMethodError: test.rb:1:in `<main>': undefined method `time' for 1:Integer
+      
+      1.time {}
+       ^^^^^
+      Did you mean?  times
+    EXPECTED
+  end
+
   it "accepts parameters from a request or hash" do
     params = {'one' => 'two'}
     notice_from_hash = build_notice(params: params)
