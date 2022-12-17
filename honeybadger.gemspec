@@ -8,8 +8,15 @@ Gem::Specification.new do |s|
   s.description = 'Make managing application errors a more pleasant experience.'
   s.authors     = ['Honeybadger Industries LLC']
   s.email       = ['support@honeybadger.io']
-  s.homepage    = 'https://github.com/honeybadger-io/honeybadger-ruby'
+  s.homepage    = 'https://www.honeybadger.io/for/ruby/'
   s.license     = 'MIT'
+  s.metadata = {
+    'bug_tracker_uri'   => 'https://github.com/honeybadger-io/honeybadger-ruby/issues',
+    'changelog_uri'     => 'https://github.com/honeybadger-io/honeybadger-ruby/blob/master/CHANGELOG.md',
+    'documentation_uri' => 'https://docs.honeybadger.io/lib/ruby/',
+    'homepage_uri'      => 'https://www.honeybadger.io/for/ruby/',
+    'source_code_uri'   => 'https://github.com/honeybadger-io/honeybadger-ruby'
+  }
 
   s.required_ruby_version = '>= 2.3.0'
 
