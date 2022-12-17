@@ -200,7 +200,10 @@ module Honeybadger
 
       self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
       self.error_message = exception_attribute(:error_message, 'No message provided') do |exception|
-        "#{exception.class.name}: #{exception.message}"
+        message = exception.respond_to?(:detailed_message) ?
+          exception.detailed_message.sub(" (#{exception.class.name})", '') # Gems like error_highlight append the exception class name
+          : exception.message
+        "#{exception.class.name}: #{message}"
       end
       self.backtrace = exception_attribute(:backtrace, caller)
       self.cause = opts.key?(:cause) ? opts[:cause] : (exception_cause(@exception) || $!)
@@ -305,7 +308,7 @@ module Honeybadger
     end
 
     # Gets a property named "attribute" of an exception, either from
-    # the #args hash or actual exception (in order of precidence).
+    # the #args hash or actual exception (in order of precedence).
     #
     # attribute - A Symbol existing as a key in #args and/or attribute on
     #             Exception.
