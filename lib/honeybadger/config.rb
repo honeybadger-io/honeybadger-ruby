@@ -76,6 +76,7 @@ module Honeybadger
       yield(new_ruby)
       self.ruby = ruby.merge(new_ruby).freeze
       @logger = @backend = nil
+      Honeybadger.load_plugins! # Reload plugins to reflect new config changes
       self
     end
 
