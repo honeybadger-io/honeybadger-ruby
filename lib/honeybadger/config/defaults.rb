@@ -325,7 +325,12 @@ module Honeybadger
         description: 'Enable/Disable automatic breadcrumbs from log messages.',
         default: true,
         type: Boolean
-      }
+      },
+      :'semantic_logger.enabled' => {
+        description: 'Automatically add the Honeybadger appender to your semantic logger configuration.',
+        default: false,
+        type: Boolean
+      },
     }.freeze
 
     DEFAULTS = Hash[OPTIONS.map{|k,v| [k, v[:default]] }].freeze

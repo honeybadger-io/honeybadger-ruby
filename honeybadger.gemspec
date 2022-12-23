@@ -33,4 +33,6 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib', 'vendor/capistrano-honeybadger/lib']
 
   s.executables << 'honeybadger'
+
+  s.add_dependency "semantic_logger", "~> 4.12"
 end
