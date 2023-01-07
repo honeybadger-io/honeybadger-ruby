@@ -32,8 +32,7 @@ module Honeybadger
       class ErrorSubscriber
         def self.report(exception, handled:, severity:, context: {}, source: nil)
           # We only report unhandled errors (`Rails.error.handle`)
-          # Unhandled errors will be caught by our integrations (eg middleware, error handlers),
-          # which have have richer context
+          # Unhandled errors will be caught by our integrations (eg middleware), which have richer context
           return unless handled
 
           return if source_ignored?(source)

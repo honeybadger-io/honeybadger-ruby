@@ -302,7 +302,7 @@ module Honeybadger
         type: Boolean
       },
       :'rails.subscriber_ignore_sources' => {
-        description: "Sources (strings or regexes) that should be ignored when using the Rails' (7+) native error reporter.",
+        description: "Sources (strings or regexes) that should be ignored when using the Rails' (7+) native error reporter (handled exceptions only).",
         # External libraries (eg Sidekiq, Resque) may wrap their execution in Rails' executor.
         # But this means errors will first be reported by Rails.error, before the library's native error handler
         # We ignore these reports, since the native error handler provides more context (such as job details)
