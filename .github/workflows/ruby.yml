@@ -33,8 +33,6 @@ jobs:
           - sidekiq7.gemfile
           - standalone.gemfile
         exclude:
-          - gemfile: delayed_job.gemfile
-            ruby: '2.7'
           - gemfile: rails5.2.gemfile
             ruby: '3.0'
           - gemfile: rails5.2.gemfile
