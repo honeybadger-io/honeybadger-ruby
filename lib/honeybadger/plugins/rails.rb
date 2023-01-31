@@ -13,7 +13,7 @@ module Honeybadger
         #
         # @return The super value of the middleware's +#render_exception()+
         #   method.
-        def render_exception(arg, exception)
+        def render_exception(arg, exception, *args)
           if arg.kind_of?(::ActionDispatch::Request)
             request = arg
             env = request.env
@@ -25,7 +25,7 @@ module Honeybadger
           env['honeybadger.exception'] = exception
           env['honeybadger.request.url'] = request.url rescue nil
 
-          super(arg, exception)
+          super(arg, exception, *args)
         end
       end
 
