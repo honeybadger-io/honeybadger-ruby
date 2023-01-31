@@ -4,10 +4,18 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-- Expose `notice.parsed_backtrace` (#454)
-- Support Sidekiq 7 (#458)
-- Support `Exception#detailed_message` on Ruby 3.2 (#459)
-- Use integrations' native error handlers over `Rails.error` where available, to avoid loss of context (#460)
+
+## [5.1.0] - 2023-01-31
+### Added
+- Support for `Exception#detailed_message` on Ruby 3.2 (#459)
+- Added `notice.parsed_backtrace` method, meant to make custom fingerprints easier (#454)
+- Support for Sidekiq 7 (#458)
+
+### Changed
+- On Rails 7, The Honeybadger gem now prioritises the more detailed integrations' native error handlers instead of `Rails.error`, to avoid loss of context (#460)
+
+### Fixed
+- Stopped the Rails middleware from crashing due to changes on Rails 7.1 (#464)
 
 ## [5.0.2] - 2022-11-04
 ### Fixed
