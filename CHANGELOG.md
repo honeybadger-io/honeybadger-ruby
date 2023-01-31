@@ -4,8 +4,6 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
-## [5.1.0] - 2023-01-31
 ### Added
 - Support for `Exception#detailed_message` on Ruby 3.2 (#459)
 - Added `notice.parsed_backtrace` method, meant to make custom fingerprints easier (#454)
