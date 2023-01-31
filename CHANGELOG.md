@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Expose `notice.parsed_backtrace` (#454)
 - Support Sidekiq 7 (#458)
 - Support `Exception#detailed_message` on Ruby 3.2 (#459)
+- Use integrations' native error handlers over `Rails.error` where available, to avoid loss of context (#460)
 
 ## [5.0.2] - 2022-11-04
 ### Fixed
