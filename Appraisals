@@ -23,6 +23,7 @@ end
 
 appraise 'delayed_job' do
   gem 'delayed_job', '< 4.1.2' # See https://github.com/collectiveidea/delayed_job/pull/931
+  gem "activesupport", "> 3.1.12", "< 5.0.0" # Prevent buggy version from being installed
 end
 
 appraise 'resque' do
@@ -56,6 +57,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'better_errors', require: false, platforms: :mri
     gem 'rack-mini-profiler', require: false
     gem 'rspec-rails'
+    gem 'tzinfo-data' # Needed for timezones to work on Windows
   end
 
   appraise 'rails6.1' do

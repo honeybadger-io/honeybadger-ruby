@@ -1,11 +1,14 @@
 require_relative '../rails_helper'
 
-RAILS_ERROR_SOURCE_SUPPORTED = defined?(::Rails::VERSION) && ::Rails::VERSION::STRING >= '7.1'
+RAILS_ERROR_REPORTER_SUPPORTED = defined?(::ActiveSupport::ErrorReporter)
+return unless RAILS_ERROR_REPORTER_SUPPORTED
 
-describe "Rails error subscriber integration", if: defined?(::ActiveSupport::ErrorReporter) do
+RAILS_ERROR_SOURCE_SUPPORTED = ::Rails::VERSION::STRING >= '7.1'
+
+describe "Rails error subscriber integration" do
   load_rails_hooks(self)
 
-  it "reports exceptions" do
+  it "always reports handled exceptions" do
     Honeybadger.flush do
       Rails.error.handle(severity: :warning, context: { key: 'value' }) do
         raise RuntimeError, "Oh no"
@@ -16,24 +19,35 @@ describe "Rails error subscriber integration", if: defined?(::ActiveSupport::Err
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
     expect(notice.context).to eq({ key: 'value' })
-    expect(notice.tags).to eq(["severity:warning", "handled:true"])
+    tags = ["severity:warning", "handled:true"]
+    tags << "source:application" if RAILS_ERROR_SOURCE_SUPPORTED
+    expect(notice.tags).to eq(tags)
   end
 
-  it "does not report exceptions again if they have already been handled by the subscriber" do
+  it "ignores unhandled exceptions on Rails" do
     expect do
       Honeybadger.flush do
-        Rails.error.record(context: { key: 'value' }) { raise RuntimeError, "Oh no" }
-      rescue => e
-        Honeybadger.notify(e)
-        raise
+        Rails.application.executor.wrap do
+          Rails.error.set_context(key: 'value')
+          raise RuntimeError, "Oh no"
+        end
       end
     end.to raise_error(RuntimeError, "Oh no")
 
-    expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
-    notice = Honeybadger::Backend::Test.notifications[:notices].first
-    expect(notice.error_class).to eq("RuntimeError")
-    expect(notice.context).to eq({ key: 'value' })
-    expect(notice.tags).to eq(["severity:error", "handled:false"])
+    expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(0)
+  end
+
+  it "ignores active_support exceptions on Rails 7.1+ (source supported)", if: RAILS_ERROR_SOURCE_SUPPORTED do
+    expect do
+      Honeybadger.flush do
+        Rails.application.executor.wrap do
+          Rails.error.set_context(key: 'value')
+          raise RuntimeError, "Oh no"
+        end
+      end
+    end.to raise_error(RuntimeError, "Oh no")
+
+    expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(0)
   end
 
   it "reports exceptions with source", if: RAILS_ERROR_SOURCE_SUPPORTED do

@@ -13,7 +13,7 @@ module Honeybadger
         #
         # @return The super value of the middleware's +#render_exception()+
         #   method.
-        def render_exception(arg, exception)
+        def render_exception(arg, exception, *args)
           if arg.kind_of?(::ActionDispatch::Request)
             request = arg
             env = request.env
@@ -25,17 +25,27 @@ module Honeybadger
           env['honeybadger.exception'] = exception
           env['honeybadger.request.url'] = request.url rescue nil
 
-          super(arg, exception)
+          super(arg, exception, *args)
         end
       end
 
       class ErrorSubscriber
         def self.report(exception, handled:, severity:, context: {}, source: nil)
-          return if source && ::Honeybadger.config[:'rails.subscriber_ignore_sources'].any? { |regex| regex.match?(source) }
+          # We only report unhandled errors (`Rails.error.handle`)
+          # Unhandled errors will be caught by our integrations (eg middleware), which have richer context
+          return unless handled
+
+          return if source_ignored?(source)
 
           tags = ["severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
           Honeybadger.notify(exception, context: context, tags: tags)
+        end
+
+        def self.source_ignored?(source)
+          source && ::Honeybadger.config[:'rails.subscriber_ignore_sources'].any? do |ignored_source|
+            ignored_source.is_a?(Regexp) ? ignored_source.match?(source) : (ignored_source == source)
+          end
         end
       end
 
@@ -52,8 +62,7 @@ module Honeybadger
             ::ActionDispatch::ShowExceptions.prepend(ExceptionsCatcher)
           end
 
-          if defined?(::ActiveSupport::ErrorReporter)
-            # Rails 7
+          if defined?(::ActiveSupport::ErrorReporter) # Rails 7
             ::Rails.error.subscribe(ErrorSubscriber)
           end
         end
