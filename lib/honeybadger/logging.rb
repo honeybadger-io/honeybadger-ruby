@@ -46,9 +46,9 @@ module Honeybadger
     end
 
     class Base
-      Logger::Severity.constants.each do |severity|
+      ::Logger::Severity.constants.each do |severity|
         define_method severity.downcase do |msg|
-          add(Logger::Severity.const_get(severity), msg)
+          add(::Logger::Severity.const_get(severity), msg)
         end
 
         define_method :"#{severity.downcase}?" do
@@ -61,7 +61,7 @@ module Honeybadger
       end
 
       def level
-        Logger::Severity::DEBUG
+        ::Logger::Severity::DEBUG
       end
     end
 
@@ -87,7 +87,7 @@ module Honeybadger
     class StandardLogger < Base
       extend Forwardable
 
-      def initialize(logger = Logger.new(nil))
+      def initialize(logger = ::Logger.new(nil))
         raise ArgumentError, 'logger not specified' unless logger
         raise ArgumentError, 'logger must be a logger' unless logger.respond_to?(:add)
 
@@ -121,7 +121,7 @@ module Honeybadger
       INFO_SUPPLEMENT = ' level=%s pid=%s'.freeze
       DEBUG_SUPPLEMENT = ' at=%s'.freeze
 
-      def initialize(config, logger = Logger.new(nil))
+      def initialize(config, logger = ::Logger.new(nil))
         @config = config
         @tty = STDOUT.tty?
         @tty_level = @config.log_level(:'logging.tty_level')
@@ -133,9 +133,9 @@ module Honeybadger
 
         # There is no debug level in Honeybadger. Debug logs will be logged at
         # the info level if the debug config option is on.
-        if severity == Logger::Severity::DEBUG
+        if severity == ::Logger::Severity::DEBUG
           return true if suppress_debug?
-          super(Logger::Severity::INFO, supplement(msg, Logger::Severity::DEBUG))
+          super(::Logger::Severity::INFO, supplement(msg, ::Logger::Severity::DEBUG))
         else
           super(severity, supplement(msg, severity))
         end
@@ -160,7 +160,7 @@ module Honeybadger
 
         r = msg.dup
         r << sprintf(INFO_SUPPLEMENT, severity, Process.pid)
-        if severity == Logger::Severity::DEBUG && l = caller_location
+        if severity == ::Logger::Severity::DEBUG && l = caller_location
           r << sprintf(DEBUG_SUPPLEMENT, l.dump)
         end
 

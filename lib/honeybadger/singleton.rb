@@ -1,5 +1,6 @@
 require 'forwardable'
 require 'honeybadger/agent'
+require 'honeybadger/logger'
 
 # Honeybadger's public API is made up of two parts: the {Honeybadger} singleton
 # module, and the {Agent} class. The singleton module delegates its methods to
@@ -55,13 +56,6 @@ module Honeybadger
     # Note this is defined directly (instead of via forwardable) so that
     # generated stack traces work as expected.
     Agent.instance.notify(exception_or_opts, opts)
-  end
-
-  def logger
-    # THis method sends a log directly to HB (skipping other registered SemanticLogger appenders),
-    # so it uses the appender directly. However, we use a different instance of the appender,
-    # to avoid concurrency issues.
-    @local_appender ||= Honeybadger::Plugins::HoneybadgerAppender.create
   end
 
   # @api private

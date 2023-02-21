@@ -329,10 +329,20 @@ module Honeybadger
         default: true,
         type: Boolean
       },
-      :'semantic_logger.enabled' => {
-        description: 'Automatically add the Honeybadger appender to your semantic logger configuration.',
+      :'auto_logging.enabled' => {
+        description: 'Automatically log actions in your Rails app with Honeybadger.',
         default: false,
         type: Boolean
+      },
+      :'logger.batch_size' => {
+        description: 'Wait until a batch contains this number of logs (or the timeout is reached) before sending.',
+        default: 20,
+        type: Integer
+      },
+      :'logger.batch_interval' => {
+        description: 'If the log batch is not full and the time (in seconds) since the last batch is up to this, the batch will be sent.',
+        default: 5,
+        type: Integer
       },
     }.freeze
 

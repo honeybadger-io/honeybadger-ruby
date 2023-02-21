@@ -10,7 +10,6 @@ require 'honeybadger/backend'
 require 'honeybadger/config/defaults'
 require 'honeybadger/util/http'
 require 'honeybadger/util/revision'
-require 'honeybadger/logging'
 
 module Honeybadger
   # @api private
@@ -239,12 +238,12 @@ module Honeybadger
 
     def log_level(key = :'logging.level')
       case self[key].to_s
-      when /\A(0|debug)\z/i then Logger::DEBUG
-      when /\A(1|info)\z/i  then Logger::INFO
-      when /\A(2|warn)\z/i  then Logger::WARN
-      when /\A(3|error)\z/i then Logger::ERROR
+      when /\A(0|debug)\z/i then ::Logger::DEBUG
+      when /\A(1|info)\z/i  then ::Logger::INFO
+      when /\A(2|warn)\z/i  then ::Logger::WARN
+      when /\A(3|error)\z/i then ::Logger::ERROR
       else
-        Logger::INFO
+        ::Logger::INFO
       end
     end
 
@@ -335,7 +334,7 @@ module Honeybadger
     end
 
     def build_stdout_logger
-      logger = Logger.new($stdout)
+      logger = ::Logger.new($stdout)
       logger.formatter = lambda do |severity, datetime, progname, msg|
         "#{msg}\n"
       end
@@ -344,9 +343,9 @@ module Honeybadger
     end
 
     def build_file_logger(path)
-      Logger.new(path).tap do |logger|
+      ::Logger.new(path).tap do |logger|
         logger.level = log_level
-        logger.formatter = Logger::Formatter.new
+        logger.formatter = ::Logger::Formatter.new
       end
     end
 
@@ -366,7 +365,7 @@ module Honeybadger
 
       return framework[:logger] if framework[:logger]
 
-      Logger.new(nil)
+      ::Logger.new(nil)
     end
 
     def init_logging!
