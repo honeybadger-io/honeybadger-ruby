@@ -4,12 +4,13 @@ module Honeybadger
   module Backend
     class Null < Base
       class StubbedResponse < Response
-        def initialize
+        def initialize(successful: true)
           super(:stubbed, '{}'.freeze)
+          @success = successful
         end
 
         def success?
-          true
+          @success
         end
       end
 

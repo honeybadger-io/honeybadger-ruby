@@ -335,12 +335,12 @@ module Honeybadger
         type: Boolean
       },
       :'logger.batch_size' => {
-        description: 'Wait until a batch contains this number of logs (or the timeout is reached) before sending.',
+        description: 'Maximum number of logs to send in one batch.',
         default: 20,
         type: Integer
       },
       :'logger.batch_interval' => {
-        description: 'If the log batch is not full and the time (in seconds) since the last batch is up to this, the batch will be sent.',
+        description: 'Send a log batch immediately if it has been this long (in seconds) since the last batch was sent.',
         default: 5,
         type: Integer
       },

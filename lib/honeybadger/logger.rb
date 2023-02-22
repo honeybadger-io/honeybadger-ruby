@@ -14,7 +14,7 @@ module Honeybadger
 
       def log_internal_error(error, action:)
         message = sprintf(
-          "Honeybadger::Logger error action=#{action} class=%s message=%s\n\t%s",
+          "Honeybadger::Logger error during #{action} class=%s message=%s\n\t%s",
           error.class, error.message.dump, Array(error.backtrace).join("\n\t")
         )
         Honeybadger.config.logger.error(message)
@@ -72,16 +72,44 @@ module Honeybadger
     # Semantic logger's AsyncBatch wrapper will handle batching,
     # and call #batch when the batch is ready to be sent
     class HttpAppender < SemanticLogger::Subscriber
+      MAX_RETRY_BACKLOG = 200.freeze
+
+      def initialize(*)
+        super
+        @retry_queue = []
+      end
+
       def default_formatter
         SemanticLogger::Formatters::Json.new
       end
 
       def batch(logs)
-        # todo Dead-letter queue, retried at intervals + circuit breaker to avoid infinite retry
         payload = logs.map { |log| formatter.call(log, self) }.join("\n")
-        ::Honeybadger.config.backend.notify(:logs, payload)
+        def payload.to_json; self; end # The Server backend calls to_json
+        response = Honeybadger.config.backend.notify(:logs, payload)
+
+        if response.success?
+          retry_previous_failed_requests
+        else
+          @retry_queue << payload
+          @retry_queue.shift if @retry_queue.size > MAX_RETRY_BACKLOG
+        end
       rescue => e
         Honeybadger::Logger.log_internal_error(e, action: :send)
+      end
+
+      private
+
+      def retry_previous_failed_requests
+        can_send = true
+        until @retry_queue.empty? || !can_send
+          payload = @retry_queue.shift
+          response = Honeybadger.config.backend.notify(:logs, payload)
+          if !response.success?
+            @retry_queue.unshift(payload)
+            can_send = false
+          end
+        end
       end
     end
   end
