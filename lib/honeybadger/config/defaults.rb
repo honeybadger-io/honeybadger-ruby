@@ -334,12 +334,12 @@ module Honeybadger
         default: false,
         type: Boolean
       },
-      :'logger.batch_size' => {
-        description: 'Maximum number of logs to send in one batch.',
-        default: 20,
+      :'features.logger.batch_size' => {
+        description: 'Maximum number of logs to include in one batch.',
+        default: 300,
         type: Integer
       },
-      :'logger.batch_interval' => {
+      :'features.logger.batch_interval' => {
         description: 'Send a log batch immediately if it has been this long (in seconds) since the last batch was sent.',
         default: 5,
         type: Integer

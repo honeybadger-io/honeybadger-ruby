@@ -44,8 +44,8 @@ module Honeybadger
         @batch_appender = ::SemanticLogger::Appender.factory(
           appender: http_appender,
           batch: true,
-          batch_size: ::Honeybadger.config[:'logger.batch_size'],
-          batch_seconds: ::Honeybadger.config[:'logger.batch_interval'],
+          batch_size: ::Honeybadger.config[:'features.logger.batch_size'],
+          batch_seconds: ::Honeybadger.config[:'features.logger.batch_interval'],
         )
         at_exit { shutdown! }
         @batch_appender
