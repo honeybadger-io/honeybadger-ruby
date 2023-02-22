@@ -58,6 +58,10 @@ module Honeybadger
     Agent.instance.notify(exception_or_opts, opts)
   end
 
+  def logger
+    @logger ||= Honeybadger::Logger
+  end
+
   # @api private
   def load_plugins!
     Dir[File.expand_path('../plugins/*.rb', __FILE__)].each do |plugin|
