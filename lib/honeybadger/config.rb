@@ -271,6 +271,8 @@ module Honeybadger
         :rails
       elsif defined?(::Sinatra::VERSION)
         :sinatra
+      elsif defined?(::Hanami::VERSION) && ::Hanami::VERSION >= '2.0'
+        :hanami
       elsif defined?(::Rack.release)
         :rack
       else
@@ -282,6 +284,7 @@ module Honeybadger
       case detected_framework
       when :rails then "Rails #{::Rails::VERSION::STRING}"
       when :sinatra then "Sinatra #{::Sinatra::VERSION}"
+      when :hanami then "Hanami #{::Hanami::VERSION}"
       when :rack then "Rack #{::Rack.release}"
       else
         "Ruby #{RUBY_VERSION}"
