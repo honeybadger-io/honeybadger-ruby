@@ -76,7 +76,6 @@ module Honeybadger
 
       def initialize(*)
         super
-        @backend = Honeybadger.config.logs_backend
         @retry_queue = []
       end
 
@@ -86,7 +85,8 @@ module Honeybadger
 
       def batch(logs)
         payload = logs.map { |log| formatter.call(log, self) }.join("\n")
-        response = @backend.notify(:logs, payload)
+        def payload.to_json; self; end # The Server backend calls to_json
+        response = Honeybadger.config.backend.notify(:logs, payload)
 
         if response.success?
           retry_previous_failed_requests
@@ -104,7 +104,7 @@ module Honeybadger
         can_send = true
         until @retry_queue.empty? || !can_send
           payload = @retry_queue.shift
-          response = @backend.notify(:logs, payload)
+          response = Honeybadger.config.backend.notify(:logs, payload)
           if !response.success?
             @retry_queue.unshift(payload)
             can_send = false

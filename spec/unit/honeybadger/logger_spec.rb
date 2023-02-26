@@ -4,7 +4,7 @@ RSpec.describe Honeybadger::Logger do
   before do
     Honeybadger.logger.instance_variable_set(:@appender, nil)
     Honeybadger::Backend::Test.notifications[:logs] = []
-    Honeybadger.config[:logs_backend] = :test
+    Honeybadger.config[:backend] = :test
   end
 
   after do
@@ -54,7 +54,10 @@ RSpec.describe Honeybadger::Logger do
     Honeybadger.config[:"features.logger.batch_size"] = 200
     Honeybadger.config[:"features.logger.batch_interval"] = 0.001
 
-    expect(Honeybadger.config.logs_backend).to receive(:notify).twice do
+    backend = Honeybadger::Backend::Test.new(Honeybadger.config)
+    Honeybadger.config[:backend] = backend
+
+    expect(backend).to receive(:notify).twice do
       Honeybadger::Backend::Null::StubbedResponse.new(successful: false)
     end
     # Four messages across three batches, with the first two batches failing
@@ -66,7 +69,7 @@ RSpec.describe Honeybadger::Logger do
 
     expect(received_batches.size).to eq(0)
 
-    expect(Honeybadger.config.logs_backend).to receive(:notify).exactly(3).times.and_call_original
+    expect(backend).to receive(:notify).exactly(3).times.and_call_original
     wait_for_other_thread { Honeybadger.logger.error("Fourth - succeeds") }
 
     expect(received_batches.size).to eq(3)
