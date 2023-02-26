@@ -151,6 +151,11 @@ module Honeybadger
       @backend
     end
 
+    def logs_backend
+      init_logs_backend! unless @logs_backend
+      @logs_backend
+    end
+
     def backend=(backend)
       set(:backend, backend)
       @backend = nil
@@ -331,6 +336,18 @@ module Honeybadger
       end
 
       @backend = default_backend
+    end
+
+    def init_logs_backend!
+      if self[:logs_backend].is_a?(String) || self[:logs_backend].is_a?(Symbol)
+        @logs_backend = Backend.for(self[:logs_backend].to_sym).new(self)
+        return
+      end
+
+      if ruby[:logs_backend].respond_to?(:notify)
+        @logs_backend = ruby[:logs_backend]
+        return
+      end
     end
 
     def build_stdout_logger

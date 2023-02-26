@@ -5,6 +5,7 @@ require 'honeybadger/backend/server'
 require 'honeybadger/backend/test'
 require 'honeybadger/backend/null'
 require 'honeybadger/backend/debug'
+require 'honeybadger/backend/events'
 
 module Honeybadger
   # @api private
@@ -16,7 +17,8 @@ module Honeybadger
         server: Server,
         test: Test,
         null: Null,
-        debug: Debug
+        debug: Debug,
+        events: Events,
       }.freeze
     end
 

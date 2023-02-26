@@ -12,7 +12,6 @@ module Honeybadger
       ENDPOINTS = {
         notices: '/v1/notices'.freeze,
         deploys: '/v1/deploys'.freeze,
-        logs: '/v1/events'.freeze,
       }.freeze
 
       CHECK_IN_ENDPOINT = '/v1/check_in'.freeze

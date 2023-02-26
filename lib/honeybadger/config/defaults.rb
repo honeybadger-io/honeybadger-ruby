@@ -71,6 +71,11 @@ module Honeybadger
         default: nil,
         type: String
       },
+      logs_backend: {
+        description: 'An alternate backend to use for the logger feature.',
+        default: :events,
+        type: String
+      },
       debug: {
         description: 'Enables debug logging.',
         default: false,
