@@ -1,18 +1,20 @@
 require 'honeybadger/logger'
 
 RSpec.describe Honeybadger::Logger do
+  let(:mock_http) { double(SemanticLogger::Appender::Http) }
+  let(:received_batches) { [] }
+
   before do
     Honeybadger.logger.instance_variable_set(:@appender, nil)
-    Honeybadger::Backend::Test.notifications[:logs] = []
-    Honeybadger.config[:backend] = :test
+    allow(SemanticLogger::Appender::Http).to receive(:new).and_return(mock_http)
+    allow(mock_http).to receive(:post) do |payload|
+      received_batches << payload
+      true
+    end
   end
 
   after do
     Honeybadger.logger.instance_variable_get(:@appender).shutdown!
-  end
-
-  def received_batches
-    Honeybadger::Backend::Test.notifications[:logs]
   end
 
   def wait_for_other_thread(wait = 0.05)
@@ -54,12 +56,7 @@ RSpec.describe Honeybadger::Logger do
     Honeybadger.config[:"features.logger.batch_size"] = 200
     Honeybadger.config[:"features.logger.batch_interval"] = 0.001
 
-    backend = Honeybadger::Backend::Test.new(Honeybadger.config)
-    Honeybadger.config[:backend] = backend
-
-    expect(backend).to receive(:notify).twice do
-      Honeybadger::Backend::Null::StubbedResponse.new(successful: false)
-    end
+    expect(mock_http).to receive(:post).twice { false }
     # Four messages across three batches, with the first two batches failing
     wait_for_other_thread do
       Honeybadger.logger.debug("First - fails")
@@ -69,7 +66,10 @@ RSpec.describe Honeybadger::Logger do
 
     expect(received_batches.size).to eq(0)
 
-    expect(backend).to receive(:notify).exactly(3).times.and_call_original
+    expect(mock_http).to receive(:post).exactly(3).times do |payload|
+      received_batches << payload
+      true
+    end
     wait_for_other_thread { Honeybadger.logger.error("Fourth - succeeds") }
 
     expect(received_batches.size).to eq(3)

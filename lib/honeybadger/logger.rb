@@ -73,6 +73,7 @@ module Honeybadger
     # and call #batch when the batch is ready to be sent
     class HttpAppender < SemanticLogger::Subscriber
       MAX_RETRY_BACKLOG = 200.freeze
+      LOGS_HOST = "localhost:4567"
 
       def initialize(*)
         super
@@ -85,27 +86,42 @@ module Honeybadger
 
       def batch(logs)
         payload = logs.map { |log| formatter.call(log, self) }.join("\n")
-        def payload.to_json; self; end # The Server backend calls to_json
-        response = Honeybadger.config.backend.notify(:logs, payload)
-
-        if response.success?
+        succeeded = send_payload(payload)
+        if succeeded
           retry_previous_failed_requests
         else
-          @retry_queue << payload
-          @retry_queue.shift if @retry_queue.size > MAX_RETRY_BACKLOG
+          retry_later(payload)
         end
       rescue => e
+        retry_later(payload)
         Honeybadger::Logger.log_internal_error(e, action: :send)
       end
 
       private
 
+      def send_payload(payload)
+        semantic_logger_http.__send__(:post, payload)
+      end
+
+      def retry_later(payload)
+        @retry_queue << payload
+        @retry_queue.shift if @retry_queue.size > MAX_RETRY_BACKLOG
+      end
+
+      def semantic_logger_http
+        @semantic_logger_http ||= ::SemanticLogger::Appender.factory(
+          appender: :http,
+          url: "http://honeybadger:#{Honeybadger.config[:api_key]}@#{LOGS_HOST}/v1/events",
+          compress: true,
+        )
+      end
+
       def retry_previous_failed_requests
         can_send = true
         until @retry_queue.empty? || !can_send
           payload = @retry_queue.shift
-          response = Honeybadger.config.backend.notify(:logs, payload)
-          if !response.success?
+          succeeded = send_payload(payload)
+          if !succeeded
             @retry_queue.unshift(payload)
             can_send = false
           end
