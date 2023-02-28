@@ -107,3 +107,9 @@ appraise 'sinatra' do
   gem 'sinatra', '~> 2.0.0.beta1'
   gem 'rack-test'
 end
+
+appraise 'hanami' do
+  gem "hanami", "~> 2.0"
+  gem "hanami-router", "~> 2.0"
+  gem 'rack-test'
+end
