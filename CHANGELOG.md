@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- First-class support for Hanami (#470)
 
 ## [5.1.0] - 2023-01-31
 ### Added
