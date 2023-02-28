@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [5.2.0] - 2023-02-28
 ### Added
 - First-class support for Hanami (#470)
 - Auto-add Sinatra optional middleware (#471). This is fine, as they don't do anything without the magic strings (and they can be disabled via config, anyway).
