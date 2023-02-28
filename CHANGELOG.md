@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Auto-add Sinatra optional middleware (#471). This is fine, as they don't do anything without the magic strings (and they can be disabled via config, anyway).
 
 ## [5.1.0] - 2023-01-31
 ### Added
