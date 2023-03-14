@@ -4,6 +4,8 @@ CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
 adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [5.2.1] - 2023-03-14
 ### Fixed
 - Remove ANSI escape codes from detailed error message in Ruby 3.2 (#473)
 
