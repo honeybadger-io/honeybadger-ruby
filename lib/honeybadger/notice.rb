@@ -201,7 +201,7 @@ module Honeybadger
       self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
       self.error_message = exception_attribute(:error_message, 'No message provided') do |exception|
         message = exception.respond_to?(:detailed_message) ?
-          exception.detailed_message.sub(" (#{exception.class.name})", '') # Gems like error_highlight append the exception class name
+          exception.detailed_message(highlight: false).sub(" (#{exception.class.name})", '') # Gems like error_highlight append the exception class name
           : exception.message
         "#{exception.class.name}: #{message}"
       end
