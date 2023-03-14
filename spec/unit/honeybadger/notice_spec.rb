@@ -112,7 +112,7 @@ describe Honeybadger::Notice do
       e
     end
 
-    def exception.detailed_message
+    def exception.detailed_message(**kwargs)
       <<~MSG
         test.rb:1:in `<main>': undefined method `time' for 1:Integer (#{self.class.name})
         
