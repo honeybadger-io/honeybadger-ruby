@@ -12,11 +12,11 @@ module Honeybadger
         @@instances
       end
 
-      def register(name = nil)
+      def register(name = nil, &block)
         name ||= name_from_caller(caller) or
           raise(ArgumentError, 'Plugin name is required, but was nil.')
         instances[key = name.to_sym] and fail("Already registered: #{name}")
-        instances[key] = new(name).tap { |d| d.instance_eval(&Proc.new) }
+        instances[key] = new(name).tap { |d| d.instance_eval(&block) }
       end
 
       def load!(config)
@@ -61,12 +61,12 @@ module Honeybadger
       @executions   = []
     end
 
-    def requirement
-      @requirements << Proc.new
+    def requirement(&block)
+      @requirements << block
     end
 
     def execution
-      @executions << Proc.new
+      @executions << block
     end
 
     def ok?(config)
