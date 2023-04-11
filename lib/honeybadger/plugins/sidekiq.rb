@@ -60,6 +60,8 @@ module Honeybadger
                   opts[:action] = 'perform' if opts[:component]
                 end
 
+                puts "[BB] inside the modified version of HB! Sending #{ex.inspect} with #{opts.inspect}"
+
                 Honeybadger.notify(ex, opts)
               }
             end
