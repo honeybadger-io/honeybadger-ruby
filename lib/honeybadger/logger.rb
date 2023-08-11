@@ -73,10 +73,8 @@ module Honeybadger
     # and call #batch when the batch is ready to be sent
     class HttpAppender < SemanticLogger::Subscriber
       MAX_RETRY_BACKLOG = 200.freeze
-      LOGS_HOST = "localhost:4567"
 
       def initialize(*)
-        super
         @retry_queue = []
       end
 
@@ -85,7 +83,7 @@ module Honeybadger
       end
 
       def batch(logs)
-        payload = logs.map { |log| formatter.call(log, self) }.join("\n")
+        payload = logs.map { |log| default_formatter.call(log, self) }.join("\n")
         succeeded = send_payload(payload)
         if succeeded
           retry_previous_failed_requests
@@ -111,8 +109,11 @@ module Honeybadger
       def semantic_logger_http
         @semantic_logger_http ||= ::SemanticLogger::Appender.factory(
           appender: :http,
-          url: "http://honeybadger:#{Honeybadger.config[:api_key]}@#{LOGS_HOST}/v1/events",
+          url: "http://#{Honeybadger.config[:'connection.host']}/v1/events",
           compress: true,
+          header: {
+            'X_API_KEY' => Honeybadger.config[:api_key]
+          }
         )
       end
 
