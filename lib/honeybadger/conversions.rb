@@ -2,7 +2,7 @@ module Honeybadger
   # @api private
   module Conversions
     module_function
-    MAX_CONTEXT_DEPTH = 20
+    MAX_CONTEXT_DEPTH = 5
 
     # Convert context into a Hash.
     #

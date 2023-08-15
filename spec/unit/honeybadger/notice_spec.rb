@@ -405,7 +405,7 @@ describe Honeybadger::Notice do
 
       context 'and a deeply nested context' do
         let(:global_context) do
-          (0..25).reduce({}) do |acc, depth|
+          (0..10).reduce({}) do |acc, depth|
             build_instance_with_hb_context({ depth => acc })
           end
         end
@@ -414,11 +414,8 @@ describe Honeybadger::Notice do
           # serialize/deserialize to simplify matching of the class at the end of the nesting
           ct = JSON.parse(notice.context.to_json)
           expect(ct).to eq({
-            '25' => { '24' => { '23' => { '22' => { '21' => {
-            '20' => { '19' => { '18' => { '17' => { '16' => {
-            '15' => { '14' => { '13' => { '12' => { '11' => {
             '10' => { '9' => { '8' => { '7' => { '6' => 'class with context'
-            }}}}}}}}}}}}}}}}}}}
+            }}}}
           })
         end
       end
