@@ -109,7 +109,7 @@ module Honeybadger
       def semantic_logger_http
         @semantic_logger_http ||= ::SemanticLogger::Appender.factory(
           appender: :http,
-          url: "http://#{Honeybadger.config[:'connection.host']}/v1/events",
+          url: "https://#{Honeybadger.config[:'connection.host']}/v1/events",
           compress: true,
           header: {
             'X_API_KEY' => Honeybadger.config[:api_key]
