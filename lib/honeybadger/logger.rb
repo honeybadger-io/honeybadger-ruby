@@ -112,7 +112,7 @@ module Honeybadger
           url: "https://#{Honeybadger.config[:'connection.host']}/v1/events",
           compress: true,
           header: {
-            'X_API_KEY' => Honeybadger.config[:api_key]
+            'X-API-Key' => Honeybadger.config[:api_key]
           }
         )
       end
