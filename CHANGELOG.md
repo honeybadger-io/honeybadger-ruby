@@ -6,6 +6,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Support for Karafka (#480)
+- Support for nested `to_honeybadger_context` (#488)
 
 ## [5.2.1] - 2023-03-14
 ### Fixed

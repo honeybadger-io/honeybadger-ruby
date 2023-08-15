@@ -374,6 +374,71 @@ describe Honeybadger::Notice do
       hash = JSON.parse(notice.to_json)
       expect(hash['request']['context']).to eq({'debuga' => true, 'debugb' => false})
     end
+
+    context 'with nested context' do
+      def build_instance_with_hb_context(value)
+        Class.new do
+          def initialize(value)
+            @to_honeybadger_context = value
+          end
+
+          def to_honeybadger_context
+            @to_honeybadger_context
+          end
+
+          def to_json(_state)
+            '"class with context"'
+          end
+        end.new(value)
+      end
+
+      let(:notice) { build_notice(global_context: global_context) }
+      let(:global_context) do
+        build_instance_with_hb_context(
+          { 'foo' => build_instance_with_hb_context(
+            { 'bar' => build_instance_with_hb_context({ 'baz' => 'qux' }) }) })
+      end
+
+      it "drills into the context values when they respond to to_honeybadger_context" do
+        expect(notice.context).to eq({ 'foo' => { 'bar' => { 'baz' => 'qux' }}})
+      end
+
+      context 'and a deeply nested context' do
+        let(:global_context) do
+          (0..10).reduce({}) do |acc, depth|
+            build_instance_with_hb_context({ depth => acc })
+          end
+        end
+
+        it "drills into the context values, but only as far as the nesting limit of 20" do
+          # serialize/deserialize to simplify matching of the class at the end of the nesting
+          ct = JSON.parse(notice.context.to_json)
+          expect(ct).to eq({
+            '10' => { '9' => { '8' => { '7' => { '6' => 'class with context'
+            }}}}
+          })
+        end
+      end
+
+      context 'and some non-nested contexts' do
+        let(:global_context) do
+          build_instance_with_hb_context(
+            { 'foo' => nil,
+              'bar' => 'baz',
+              'qux' => build_instance_with_hb_context({ 'fred' => 'thud' }),
+              'array' => ['item'],
+              'hash' => { 'key' => 'value' }
+            })
+        end
+
+        it "drills in only where the object can drill" do
+          expect(notice.context).to eq(
+            { 'foo' => nil, 'bar' => 'baz', 'qux' => { 'fred' => 'thud' },
+              'array' => ['item'], 'hash' => { 'key' => 'value' }}
+          )
+        end
+      end
+    end
   end
 
   describe "Rack features", if: defined?(::Rack) do
