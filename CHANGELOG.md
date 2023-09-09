@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](http://semver.org/).
 - Support for Karafka (#480)
 - Support for nested `to_honeybadger_context` (#488)
 
+### Fixed
+- `Honeybadger::Config#respond_to?` would always return true (#490)
+
 ## [5.2.1] - 2023-03-14
 ### Fixed
 - Remove ANSI escape codes from detailed error message in Ruby 3.2 (#473)

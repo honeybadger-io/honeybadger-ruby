@@ -32,7 +32,12 @@ module Honeybadger
       end
 
       def respond_to_missing?(method_name, include_private = false)
-        true
+        m = method_name.to_s
+        if mash?(m) || setter?(m) || getter?(m)
+          true
+        else
+          super
+        end
       end
 
       def mash?(method)

@@ -280,5 +280,21 @@ describe Honeybadger::Config do
 
       expect(subject.before_notify_hooks.size).to eq(2)
     end
+
+    it "only responds to methods that correspond to default keys" do
+      known_key_response = nil
+      unknown_key_response = nil
+
+      subject.configure do |config|
+        known_key_response = config.respond_to?("api_key")
+      end
+
+      subject.configure do |config|
+        unknown_key_response = config.respond_to?("ejfhjskdhfkdjhf=")
+      end
+
+      expect(known_key_response).to eq(true)
+      expect(unknown_key_response).to eq(false)
+    end
   end
 end
