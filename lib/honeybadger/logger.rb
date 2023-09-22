@@ -34,6 +34,14 @@ module Honeybadger
 
       def should_log?(log_entry)
         # Some custom filter, maybe?
+
+        if log_entry.nil? || log_entry == ""
+          Honeybadger.config.logger.error("Honeybadger::Logger attempting to send empty log:")
+          caller.each do |line|
+            Honeybadger.config.logger.error(line)
+          end
+        end
+
         super
       end
 
