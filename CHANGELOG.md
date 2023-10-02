@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Support for Karafka (#480)
 - Support for nested `to_honeybadger_context` (#488)
+- Explain 413 responses from API (#492)
 
 ### Fixed
 - `Honeybadger::Config#respond_to?` would always return true (#490)
