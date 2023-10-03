@@ -15,7 +15,8 @@ module Honeybadger
         429 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
         503 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
         402 => "The project owner's billing information has expired (or the trial has ended).\nPlease check your payment details or email support@honeybadger.io for help.".freeze,
-        403 => "The API key is invalid. Please check your API key and try again.".freeze
+        403 => "The API key is invalid. Please check your API key and try again.".freeze,
+        413 => "The payload is too large.".freeze
       }.freeze
 
       # Initializes the Response instance.

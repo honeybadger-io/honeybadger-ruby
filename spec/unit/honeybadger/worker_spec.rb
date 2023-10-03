@@ -304,6 +304,15 @@ describe Honeybadger::Worker do
       end
     end
 
+    context "when 413" do
+      let(:response) { Honeybadger::Backend::Response.new(413, %({"error":"Payload exceeds maximum size"})) }
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/too large/)
+        handle_response
+      end
+    end
+
     context "when 201" do
       let(:response) { Honeybadger::Backend::Response.new(201) }
 

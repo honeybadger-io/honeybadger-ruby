@@ -223,6 +223,8 @@ module Honeybadger
       when 403
         warn { sprintf('Error report failed: API key is invalid. id=%s code=%s', msg.id, response.code) }
         suspend(3600)
+      when 413
+        warn { sprintf('Error report failed: Payload is too large. id=%s code=%s', msg.id, response.code) }
       when 201
         if throttle = dec_throttle
           info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s throttle=%s interval=%s', msg.id, msg.id, response.code, throttle, throttle_interval) }
