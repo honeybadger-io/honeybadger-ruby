@@ -19,6 +19,9 @@ describe "Sidekiq Dependency" do
       Class.new do
         def self.configure_server
         end
+
+        def self.default_configuration
+        end
       end
     end
 
