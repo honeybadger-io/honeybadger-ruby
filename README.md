@@ -1,7 +1,6 @@
 # Honeybadger for Ruby
 
-![Ruby](https://github.com/honeybadger-io/honeybadger-ruby/workflows/Ruby/badge.svg)
-![JRuby](https://github.com/honeybadger-io/honeybadger-ruby/workflows/JRuby/badge.svg)
+[![Ruby](https://github.com/honeybadger-io/honeybadger-ruby/actions/workflows/ruby.yml/badge.svg)](https://github.com/honeybadger-io/honeybadger-ruby/actions/workflows/ruby.yml)
 [![Gem Version](https://badge.fury.io/rb/honeybadger.svg)](http://badge.fury.io/rb/honeybadger)
 
 This is the notifier gem for integrating apps with the :zap: [Honeybadger Exception Notifier for Ruby and Rails](http://honeybadger.io).
