@@ -11,6 +11,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - `Honeybadger::Config#respond_to?` would always return true (#490)
+- `Honeybadger::Agent#notify` takes keyword arguments instead of an options hash now (#498)
 
 ### Changed
 - Accept three arguments for the Sidekiq error handler (#495)
