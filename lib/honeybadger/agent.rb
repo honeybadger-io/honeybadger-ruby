@@ -91,15 +91,16 @@ module Honeybadger
     #   end
     #
     #   # Custom notification:
-    #   Honeybadger.notify('Something went wrong.', {
+    #   Honeybadger.notify('Something went wrong.',
     #     error_class: 'MyClass',
     #     context: {my_data: 'value'}
-    #   }) # => '06220c5a-b471-41e5-baeb-de247da45a56'
+    #   ) # => '06220c5a-b471-41e5-baeb-de247da45a56'
     #
     # @param [Exception, Hash, Object] exception_or_opts An Exception object,
     #   or a Hash of options which is used to build the notice. All other types
     #   of objects will be converted to a String and used as the :error_message.
     # @param [Hash] opts The options Hash when the first argument is an Exception.
+    # @param [Hash] kwargs options as keyword args.
     #
     # @option opts [String]    :error_message The error message.
     # @option opts [String]    :error_class ('Notice') The class name of the error.
