@@ -102,7 +102,7 @@ describe Honeybadger::Agent do
       opts = {error_message: 'test'}
       prev = opts.dup
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
-      instance.notify("test", opts)
+      instance.notify("test", **opts)
       expect(prev).to eq(opts)
     end
 

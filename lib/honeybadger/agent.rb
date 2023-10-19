@@ -118,19 +118,20 @@ module Honeybadger
     #
     # @return [String] UUID reference to the notice within Honeybadger.
     # @return [false] when ignored.
-    def notify(exception_or_opts, opts = {})
+    def notify(exception_or_opts=nil, opts={}, **kwargs)
       opts = opts.dup
 
       if exception_or_opts.is_a?(Exception)
         already_reported_notice_id = exception_or_opts.instance_variable_get(:@__hb_notice_id)
         return already_reported_notice_id if already_reported_notice_id
-
         opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
         opts.merge!(exception_or_opts.to_hash)
-      else
+      elsif !exception_or_opts.nil?
         opts[:error_message] = exception_or_opts.to_s
       end
+
+      opts = opts.merge(kwargs)
 
       validate_notify_opts!(opts)
 
