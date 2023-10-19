@@ -91,15 +91,16 @@ module Honeybadger
     #   end
     #
     #   # Custom notification:
-    #   Honeybadger.notify('Something went wrong.', {
+    #   Honeybadger.notify('Something went wrong.',
     #     error_class: 'MyClass',
     #     context: {my_data: 'value'}
-    #   }) # => '06220c5a-b471-41e5-baeb-de247da45a56'
+    #   ) # => '06220c5a-b471-41e5-baeb-de247da45a56'
     #
     # @param [Exception, Hash, Object] exception_or_opts An Exception object,
     #   or a Hash of options which is used to build the notice. All other types
     #   of objects will be converted to a String and used as the :error_message.
     # @param [Hash] opts The options Hash when the first argument is an Exception.
+    # @param [Hash] kwargs options as keyword args.
     #
     # @option opts [String]    :error_message The error message.
     # @option opts [String]    :error_class ('Notice') The class name of the error.
@@ -118,17 +119,17 @@ module Honeybadger
     #
     # @return [String] UUID reference to the notice within Honeybadger.
     # @return [false] when ignored.
-    def notify(exception_or_opts, opts = {})
+    def notify(exception_or_opts = nil, opts = {}, **kwargs)
       opts = opts.dup
+      opts.merge!(kwargs)
 
       if exception_or_opts.is_a?(Exception)
         already_reported_notice_id = exception_or_opts.instance_variable_get(:@__hb_notice_id)
         return already_reported_notice_id if already_reported_notice_id
-
         opts[:exception] = exception_or_opts
       elsif exception_or_opts.respond_to?(:to_hash)
         opts.merge!(exception_or_opts.to_hash)
-      else
+      elsif !exception_or_opts.nil?
         opts[:error_message] = exception_or_opts.to_s
       end
 

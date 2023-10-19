@@ -51,10 +51,10 @@ module Honeybadger
   # @!method notify(...)
   # Forwards to {Agent.instance}.
   # @see Agent#notify
-  def notify(exception_or_opts, opts = {})
+  def notify(exception_or_opts=nil, opts = {}, **kwargs)
     # Note this is defined directly (instead of via forwardable) so that
     # generated stack traces work as expected.
-    Agent.instance.notify(exception_or_opts, opts)
+    Agent.instance.notify(exception_or_opts, opts, **kwargs)
   end
 
   # @api private

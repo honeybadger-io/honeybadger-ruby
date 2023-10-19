@@ -102,8 +102,43 @@ describe Honeybadger::Agent do
       opts = {error_message: 'test'}
       prev = opts.dup
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
-      instance.notify("test", opts)
+      instance.notify('test', opts)
       expect(prev).to eq(opts)
+    end
+
+    it "does take keyword arguments" do
+      opts = {error_message: 'test'}
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+     
+      expect(instance.worker).to receive(:push) do |notice|
+        expect(notice.error_message).to match('test')
+      end
+      instance.notify(**opts)
+    end
+
+    it "does take keyword arguments as second argument" do
+      opts = {tags: 'testing, kwargs'}
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+      
+      expect(instance.worker).to receive(:push) do |notice|
+        expect(notice.error_message).to match('test')
+        expect(notice.tags).to eq(['testing', 'kwargs'])
+      end
+      instance.notify('test', **opts)
+    end
+
+    it "does take explicit hash as second argument" do
+      opts = {tags: 'testing, hash'}
+      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      instance = described_class.new(config)
+      
+      expect(instance.worker).to receive(:push) do |notice|
+        expect(notice.error_message).to match('test')
+        expect(notice.tags).to eq(['testing', 'hash'])
+      end
+      instance.notify('test', opts)
     end
 
     it "does not report an already reported exception" do
