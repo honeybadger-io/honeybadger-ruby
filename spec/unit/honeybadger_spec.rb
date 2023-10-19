@@ -102,7 +102,7 @@ describe Honeybadger do
       Honeybadger.notify(error_message: 'uh oh')
     end
 
-    it "creates and sends a notice for an exception and hash" do
+    it "creates and sends a notice for an exception with additional arguments" do
       exception = build_exception
       notice = stub_notice!(config)
       notice_args = { error_message: 'uh oh' }
@@ -110,7 +110,7 @@ describe Honeybadger do
       expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(notice_args.merge(exception: exception))).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
-      Honeybadger.notify(exception, notice_args)
+      Honeybadger.notify(exception, **notice_args)
     end
 
     it "sends a notice with a string" do
