@@ -33,6 +33,8 @@ class RailsApp < Rails::Application
   config.serve_static_files = false
   config.consider_all_requests_local = false
 
+  config.active_job.queue_adapter = :async
+
   routes.append do
     get '/runtime_error', :to => 'rails#runtime_error'
     get '/record_not_found', :to => 'rails#record_not_found'
@@ -62,3 +64,4 @@ Rails.env = 'production'
 Rails.logger = Logger.new(File::NULL)
 
 require_relative './breadcrumbs'
+require_relative './queue_adapter'
