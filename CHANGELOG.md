@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Accept three arguments for the Sidekiq error handler (#495)
+- Log level of init message changed to DEBUG (#497)
 - Add .tool-versions to set ruby version for development (#501) 
 
 ## [5.2.1] - 2023-03-14
