@@ -55,7 +55,7 @@ module Honeybadger
       init_logging!
       init_backend!
 
-      logger.info(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
+      logger.debug(sprintf('Initializing Honeybadger Error Tracker for Ruby. Ship it! version=%s framework=%s', Honeybadger::VERSION, detected_framework))
       logger.warn('Development mode is enabled. Data will not be reported until you deploy your app.') if warn_development?
 
       self
