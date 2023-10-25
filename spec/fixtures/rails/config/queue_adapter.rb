@@ -1,13 +1,12 @@
 class ErrorJob < ActiveJob::Base
-  def perform
-    pp "PERFORM #{::Rails.application.config.active_job}", caller
+  def perform(opts={})
     raise "exception raised in job"
   end
 end
 
 class ErrorJobController < ApplicationController
   def enqueue_error_job
-    ErrorJob.perform_later
+    ErrorJob.perform_later({some: "data"})
     head 200
   end
 end
