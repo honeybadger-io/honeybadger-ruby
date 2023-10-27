@@ -1,29 +1,20 @@
 name: Release gem
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [Ruby]
+    types: [completed]
+    branches: [master]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  ruby:
+  release-if-needed:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-
-      - name: Build and test regular ruby
-        run: |
-          bundle exec rake
-
       - name: Create Release PR
         uses: google-github-actions/release-please-action@v3
         id: release
@@ -31,6 +22,15 @@ jobs:
           release-type: ruby
           package-name: honeybadger
           version-file: lib/honeybadger/version.rb
+
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # read from .tool-versions
+          # ruby-version: '3.2'
+          bundler-cache: true
 
       - name: Publish gem
         if: ${{ steps.release.outputs.release_created }}
