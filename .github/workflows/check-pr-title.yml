@@ -1,0 +1,23 @@
+name: Check PR title conforms to conventional commits format
+
+on:
+  pull_request:
+    branches: [ master ]
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  commitlint:
+    name: Check PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          # we don't have a package.json file, so we use the yml file as the cache key
+          cache-dependency-path: '**/.github/workflows/check-pr-title.yml'
+
+      - name: Verify PR title is in the correct format
+        run: |
+          echo "${{ github.event.pull_request.title }}" | npx commitlint -V
