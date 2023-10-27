@@ -32,7 +32,6 @@ jobs:
           package-name: honeybadger
           version-file: lib/honeybadger/version.rb
 
-      # Publish
       - name: Publish gem
         if: ${{ steps.release.outputs.release_created }}
         run: |
