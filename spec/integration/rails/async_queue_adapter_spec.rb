@@ -1,7 +1,7 @@
 require_relative '../rails_helper'
 
 describe "Rails Async Queue Adapter Test", if: RAILS_PRESENT, type: :request do
-  include ActiveJob::TestHelper
+  include ActiveJob::TestHelper if RAILS_PRESENT
   load_rails_hooks(self)
 
   it "reports exceptions" do
