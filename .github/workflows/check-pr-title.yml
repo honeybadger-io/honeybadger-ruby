@@ -15,6 +15,11 @@ jobs:
         with:
           node-version: '18.x'
 
+      - name: Setup
+        run: |
+          npm install -g @commitlint/cli @commitlint/config-conventional
+          echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+
       - name: Verify PR title is in the correct format
         run: |
           echo "${{ github.event.pull_request.title }}" | npx commitlint -V
