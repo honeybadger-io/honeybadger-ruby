@@ -13,7 +13,8 @@ For comprehensive documentation and support, [check out our documentation site](
 
 ## Changelog
 
-See https://github.com/honeybadger-io/honeybadger-ruby/blob/master/CHANGELOG.md
+Changelog is generated automatically as part of the release process, using
+[conventional commits](https://www.conventionalcommits.org/).
 
 ## Development
 
@@ -44,12 +45,12 @@ versions of [Rails](http://rubyonrails.org/).
 
 ### Releasing
 
-To release a new [patch] version:
-
-1. With a clean working tree, use `rake bump:patch` to bump the version and stage the changes (you can make additional manual changes at this point if necessary).
-2. Use `rake release` to run the tests, commit/tag the release, build the gem, and push to GitHub/RubyGems.
-
-See `rake -T` for additional tasks.
+Releases are automated, using [Github Actions](.github/workflows/release.yml):
+- When a PR is merged on master, the [ruby.yml](.github/workflows/ruby.yml) workflow is executed, which runs the tests.
+- If the tests pass, the [release.yml](.github/workflows/release.yml) workflow will be executed.
+- Depending on the commit message, a release PR will be created with the suggested the version bump and changelog.
+  Note: Not all commit messages trigger a new release, for example, `chore: ...` will not trigger a release.
+- If the release PR is merged, the [release.yml](.github/workflows/release.yml) workflow will be executed again, and this time it will create a github release, bundle the gem and push it to RubyGems.
 
 ### License
 

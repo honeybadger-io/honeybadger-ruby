@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## [Unreleased] - these should be manually added to the next release as the release process has changed
 ### Added
 - Support for Karafka (#480)
 - Support for nested `to_honeybadger_context` (#488)
