@@ -5,7 +5,6 @@
 
 ### Features
 
-* dummy commit to trigger minor version bump ([11ef01c](https://github.com/honeybadger-io/honeybadger-ruby/commit/11ef01c4bfa4bcf02d6cc37e02fa017dd71342af))
 * Support for Karafka (#480)
 * Support for nested `to_honeybadger_context` (#488)
 * Explain 413 responses from API (#492)
