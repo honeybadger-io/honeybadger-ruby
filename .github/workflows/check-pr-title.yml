@@ -14,9 +14,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          cache: 'npm'
-          # we don't have a package.json file, so we use the yml file as the cache key
-          cache-dependency-path: '**/.github/workflows/check-pr-title.yml'
 
       - name: Verify PR title is in the correct format
         run: |
