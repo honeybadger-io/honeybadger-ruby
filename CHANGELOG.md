@@ -1,9 +1,6 @@
 # Change Log
-All notable changes to this project will be documented in this file. See [Keep a
-CHANGELOG](http://keepachangelog.com/) for how to update this file. This project
-adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [Unreleased] - these should be manually added to the next release as the release process has changed
 ### Added
 - Support for Karafka (#480)
 - Support for nested `to_honeybadger_context` (#488)
