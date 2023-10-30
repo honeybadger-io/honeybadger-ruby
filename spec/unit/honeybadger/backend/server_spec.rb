@@ -76,6 +76,17 @@ describe Honeybadger::Backend::Server do
       end
     end
 
+    context "sync checkins" do
+      it "syncs with empty array" do
+        http = stub_http
+        subject.sync_checkins([])
+      end
+
+      it "syncs with invalid array" do
+        expect { subject.sync_checkins([{ projectId: '1234' }]) }.to raise_error ::Honeybadger::Backend::InvalidCheckinConfig
+      end
+    end
+
     def notify_backend
       subject.notify(:notices, payload)
     end

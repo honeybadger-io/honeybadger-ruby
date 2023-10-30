@@ -48,7 +48,32 @@ module Honeybadger
         Response.new(:error, nil, "HTTP Error: #{e.class}")
       end
 
+      # Sync checkin configs
+      # @example
+      #   backend.sync_checkins([{project_id: "11222", slug: "some slug", schedule_type: "simple", report_period: "1 hour"}])
+      #
+      # @param [Array] checkins The checkin configurations that should be synced
+      def sync_checkins(checkins)
+        validate_checkins(checkins)
+        added = sync_existing_checkins(checkins)
+        removed = sync_removed_checkins(checkins)
+
+        return (added + removed).uniq
+
+        raise NotImplementedError, 'must define #sync_checkins on subclass'
+      end
+
       private
+
+      def sync_existing_checkins(checkins)
+        return [] if checkins.nil? || checkins.empty?
+        checkins
+      end
+
+      def sync_removed_checkins(checkins)
+        return [] if checkins.nil? || checkins.empty?
+        checkins
+      end
 
       def payload_headers(payload)
         if payload.respond_to?(:api_key) && payload.api_key

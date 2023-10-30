@@ -4,6 +4,7 @@ require 'honeybadger/cli/heroku'
 require 'honeybadger/cli/install'
 require 'honeybadger/cli/notify'
 require 'honeybadger/cli/test'
+require 'honeybadger/cli/checkins'
 require 'honeybadger/config'
 require 'honeybadger/config/defaults'
 require 'honeybadger/ruby'
@@ -117,20 +118,32 @@ WELCOME
         end
 
         config = build_config(options)
+        
+        if config.get(:api_key).to_s =~ BLANK
+          say("No value provided for required options '--api-key'", :red)
+          exit(1)
+        end
+        
+        Exec.new(options, args, config).run
+      rescue => e
+        log_error(e)
+        exit(1)
+      end
+      
+      desc 'heroku SUBCOMMAND ...ARGS', 'Manage Honeybadger on Heroku'
+      subcommand 'heroku', Heroku
+      
+      desc 'sync_checkins', 'Sync checkins config'
+      def sync_checkins(*args)
+        config = build_config(options)
 
         if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'", :red)
           exit(1)
         end
 
-        Exec.new(options, args, config).run
-      rescue => e
-        log_error(e)
-        exit(1)
+        Checkins.new(options, args, config).run
       end
-
-      desc 'heroku SUBCOMMAND ...ARGS', 'Manage Honeybadger on Heroku'
-      subcommand 'heroku', Heroku
 
       private
 

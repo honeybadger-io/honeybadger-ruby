@@ -63,4 +63,17 @@ describe Honeybadger::Backend::Base do
       subject.track_deployment(opts)
     end
   end
+
+  describe "#sync_checkins" do
+    it "raises NotImplementedError" do
+      expect { subject.sync_checkins([]) }.to raise_error NotImplementedError
+    end
+
+  end
+
+  describe "#validate_checkins" do
+    it "throws exception if invalid checkin config is used" do
+      expect { subject.send(:validate_checkins, [{project_id: "1234"}]) }.to raise_error ::Honeybadger::Backend::InvalidCheckinConfig
+    end
+  end
 end

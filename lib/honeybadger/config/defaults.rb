@@ -328,6 +328,11 @@ module Honeybadger
         description: 'Enable/Disable automatic breadcrumbs from log messages.',
         default: true,
         type: Boolean
+      },
+      :'checkins' => {
+        description: 'Check in configuration',
+        default: [],
+        type: Array
       }
     }.freeze
 

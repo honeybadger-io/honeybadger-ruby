@@ -6,6 +6,8 @@ require 'honeybadger/logging'
 
 module Honeybadger
   module Backend
+
+    class InvalidCheckinConfig < StandardError; end
     class Response
       NOT_BLANK = /\S/
 
@@ -109,7 +111,31 @@ module Honeybadger
         notify(:deploys, payload)
       end
 
+
+      # Sync checkin configs
+      # @example
+      #   backend.sync_checkins([{project_id: "11222", slug: "some slug", schedule_type: "simple", report_period: "1 hour"}])
+      #
+      # @param [Array] checkins The checkin configurations that should be synced
+      def sync_checkins(checkins)
+        raise NotImplementedError, 'must define #sync_checkins on subclass'
+      end
+
       private
+
+      def validate_checkins(checkins)
+        checkins.each do |checkin|
+          raise InvalidCheckinConfig.new('project_id is required for each checkin') if checkin[:project_id].nil? || checkin[:project_id] == ''
+          raise InvalidCheckinConfig.new('name is required for each checkin') if checkin[:name].nil? || checkin[:name] == ''
+          name = checkin[:name]
+          raise InvalidCheckinConfig.new("#{name} schedule_type must be either 'simple' or 'cron'") unless ['simple', 'cron'].include? checkin[:schedule_type]
+          if checkin[:schedule_type] == 'simple'
+            raise InvalidCheckinConfig.new("#{name} report_period is required for simple checkins") if checkin[:report_period].nil? || checkin[:report_period] == ''
+          else
+            raise InvalidCheckinConfig.new("#{name} cron_schedule is required for cron checkins") if checkin[:cron_schedule].nil? || checkin[:cron_schedule] == ''
+          end
+        end
+      end
 
       attr_reader :config
     end
