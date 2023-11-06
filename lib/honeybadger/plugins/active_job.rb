@@ -12,12 +12,10 @@ module Honeybadger
           ::ActiveJob::Base.class_eval do |base| 
             base.set_callback :perform, :around do |param, block|
               begin
-                Honeybadger.flush {
-                  block.call
-                }
-              rescue => e
-                Honeybadger.notify(e, parameters: { job_arguments: self.arguments }, sync: true)
-                raise
+                block.call
+              rescue => error
+                Honeybadger.notify(error, parameters: { job_arguments: self.arguments })
+                raise error
               end
             end
           end          
