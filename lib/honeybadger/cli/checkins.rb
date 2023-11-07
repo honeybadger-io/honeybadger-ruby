@@ -2,7 +2,7 @@ require 'forwardable'
 require 'honeybadger/cli/main'
 require 'honeybadger/cli/helpers'
 require 'honeybadger/util/http'
-
+require 'honeybadger/config_sync_service'
 module Honeybadger
   module CLI
     class Checkins
@@ -17,7 +17,8 @@ module Honeybadger
       end
       
       def run
-        
+        config_sync_service = ConfigSyncService.new(@config)
+        result = config_sync_service.sync_checkins
         say("Checkin config synced", :green)
       end
 

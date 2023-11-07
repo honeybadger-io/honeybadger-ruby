@@ -130,13 +130,13 @@ WELCOME
         exit(1)
       end
       
-      desc 'heroku SUBCOMMAND ...ARGS', 'Manage Honeybadger on Heroku'
+      desc 'heroku SUBCOMMAND ...ARGS', 'Manage -- Honeybadger on Heroku'
       subcommand 'heroku', Heroku
       
       desc 'sync_checkins', 'Sync checkins config'
+      project_options
       def sync_checkins(*args)
         config = build_config(options)
-
         if config.get(:api_key).to_s =~ BLANK
           say("No value provided for required options '--api-key'", :red)
           exit(1)

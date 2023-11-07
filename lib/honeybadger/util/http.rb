@@ -37,15 +37,27 @@ module Honeybadger
         @config = config
       end
 
-      def get(endpoint)
-        response = http_connection.get(endpoint)
+      def get(endpoint, headers = nil)
+        response = http_connection.get(endpoint, http_headers(headers))
         debug { sprintf("http method=GET path=%s code=%d", endpoint.dump, response.code) }
+        response
+      end
+
+      def delete(endpoint, headers = nil)
+        response = http_connection.delete(endpoint, http_headers(headers))
+        debug { sprintf("http method=DELETE path=%s code=%d", endpoint.dump, response.code) }
         response
       end
 
       def post(endpoint, payload, headers = nil)
         response = http_connection.post(endpoint, compress(payload.to_json), http_headers(headers))
         debug { sprintf("http method=POST path=%s code=%d", endpoint.dump, response.code) }
+        response
+      end
+
+      def put(endpoint, payload, headers = nil)
+        response = http_connection.put(endpoint, compress(payload.to_json), http_headers(headers))
+        debug { sprintf("http method=PUT path=%s code=%d", endpoint.dump, response.code) }
         response
       end
 

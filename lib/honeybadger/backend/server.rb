@@ -21,6 +21,8 @@ module Honeybadger
 
       def initialize(config)
         @http = Util::HTTP.new(config)
+        # for checkin config sync
+        @personal_auth_token = config.get(:personal_auth_token)
         super
       end
 
@@ -48,31 +50,57 @@ module Honeybadger
         Response.new(:error, nil, "HTTP Error: #{e.class}")
       end
 
-      # Sync checkin configs
-      # @example
-      #   backend.sync_checkins([{project_id: "11222", slug: "some slug", schedule_type: "simple", report_period: "1 hour"}])
+
       #
-      # @param [Array] checkins The checkin configurations that should be synced
-      def sync_checkins(checkins)
-        validate_checkins(checkins)
-        added = sync_existing_checkins(checkins)
-        removed = sync_removed_checkins(checkins)
+      ##### Checkin Crud methods
+      #
 
-        return (added + removed).uniq
+      def get_checkin(project_id, id)
+        response = Response.new(@http.get("/v2/projects/#{project_id}/check_ins/#{id}", personal_auth_headers))
+        if response.success?
+          return Checkin.from_remote(project_id, JSON.parse(response.body))
+        else
+          if response.code == 404
+            return nil
+          end
+        end
+        raise CheckinSyncError.new "Fetching Checkin failed (Code: #{response.code}) #{response.body}"
+      end
 
-        raise NotImplementedError, 'must define #sync_checkins on subclass'
+      def get_checkins(project_id)
+        response = Response.new(@http.get("/v2/projects/#{project_id}/check_ins", personal_auth_headers))
+        if response.success?
+          all_checkins = JSON.parse(response.body)["results"]
+          return all_checkins.map{|cfg| Checkin.from_remote(project_id, cfg) }
+        end
+        raise CheckinFetchError.new "Fetching Checkins failed (Code: #{response.code}) #{response.body}"
+      end
+      
+      def update_checkin(project_id, id, data)
+        response = Response.new(@http.put("/v2/projects/#{project_id}/check_ins/#{id}", data.to_json, personal_auth_headers))
+        return Checkin.from_remote(project_id, JSON.parse(response.body))
+      end
+
+      def create_checkin(project_id, data)
+        response = Response.new(@http.post("/v2/projects/#{project_id}/check_ins", data.to_json, personal_auth_headers))
+        if response.success?
+          return Checkin.from_remote(project_id, JSON.parse(response.body))
+        end
+        raise CheckinFetchError.new "Saving Checkin failed (Code: #{response.code}) #{response.body}"
+      end
+
+      def delete_checkin(checkin, access_token)
+        response = Response.new(@http.delete("/v2/projects/#{checkin.project_id}/check_ins/#{checkin.id}", personal_auth_headers))
+        if response.success?
+          return true
+        end
+        raise CheckinFetchError.new "Deleting Checkin failed (Code: #{response.code}) #{response.body}"
       end
 
       private
 
-      def sync_existing_checkins(checkins)
-        return [] if checkins.nil? || checkins.empty?
-        checkins
-      end
-
-      def sync_removed_checkins(checkins)
-        return [] if checkins.nil? || checkins.empty?
-        checkins
+      def personal_auth_headers
+        {"Authorization" => "#{@personal_auth_token}:"}
       end
 
       def payload_headers(payload)
