@@ -3,7 +3,6 @@ require 'honeybadger'
 feature "Running the checkins cli command" do
   scenario "sync checkins" do
     context "with config file" do
-
       let(:config_file_contents) { 
         {
           checkins: [
@@ -20,14 +19,35 @@ feature "Running the checkins cli command" do
       before { 
         File.write(config_file, config_file_contents)
         set_environment_variable('HONEYBADGER_CONFIG_PATH', config_file)
-        set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
+        set_environment_variable('HONEYBADGER_PERSONAL_AUTH_TOKEN', 'asdf')
         set_environment_variable('HONEYBADGER_BACKEND', 'test')
       }
 
       after { File.unlink(config_file) }
 
       it "syncs checkin configuration" do
-        expect(run_command("honeybadger sync_checkins")).to be_successfully_executed
+        expect(run_command("honeybadger sync_checkins --personal-auth-token=abcd")).to be_successfully_executed
+      end
+    end
+
+    context "with config file without checkins" do
+      let(:config_file_contents) { 
+        {
+        }.to_yaml
+      }
+      let(:config_file) { TMP_DIR.join("honeybadger.yml") }
+      before { 
+        File.write(config_file, config_file_contents)
+        set_environment_variable('HONEYBADGER_CONFIG_PATH', config_file)
+        set_environment_variable('HONEYBADGER_PERSONAL_AUTH_TOKEN', 'asdf')
+        set_environment_variable('HONEYBADGER_BACKEND', 'test')
+      }
+
+      after { File.unlink(config_file) }
+
+      it "does not sync checkin configuration if checkins are not configured in config file" do
+        expect(run_command("honeybadger sync_checkins --personal-auth-token=abcd")).to_not be_successfully_executed
+        expect(all_output).to match(/No checkins provided in config file/)
       end
     end
   end

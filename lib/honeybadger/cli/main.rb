@@ -135,10 +135,16 @@ WELCOME
       
       desc 'sync_checkins', 'Sync checkins config'
       project_options
+      option :personal_auth_token, required: false, type: :string, desc: "Personal auth token for API access"
       def sync_checkins(*args)
         config = build_config(options)
-        if config.get(:api_key).to_s =~ BLANK
-          say("No value provided for required options '--api-key'", :red)
+        if config.get(:personal_auth_token).to_s =~ BLANK
+          say(config.inspect)
+          say("No value provided for required options '--personal-auth-token'", :red)
+          exit(1)
+        end
+        if (config.get(:checkins) || []).empty?
+          say("No checkins provided in config file", :red)
           exit(1)
         end
 
@@ -158,7 +164,7 @@ WELCOME
         config.set(:report_data, true)
         config.set(:api_key, fetch_value(options, 'api_key')) if options.has_key?('api_key')
         config.set(:env, fetch_value(options, 'environment')) if options.has_key?('environment')
-
+        config.set(:personal_auth_token, fetch_value(options, 'personal_auth_token')) if options.has_key?('personal_auth_token')
         config
       end
 
