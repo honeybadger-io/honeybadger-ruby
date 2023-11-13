@@ -21,6 +21,7 @@ feature "Running the checkins cli command" do
         File.write(config_file, config_file_contents)
         set_environment_variable('HONEYBADGER_CONFIG_PATH', config_file)
         set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
+        set_environment_variable('HONEYBADGER_BACKEND', 'test')
       }
 
       after { File.unlink(config_file) }

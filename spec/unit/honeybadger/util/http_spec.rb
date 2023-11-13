@@ -34,7 +34,7 @@ describe Honeybadger::Util::HTTP do
       proxy = double(new: http)
       allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
 
-      expect(http).to receive(:get).with('/v1/foo')
+      expect(http).to receive(:get).with('/v1/foo', anything)
       expect(Net::HTTP).to receive(:Proxy).with('some.host', 88, 'login', 'passwd')
 
       http_get

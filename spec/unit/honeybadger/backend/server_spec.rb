@@ -76,13 +76,126 @@ describe Honeybadger::Backend::Server do
       end
     end
 
-    context "sync checkins crud calls" do
-
-    end
-
+    
     def notify_backend
       subject.notify(:notices, payload)
     end
+    
+  end
+  
+  describe "sync checkins API" do
+    describe "#get_checkin" do
+      it "should get one check in" do
+        get_one = stub_request(:get, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return({
+          status: 200,
+          body: {
+            name: "Test Checkin",
+            slug: nil,
+            schedule_type: "simple",
+            report_period: "1 day",
+            grace_period: "3 hours",
+            cron_schedule: nil,
+            cron_timezone: nil,
+            id: "5678"
+          }.to_json
+        })
+        checkin = subject.get_checkin("1234", "5678")
+        expect(checkin).to be_a(Honeybadger::Checkin)
+        expect(get_one).to have_been_made
+      end
 
+      it "should return nil if it gets a 404" do
+        get_one = stub_request(:get, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return({status: 404})
+        checkin = subject.get_checkin("1234", "5678")
+        expect(checkin).to be_nil
+        expect(get_one).to have_been_made
+      end
+    end
+    
+    describe "#get_checkins" do
+      it "should return an array of check ins" do
+        get_all = stub_request(:get, "https://api.honeybadger.io/v2/projects/1234/check_ins").to_return({
+          status: 200,
+          body: {results: [{
+            name: "Test Checkin",
+            slug: nil,
+            schedule_type: "simple",
+            report_period: "1 day",
+            grace_period: "3 hours",
+            cron_schedule: nil,
+            cron_timezone: nil,
+            id: "5678"
+          }]}.to_json
+        })
+        checkins = subject.get_checkins("1234")
+        expect(checkins).to be_a(Array)
+        expect(checkins.length).to eq(1)
+        expect(checkins.first).to be_a(Honeybadger::Checkin)
+        expect(get_all).to have_been_made
+      end
+    end
+
+    describe "#create_checkin" do
+      it "should return checkin" do
+        post_one = stub_request(:post, "https://api.honeybadger.io/v2/projects/1234/check_ins").to_return({
+          status: 200,
+          body: {
+            name: "Test Checkin",
+            slug: nil,
+            schedule_type: "simple",
+            report_period: "1 day",
+            grace_period: "3 hours",
+            cron_schedule: nil,
+            cron_timezone: nil,
+            id: "5678"
+          }.to_json
+        })
+        checkin = Honeybadger::Checkin.from_config({
+          name: "Test Checkin",
+          schedule_type: "simple",
+          report_period: "1 day",
+          grace_period: "3 hours"
+        })
+        result = subject.create_checkin("1234", checkin)
+        expect(result).to be_a(Honeybadger::Checkin)
+        expect(post_one).to have_been_made
+      end
+    end
+
+    describe "#update_checkin" do
+      it "should return checkin" do
+        put_one = stub_request(:put, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return({
+          status: 200,
+          body: {
+            name: "Test Checkin",
+            slug: nil,
+            schedule_type: "simple",
+            report_period: "2 days",
+            grace_period: "3 hours",
+            cron_schedule: nil,
+            cron_timezone: nil,
+            id: "5678"
+          }.to_json
+        })
+        checkin = Honeybadger::Checkin.from_config({
+          name: "Test Checkin",
+          schedule_type: "simple",
+          report_period: "2 days",
+          grace_period: "3 hours"
+        })
+        result = subject.update_checkin("1234", "5678", checkin)
+        expect(result).to be_a(Honeybadger::Checkin)
+        expect(put_one).to have_been_made
+      end
+    end
+
+    describe "#delete_checkin" do
+      it "should accept a delete" do
+        delete_one = stub_request(:delete, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return(status: 200)
+        result = subject.delete_checkin("1234", "5678")
+        expect(result).to be_truthy
+        expect(delete_one).to have_been_made
+      end
+    end
   end
 end
