@@ -3,6 +3,7 @@ module Honeybadger
   class ConfigSyncService
     def initialize(config)
       @config = config
+      @checkins_cache = nil
     end
 
     def sync_checkins
@@ -23,8 +24,8 @@ module Honeybadger
     private
 
     def get_checkin_by_name(project_id, name)
-      checkins = @config.backend.get_checkins(project_id)
-      checkins.find {|c| c.name == name }
+      @checkins_cache ||= @config.backend.get_checkins(project_id)
+      @checkins_cache.find {|c| c.name == name }
     end
 
     def sync_existing_checkins(checkins = [])
@@ -52,10 +53,10 @@ module Honeybadger
       result = []
       project_ids = checkins.map{|ch| ch.project_id }.uniq
       project_ids.each do |prj_id|
-        project_checkins = @config.backend.get_checkins(prj_id)
+        @checkins_cache ||= @config.backend.get_checkins(prj_id)
 
         local_project_checkins = checkins.select {|c| c.project_id == prj_id }
-        to_remove = project_checkins.reject do |pc| 
+        to_remove = @checkins_cache.reject do |pc|
           local_project_checkins.find{|c| c.id == pc.id || c.name == pc.name }
         end
         to_remove.each do |ch|

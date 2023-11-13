@@ -64,16 +64,35 @@ describe Honeybadger::Backend::Base do
     end
   end
 
-  describe "#sync_checkins" do
-    it "raises NotImplementedError" do
-      expect { subject.sync_checkins([]) }.to raise_error NotImplementedError
+  describe "checkin API methods" do
+    describe "#get_checkin" do
+      it "raises NotImplementedError" do
+        expect { subject.get_checkin('abcd', 'efgh') }.to raise_error NotImplementedError
+      end
     end
 
-  end
+    describe "#get_checkins" do
+      it "raises NotImplementedError" do
+        expect { subject.get_checkins('abcd') }.to raise_error NotImplementedError
+      end
+    end
 
-  describe "#validate_checkins" do
-    it "throws exception if invalid checkin config is used" do
-      expect { subject.send(:validate_checkins, [{project_id: "1234"}]) }.to raise_error ::Honeybadger::Backend::InvalidCheckinConfig
+    describe "#create_checkin" do
+      it "raises NotImplementedError" do
+        expect { subject.create_checkin('abcd', {}) }.to raise_error NotImplementedError
+      end
+    end
+
+    describe "#update_checkin" do
+      it "raises NotImplementedError" do
+        expect { subject.update_checkin('abcd', 'efgh', {}) }.to raise_error NotImplementedError
+      end
+    end
+
+    describe "#delete_checkin" do
+      it "raises NotImplementedError" do
+        expect { subject.delete_checkin('abcd', 'efgh') }.to raise_error NotImplementedError
+      end
     end
   end
 end

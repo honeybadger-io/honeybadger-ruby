@@ -55,6 +55,15 @@ module Honeybadger
       ##### Checkin Crud methods
       #
 
+      # Get checkin by id
+      # @example
+      #   backend.get_checkin('1234', 'ajdja")
+      #
+      # @param [String] project_id The unique project id
+      # @param [String] id The unique check_in id
+      # @returns [Checkin] or nil if checkin is not found
+      # @raises CheckinSyncError on error
+
       def get_checkin(project_id, id)
         response = Response.new(@http.get("/v2/projects/#{project_id}/check_ins/#{id}", personal_auth_headers))
         if response.success?
@@ -67,34 +76,69 @@ module Honeybadger
         raise CheckinSyncError.new "Fetching Checkin failed (Code: #{response.code}) #{response.body}"
       end
 
+      # Get checkins by project
+      # @example
+      #   backend.get_checkins('1234')
+      #
+      # @param [String] project_id The unique project id
+      # @returns [Array<Checkin>] All checkins for this project
+      # @raises CheckinSyncError on error
       def get_checkins(project_id)
         response = Response.new(@http.get("/v2/projects/#{project_id}/check_ins", personal_auth_headers))
         if response.success?
           all_checkins = JSON.parse(response.body)["results"]
           return all_checkins.map{|cfg| Checkin.from_remote(project_id, cfg) }
         end
-        raise CheckinFetchError.new "Fetching Checkins failed (Code: #{response.code}) #{response.body}"
-      end
-      
-      def update_checkin(project_id, id, data)
-        response = Response.new(@http.put("/v2/projects/#{project_id}/check_ins/#{id}", data.to_json, personal_auth_headers))
-        return Checkin.from_remote(project_id, JSON.parse(response.body))
+        raise CheckinSyncError.new "Fetching Checkins failed (Code: #{response.code}) #{response.body}"
       end
 
+      # Create checkin on project
+      # @example
+      #   backend.create_checkin('1234', checkin)
+      #
+      # @param [String] project_id The unique project id
+      # @param [Checkin] data A Checkin object encapsulating the config
+      # @returns [Checkin] A checkin object containing the id
+      # @raises CheckinSyncError on error
       def create_checkin(project_id, data)
         response = Response.new(@http.post("/v2/projects/#{project_id}/check_ins", data.to_json, personal_auth_headers))
         if response.success?
           return Checkin.from_remote(project_id, JSON.parse(response.body))
         end
-        raise CheckinFetchError.new "Saving Checkin failed (Code: #{response.code}) #{response.body}"
+        raise CheckinSyncError.new "Creating Checkin failed (Code: #{response.code}) #{response.body}"
       end
 
-      def delete_checkin(checkin, access_token)
-        response = Response.new(@http.delete("/v2/projects/#{checkin.project_id}/check_ins/#{checkin.id}", personal_auth_headers))
+      # Update checkin on project
+      # @example
+      #   backend.update_checkin('1234', 'eajaj', checkin)
+      #
+      # @param [String] project_id The unique project id
+      # @param [String] id The unique check_in id
+      # @param [Checkin] data A Checkin object encapsulating the config
+      # @returns [Checkin] updated Checkin object
+      # @raises CheckinSyncError on error
+      def update_checkin(project_id, id, data)
+        response = Response.new(@http.put("/v2/projects/#{project_id}/check_ins/#{id}", data.to_json, personal_auth_headers))
+        if response.success?
+          return Checkin.from_remote(project_id, JSON.parse(response.body))
+        end
+        raise CheckinSyncError.new "Updating Checkin failed (Code: #{response.code}) #{response.body}"
+      end
+
+      # Delete checkin
+      # @example
+      #   backend.delete_checkin('1234', 'eajaj')
+      #
+      # @param [String] project_id The unique project id
+      # @param [String] id The unique check_in id
+      # @returns [Boolean] true if deletion was successful
+      # @raises CheckinSyncError on error
+      def delete_checkin(project_id, id)
+        response = Response.new(@http.delete("/v2/projects/#{project_id}/check_ins/#{id}", personal_auth_headers))
         if response.success?
           return true
         end
-        raise CheckinFetchError.new "Deleting Checkin failed (Code: #{response.code}) #{response.body}"
+        raise CheckinSyncError.new "Deleting Checkin failed (Code: #{response.code}) #{response.body}"
       end
 
       private

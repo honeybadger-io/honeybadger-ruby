@@ -8,8 +8,6 @@ require 'honeybadger/checkin'
 
 module Honeybadger
   module Backend
-
-    
     class Response
       NOT_BLANK = /\S/
 
@@ -113,43 +111,62 @@ module Honeybadger
         notify(:deploys, payload)
       end
 
-      # Sync checkin configs
+      # Get checkin by id
       # @example
-      #   backend.sync_checkins([{project_id: "11222", slug: "some slug", schedule_type: "simple", report_period: "1 hour"}])
+      #   backend.get_checkin('1234', 'ajdja")
       #
-      # @param [Array] checkins The checkin configurations that should be synced
-
+      # @param [String] project_id The unique project id
+      # @param [String] id The unique check_in id
+      # @raise NotImplementedError
       def get_checkin(project_id, id)
         raise NotImplementedError, 'must define #get_checkin on subclass'
       end
-      
+
+      # Get checkins by project
+      # @example
+      #   backend.get_checkins('1234')
+      #
+      # @param [String] project_id The unique project id
+      # @raise NotImplementedError
       def get_checkins(project_id)
         raise NotImplementedError, 'must define #get_checkins on subclass'
       end
-      
+
+      # Create checkin on project
+      # @example
+      #   backend.create_checkin('1234', checkin)
+      #
+      # @param [String] project_id The unique project id
+      # @param [Checkin] data A Checkin object encapsulating the config
+      # @raise NotImplementedError
       def create_checkin(project_id, data)
         raise NotImplementedError, 'must define #create_checkin on subclass'
       end
 
+      # Update checkin on project
+      # @example
+      #   backend.update_checkin('1234', 'eajaj', checkin)
+      #
+      # @param [String] project_id The unique project id
+      # @param [String] id The unique check_in id
+      # @param [Checkin] data A Checkin object encapsulating the config
+      # @raise NotImplementedError
       def update_checkin(project_id, id, data)
         raise NotImplementedError, 'must define #update_checkin on subclass'
       end
-      
+
+      # Delete checkin
+      # @example
+      #   backend.delete_checkin('1234', 'eajaj')
+      #
+      # @param [String] project_id The unique project id
+      # @param [String] id The unique check_in id
+      # @raise NotImplementedError
       def delete_checkin(project_id, id)
         raise NotImplementedError, 'must define #delete_checkin on subclass'
       end
 
-      def sync_checkins(checkins, access_token)
-        raise NotImplementedError, 'must define #sync_checkins on subclass'
-      end
-
       private
-
-      def validate_checkins(checkins)
-        checkins.each do |checkin|
-          checkin.validate!
-        end
-      end
 
       attr_reader :config
     end
