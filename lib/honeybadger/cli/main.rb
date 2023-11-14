@@ -133,29 +133,12 @@ WELCOME
       desc 'heroku SUBCOMMAND ...ARGS', 'Manage -- Honeybadger on Heroku'
       subcommand 'heroku', Heroku
       
-      desc 'sync_checkins', 'Sync checkins config'
-      project_options
-      option :personal_auth_token, required: false, type: :string, desc: "Personal auth token for API access"
-      def sync_checkins(*args)
-        config = build_config(options)
-        if config.get(:personal_auth_token).to_s =~ BLANK
-          say(config.inspect)
-          say("No value provided for required options '--personal-auth-token'", :red)
-          exit(1)
-        end
-        if (config.get(:checkins) || []).empty?
-          say("No checkins provided in config file", :red)
-          exit(1)
-        end
-
-        Checkins.new(options, args, config).run
-      end
+      desc 'check_ins', 'Manage check ins'
+      subcommand 'check_ins', CheckIns
 
       private
 
-      def fetch_value(options, key)
-        options[key] == key ? nil : options[key]
-      end
+      include Helpers::Environment
 
       def build_config(options)
         load_env(options)
@@ -166,35 +149,6 @@ WELCOME
         config.set(:env, fetch_value(options, 'environment')) if options.has_key?('environment')
         config.set(:personal_auth_token, fetch_value(options, 'personal_auth_token')) if options.has_key?('personal_auth_token')
         config
-      end
-
-      def load_env(options)
-        # Initialize Rails when running from Rails root.
-        environment_rb = File.join(Dir.pwd, 'config', 'environment.rb')
-        if File.exist?(environment_rb)
-          load_rails_env_if_allowed(environment_rb, options)
-        end
-        # Ensure config is loaded (will be skipped if initialized by Rails).
-        Honeybadger.config.load!
-      end
-
-      def load_rails_env_if_allowed(environment_rb, options)
-        # Skip Rails initialization according to option flag
-        if options.has_key?('skip_rails_load') && fetch_value(options, 'skip_rails_load')
-          say("Skipping Rails initialization.")
-        else
-          load_rails_env(environment_rb)
-        end
-      end
-
-      def load_rails_env(environment_rb)
-        begin
-          require 'rails'
-        rescue LoadError
-          # No Rails, so skip loading Rails environment.
-          return
-        end
-        require environment_rb
       end
 
       def log_error(e)

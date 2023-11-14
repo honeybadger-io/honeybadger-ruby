@@ -26,7 +26,10 @@ feature "Running the check_ins cli command" do
       after { File.unlink(config_file) }
 
       it "syncs check in configuration" do
-        expect(run_command("honeybadger sync_checkins --personal-auth-token=abcd")).to be_successfully_executed
+        expect(run_command("honeybadger check_ins sync")).to be_successfully_executed
+        expect(all_output).to match(/Check in config synced/)
+        expect(all_output).to match(/1   worker check in/)
+        expect(all_output).to match(/Synced/)
       end
     end
 
@@ -46,8 +49,8 @@ feature "Running the check_ins cli command" do
       after { File.unlink(config_file) }
 
       it "does not sync check_in configuration if checkins are not configured in config file" do
-        expect(run_command("honeybadger sync_checkins --personal-auth-token=abcd")).to_not be_successfully_executed
-        expect(all_output).to match(/No checkins provided in config file/)
+        expect(run_command("honeybadger check_ins sync")).to_not be_successfully_executed
+        expect(all_output).to match(/No check_ins provided in config file/)
       end
     end
   end

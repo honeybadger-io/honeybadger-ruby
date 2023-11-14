@@ -23,6 +23,40 @@ To fix this issue, please try the following:
 MSG
         end
       end
+      module Environment
+        def fetch_value(options, key)
+          options[key] == key ? nil : options[key]
+        end
+        
+        def load_env(options)
+          # Initialize Rails when running from Rails root.
+          environment_rb = File.join(Dir.pwd, 'config', 'environment.rb')
+          if File.exist?(environment_rb)
+            load_rails_env_if_allowed(environment_rb, options)
+          end
+          # Ensure config is loaded (will be skipped if initialized by Rails).
+          Honeybadger.config.load!
+        end
+  
+        def load_rails_env_if_allowed(environment_rb, options)
+          # Skip Rails initialization according to option flag
+          if options.has_key?('skip_rails_load') && fetch_value(options, 'skip_rails_load')
+            say("Skipping Rails initialization.")
+          else
+            load_rails_env(environment_rb)
+          end
+        end
+  
+        def load_rails_env(environment_rb)
+          begin
+            require 'rails'
+          rescue LoadError
+            # No Rails, so skip loading Rails environment.
+            return
+          end
+          require environment_rb
+        end
+      end
     end
   end
 end

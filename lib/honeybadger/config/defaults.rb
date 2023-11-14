@@ -41,6 +41,11 @@ module Honeybadger
         default: nil,
         type: String
       },
+      personal_auth_token: {
+        description: 'The personal auth token for API access.',
+        default: nil,
+        type: String
+      },
       env: {
         description: 'The current application\'s environment name.',
         default: nil,
