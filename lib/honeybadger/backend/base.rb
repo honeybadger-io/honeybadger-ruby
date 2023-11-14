@@ -4,7 +4,7 @@ require 'json'
 
 require 'honeybadger/logging'
 
-require 'honeybadger/checkin'
+require 'honeybadger/check_in'
 
 module Honeybadger
   module Backend
@@ -111,59 +111,59 @@ module Honeybadger
         notify(:deploys, payload)
       end
 
-      # Get checkin by id
+      # Get check_in by id
       # @example
-      #   backend.get_checkin('1234', 'ajdja")
+      #   backend.get_check_in('1234', 'ajdja")
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
       # @raise NotImplementedError
-      def get_checkin(project_id, id)
+      def get_check_in(project_id, id)
         raise NotImplementedError, 'must define #get_checkin on subclass'
       end
 
       # Get checkins by project
       # @example
-      #   backend.get_checkins('1234')
+      #   backend.get_check_ins('1234')
       #
       # @param [String] project_id The unique project id
       # @raise NotImplementedError
-      def get_checkins(project_id)
+      def get_check_ins(project_id)
         raise NotImplementedError, 'must define #get_checkins on subclass'
       end
 
-      # Create checkin on project
+      # Create check_in on project
       # @example
-      #   backend.create_checkin('1234', checkin)
+      #   backend.create_check_in('1234', check_in)
       #
       # @param [String] project_id The unique project id
-      # @param [Checkin] data A Checkin object encapsulating the config
+      # @param [CheckIn] data A CheckIn object encapsulating the config
       # @raise NotImplementedError
-      def create_checkin(project_id, data)
-        raise NotImplementedError, 'must define #create_checkin on subclass'
+      def create_check_in(project_id, data)
+        raise NotImplementedError, 'must define #create_check_in on subclass'
       end
 
-      # Update checkin on project
+      # Update check_in on project
       # @example
-      #   backend.update_checkin('1234', 'eajaj', checkin)
+      #   backend.update_check_in('1234', 'eajaj', check_in)
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
-      # @param [Checkin] data A Checkin object encapsulating the config
+      # @param [CheckIn] data A CheckIn object encapsulating the config
       # @raise NotImplementedError
-      def update_checkin(project_id, id, data)
-        raise NotImplementedError, 'must define #update_checkin on subclass'
+      def update_check_in(project_id, id, data)
+        raise NotImplementedError, 'must define #update_check_in on subclass'
       end
 
-      # Delete checkin
+      # Delete check_in
       # @example
-      #   backend.delete_checkin('1234', 'eajaj')
+      #   backend.delete_check_in('1234', 'eajaj')
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
       # @raise NotImplementedError
-      def delete_checkin(project_id, id)
-        raise NotImplementedError, 'must define #delete_checkin on subclass'
+      def delete_check_in(project_id, id)
+        raise NotImplementedError, 'must define #delete_check_in on subclass'
       end
 
       private

@@ -1,6 +1,6 @@
 require 'honeybadger/backend/test'
 require 'honeybadger/config'
-require 'honeybadger/checkin'
+require 'honeybadger/check_in'
 
 
 describe Honeybadger::Backend::Test do
@@ -48,107 +48,107 @@ describe Honeybadger::Backend::Test do
     end
   end
 
-  context "checkin sync crud methods" do
+  context "check_in sync crud methods" do
     before do
-      Honeybadger::Backend::Test.checkin_configs.clear
+      Honeybadger::Backend::Test.check_in_configs.clear
     end
 
     describe "#set_checkin" do
       it "should set object on class" do
-        checkin = Honeybadger::Checkin.from_config({
+        check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "1 hour"
         })
 
-        subject.set_checkin("1234", "5678", checkin)
-        expect(subject.checkin_configs["1234"]["5678"]).to eq(checkin)
+        subject.set_checkin("1234", "5678", check_in)
+        expect(subject.check_in_configs["1234"]["5678"]).to eq(check_in)
       end
     end
 
     describe "#get_checkin" do
-      it "should return nil if checkin does not exist" do
-        expect(subject.get_checkin("1234", "5678")).to be_nil
+      it "should return nil if check_in does not exist" do
+        expect(subject.get_check_in("1234", "5678")).to be_nil
       end
-      it "should return checkin if it exists" do
-        checkin = Honeybadger::Checkin.from_config({
+      it "should return check_in if it exists" do
+        check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        subject.set_checkin("1234", "5678", checkin)
-        expect(subject.get_checkin("1234", "5678")).to eq(checkin)
+        subject.set_checkin("1234", "5678", check_in)
+        expect(subject.get_check_in("1234", "5678")).to eq(check_in)
       end
     end
 
     describe "#get_checkins" do
-      it "should return empty array if no checkin exists" do
-        expect(subject.get_checkins("1234")).to be_empty
+      it "should return empty array if no check_in exists" do
+        expect(subject.get_check_ins("1234")).to be_empty
       end
-      it "should return array if checkin exists" do
-        checkin = Honeybadger::Checkin.from_config({
+      it "should return array if check_in exists" do
+        check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        subject.set_checkin("1234", "5678", checkin)
-        expect(subject.get_checkins("1234").first).to eq(checkin)
+        subject.set_checkin("1234", "5678", check_in)
+        expect(subject.get_check_ins("1234").first).to eq(check_in)
       end
     end
 
-    describe "#create_checkin" do
-      it "should create checkin and return it" do
-        checkin = Honeybadger::Checkin.from_config({
+    describe "#create_check_in" do
+      it "should create check_in and return it" do
+        check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        created = subject.create_checkin("1234", checkin)
+        created = subject.create_check_in("1234", check_in)
         expect(created.id).to_not be_nil
-        expect(subject.checkin_configs["1234"][created.id]).to_not be_nil
+        expect(subject.check_in_configs["1234"][created.id]).to_not be_nil
       end
     end
 
-    describe "#update_checkin" do
-      it "should update checkin and return it" do
-        checkin = Honeybadger::Checkin.from_config({
+    describe "#update_check_in" do
+      it "should update check_in and return it" do
+        check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        checkin_update = Honeybadger::Checkin.from_config({
+        checkin_update = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "2 hours"
         })
 
-        subject.set_checkin("1234", "5678", checkin)
-        updated = subject.update_checkin("1234", "5678", checkin_update)
+        subject.set_checkin("1234", "5678", check_in)
+        updated = subject.update_check_in("1234", "5678", checkin_update)
 
         expect(updated.report_period).to eq("2 hours")
-        expect(subject.checkin_configs["1234"]["5678"].report_period).to eq("2 hours")
+        expect(subject.check_in_configs["1234"]["5678"].report_period).to eq("2 hours")
       end
     end
 
-    describe "#delete_checkin" do
-      it "should update checkin and return it" do
-        checkin = Honeybadger::Checkin.from_config({
+    describe "#delete_check_in" do
+      it "should update check_in and return it" do
+        check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
-          name: "Test checkin",
+          name: "Test check_in",
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        subject.set_checkin("1234", "5678", checkin)
-        expect(subject.checkin_configs["1234"]["5678"]).to_not be_nil
+        subject.set_checkin("1234", "5678", check_in)
+        expect(subject.check_in_configs["1234"]["5678"]).to_not be_nil
 
-        expect(subject.delete_checkin("1234", "5678")).to be_truthy
-        expect(subject.checkin_configs["1234"]["5678"]).to be_nil
+        expect(subject.delete_check_in("1234", "5678")).to be_truthy
+        expect(subject.check_in_configs["1234"]["5678"]).to be_nil
       end
     end
   end

@@ -64,34 +64,34 @@ describe Honeybadger::Backend::Base do
     end
   end
 
-  describe "checkin API methods" do
+  describe "check_in API methods" do
     describe "#get_checkin" do
       it "raises NotImplementedError" do
-        expect { subject.get_checkin('abcd', 'efgh') }.to raise_error NotImplementedError
+        expect { subject.get_check_in('abcd', 'efgh') }.to raise_error NotImplementedError
       end
     end
 
     describe "#get_checkins" do
       it "raises NotImplementedError" do
-        expect { subject.get_checkins('abcd') }.to raise_error NotImplementedError
+        expect { subject.get_check_ins('abcd') }.to raise_error NotImplementedError
       end
     end
 
-    describe "#create_checkin" do
+    describe "#create_check_in" do
       it "raises NotImplementedError" do
-        expect { subject.create_checkin('abcd', {}) }.to raise_error NotImplementedError
+        expect { subject.create_check_in('abcd', {}) }.to raise_error NotImplementedError
       end
     end
 
-    describe "#update_checkin" do
+    describe "#update_check_in" do
       it "raises NotImplementedError" do
-        expect { subject.update_checkin('abcd', 'efgh', {}) }.to raise_error NotImplementedError
+        expect { subject.update_check_in('abcd', 'efgh', {}) }.to raise_error NotImplementedError
       end
     end
 
-    describe "#delete_checkin" do
+    describe "#delete_check_in" do
       it "raises NotImplementedError" do
-        expect { subject.delete_checkin('abcd', 'efgh') }.to raise_error NotImplementedError
+        expect { subject.delete_check_in('abcd', 'efgh') }.to raise_error NotImplementedError
       end
     end
   end

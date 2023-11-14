@@ -1,14 +1,14 @@
 require 'honeybadger'
 
-feature "Running the checkins cli command" do
-  scenario "sync checkins" do
+feature "Running the check_ins cli command" do
+  scenario "sync check ins" do
     context "with config file" do
       let(:config_file_contents) { 
         {
           checkins: [
             {
               project_id: 'abcd',
-              name: "worker checkin",
+              name: "worker check in",
               schedule_type: "simple",
               report_period: "1 hour"
             }
@@ -25,7 +25,7 @@ feature "Running the checkins cli command" do
 
       after { File.unlink(config_file) }
 
-      it "syncs checkin configuration" do
+      it "syncs check in configuration" do
         expect(run_command("honeybadger sync_checkins --personal-auth-token=abcd")).to be_successfully_executed
       end
     end
@@ -45,7 +45,7 @@ feature "Running the checkins cli command" do
 
       after { File.unlink(config_file) }
 
-      it "does not sync checkin configuration if checkins are not configured in config file" do
+      it "does not sync check_in configuration if checkins are not configured in config file" do
         expect(run_command("honeybadger sync_checkins --personal-auth-token=abcd")).to_not be_successfully_executed
         expect(all_output).to match(/No checkins provided in config file/)
       end

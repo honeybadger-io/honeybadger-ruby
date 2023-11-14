@@ -89,7 +89,7 @@ describe Honeybadger::Backend::Server do
         get_one = stub_request(:get, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return({
           status: 200,
           body: {
-            name: "Test Checkin",
+            name: "Test CheckIn",
             slug: nil,
             schedule_type: "simple",
             report_period: "1 day",
@@ -99,25 +99,25 @@ describe Honeybadger::Backend::Server do
             id: "5678"
           }.to_json
         })
-        checkin = subject.get_checkin("1234", "5678")
-        expect(checkin).to be_a(Honeybadger::Checkin)
+        check_in = subject.get_check_in("1234", "5678")
+        expect(check_in).to be_a(Honeybadger::CheckIn)
         expect(get_one).to have_been_made
       end
 
       it "should return nil if it gets a 404" do
         get_one = stub_request(:get, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return({status: 404})
-        checkin = subject.get_checkin("1234", "5678")
-        expect(checkin).to be_nil
+        check_in = subject.get_check_in("1234", "5678")
+        expect(check_in).to be_nil
         expect(get_one).to have_been_made
       end
     end
-    
+
     describe "#get_checkins" do
       it "should return an array of check ins" do
         get_all = stub_request(:get, "https://api.honeybadger.io/v2/projects/1234/check_ins").to_return({
           status: 200,
           body: {results: [{
-            name: "Test Checkin",
+            name: "Test CheckIn",
             slug: nil,
             schedule_type: "simple",
             report_period: "1 day",
@@ -127,20 +127,20 @@ describe Honeybadger::Backend::Server do
             id: "5678"
           }]}.to_json
         })
-        checkins = subject.get_checkins("1234")
+        checkins = subject.get_check_ins("1234")
         expect(checkins).to be_a(Array)
         expect(checkins.length).to eq(1)
-        expect(checkins.first).to be_a(Honeybadger::Checkin)
+        expect(checkins.first).to be_a(Honeybadger::CheckIn)
         expect(get_all).to have_been_made
       end
     end
 
-    describe "#create_checkin" do
-      it "should return checkin" do
+    describe "#create_check_in" do
+      it "should return check_in" do
         post_one = stub_request(:post, "https://api.honeybadger.io/v2/projects/1234/check_ins").to_return({
           status: 200,
           body: {
-            name: "Test Checkin",
+            name: "Test CheckIn",
             slug: nil,
             schedule_type: "simple",
             report_period: "1 day",
@@ -150,24 +150,24 @@ describe Honeybadger::Backend::Server do
             id: "5678"
           }.to_json
         })
-        checkin = Honeybadger::Checkin.from_config({
-          name: "Test Checkin",
+        check_in = Honeybadger::CheckIn.from_config({
+          name: "Test CheckIn",
           schedule_type: "simple",
           report_period: "1 day",
           grace_period: "3 hours"
         })
-        result = subject.create_checkin("1234", checkin)
-        expect(result).to be_a(Honeybadger::Checkin)
+        result = subject.create_check_in("1234", check_in)
+        expect(result).to be_a(Honeybadger::CheckIn)
         expect(post_one).to have_been_made
       end
     end
 
-    describe "#update_checkin" do
-      it "should return checkin" do
+    describe "#update_check_in" do
+      it "should return check_in" do
         put_one = stub_request(:put, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return({
           status: 200,
           body: {
-            name: "Test Checkin",
+            name: "Test CheckIn",
             slug: nil,
             schedule_type: "simple",
             report_period: "2 days",
@@ -177,22 +177,22 @@ describe Honeybadger::Backend::Server do
             id: "5678"
           }.to_json
         })
-        checkin = Honeybadger::Checkin.from_config({
-          name: "Test Checkin",
+        check_in = Honeybadger::CheckIn.from_config({
+          name: "Test CheckIn",
           schedule_type: "simple",
           report_period: "2 days",
           grace_period: "3 hours"
         })
-        result = subject.update_checkin("1234", "5678", checkin)
-        expect(result).to be_a(Honeybadger::Checkin)
+        result = subject.update_check_in("1234", "5678", check_in)
+        expect(result).to be_a(Honeybadger::CheckIn)
         expect(put_one).to have_been_made
       end
     end
 
-    describe "#delete_checkin" do
+    describe "#delete_check_in" do
       it "should accept a delete" do
         delete_one = stub_request(:delete, "https://api.honeybadger.io/v2/projects/1234/check_ins/5678").to_return(status: 200)
-        result = subject.delete_checkin("1234", "5678")
+        result = subject.delete_check_in("1234", "5678")
         expect(result).to be_truthy
         expect(delete_one).to have_been_made
       end

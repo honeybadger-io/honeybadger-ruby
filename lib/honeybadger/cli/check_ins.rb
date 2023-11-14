@@ -19,7 +19,7 @@ module Honeybadger
       def run
         config_sync_service = ConfigSyncService.new(@config)
         result = config_sync_service.sync_checkins
-        say("Checkin config synced", :green)
+        say("CheckIn config synced", :green)
       end
 
       private

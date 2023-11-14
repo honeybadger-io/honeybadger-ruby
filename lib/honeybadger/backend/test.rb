@@ -42,102 +42,102 @@ module Honeybadger
         super
       end
 
-      def self.checkin_configs
-        @checkin_configs ||= {}
+      def self.check_in_configs
+        @check_in_configs ||= {}
       end
 
-      def checkin_configs
-        self.class.checkin_configs
+      def check_in_configs
+        self.class.check_in_configs
       end
 
-      # Set checkin by id, only for use in tests
+      # Set check_in by id, only for use in tests
       # @example
-      #   backend.set_checkin('1234', 'ajdja', checkin)
+      #   backend.set_checkin('1234', 'ajdja', check_in)
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
-      # @param [Checkin] data Checkin object with config
+      # @param [CheckIn] data CheckIn object with config
       def set_checkin(project_id, id, data)
-        self.checkin_configs[project_id] = self.checkin_configs[project_id] || {}
-        self.checkin_configs[project_id][id] = data
+        self.check_in_configs[project_id] = self.check_in_configs[project_id] || {}
+        self.check_in_configs[project_id][id] = data
       end
 
-      # Get checkin by id
+      # Get check_in by id
       # @example
-      #   backend.get_checkin('1234', 'ajdja")
+      #   backend.get_check_in('1234', 'ajdja")
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
-      # @returns [Checkin] or nil if checkin is not found
-      def get_checkin(project_id, id)
-        self.checkin_configs ||= {}
-        self.checkin_configs[project_id]&.[](id)
+      # @returns [CheckIn] or nil if check_in is not found
+      def get_check_in(project_id, id)
+        self.check_in_configs ||= {}
+        self.check_in_configs[project_id]&.[](id)
       end
 
       # Get checkins by project
       # @example
-      #   backend.get_checkins('1234')
+      #   backend.get_check_ins('1234')
       #
       # @param [String] project_id The unique project id
-      # @returns [Array<Checkin>] All checkins for this project
-      def get_checkins(project_id)
-        self.checkin_configs ||= {}
-        self.checkin_configs[project_id] = self.checkin_configs[project_id] || {}
-        return [] if self.checkin_configs[project_id].empty?
-        self.checkin_configs[project_id].values
+      # @returns [Array<CheckIn>] All checkins for this project
+      def get_check_ins(project_id)
+        self.check_in_configs ||= {}
+        self.check_in_configs[project_id] = self.check_in_configs[project_id] || {}
+        return [] if self.check_in_configs[project_id].empty?
+        self.check_in_configs[project_id].values
       end
 
-      # Create checkin on project
+      # Create check_in on project
       # @example
-      #   backend.create_checkin('1234', checkin)
+      #   backend.create_check_in('1234', check_in)
       #
       # @param [String] project_id The unique project id
-      # @param [Checkin] data A Checkin object encapsulating the config
-      # @returns [Checkin] A checkin object containing the id
-      def create_checkin(project_id, data)
-        self.checkin_configs ||= {}
-        self.checkin_configs[project_id] = self.checkin_configs[project_id] || {}
-        id = self.checkin_configs[project_id].length + 1
+      # @param [CheckIn] data A CheckIn object encapsulating the config
+      # @returns [CheckIn] A check_in object containing the id
+      def create_check_in(project_id, data)
+        self.check_in_configs ||= {}
+        self.check_in_configs[project_id] = self.check_in_configs[project_id] || {}
+        id = self.check_in_configs[project_id].length + 1
         loop do
-          break unless self.checkin_configs[project_id].has_key?(id)
+          break unless self.check_in_configs[project_id].has_key?(id)
           id += 1
         end
         id = id.to_s
         data.id = id
-        self.checkin_configs[project_id][id] = data
+        self.check_in_configs[project_id][id] = data
         data
       end
 
-      # Update checkin on project
+      # Update check_in on project
       # @example
-      #   backend.update_checkin('1234', 'eajaj', checkin)
+      #   backend.update_check_in('1234', 'eajaj', check_in)
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
-      # @param [Checkin] data A Checkin object encapsulating the config
-      # @returns [Checkin] updated Checkin object
-      def update_checkin(project_id, id, data)
-        self.checkin_configs ||= {}
-        if self.checkin_configs[project_id]&.[](id)
-          self.checkin_configs[project_id][id] = data
+      # @param [CheckIn] data A CheckIn object encapsulating the config
+      # @returns [CheckIn] updated CheckIn object
+      def update_check_in(project_id, id, data)
+        self.check_in_configs ||= {}
+        if self.check_in_configs[project_id]&.[](id)
+          self.check_in_configs[project_id][id] = data
           return data
         else
           raise "Update failed"
         end
       end
 
-      # Delete checkin
+      # Delete check_in
       # @example
-      #   backend.delete_checkin('1234', 'eajaj')
+      #   backend.delete_check_in('1234', 'eajaj')
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
       # @returns [Boolean] true if deletion was successful
-      # @raises CheckinSyncError on error
-      def delete_checkin(project_id, id)
-        self.checkin_configs ||= {}
-        if self.checkin_configs[project_id]&.[](id)
-          self.checkin_configs[project_id].delete(id)
+      # @raises CheckInSyncError on error
+      def delete_check_in(project_id, id)
+        self.check_in_configs ||= {}
+        if self.check_in_configs[project_id]&.[](id)
+          self.check_in_configs[project_id].delete(id)
         else
           raise "Delete failed"
         end

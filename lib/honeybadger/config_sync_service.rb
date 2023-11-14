@@ -1,9 +1,9 @@
-require 'honeybadger/checkin'
+require 'honeybadger/check_in'
 module Honeybadger
   class ConfigSyncService
     def initialize(config)
       @config = config
-      @checkins_cache = nil
+      @check_ins_cache = nil
     end
 
     def sync_checkins
@@ -11,9 +11,9 @@ module Honeybadger
       return [] if checkin_configs.empty?
 
       checkins = checkin_configs.map do |cfg|
-        checkin = Checkin.from_config(cfg)
-        checkin.validate!
-        checkin
+        check_in = CheckIn.from_config(cfg)
+        check_in.validate!
+        check_in
       end
       created_or_updated = sync_existing_checkins(checkins)
       removed = sync_removed_checkins(checkins)
@@ -24,25 +24,25 @@ module Honeybadger
     private
 
     def get_checkin_by_name(project_id, name)
-      @checkins_cache ||= @config.backend.get_checkins(project_id)
-      @checkins_cache.find {|c| c.name == name }
+      @check_ins_cache ||= @config.backend.get_check_ins(project_id)
+      @check_ins_cache.find {|c| c.name == name }
     end
 
     def sync_existing_checkins(checkins = [])
       return [] if checkins.empty?
       result = []
-      checkins.each do |checkin|
-        remote_checkin = if checkin.id
-          @config.backend.get_checkin(checkin.project_id, checkin.id)
+      checkins.each do |check_in|
+        remote_checkin = if check_in.id
+          @config.backend.get_check_in(check_in.project_id, check_in.id)
         else
-          get_checkin_by_name(checkin.project_id, checkin.name)
+          get_checkin_by_name(check_in.project_id, check_in.name)
         end
         if remote_checkin
-          unless remote_checkin == checkin
-            result << @config.backend.update_checkin(checkin.project_id, remote_checkin.id, checkin)
+          unless remote_checkin == check_in
+            result << @config.backend.update_check_in(check_in.project_id, remote_checkin.id, check_in)
           end
         else
-          result << @config.backend.create_checkin(checkin.project_id, checkin)
+          result << @config.backend.create_check_in(check_in.project_id, check_in)
         end
       end
       result
@@ -53,17 +53,17 @@ module Honeybadger
       result = []
       project_ids = checkins.map{|ch| ch.project_id }.uniq
       project_ids.each do |prj_id|
-        @checkins_cache ||= @config.backend.get_checkins(prj_id)
+        @check_ins_cache ||= @config.backend.get_check_ins(prj_id)
 
         local_project_checkins = checkins.select {|c| c.project_id == prj_id }
-        to_remove = @checkins_cache.reject do |pc|
+        to_remove = @check_ins_cache.reject do |pc|
           local_project_checkins.find{|c| c.id == pc.id || c.name == pc.name }
         end
         to_remove.each do |ch|
           if ch.id.nil?
             ch = get_checkin_by_name(prj_id, ch.name)
           end
-          @config.backend.delete_checkin(prj_id, ch.id)
+          @config.backend.delete_check_in(prj_id, ch.id)
           ch.deleted = true
           result << ch
         end
