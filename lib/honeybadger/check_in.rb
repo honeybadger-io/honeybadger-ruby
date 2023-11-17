@@ -3,62 +3,40 @@ module Honeybadger
   class CheckInSyncError < StandardError; end
   
   class CheckIn
-    attr_reader :project_id
-    attr_accessor :name, :slug, :schedule_type, :report_period, :grace_period, :cron_schedule, :cron_timezone, :deleted, :id
-    def self.from_config(config_entry)
-      c = config_entry.transform_keys {|k| k.to_s }
-      
-      check_in = self.new(c["project_id"], c["id"])
-      check_in.name = c["name"]
-      check_in.slug = c["slug"]
-      check_in.schedule_type = c["schedule_type"]
-      check_in.report_period = c["report_period"]
-      check_in.grace_period = c["grace_period"]
-      check_in.cron_schedule = c["cron_schedule"]
-      check_in.cron_timezone = c["cron_timezone"]
-      check_in
-    end
-    
-    def self.from_remote(project_id, data)
-      check_in = self.new(project_id, data["id"])
-      check_in.name = data["name"]
-      check_in.slug = data["slug"]
-      check_in.schedule_type = data["schedule_type"]
-      check_in.report_period = data["report_period"]
-      check_in.grace_period = data["grace_period"]
-      check_in.cron_schedule = data["cron_schedule"]
-      check_in.cron_timezone = data["cron_timezone"]
-      check_in
+    ATTRIBUTES = %w[name slug schedule_type report_period grace_period cron_schedule cron_timezone].freeze
+    attr_reader :project_id, :data
+    attr_accessor :deleted, :id
+
+    def self.from_config(attrs)
+      attrs = attrs.transform_keys(&:to_s)
+      self.new(attrs["project_id"], id: attrs["id"], attributes: attrs)
     end
 
-    def initialize(project_id, id = nil)
+    def self.from_remote(project_id, attrs)
+      attrs = attrs.transform_keys(&:to_s)
+      self.new(project_id, id: attrs["id"], attributes: attrs)
+    end
+
+    def initialize(project_id, id: nil, attributes: nil)
       @project_id = project_id
       @id = id
-      @deleted = false
+      @data = attributes.slice(*ATTRIBUTES) if attributes.is_a?(Hash)
     end
 
     def ==(other)
-      self.name == other.name &&
-      self.slug == other.slug &&
-      self.schedule_type == other.schedule_type &&
-      self.report_period == other.report_period &&
-      self.grace_period == other.grace_period &&
-      self.cron_schedule == other.cron_schedule &&
-      self.cron_timezone == other.cron_timezone
+      (data.reject {|k,v| v.nil?}) == (other.data.reject {|k,v| v.nil?})
     end
 
     def to_json
-      {
-        name: name, slug: slug, schedule_type: schedule_type, 
-        report_period: report_period, grace_period: grace_period, 
-        cron_schedule: cron_schedule, cron_timezone: cron_timezone
-      }.to_json
+      data.to_json
     end
 
-    def blank?(str)
-      str.nil? || str == "" 
+    ATTRIBUTES.each do |meth|
+      define_method meth do
+        data[meth]
+      end
     end
-
+    
     def validate!
       raise InvalidCheckinConfig.new('project_id is required for each check_in') if blank?(project_id)
       raise InvalidCheckinConfig.new('name is required for each check_in') if blank?(name)
@@ -71,17 +49,16 @@ module Honeybadger
     end
 
     def update_from(check_in)
-      self.name = check_in.name
-      self.slug = check_in.slug
-      self.schedule_type = check_in.schedule_type
-      self.report_period = check_in.report_period
-      self.grace_period = check_in.grace_period
-      self.cron_schedule = check_in.cron_schedule
-      self.cron_timezone = check_in.cron_timezone
+      @data = check_in.data
     end
 
     def deleted?
       @deleted
+    end
+    private 
+
+    def blank?(str)
+      str.nil? || str == "" 
     end
   end
 end

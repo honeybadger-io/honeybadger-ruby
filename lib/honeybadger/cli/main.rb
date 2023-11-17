@@ -130,7 +130,7 @@ WELCOME
         exit(1)
       end
       
-      desc 'heroku SUBCOMMAND ...ARGS', 'Manage -- Honeybadger on Heroku'
+      desc 'heroku SUBCOMMAND ...ARGS', 'Manage Honeybadger on Heroku'
       subcommand 'heroku', Heroku
       
       desc 'check_ins', 'Manage check ins'

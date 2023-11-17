@@ -118,9 +118,9 @@ module Honeybadger
       # @returns [CheckIn] updated CheckIn object
       def update_check_in(project_id, id, data)
         self.check_in_configs ||= {}
-        if self.check_in_configs[project_id]&.[](id)
-          self.check_in_configs[project_id][id] = data
-          return data
+        if self.check_in_configs.dig(project_id, id)
+          self.check_in_configs.dig(project_id, id).update_from(data) 
+          return self.check_in_configs.dig(project_id, id)
         else
           raise "Update failed"
         end
@@ -136,7 +136,7 @@ module Honeybadger
       # @raises CheckInSyncError on error
       def delete_check_in(project_id, id)
         self.check_in_configs ||= {}
-        if self.check_in_configs[project_id]&.[](id)
+        if self.check_in_configs.dig(project_id, id)
           self.check_in_configs[project_id].delete(id)
         else
           raise "Delete failed"

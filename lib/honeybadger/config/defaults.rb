@@ -334,7 +334,7 @@ module Honeybadger
         default: true,
         type: Boolean
       },
-      :'checkins' => {
+      checkins: {
         description: 'Check in configuration',
         default: [],
         type: Array
