@@ -18,7 +18,7 @@ module Honeybadger
       created_or_updated = sync_existing_checkins(checkins)
       removed = sync_removed_checkins(checkins)
 
-      return (created_or_updated + removed).uniq
+      return created_or_updated + removed
     end
 
     private
@@ -60,9 +60,6 @@ module Honeybadger
           local_project_checkins.find{|c| c.id == pc.id || c.name == pc.name }
         end
         to_remove.each do |ch|
-          if ch.id.nil?
-            ch = get_checkin_by_name(prj_id, ch.name)
-          end
           @config.backend.delete_check_in(prj_id, ch.id)
           ch.deleted = true
           result << ch

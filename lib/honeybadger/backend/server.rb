@@ -119,7 +119,7 @@ module Honeybadger
       def update_check_in(project_id, id, check_in_config)
         response = Response.new(@http.put("/v2/projects/#{project_id}/check_ins/#{id}", check_in_config.to_json, personal_auth_headers))
         if response.success?
-          return CheckIn.from_remote(project_id, JSON.parse(response.body))
+          return check_in_config
         end
         raise CheckInSyncError.new "Updating CheckIn failed (Code: #{response.code}) #{response.body}"
       end
