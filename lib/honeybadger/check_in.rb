@@ -8,12 +8,12 @@ module Honeybadger
     attr_accessor :deleted, :id
 
     def self.from_config(attrs)
-      attrs = attrs.transform_keys(&:to_s)
+      attrs = normalize_keys(attrs)
       self.new(attrs["project_id"], id: attrs["id"], attributes: attrs)
     end
 
     def self.from_remote(project_id, attrs)
-      attrs = attrs.transform_keys(&:to_s)
+      attrs = normalize_keys(attrs)
       self.new(project_id, id: attrs["id"], attributes: attrs)
     end
 
@@ -27,8 +27,9 @@ module Honeybadger
       (data.reject {|k,v| v.nil?}) == (other.data.reject {|k,v| v.nil?})
     end
 
+
     def to_json
-      data.to_json
+      fix_nils(data).to_json
     end
 
     ATTRIBUTES.each do |meth|
@@ -55,10 +56,25 @@ module Honeybadger
     def deleted?
       @deleted
     end
+
     private 
 
     def blank?(str)
       str.nil? || str == "" 
+    end
+
+    def self.normalize_keys(hash)
+      hash.transform_keys(&:to_s)
+    end
+
+    def fix_nils(data)
+      data = data.clone
+      data["grace_period"] ||= ""
+      data["slug"] ||= ""
+      if data["schedule_type"] == "cron"
+        data["cron_timezone"] ||= ""
+      end
+      data
     end
   end
 end
