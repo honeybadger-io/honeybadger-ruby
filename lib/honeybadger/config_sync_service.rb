@@ -15,6 +15,9 @@ module Honeybadger
         check_in.validate!
         check_in
       end
+
+      check_unique_names(checkins)
+
       created_or_updated = sync_existing_checkins(checkins)
       removed = sync_removed_checkins(checkins)
 
@@ -22,6 +25,12 @@ module Honeybadger
     end
 
     private
+
+    def check_unique_names(checkins)
+      names = checkins.map(&:name)
+      dupes = names.find_all {|n| names.count(n) > 1}.uniq
+      raise Honeybadger::InvalidCheckinConfig.new("Check Ins need to have unique names. #{dupes.join(", ")} used multiple times.") if dupes.length > 0
+    end
 
     def get_checkin_by_name(project_id, name)
       @check_ins_cache ||= @config.backend.get_check_ins(project_id)

@@ -90,5 +90,14 @@ describe Honeybadger::ConfigSyncService do
       config.set(:checkins, [{ project_id: '1234' }])
       expect { subject.sync_checkins }.to raise_error Honeybadger::InvalidCheckinConfig
     end
+
+    it "does not sync with multiple sampe names" do
+      checkin_configs = [
+        { project_id: '1234', name: 'a', schedule_type: 'simple', report_period: '1 hour' },
+        { project_id: '1234', name: 'a', schedule_type: 'simple', report_period: '2 hours' }
+      ]
+      config.set(:checkins, checkin_configs)
+      expect { subject.sync_checkins }.to raise_error(Honeybadger::InvalidCheckinConfig, /need to have unique names/)
+    end
   end
 end
