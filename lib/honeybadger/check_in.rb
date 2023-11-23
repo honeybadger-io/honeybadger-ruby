@@ -29,7 +29,20 @@ module Honeybadger
 
 
     def to_json
-      fix_nils(data).to_json
+      output = {
+        name: name,
+        slug: slug || '',
+        schedule_type: schedule_type,
+        grace_period: grace_period || ''
+      }
+      if schedule_type == 'simple'
+        output[:report_period] = report_period
+      else
+        output[:cron_schedule] = cron_schedule
+        output[:cron_timezone] = cron_timezone || ""
+      end
+
+      output.to_json
     end
 
     ATTRIBUTES.each do |meth|
@@ -65,16 +78,6 @@ module Honeybadger
 
     def self.normalize_keys(hash)
       hash.transform_keys(&:to_s)
-    end
-
-    def fix_nils(data)
-      data = data.clone
-      data["grace_period"] ||= ""
-      data["slug"] ||= ""
-      if data["schedule_type"] == "cron"
-        data["cron_timezone"] ||= ""
-      end
-      data
     end
   end
 end
