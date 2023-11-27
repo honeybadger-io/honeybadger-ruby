@@ -43,21 +43,9 @@ module Honeybadger
         response
       end
 
-      def delete(endpoint, headers = nil)
-        response = http_connection.delete(endpoint, http_headers(headers))
-        debug { sprintf("http method=DELETE path=%s code=%d", endpoint.dump, response.code) }
-        response
-      end
-
       def post(endpoint, payload, headers = nil)
         response = http_connection.post(endpoint, compress(payload.to_json), http_headers(headers))
         debug { sprintf("http method=POST path=%s code=%d", endpoint.dump, response.code) }
-        response
-      end
-
-      def put(endpoint, payload, headers = nil)
-        response = http_connection.put(endpoint, compress(payload.to_json), http_headers(headers))
-        debug { sprintf("http method=PUT path=%s code=%d", endpoint.dump, response.code) }
         response
       end
 
@@ -77,9 +65,14 @@ module Honeybadger
         end
       end
 
+      # To allow this to be overridden in sub class
+      def host
+        config[:'connection.host']
+      end
+
       def setup_http_connection
         http_class = Net::HTTP::Proxy(config[:'connection.proxy_host'], config[:'connection.proxy_port'], config[:'connection.proxy_user'], config[:'connection.proxy_pass'])
-        http = http_class.new(config[:'connection.host'], config.connection_port)
+        http = http_class.new(host, config.connection_port)
 
         http.read_timeout = config[:'connection.http_read_timeout']
         http.open_timeout = config[:'connection.http_open_timeout']

@@ -21,6 +21,7 @@ module Honeybadger
       @project_id = project_id
       @id = id
       @data = attributes.slice(*ATTRIBUTES) if attributes.is_a?(Hash)
+      @data["grace_period"] ||= ""
     end
 
     def ==(other)

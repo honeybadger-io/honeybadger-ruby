@@ -52,12 +52,12 @@ module Honeybadger
 
       # Set check_in by id, only for use in tests
       # @example
-      #   backend.set_checkin('1234', 'ajdja', check_in)
+      #   backend.set_check_in('1234', 'ajdja', check_in)
       #
       # @param [String] project_id The unique project id
       # @param [String] id The unique check_in id
       # @param [CheckIn] data CheckIn object with config
-      def set_checkin(project_id, id, data)
+      def set_check_in(project_id, id, data)
         self.check_in_configs[project_id] = self.check_in_configs[project_id] || {}
         self.check_in_configs[project_id][id] = data
       end

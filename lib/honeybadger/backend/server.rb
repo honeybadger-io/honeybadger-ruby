@@ -5,6 +5,7 @@ require 'openssl'
 
 require 'honeybadger/backend/base'
 require 'honeybadger/util/http'
+require 'honeybadger/util/app_http'
 
 module Honeybadger
   module Backend
@@ -20,8 +21,7 @@ module Honeybadger
 
       def initialize(config)
         @http = Util::HTTP.new(config)
-        # for check_in config sync
-        @personal_auth_token = config.get(:personal_auth_token)
+        @app_http = Util::AppHTTP.new(config)
         super
       end
 
@@ -64,7 +64,7 @@ module Honeybadger
       # @raises CheckInSyncError on error
 
       def get_check_in(project_id, id)
-        response = Response.new(@http.get("/v2/projects/#{project_id}/check_ins/#{id}", personal_auth_headers))
+        response = Response.new(@app_http.get("/v2/projects/#{project_id}/check_ins/#{id}"))
         if response.success?
           return CheckIn.from_remote(project_id, JSON.parse(response.body))
         else
@@ -83,7 +83,7 @@ module Honeybadger
       # @returns [Array<CheckIn>] All checkins for this project
       # @raises CheckInSyncError on error
       def get_check_ins(project_id)
-        response = Response.new(@http.get("/v2/projects/#{project_id}/check_ins", personal_auth_headers))
+        response = Response.new(@app_http.get("/v2/projects/#{project_id}/check_ins"))
         if response.success?
           all_check_ins = JSON.parse(response.body)["results"]
           return all_check_ins.map{|cfg| CheckIn.from_remote(project_id, cfg) }
@@ -100,7 +100,7 @@ module Honeybadger
       # @returns [CheckIn] A CheckIn object additionally containing the id
       # @raises CheckInSyncError on error
       def create_check_in(project_id, check_in_config)
-        response = Response.new(@http.post("/v2/projects/#{project_id}/check_ins", check_in_config.to_json, personal_auth_headers))
+        response = Response.new(@app_http.post("/v2/projects/#{project_id}/check_ins", check_in_config))
         if response.success?
           return CheckIn.from_remote(project_id, JSON.parse(response.body))
         end
@@ -117,7 +117,7 @@ module Honeybadger
       # @returns [CheckIn] updated CheckIn object
       # @raises CheckInSyncError on error
       def update_check_in(project_id, id, check_in_config)
-        response = Response.new(@http.put("/v2/projects/#{project_id}/check_ins/#{id}", check_in_config.to_json, personal_auth_headers))
+        response = Response.new(@app_http.put("/v2/projects/#{project_id}/check_ins/#{id}", check_in_config))
         if response.success?
           return check_in_config
         end
@@ -133,7 +133,7 @@ module Honeybadger
       # @returns [Boolean] true if deletion was successful
       # @raises CheckInSyncError on error
       def delete_check_in(project_id, id)
-        response = Response.new(@http.delete("/v2/projects/#{project_id}/check_ins/#{id}", personal_auth_headers))
+        response = Response.new(@app_http.delete("/v2/projects/#{project_id}/check_ins/#{id}"))
         if response.success?
           return true
         end
@@ -141,10 +141,6 @@ module Honeybadger
       end
 
       private
-
-      def personal_auth_headers
-        {"Authorization" => "#{@personal_auth_token}:"}
-      end
 
       def payload_headers(payload)
         if payload.respond_to?(:api_key) && payload.api_key

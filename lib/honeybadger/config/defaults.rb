@@ -146,6 +146,11 @@ module Honeybadger
         default: 'api.honeybadger.io'.freeze,
         type: String
       },
+      :'connection.app_host' => {
+        description: 'The host to use when interacting with the new API.',
+        default: 'app.honeybadger.io'.freeze,
+        type: String
+      },
       :'connection.port' => {
         description: 'The port to use when sending data.',
         default: nil,

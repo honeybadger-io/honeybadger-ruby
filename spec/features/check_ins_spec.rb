@@ -5,7 +5,7 @@ feature "Running the check_ins cli command" do
     context "with config file" do
       let(:config_file_contents) { 
         {
-          checkins: [
+          check_ins: [
             {
               project_id: 'abcd',
               name: "worker check in",

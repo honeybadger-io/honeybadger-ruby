@@ -53,7 +53,7 @@ describe Honeybadger::Backend::Test do
       Honeybadger::Backend::Test.check_in_configs.clear
     end
 
-    describe "#set_checkin" do
+    describe "#set_check_in" do
       it "should set object on class" do
         check_in = Honeybadger::CheckIn.from_config({
           project_id: "1234",
@@ -62,7 +62,7 @@ describe Honeybadger::Backend::Test do
           report_period: "1 hour"
         })
 
-        subject.set_checkin("1234", "5678", check_in)
+        subject.set_check_in("1234", "5678", check_in)
         expect(subject.check_in_configs["1234"]["5678"]).to eq(check_in)
       end
     end
@@ -78,7 +78,7 @@ describe Honeybadger::Backend::Test do
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        subject.set_checkin("1234", "5678", check_in)
+        subject.set_check_in("1234", "5678", check_in)
         expect(subject.get_check_in("1234", "5678")).to eq(check_in)
       end
     end
@@ -94,7 +94,7 @@ describe Honeybadger::Backend::Test do
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        subject.set_checkin("1234", "5678", check_in)
+        subject.set_check_in("1234", "5678", check_in)
         expect(subject.get_check_ins("1234").first).to eq(check_in)
       end
     end
@@ -128,7 +128,7 @@ describe Honeybadger::Backend::Test do
           report_period: "2 hours"
         })
 
-        subject.set_checkin("1234", "5678", check_in)
+        subject.set_check_in("1234", "5678", check_in)
         updated = subject.update_check_in("1234", "5678", checkin_update)
 
         expect(updated.report_period).to eq("2 hours")
@@ -144,7 +144,7 @@ describe Honeybadger::Backend::Test do
           schedule_type: "simple",
           report_period: "1 hour"
         })
-        subject.set_checkin("1234", "5678", check_in)
+        subject.set_check_in("1234", "5678", check_in)
         expect(subject.check_in_configs["1234"]["5678"]).to_not be_nil
 
         expect(subject.delete_check_in("1234", "5678")).to be_truthy

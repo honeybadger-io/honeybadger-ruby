@@ -21,12 +21,12 @@ module Honeybadger
           say("No value provided for required options '--personal-auth-token'", :red)
           exit(1)
         end
-        if (config.get(:checkins) || []).empty?
+        if (config.get(:check_ins) || []).empty?
           say("No check_ins provided in config file", :red)
           exit(1)
         end
         config_sync_service = ConfigSyncService.new(config)
-        result = config_sync_service.sync_checkins
+        result = config_sync_service.sync_check_ins
         table = [["Id", "Name", "Slug", "Schedule Type", "Report Period", "Grace Period", "Cron Schedule", "Cron Timezone", "Status"]]
         table += result.map do |c|
           [c.id, c.name, c.slug, c.schedule_type, c.report_period, c.grace_period, c.cron_schedule, c.cron_timezone, c.deleted? ? "Deleted" : "Synced"]

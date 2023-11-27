@@ -122,7 +122,7 @@ module Honeybadger
         raise NotImplementedError, 'must define #get_checkin on subclass'
       end
 
-      # Get checkins by project
+      # Get check_ins by project
       # @example
       #   backend.get_check_ins('1234')
       #
