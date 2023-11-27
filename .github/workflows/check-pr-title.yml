@@ -1,0 +1,25 @@
+name: Check PR Title
+
+on:
+  pull_request:
+    branches: [ master ]
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  commitlint:
+    name: Check PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Setup
+        run: |
+          npm install -g @commitlint/cli @commitlint/config-conventional
+          echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+
+      - name: Verify PR title is in the correct format
+        run: |
+          echo "${{ github.event.pull_request.title }}" | npx commitlint -V
