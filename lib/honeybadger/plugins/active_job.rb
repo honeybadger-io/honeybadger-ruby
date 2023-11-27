@@ -11,6 +11,7 @@ module Honeybadger
         execution {
           ::ActiveJob::Base.class_eval do |base| 
             base.set_callback :perform, :around do |param, block|
+              Honeybadger.clear!
               begin
                 block.call
               rescue => error
