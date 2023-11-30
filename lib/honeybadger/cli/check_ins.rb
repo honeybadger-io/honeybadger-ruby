@@ -10,8 +10,8 @@ module Honeybadger
       extend Forwardable
 
       class_option :personal_auth_token, required: false, type: :string, desc: "personal auth token for API access"
-      class_option :environment,     required: false, aliases: [:'-e', :'-env'], type: :string, desc: 'Environment this command is being executed in (i.e. "production", "staging")'
       class_option :skip_rails_load, required: false, type: :boolean, desc: 'Flag to skip rails initialization'
+      class_option :yes, required: false, type: :boolean, desc: 'Flag to skip confirmation'
       
       desc "sync", "Sync check in configuration from config file"
       def sync
@@ -23,6 +23,12 @@ module Honeybadger
         end
         if (config.get(:check_ins) || []).empty?
           say("No check_ins provided in config file", :red)
+          exit(1)
+        end
+
+        skip_confirmation = options.has_key?('yes')
+
+        if (!skip_confirmation && !yes?("Warning: Proceeding will replace all your current check-ins with the ones defined in the configuration file.\n\n Do you want to continue? (y/n)"))
           exit(1)
         end
         config_sync_service = ConfigSyncService.new(config)
@@ -44,12 +50,9 @@ module Honeybadger
 
         config = Honeybadger.config
         config.set(:api_key, fetch_value(options, 'api_key')) if options.has_key?('api_key')
-        config.set(:env, fetch_value(options, 'environment')) if options.has_key?('environment')
         config.set(:personal_auth_token, fetch_value(options, 'personal_auth_token')) if options.has_key?('personal_auth_token')
         config
       end
-
-
     end
   end
 end

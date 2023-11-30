@@ -74,7 +74,7 @@ module Honeybadger
     private 
 
     def blank?(str)
-      str.nil? || str.strip == "" 
+      str.nil? || str.to_s.strip == "" 
     end
 
     def self.normalize_keys(hash)
