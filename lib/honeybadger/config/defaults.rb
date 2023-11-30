@@ -147,7 +147,7 @@ module Honeybadger
         type: String
       },
       :'connection.app_host' => {
-        description: 'The host to use when interacting with the new API.',
+        description: 'The host to use when interacting with the REST API.',
         default: 'app.honeybadger.io'.freeze,
         type: String
       },
