@@ -11,7 +11,7 @@ module Honeybadger
 
       class_option :personal_auth_token, required: false, type: :string, desc: "personal auth token for API access"
       class_option :skip_rails_load, required: false, type: :boolean, desc: 'Flag to skip rails initialization'
-      class_option :yes, required: false, type: :boolean, desc: 'Flag to skip confirmation'
+      class_option :yes, required: false, aliases: :'-y', type: :boolean, desc: 'Flag to skip confirmation'
       
       desc "sync", "Sync check in configuration from config file"
       def sync
