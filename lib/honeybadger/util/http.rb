@@ -37,8 +37,8 @@ module Honeybadger
         @config = config
       end
 
-      def get(endpoint, headers = nil)
-        response = http_connection.get(endpoint, http_headers(headers))
+      def get(endpoint)
+        response = http_connection.get(endpoint)
         debug { sprintf("http method=GET path=%s code=%d", endpoint.dump, response.code) }
         response
       end

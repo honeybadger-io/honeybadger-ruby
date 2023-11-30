@@ -21,6 +21,13 @@ module Honeybadger
         config[:'connection.app_host']
       end
 
+
+      def get(endpoint, headers = nil)
+        response = http_connection.get(endpoint, http_headers(headers))
+        debug { sprintf("http method=GET path=%s code=%d", endpoint.dump, response.code) }
+        response
+      end
+
       def put(endpoint, payload, headers = nil)
         response = http_connection.put(endpoint, compress(payload.to_json), http_headers(headers))
         debug { sprintf("http method=PUT path=%s code=%d", endpoint.dump, response.code) }
