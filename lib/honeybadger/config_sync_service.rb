@@ -31,7 +31,7 @@ module Honeybadger
     def check_unique_names(check_ins)
       names = check_ins.map(&:name)
       dupes = names.find_all {|n| names.count(n) > 1}.uniq
-      raise Honeybadger::InvalidCheckinConfig.new("Check Ins need to have unique names. #{dupes.join(", ")} used multiple times.") if dupes.length > 0
+      raise Honeybadger::InvalidCheckinConfig.new("Check-ins need to have unique names. #{dupes.join(", ")} used multiple times.") if dupes.length > 0
     end
 
     def get_checkin_by_name(project_id, name)
