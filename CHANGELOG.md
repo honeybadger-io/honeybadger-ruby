@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.4.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.3.0...v5.4.0) (2023-12-04)
+
+
+### Features
+
+* track exceptions in :async activejob adapter ([#503](https://github.com/honeybadger-io/honeybadger-ruby/issues/503)) ([9a6e2ec](https://github.com/honeybadger-io/honeybadger-ruby/commit/9a6e2ec795c7f61e83f624d81db87df3802e370c))
+
 ## [5.3.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.2.1...v5.3.0) (2023-10-27)
 
 
