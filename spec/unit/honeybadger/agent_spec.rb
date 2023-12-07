@@ -283,6 +283,23 @@ describe Honeybadger::Agent do
     end
   end
 
+  context "#event" do
+    let(:logger) { double(NULL_LOGGER) }
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: logger, debug: true) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    subject { instance }
+
+    it "logs an event" do
+      expected_msg = { event: "test_event", payload: { some_data: "is here" } }.to_json
+      expect(logger).to receive(:add) do |level, msg|
+        expect(level).to eq(Logger::Severity::INFO)
+        expect(msg).to match(Regexp.escape(expected_msg))
+      end
+      subject.event("test_event", some_data: "is here")
+    end
+  end
+
   context do
     let!(:instance) { described_class.new(config) }
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }

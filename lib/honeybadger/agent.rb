@@ -365,6 +365,15 @@ module Honeybadger
       true
     end
 
+    # Sends event to events backend
+    #
+    # @param event_name [String] a string describing the event
+    # @param payload [Hash] Additional data to be sent with the event as keyword arguments
+    def event(event_name, **payload)
+      log_string = {event: event_name, payload: payload}.to_json
+      logger.debug(log_string)
+    end
+
     # @api private
     attr_reader :config
 
