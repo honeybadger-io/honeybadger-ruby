@@ -369,8 +369,13 @@ module Honeybadger
     #
     # @param event_name [String] a string describing the event
     # @param payload [Hash] Additional data to be sent with the event as keyword arguments
-    def event(event_name, **payload)
-      log_string = {event: event_name, payload: payload}.to_json
+    def event(event_type, payload={})
+      ts = DateTime.now.new_offset(0).rfc3339
+      unless payload.kind_of?(Hash)
+        logger.error("Event has non-hash payload")
+        return
+      end
+      log_string = payload.merge({event_type: event_type, ts: ts}).to_json
       logger.debug(log_string)
     end
 

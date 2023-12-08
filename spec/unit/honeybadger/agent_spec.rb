@@ -291,10 +291,11 @@ describe Honeybadger::Agent do
     subject { instance }
 
     it "logs an event" do
-      expected_msg = { event: "test_event", payload: { some_data: "is here" } }.to_json
       expect(logger).to receive(:add) do |level, msg|
         expect(level).to eq(Logger::Severity::INFO)
-        expect(msg).to match(Regexp.escape(expected_msg))
+        expect(msg).to match(/"some_data":"is here"/)
+        expect(msg).to match(/"event_type":"test_event"/)
+        expect(msg).to match(/"ts":/)
       end
       subject.event("test_event", some_data: "is here")
     end
