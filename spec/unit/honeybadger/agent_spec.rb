@@ -285,14 +285,14 @@ describe Honeybadger::Agent do
 
   context "#event" do
     let(:logger) { double(NULL_LOGGER) }
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: logger, debug: true) }
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: logger, backend: :debug) }
     let(:instance) { Honeybadger::Agent.new(config) }
 
     subject { instance }
 
     it "logs an event" do
       expect(logger).to receive(:add) do |level, msg|
-        expect(level).to eq(Logger::Severity::INFO)
+        expect(level).to eq(Logger::Severity::UNKNOWN)
         expect(msg).to match(/"some_data":"is here"/)
         expect(msg).to match(/"event_type":"test_event"/)
         expect(msg).to match(/"ts":/)

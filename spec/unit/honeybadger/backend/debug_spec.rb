@@ -36,4 +36,16 @@ describe Honeybadger::Backend::Debug do
       instance.check_in(10)
     end
   end
+
+  describe "#event" do
+    it "logs the event" do
+      expect(logger).to receive(:unknown) do |msg|
+        expect(msg).to match(/"some_data":"is here"/)
+        expect(msg).to match(/"event_type":"test_event"/)
+        expect(msg).to match(/"ts":"test_timestamp"/)
+      end
+
+      instance.event("test_event", "test_timestamp", {some_data: "is here"})
+    end
+  end
 end

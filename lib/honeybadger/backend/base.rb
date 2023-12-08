@@ -109,6 +109,17 @@ module Honeybadger
         notify(:deploys, payload)
       end
 
+      # Send event
+      # @example
+      #   backend.event("email_received", "2023-03-04T12:12:00+1:00", { subject: 'Re: Aquisition' })
+      #
+      # @param [String] event_type Type of event to send
+      # @param [String] timestamp RFC3339 conforming formatted timestamp
+      # @param [Hash]   payload Generic payload
+      def event(event_type, timestamp, payload = {})
+        raise NotImplementedError, "must define #event on subclass"
+      end
+
       private
 
       attr_reader :config
