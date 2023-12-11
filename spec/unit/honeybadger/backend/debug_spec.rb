@@ -45,7 +45,7 @@ describe Honeybadger::Backend::Debug do
         expect(msg).to match(/"ts":"test_timestamp"/)
       end
 
-      instance.event("test_event", "test_timestamp", {some_data: "is here"})
+      instance.event({event_type: "test_event", ts: "test_timestamp", some_data: "is here"})
     end
   end
 end

@@ -25,7 +25,7 @@ module Honeybadger
         StubbedResponse.new
       end
 
-      def event(event_type, timestamp, payload = {})
+      def event(payload)
         StubbedResponse.new
       end
     end

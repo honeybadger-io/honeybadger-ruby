@@ -375,7 +375,7 @@ module Honeybadger
         logger.error("Event has non-hash payload")
         return
       end
-      backend.event(event_type, ts, payload)
+      backend.event({event_type: event_type, ts: ts}.merge(payload))
     end
 
     # @api private
