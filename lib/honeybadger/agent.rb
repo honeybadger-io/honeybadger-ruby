@@ -7,6 +7,7 @@ require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
+require 'honeybadger/events_worker'
 require 'honeybadger/breadcrumbs'
 
 module Honeybadger
@@ -74,7 +75,7 @@ module Honeybadger
         @breadcrumbs = nil
       end
 
-      init_worker
+      init_workers
     end
 
     # Sends an exception to Honeybadger. Does not report ignored exceptions by
@@ -375,7 +376,7 @@ module Honeybadger
         logger.error("Event has non-hash payload")
         return
       end
-      backend.event({event_type: event_type, ts: ts}.merge(payload))
+      events_worker.push({event_type: event_type, ts: ts}.merge(payload))
     end
 
     # @api private
@@ -450,7 +451,7 @@ module Honeybadger
     end
 
     # @api private
-    attr_reader :worker
+    attr_reader :worker, :events_worker
 
     # @api private
     # @!method init!(...)
@@ -487,8 +488,9 @@ module Honeybadger
       true
     end
 
-    def init_worker
+    def init_workers
       @worker = Worker.new(config)
+      @events_worker = EventsWorker.new(config)
     end
 
     def with_error_handling
