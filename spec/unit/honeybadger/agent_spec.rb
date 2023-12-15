@@ -1,4 +1,5 @@
 require 'honeybadger/agent'
+require 'honeybadger/events_worker'
 require 'timecop'
 
 describe Honeybadger::Agent do
@@ -284,18 +285,21 @@ describe Honeybadger::Agent do
   end
 
   context "#event" do
-    let(:logger) { double(NULL_LOGGER) }
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: logger, backend: :debug) }
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug) }
+    let(:events_worker) { double(Honeybadger::EventsWorker.new(config)) }
     let(:instance) { Honeybadger::Agent.new(config) }
 
     subject { instance }
 
+    before do
+      allow(instance).to receive(:events_worker).and_return(events_worker)
+    end
+
     it "logs an event" do
-      expect(logger).to receive(:add) do |level, msg|
-        expect(level).to eq(Logger::Severity::UNKNOWN)
-        expect(msg).to match(/"some_data":"is here"/)
-        expect(msg).to match(/"event_type":"test_event"/)
-        expect(msg).to match(/"ts":/)
+      expect(events_worker).to receive(:push) do |msg|
+        expect(msg[:event_type]).to eq("test_event")
+        expect(msg[:some_data]).to eq("is here")
+        expect(msg[:ts]).not_to be_nil
       end
       subject.event("test_event", some_data: "is here")
     end

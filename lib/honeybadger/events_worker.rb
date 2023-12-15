@@ -155,8 +155,7 @@ module Honeybadger
       begin
         d { 'worker started' }
         Thread.current.thread_variable_set(:last_sent, Time.now)
-        Thread.current.thread_variable_set(:send_queue, Queue.new)
-        Thread.current.thread_variable_set(:send_queue_byte_size, 0)
+        Thread.current.thread_variable_set(:send_queue, [])
 
         loop do
           case msg = queue.pop
@@ -179,24 +178,19 @@ module Honeybadger
 
     def enqueue_msg(msg)
       queue = Thread.current.thread_variable_get(:send_queue)
-      queue_byte_size = Thread.current.thread_variable_get(:send_queue_byte_size)
-      size = msg.to_json.bytesize + 1
-      Thread.current.thread_variable_set(:send_queue_byte_size, queue_byte_size + size)
       queue << msg
+      # queue_byte_size = Thread.current.thread_variable_get(:send_queue_byte_size)
+      # size = msg.to_json.bytesize + 1
+      # Thread.current.thread_variable_set(:send_queue_byte_size, queue_byte_size + size)
     end
 
     def check_and_send
       queue = Thread.current.thread_variable_get(:send_queue)
       return if queue.empty?
       last_sent = Thread.current.thread_variable_get(:last_sent)
-      queue_byte_size = Thread.current.thread_variable_get(:send_queue_byte_size)
-
-      if queue.size >= MAX_EVENTS || (Time.now.to_i - last_sent.to_i) >= SEND_TIMEOUT || queue_byte_size >= MAX_EVENTS_SIZE
-        to_send = []
-        while !queue.empty?
-          to_send << queue.pop
-        end
-        send_now(to_send)
+      if queue.length >= MAX_EVENTS || (Time.now.to_i - last_sent.to_i) >= SEND_TIMEOUT
+        send_now(queue)
+        queue.clear
       end
     end
 
