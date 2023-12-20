@@ -25,7 +25,8 @@ Gem::Specification.new do |s|
 
   s.files  = Dir['lib/**/*.{rb,erb}']
   s.files += Dir['bin/*']
-  s.files += Dir['vendor/**/*.{rb,rake,cap}']
+  # CI installs caches installed gems in vendor/bundle, but we don't want to include them in the gem.
+  s.files += Dir['vendor/**/*.{rb,rake,cap}'].reject { |file| file.start_with?("vendor/bundle") }
   s.files += Dir['resources/**/*.crt']
   s.files += Dir['*.md']
   s.files += ['LICENSE']
