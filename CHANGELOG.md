@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.4.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.4.0...v5.4.1) (2023-12-22)
+
+
+### Bug Fixes
+
+* ignore vendor/bundle when creating gem ([#515](https://github.com/honeybadger-io/honeybadger-ruby/issues/515)) ([a38658f](https://github.com/honeybadger-io/honeybadger-ruby/commit/a38658f84f5ecc062fce7b606311107483f7af96)), closes [#514](https://github.com/honeybadger-io/honeybadger-ruby/issues/514)
+
 ## [5.4.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.3.0...v5.4.0) (2023-12-04)
 
 
