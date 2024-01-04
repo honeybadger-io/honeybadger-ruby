@@ -7,7 +7,13 @@ require 'honeybadger/backend'
 
 describe Honeybadger::EventsWorker do
   let!(:instance) { described_class.new(config) }
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
+  let(:config) {
+    Honeybadger::Config.new(
+      logger: NULL_LOGGER, debug: true, backend: 'null',
+      events_batch_size: 5,
+      events_timeout: 10_000
+    )
+  }
   let(:event) { {event_type: "test", ts: "not-important"} }
 
   subject { instance }
@@ -350,6 +356,39 @@ describe Honeybadger::EventsWorker do
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/test error message/)
         handle_response
+      end
+    end
+  end
+
+  describe "batching" do
+    it "should send after batch size is reached" do
+      expect(subject.send(:backend)).to receive(:event).with([event] * 5).and_return(Honeybadger::Backend::Null::StubbedResponse.new)
+      5.times do
+        subject.push(event)
+      end
+      sleep(0.2)
+    end
+    context "timeout" do
+      let(:config) {
+        Honeybadger::Config.new(
+          logger: NULL_LOGGER, debug: true, backend: 'null',
+          events_batch_size: 5,
+          events_timeout: 100
+        )
+      }
+
+      it "should send after timeout when sending another" do
+        expect(subject.send(:backend)).to receive(:event).with([event]).twice().and_return(Honeybadger::Backend::Null::StubbedResponse.new)
+        subject.push(event)
+        sleep(0.2)
+        subject.push(event)
+        sleep(0.2)
+      end
+
+      it "should send after timeout without new message" do
+        expect(subject.send(:backend)).to receive(:event).with([event]).and_return(Honeybadger::Backend::Null::StubbedResponse.new)
+        subject.push(event)
+        sleep(0.2)
       end
     end
   end

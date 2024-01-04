@@ -91,6 +91,16 @@ module Honeybadger
         default: 100,
         type: Integer
       },
+      events_batch_size: {
+        description: 'Send events batch if n events have accumulated',
+        default: 100,
+        type: Integer
+      },
+      events_timeout: {
+        description: 'Timeout after which the events batch will be sent regardless (in milliseconds)',
+        default: 30_000,
+        type: Integer
+      },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
         default: nil,

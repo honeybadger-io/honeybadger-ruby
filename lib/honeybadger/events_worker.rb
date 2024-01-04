@@ -17,6 +17,7 @@ module Honeybadger
     # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
     FLUSH = :__hb_worker_flush!
+    CHECK_TIMEOUT = :__hb_worker_check_timeout!
 
     # The base number for the exponential backoff formula when calculating the
     # throttle interval. `1.05 ** throttle` will reach an interval of 2 minutes
@@ -24,10 +25,6 @@ module Honeybadger
     BASE_THROTTLE = 1.05
 
     # TODO: These could be configurable?
-    SEND_TIMEOUT = 30
-    MAX_EVENTS = 200
-    MAX_EVENTS_SIZE = 400_000
-
 
     def initialize(config)
       @config = config
@@ -40,6 +37,11 @@ module Honeybadger
       @shutdown = false
       @start_at = nil
       @pid = Process.pid
+      @send_queue = []
+      @last_sent = nil
+
+      @max_events = config.get(:events_batch_size)
+      @send_timeout = config.get(:events_timeout)
     end
 
     def push(msg)
@@ -103,6 +105,7 @@ module Honeybadger
 
         @pid = Process.pid
         @thread = Thread.new { run }
+        @timeout_thread = Thread.new { schedule_timeout_check }
       end
 
       true
@@ -110,8 +113,8 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :throttle,
-      :throttle_interval, :start_at
+    attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :timeout_thread, :throttle,
+      :throttle_interval, :start_at, :send_queue, :last_sent, :max_events, :send_timeout
 
     def_delegator :config, :backend
 
@@ -138,6 +141,7 @@ module Honeybadger
 
       if thread
         Thread.kill(thread)
+        Thread.kill(timeout_thread)
         thread.join # Allow ensure blocks to execute.
       end
 
@@ -154,15 +158,30 @@ module Honeybadger
       kill!
     end
 
+    def schedule_timeout_check
+      loop do
+        sleep(send_timeout / 1000.0)
+        ms_since = (Time.now.to_f - last_sent.to_f) * 1000.0
+        if ms_since >= send_timeout
+          queue.push(CHECK_TIMEOUT)
+        end
+      end
+    end
+
     def run
       begin
         d { 'worker started' }
-        Thread.current.thread_variable_set(:last_sent, Time.now)
-        Thread.current.thread_variable_set(:send_queue, [])
-
+        mutex.synchronize do
+          @last_sent = Time.now
+        end
         loop do
+          # ms_since = (Time.now.to_f - @last_sent.to_f) * 1000.0
+          # if ms_since >= send_timeout
+          #   queue.push(CHECK_TIMEOUT)
+          # end
           case msg = queue.pop
           when SHUTDOWN then break
+          when CHECK_TIMEOUT then check_timeout
           when FLUSH then flush_send_queue
           when ConditionVariable then signal_marker(msg)
           else work(msg)
@@ -180,22 +199,43 @@ module Honeybadger
       release_marker
     end
 
+    def check_timeout
+      return if mutex.synchronize { send_queue.empty? }
+      ms_since = (Time.now.to_f - last_sent.to_f) * 1000.0
+      if ms_since >= send_timeout
+        send_batch
+      end
+    end
+
     def enqueue_msg(msg)
-      queue = Thread.current.thread_variable_get(:send_queue)
-      queue << msg
-      # queue_byte_size = Thread.current.thread_variable_get(:send_queue_byte_size)
-      # size = msg.to_json.bytesize + 1
-      # Thread.current.thread_variable_set(:send_queue_byte_size, queue_byte_size + size)
+      mutex.synchronize do
+        @send_queue << msg
+      end
+    end
+
+    def send_batch
+      send_now(mutex.synchronize { send_queue })
+      mutex.synchronize do
+        @last_sent = Time.now
+        send_queue.clear
+      end
     end
 
     def check_and_send
-      send_queue = Thread.current.thread_variable_get(:send_queue)
-      return if send_queue.empty?
-      last_sent = Thread.current.thread_variable_get(:last_sent)
-      if send_queue.length >= MAX_EVENTS || (Time.now.to_i - last_sent.to_i) >= SEND_TIMEOUT
-        send_now(send_queue)
-        send_queue.clear
+      return if mutex.synchronize { send_queue.empty? }
+      if mutex.synchronize { send_queue.length } >= max_events
+        send_batch
       end
+    end
+
+    def flush_send_queue
+      return if mutex.synchronize { send_queue.empty? }
+      send_batch
+    rescue StandardError => e
+      error {
+        msg = "Error in worker thread class=%s message=%s\n\t%s"
+        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
+      }
     end
 
     def work(msg)
@@ -216,21 +256,11 @@ module Honeybadger
       }
     end
 
-    def flush_send_queue
-      send_queue = Thread.current.thread_variable_get(:send_queue)
-      return if send_queue.empty?
-      send_now(send_queue)
-      send_queue.clear
-    rescue StandardError => e
-      error {
-        msg = "Error in worker thread class=%s message=%s\n\t%s"
-        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
-      }
-    end
 
     def send_to_backend(msg)
       d { 'events_worker sending to backend' }
-      backend.event(msg)
+      response = backend.event(msg)
+      response
     end
 
     def calc_throttle_interval
