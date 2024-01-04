@@ -16,12 +16,14 @@ module Honeybadger
 
     # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
+    FLUSH = :__hb_worker_flush!
 
     # The base number for the exponential backoff formula when calculating the
     # throttle interval. `1.05 ** throttle` will reach an interval of 2 minutes
     # after around 100 429 responses from the server.
     BASE_THROTTLE = 1.05
 
+    # TODO: These could be configurable?
     SEND_TIMEOUT = 30
     MAX_EVENTS = 200
     MAX_EVENTS_SIZE = 400_000
@@ -44,7 +46,7 @@ module Honeybadger
       return false unless start
 
       if queue.size >= config.max_queue_size
-        warn { sprintf('Unable to report error; reached max queue size of %s. id=%s', queue.size, msg.id) }
+        warn { sprintf('Unable to send event; reached max queue size of %s.', queue.size) }
         return false
       end
 
@@ -52,7 +54,7 @@ module Honeybadger
     end
 
     def send_now(msg)
-      handle_response(msg, send_to_backend(msg))
+      handle_response(send_to_backend(msg))
     end
 
     def shutdown(force = false)
@@ -66,12 +68,12 @@ module Honeybadger
       return true unless thread&.alive?
 
       if throttled?
-        warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } unless queue.empty?
+        warn { sprintf('Unable to send %s event(s) to Honeybadger (currently throttled)', queue.size) } unless queue.empty?
         return true
       end
 
-      info { sprintf('Waiting to report %s error(s) to Honeybadger', queue.size) } unless queue.empty?
-
+      info { sprintf('Waiting to send %s events(s) to Honeybadger', queue.size) } unless queue.empty?
+      queue.push(FLUSH)
       queue.push(SHUTDOWN)
       !!thread.join
     ensure
@@ -83,6 +85,7 @@ module Honeybadger
     def flush
       mutex.synchronize do
         if thread && thread.alive?
+          queue.push(FLUSH)
           queue.push(marker)
           marker.wait(mutex)
         end
@@ -160,6 +163,7 @@ module Honeybadger
         loop do
           case msg = queue.pop
           when SHUTDOWN then break
+          when FLUSH then flush_send_queue
           when ConditionVariable then signal_marker(msg)
           else work(msg)
           end
@@ -185,12 +189,12 @@ module Honeybadger
     end
 
     def check_and_send
-      queue = Thread.current.thread_variable_get(:send_queue)
-      return if queue.empty?
+      send_queue = Thread.current.thread_variable_get(:send_queue)
+      return if send_queue.empty?
       last_sent = Thread.current.thread_variable_get(:last_sent)
-      if queue.length >= MAX_EVENTS || (Time.now.to_i - last_sent.to_i) >= SEND_TIMEOUT
-        send_now(queue)
-        queue.clear
+      if send_queue.length >= MAX_EVENTS || (Time.now.to_i - last_sent.to_i) >= SEND_TIMEOUT
+        send_now(send_queue)
+        send_queue.clear
       end
     end
 
@@ -199,7 +203,7 @@ module Honeybadger
       check_and_send
 
       if shutdown? && throttled?
-        warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
+        warn { sprintf('Unable to semd %s events(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
         kill!
         return
       end
@@ -212,9 +216,21 @@ module Honeybadger
       }
     end
 
+    def flush_send_queue
+      send_queue = Thread.current.thread_variable_get(:send_queue)
+      return if send_queue.empty?
+      send_now(send_queue)
+      send_queue.clear
+    rescue StandardError => e
+      error {
+        msg = "Error in worker thread class=%s message=%s\n\t%s"
+        sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
+      }
+    end
+
     def send_to_backend(msg)
       d { 'events_worker sending to backend' }
-      events_backend.send_event(msg)
+      backend.event(msg)
     end
 
     def calc_throttle_interval
@@ -238,21 +254,21 @@ module Honeybadger
       end
     end
 
-    def handle_response(msg, response)
+    def handle_response(response)
       d { sprintf('events_worker response code=%s message=%s', response.code, response.message.to_s.dump) }
 
       case response.code
       when 429, 503
         throttle = inc_throttle
-        warn { sprintf('Event send failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s', msg.id, response.code, throttle, throttle_interval) }
+        warn { sprintf('Event send failed: project is sending too many events. code=%s throttle=%s interval=%s', response.code, throttle, throttle_interval) }
       when 402
-        warn { sprintf('Event send failed: payment is required. id=%s code=%s', msg.id, response.code) }
+        warn { sprintf('Event send failed: payment is required. code=%s', response.code) }
         suspend(3600)
       when 403
-        warn { sprintf('Event send failed: API key is invalid. id=%s code=%s', msg.id, response.code) }
+        warn { sprintf('Event send failed: API key is invalid. code=%s', response.code) }
         suspend(3600)
       when 413
-        warn { sprintf('Event send failed: Payload is too large. id=%s code=%s', msg.id, response.code) }
+        warn { sprintf('Event send failed: Payload is too large. code=%s', response.code) }
       when 201
         if throttle = dec_throttle
           info { sprintf('Success ⚡ Event sent code=%s throttle=%s interval=%s', response.code, throttle, throttle_interval) }

@@ -34,7 +34,7 @@ describe Honeybadger::EventsWorker do
       instance.push(event)
       instance.flush
 
-      sleep(0.1)
+      sleep(0.2)
       expect(instance.send(:thread)).not_to be_alive
     end
 
@@ -97,260 +97,260 @@ describe Honeybadger::EventsWorker do
     end
   end
 
-  # describe "#push" do
-  #   it "flushes payload to backend" do
-  #     expect(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_call_original
-  #     expect(instance.push(obj)).not_to eq false
-  #     instance.flush
-  #   end
+  describe "#push" do
+    it "flushes payload to backend" do
+      expect(instance.send(:backend)).to receive(:event).with([event]).and_call_original
+      expect(instance.push(event)).not_to eq false
+      instance.flush
+    end
 
-  #   context "when not started" do
-  #     before do
-  #       allow(instance).to receive(:start).and_return false
-  #     end
+    context "when not started" do
+      before do
+        allow(instance).to receive(:start).and_return false
+      end
 
-  #     it "rejects push" do
-  #       expect(instance.send(:queue)).not_to receive(:push)
-  #       expect(instance.push(obj)).to eq false
-  #     end
-  #   end
+      it "rejects push" do
+        expect(instance.send(:queue)).not_to receive(:push)
+        expect(instance.push(event)).to eq false
+      end
+    end
 
-  #   context "when queue is full" do
-  #     before do
-  #       allow(config).to receive(:max_queue_size).and_return(5)
-  #       allow(instance).to receive(:queue).and_return(double(size: 5))
-  #     end
+    context "when queue is full" do
+      before do
+        allow(config).to receive(:max_queue_size).and_return(5)
+        allow(instance).to receive(:queue).and_return(double(size: 5))
+      end
 
-  #     it "rejects the push" do
-  #       expect(instance.send(:queue)).not_to receive(:push)
-  #       expect(instance.push(obj)).to eq false
-  #     end
+      it "rejects the push" do
+        expect(instance.send(:queue)).not_to receive(:push)
+        expect(instance.push(event)).to eq false
+      end
 
-  #     it "warns the logger" do
-  #       allow(config.logger).to receive(:warn)
-  #       expect(config.logger).to receive(:warn).with(/reached max/i)
-  #       instance.push(obj)
-  #     end
-  #   end
-  # end
+      it "warns the logger" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).to receive(:warn).with(/reached max/i)
+        instance.push(event)
+      end
+    end
+  end
 
-  # describe "#start" do
-  #   it "starts the thread" do
-  #     expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
-  #   end
+  describe "#start" do
+    it "starts the thread" do
+      expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
+    end
 
-  #   it "changes the pid to the current pid" do
-  #     allow(Process).to receive(:pid).and_return(:expected)
-  #     expect { subject.start }.to change(subject, :pid).to(:expected)
-  #   end
+    it "changes the pid to the current pid" do
+      allow(Process).to receive(:pid).and_return(:expected)
+      expect { subject.start }.to change(subject, :pid).to(:expected)
+    end
 
-  #   context "when shutdown" do
-  #     before do
-  #       subject.shutdown
-  #     end
+    context "when shutdown" do
+      before do
+        subject.shutdown
+      end
 
-  #     it "doesn't start" do
-  #       expect { subject.start }.not_to change(subject, :thread)
-  #     end
-  #   end
+      it "doesn't start" do
+        expect { subject.start }.not_to change(subject, :thread)
+      end
+    end
 
-  #   context "when suspended" do
-  #     before do
-  #       subject.send(:suspend, 300)
-  #     end
+    context "when suspended" do
+      before do
+        subject.send(:suspend, 300)
+      end
 
-  #     context "and restart is in the future" do
-  #       it "doesn't start" do
-  #         expect { subject.start }.not_to change(subject, :thread)
-  #       end
-  #     end
+      context "and restart is in the future" do
+        it "doesn't start" do
+          expect { subject.start }.not_to change(subject, :thread)
+        end
+      end
 
-  #     context "and restart is in the past" do
-  #       it "starts the thread" do
-  #         Timecop.travel(Time.now + 301) do
-  #           expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
-  #         end
-  #       end
-  #     end
-  #   end
-  # end
+      context "and restart is in the past" do
+        it "starts the thread" do
+          Timecop.travel(Time.now + 301) do
+            expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
+          end
+        end
+      end
+    end
+  end
 
-  # describe "#shutdown" do
-  #   before { subject.start }
+  describe "#shutdown" do
+    before { subject.start }
 
-  #   it "blocks until queue is processed" do
-  #     expect(subject.send(:backend)).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
-  #     subject.push(obj)
-  #     subject.shutdown
-  #   end
+    it "blocks until queue is processed" do
+      expect(subject.send(:backend)).to receive(:event).with([event]).and_call_original
+      subject.push(event)
+      subject.shutdown
+    end
 
-  #   it "stops the thread" do
-  #     subject.shutdown
+    it "stops the thread" do
+      subject.shutdown
 
-  #     sleep(0.1)
-  #     expect(subject.send(:thread)).not_to be_alive
-  #   end
+      sleep(0.1)
+      expect(subject.send(:thread)).not_to be_alive
+    end
 
-  #   context "when previously throttled" do
-  #     before do
-  #       100.times { subject.send(:inc_throttle) }
-  #       subject.push(obj)
-  #       sleep(0.01) # Pause to allow throttle to activate
-  #     end
+    context "when previously throttled" do
+      before do
+        100.times { subject.send(:inc_throttle) }
+        subject.push(event)
+        sleep(0.01) # Pause to allow throttle to activate
+      end
 
-  #     it "shuts down immediately" do
-  #       expect(subject.send(:backend)).not_to receive(:notify)
-  #       subject.push(obj)
-  #       subject.shutdown
-  #     end
+      it "shuts down immediately" do
+        expect(subject.send(:backend)).not_to receive(:event)
+        subject.push(event)
+        subject.shutdown
+      end
 
-  #     it "does not warn the logger when the queue is empty" do
-  #       allow(config.logger).to receive(:warn)
-  #       expect(config.logger).not_to receive(:warn)
-  #       subject.shutdown
-  #     end
+      it "does not warn the logger when the queue is empty" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).not_to receive(:warn)
+        subject.shutdown
+      end
 
-  #     it "warns the logger when queue has items" do
-  #       subject.push(obj)
-  #       allow(config.logger).to receive(:warn)
-  #       expect(config.logger).to receive(:warn).with(/throttled/i)
-  #       subject.shutdown
-  #     end
-  #   end
+      it "warns the logger when queue has items" do
+        subject.push(event)
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).to receive(:warn).with(/throttled/i)
+        subject.shutdown
+      end
+    end
 
-  #   context "when throttled during shutdown" do
-  #     before do
-  #       allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429) )
-  #     end
+    context "when throttled during shutdown" do
+      before do
+        allow(subject.send(:backend)).to receive(:event).with(anything).and_return(Honeybadger::Backend::Response.new(429) )
+      end
 
-  #     it "shuts down immediately" do
-  #       expect(subject.send(:backend)).to receive(:notify).exactly(1).times
-  #       5.times { subject.push(obj) }
-  #       subject.shutdown
-  #     end
+      it "shuts down immediately" do
+        expect(subject.send(:backend)).to receive(:event).exactly(1).times
+        5.times { subject.push(event) }
+        subject.shutdown
+      end
 
-  #     it "does not warn the logger when the queue is empty" do
-  #       allow(config.logger).to receive(:warn)
-  #       expect(config.logger).not_to receive(:warn).with(/throttled/)
+      it "does not warn the logger when the queue is empty" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).not_to receive(:warn).with(/throttled/)
 
-  #       subject.push(obj)
-  #       subject.shutdown
-  #     end
+        subject.push(event)
+        subject.shutdown
+      end
 
-  #     it "warns the logger when the queue has additional items" do
-  #       allow(config.logger).to receive(:warn)
-  #       expect(config.logger).to receive(:warn).with(/throttled/i)
+      it "warns the logger when the queue has additional items" do
+        allow(config.logger).to receive(:warn)
+        expect(config.logger).to receive(:warn).with(/throttled/i)
+        100.times { subject.send(:inc_throttle) }
+        10.times do
+          subject.push(event)
+        end
 
-  #       30.times do
-  #         subject.push(obj)
-  #       end
+        subject.shutdown
+      end
+    end
+  end
 
-  #       subject.shutdown
-  #     end
-  #   end
-  # end
+  describe "#flush" do
+    it "blocks until queue is flushed" do
+      expect(subject.send(:backend)).to receive(:event).with([event]).and_call_original
+      subject.push(event)
+      subject.flush
+    end
+  end
 
-  # describe "#flush" do
-  #   it "blocks until queue is flushed" do
-  #     expect(subject.send(:backend)).to receive(:notify).with(kind_of(Symbol), obj).and_call_original
-  #     subject.push(obj)
-  #     subject.flush
-  #   end
-  # end
+  describe "#handle_response" do
+    def handle_response
+      instance.send(:handle_response, response)
+    end
 
-  # describe "#handle_response" do
-  #   def handle_response
-  #     instance.send(:handle_response, obj, response)
-  #   end
+    before do
+      allow(instance).to receive(:suspend).and_return true
+    end
 
-  #   before do
-  #     allow(instance).to receive(:suspend).and_return true
-  #   end
+    context "when 429" do
+      let(:response) { Honeybadger::Backend::Response.new(429) }
 
-  #   context "when 429" do
-  #     let(:response) { Honeybadger::Backend::Response.new(429) }
+      it "adds throttle" do
+        expect { handle_response }.to change(instance, :throttle_interval).by(0.05)
+      end
+    end
 
-  #     it "adds throttle" do
-  #       expect { handle_response }.to change(instance, :throttle_interval).by(0.05)
-  #     end
-  #   end
+    context "when 402" do
+      let(:response) { Honeybadger::Backend::Response.new(402) }
 
-  #   context "when 402" do
-  #     let(:response) { Honeybadger::Backend::Response.new(402) }
+      it "shuts down the worker" do
+        expect(instance).to receive(:suspend)
+        handle_response
+      end
 
-  #     it "shuts down the worker" do
-  #       expect(instance).to receive(:suspend)
-  #       handle_response
-  #     end
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/payment/)
+        handle_response
+      end
+    end
 
-  #     it "warns the logger" do
-  #       expect(config.logger).to receive(:warn).with(/payment/)
-  #       handle_response
-  #     end
-  #   end
+    context "when 403" do
+      let(:response) { Honeybadger::Backend::Response.new(403, %({"error":"unauthorized"})) }
 
-  #   context "when 403" do
-  #     let(:response) { Honeybadger::Backend::Response.new(403, %({"error":"unauthorized"})) }
+      it "shuts down the worker" do
+        expect(instance).to receive(:suspend)
+        handle_response
+      end
 
-  #     it "shuts down the worker" do
-  #       expect(instance).to receive(:suspend)
-  #       handle_response
-  #     end
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/invalid/)
+        handle_response
+      end
+    end
 
-  #     it "warns the logger" do
-  #       expect(config.logger).to receive(:warn).with(/invalid/)
-  #       handle_response
-  #     end
-  #   end
+    context "when 413" do
+      let(:response) { Honeybadger::Backend::Response.new(413, %({"error":"Payload exceeds maximum size"})) }
 
-  #   context "when 413" do
-  #     let(:response) { Honeybadger::Backend::Response.new(413, %({"error":"Payload exceeds maximum size"})) }
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/too large/)
+        handle_response
+      end
+    end
 
-  #     it "warns the logger" do
-  #       expect(config.logger).to receive(:warn).with(/too large/)
-  #       handle_response
-  #     end
-  #   end
+    context "when 201" do
+      let(:response) { Honeybadger::Backend::Response.new(201) }
 
-  #   context "when 201" do
-  #     let(:response) { Honeybadger::Backend::Response.new(201) }
+      context "and there is no throttle" do
+        it "doesn't change throttle" do
+          expect { handle_response }.not_to change(instance, :throttle_interval)
+        end
+      end
 
-  #     context "and there is no throttle" do
-  #       it "doesn't change throttle" do
-  #         expect { handle_response }.not_to change(instance, :throttle_interval)
-  #       end
-  #     end
+      context "and a throttle is set" do
+        before { instance.send(:inc_throttle) }
 
-  #     context "and a throttle is set" do
-  #       before { instance.send(:inc_throttle) }
+        it "removes throttle" do
+          expect { handle_response }.to change(instance, :throttle_interval).by(-0.05)
+        end
+      end
 
-  #       it "removes throttle" do
-  #         expect { handle_response }.to change(instance, :throttle_interval).by(-0.05)
-  #       end
-  #     end
+      it "doesn't warn" do
+        expect(config.logger).not_to receive(:warn)
+        handle_response
+      end
+    end
 
-  #     it "doesn't warn" do
-  #       expect(config.logger).not_to receive(:warn)
-  #       handle_response
-  #     end
-  #   end
+    context "when unknown" do
+      let(:response) { Honeybadger::Backend::Response.new(418) }
 
-  #   context "when unknown" do
-  #     let(:response) { Honeybadger::Backend::Response.new(418) }
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/failed/)
+        handle_response
+      end
+    end
 
-  #     it "warns the logger" do
-  #       expect(config.logger).to receive(:warn).with(/failed/)
-  #       handle_response
-  #     end
-  #   end
+    context "when error" do
+      let(:response) { Honeybadger::Backend::Response.new(:error, nil, 'test error message') }
 
-  #   context "when error" do
-  #     let(:response) { Honeybadger::Backend::Response.new(:error, nil, 'test error message') }
-
-  #     it "warns the logger" do
-  #       expect(config.logger).to receive(:warn).with(/test error message/)
-  #       handle_response
-  #     end
-  #   end
-  # end
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/test error message/)
+        handle_response
+      end
+    end
+  end
 end
