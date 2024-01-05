@@ -372,11 +372,8 @@ module Honeybadger
     # @param payload [Hash] Additional data to be sent with the event as keyword arguments
     def event(event_type, payload={})
       ts = DateTime.now.new_offset(0).rfc3339
-      unless payload.kind_of?(Hash)
-        logger.error("Event has non-hash payload")
-        return
-      end
-      events_worker.push({event_type: event_type, ts: ts}.merge(payload))
+      merged = {event_type: event_type, ts: ts}.merge(Hash(payload))
+      events_worker.push(merged)
     end
 
     # @api private
