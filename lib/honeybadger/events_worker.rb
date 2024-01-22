@@ -40,8 +40,8 @@ module Honeybadger
       @send_queue = []
       @last_sent = nil
 
-      @max_events = config.get(:events_batch_size)
-      @send_timeout = config.get(:events_timeout)
+      @max_events = config.get(:'events.batch_size')
+      @send_timeout = config.get(:'events.timeout')
     end
 
     def push(msg)
@@ -161,10 +161,7 @@ module Honeybadger
     def schedule_timeout_check
       loop do
         sleep(send_timeout / 1000.0)
-        ms_since = (Time.now.to_f - last_sent.to_f) * 1000.0
-        if ms_since >= send_timeout
-          queue.push(CHECK_TIMEOUT)
-        end
+        queue.push(CHECK_TIMEOUT)
       end
     end
 
@@ -243,7 +240,7 @@ module Honeybadger
       check_and_send
 
       if shutdown? && throttled?
-        warn { sprintf('Unable to semd %s events(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
+        warn { sprintf('Unable to send %s events(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
         kill!
         return
       end

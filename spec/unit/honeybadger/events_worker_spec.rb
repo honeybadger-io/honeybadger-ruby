@@ -10,8 +10,8 @@ describe Honeybadger::EventsWorker do
   let(:config) {
     Honeybadger::Config.new(
       logger: NULL_LOGGER, debug: true, backend: 'null',
-      events_batch_size: 5,
-      events_timeout: 10_000
+      :'events.batch_size' => 5,
+      :'events.timeout' => 10_000
     )
   }
   let(:event) { {event_type: "test", ts: "not-important"} }
@@ -73,12 +73,6 @@ describe Honeybadger::EventsWorker do
       flush
       expect(instance.send(:thread)).to be_alive
     end
-
-    # it "logs the error" do
-    #   allow(config.logger).to receive(:error)
-    #   expect(config.logger).to receive(:error).with(/error/i)
-    #   flush
-    # end
   end
 
   describe "#initialize" do
@@ -372,8 +366,8 @@ describe Honeybadger::EventsWorker do
       let(:config) {
         Honeybadger::Config.new(
           logger: NULL_LOGGER, debug: true, backend: 'null',
-          events_batch_size: 5,
-          events_timeout: 100
+          :'events.batch_size' => 5,
+          :'events.timeout' => 100
         )
       }
 

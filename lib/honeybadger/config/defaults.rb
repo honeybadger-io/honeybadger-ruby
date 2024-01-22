@@ -91,12 +91,12 @@ module Honeybadger
         default: 100,
         type: Integer
       },
-      events_batch_size: {
+      :'events.batch_size' => {
         description: 'Send events batch if n events have accumulated',
         default: 100,
         type: Integer
       },
-      events_timeout: {
+      :'events.timeout' => {
         description: 'Timeout after which the events batch will be sent regardless (in milliseconds)',
         default: 30_000,
         type: Integer
