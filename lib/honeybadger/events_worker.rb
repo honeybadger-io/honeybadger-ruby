@@ -172,10 +172,6 @@ module Honeybadger
           @last_sent = Time.now
         end
         loop do
-          # ms_since = (Time.now.to_f - @last_sent.to_f) * 1000.0
-          # if ms_since >= send_timeout
-          #   queue.push(CHECK_TIMEOUT)
-          # end
           case msg = queue.pop
           when SHUTDOWN then break
           when CHECK_TIMEOUT then check_timeout
