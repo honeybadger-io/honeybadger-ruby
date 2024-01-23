@@ -11,11 +11,10 @@ module Honeybadger
     class Server < Base
       ENDPOINTS = {
         notices: '/v1/notices'.freeze,
-        deploys: '/v1/deploys'.freeze
+        deploys: '/v1/deploys'.freeze,
       }.freeze
-
       CHECK_IN_ENDPOINT = '/v1/check_in'.freeze
-
+      EVENTS_ENDPOINT = '/v1/events'.freeze
 
       HTTP_ERRORS = Util::HTTP::ERRORS
 
@@ -44,6 +43,18 @@ module Honeybadger
       # @return [Response]
       def check_in(id)
         Response.new(@http.get("#{CHECK_IN_ENDPOINT}/#{id}"))
+      rescue *HTTP_ERRORS => e
+        Response.new(:error, nil, "HTTP Error: #{e.class}")
+      end
+
+      # Send event
+      # @example
+      #   backend.event([{event_type: "email_received", ts: "2023-03-04T12:12:00+1:00", subject: 'Re: Aquisition' }})
+      #
+      # @param [Array] payload array of event hashes to send
+      # @return [Response]
+      def event(payload)
+        Response.new(@http.post_newline_delimited(EVENTS_ENDPOINT, payload))
       rescue *HTTP_ERRORS => e
         Response.new(:error, nil, "HTTP Error: #{e.class}")
       end
