@@ -51,10 +51,10 @@ jobs:
       BUNDLE_WITHOUT: "development"
     steps:
     - uses: actions/checkout@v4
-    - name: setup sqlite3
+
+    - name: Upgrade rubygems
       run: |
-        sudo apt-get update && sudo apt-get upgrade -y
-        sudo apt-get install -y libsqlite3-dev
+        gem update --system
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
