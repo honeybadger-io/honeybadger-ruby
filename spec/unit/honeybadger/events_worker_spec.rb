@@ -374,15 +374,15 @@ describe Honeybadger::EventsWorker do
       it "should send after timeout when sending another" do
         expect(subject.send(:backend)).to receive(:event).with([event]).twice().and_return(Honeybadger::Backend::Null::StubbedResponse.new)
         subject.push(event)
-        sleep(0.2)
+        sleep(0.25)
         subject.push(event)
-        sleep(0.2)
+        sleep(0.25)
       end
 
       it "should send after timeout without new message" do
         expect(subject.send(:backend)).to receive(:event).with([event]).and_return(Honeybadger::Backend::Null::StubbedResponse.new)
         subject.push(event)
-        sleep(0.2)
+        sleep(0.25)
       end
     end
   end
