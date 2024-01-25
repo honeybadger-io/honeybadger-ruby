@@ -53,8 +53,8 @@ jobs:
     - uses: actions/checkout@v4
     - name: setup sqlite3
       run: |
-        apt update && apt upgrade
-        apt install libsqlite-dev
+        sudo apt-get update && sudo apt-get upgrade -y
+        sudo apt-get install -y libsqlite3-dev
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
