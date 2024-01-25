@@ -60,7 +60,7 @@ module Honeybadger
     end
 
     def shutdown(force = false)
-      d { 'shutting down worker' }
+      d { 'shutting down events worker' }
 
       mutex.synchronize do
         @shutdown = true

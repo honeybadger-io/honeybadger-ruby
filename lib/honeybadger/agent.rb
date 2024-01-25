@@ -355,6 +355,7 @@ module Honeybadger
       yield
     ensure
       worker.flush
+      events_worker.flush
     end
 
     # Stops the Honeybadger service.
@@ -363,6 +364,7 @@ module Honeybadger
     #   Honeybadger.stop # => nil
     def stop(force = false)
       worker.shutdown(force)
+      events_worker.shutdown(force)
       true
     end
 
