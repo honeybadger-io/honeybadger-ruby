@@ -51,6 +51,10 @@ jobs:
       BUNDLE_WITHOUT: "development"
     steps:
     - uses: actions/checkout@v4
+    - name: setup sqlite3
+      run: |
+        apt update && apt upgrade
+        apt install libsqlite-dev
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
