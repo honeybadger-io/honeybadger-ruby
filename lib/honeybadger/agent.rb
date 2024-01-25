@@ -7,6 +7,7 @@ require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
+require 'honeybadger/events_worker'
 require 'honeybadger/breadcrumbs'
 
 module Honeybadger
@@ -74,7 +75,7 @@ module Honeybadger
         @breadcrumbs = nil
       end
 
-      init_worker
+      init_workers
     end
 
     # Sends an exception to Honeybadger. Does not report ignored exceptions by
@@ -354,6 +355,7 @@ module Honeybadger
       yield
     ensure
       worker.flush
+      events_worker.flush
     end
 
     # Stops the Honeybadger service.
@@ -362,6 +364,7 @@ module Honeybadger
     #   Honeybadger.stop # => nil
     def stop(force = false)
       worker.shutdown(force)
+      events_worker.shutdown(force)
       true
     end
 
@@ -372,7 +375,7 @@ module Honeybadger
     def event(event_type, payload={})
       ts = DateTime.now.new_offset(0).rfc3339
       merged = {event_type: event_type, ts: ts}.merge(Hash(payload))
-      logger.debug(merged.to_json)
+      events_worker.push(merged)
     end
 
     # @api private
@@ -447,7 +450,7 @@ module Honeybadger
     end
 
     # @api private
-    attr_reader :worker
+    attr_reader :worker, :events_worker
 
     # @api private
     # @!method init!(...)
@@ -484,8 +487,9 @@ module Honeybadger
       true
     end
 
-    def init_worker
+    def init_workers
       @worker = Worker.new(config)
+      @events_worker = EventsWorker.new(config)
     end
 
     def with_error_handling

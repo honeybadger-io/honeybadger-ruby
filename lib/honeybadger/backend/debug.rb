@@ -17,6 +17,12 @@ module Honeybadger
         return Response.new(ENV['DEBUG_BACKEND_STATUS'].to_i, nil) if ENV['DEBUG_BACKEND_STATUS']
         super
       end
+
+      def event(payload)
+        logger.unknown("sending event to debug backend with event=#{payload.to_json}")
+        return Response.new(ENV['DEBUG_BACKEND_STATUS'].to_i, nil) if ENV['DEBUG_BACKEND_STATUS']
+        super
+      end
     end
   end
 end
