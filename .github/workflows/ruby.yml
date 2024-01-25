@@ -52,15 +52,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Upgrade rubygems
-      run: |
-        gem update --system
-
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+        rubygems: latest
 
     - name: Build and test regular ruby
       run: |
