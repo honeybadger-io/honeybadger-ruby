@@ -370,11 +370,30 @@ module Honeybadger
 
     # Sends event to events backend
     #
-    # @param event_name [String] a string describing the event
+    # @example
+    #   # With event type as first argument (recommended):
+    #   Honeybadger.event("user_signed_up", user_id: 123)
+    #
+    #   # With just a payload:
+    #   Honeybadger.event(event_type: "user_signed_up", user_id: 123)
+    #
+    # @param event_name [String, Hash] a String describing the event or a Hash
+    #   when the second argument is omitted.
     # @param payload [Hash] Additional data to be sent with the event as keyword arguments
-    def event(event_type, payload={})
+    #
+    # @return [void]
+    def event(event_type, payload = {})
       ts = DateTime.now.new_offset(0).rfc3339
-      merged = {event_type: event_type, ts: ts}.merge(Hash(payload))
+      merged = {ts: ts}
+
+      if event_type.is_a?(String)
+        merged.merge!(event_type: event_type)
+      else
+        merged.merge!(Hash(event_type))
+      end
+
+      merged.merge!(Hash(payload))
+
       events_worker.push(merged)
     end
 

@@ -295,13 +295,26 @@ describe Honeybadger::Agent do
       allow(instance).to receive(:events_worker).and_return(events_worker)
     end
 
-    it "logs an event" do
-      expect(events_worker).to receive(:push) do |msg|
-        expect(msg[:event_type]).to eq("test_event")
-        expect(msg[:some_data]).to eq("is here")
-        expect(msg[:ts]).not_to be_nil
+    context "with event type as first argument" do
+      it "logs an event" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg[:event_type]).to eq("test_event")
+          expect(msg[:some_data]).to eq("is here")
+          expect(msg[:ts]).not_to be_nil
+        end
+        subject.event("test_event", some_data: "is here")
       end
-      subject.event("test_event", some_data: "is here")
+    end
+
+    context "with payload as first argument" do
+      it "logs an event" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg[:event_type]).to eq("test_event")
+          expect(msg[:some_data]).to eq("is here")
+          expect(msg[:ts]).not_to be_nil
+        end
+        subject.event(event_type: "test_event", some_data: "is here")
+      end
     end
   end
 
