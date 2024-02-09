@@ -39,9 +39,6 @@ module Honeybadger
       @pid = Process.pid
       @send_queue = []
       @last_sent = nil
-
-      @max_events = config.get(:'events.batch_size')
-      @send_timeout = config.get(:'events.timeout')
     end
 
     def push(msg)
@@ -114,7 +111,7 @@ module Honeybadger
     private
 
     attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :timeout_thread, :throttle,
-      :throttle_interval, :start_at, :send_queue, :last_sent, :max_events, :send_timeout
+      :throttle_interval, :start_at, :send_queue, :last_sent
 
     def_delegator :config, :backend
 
@@ -160,7 +157,7 @@ module Honeybadger
 
     def schedule_timeout_check
       loop do
-        sleep(send_timeout / 1000.0)
+        sleep(config.events_timeout / 1000.0)
         queue.push(CHECK_TIMEOUT)
       end
     end
@@ -195,7 +192,7 @@ module Honeybadger
     def check_timeout
       return if mutex.synchronize { send_queue.empty? }
       ms_since = (Time.now.to_f - last_sent.to_f) * 1000.0
-      if ms_since >= send_timeout
+      if ms_since >= config.events_timeout
         send_batch
       end
     end
@@ -216,7 +213,7 @@ module Honeybadger
 
     def check_and_send
       return if mutex.synchronize { send_queue.empty? }
-      if mutex.synchronize { send_queue.length } >= max_events
+      if mutex.synchronize { send_queue.length } >= config.events_batch_size
         send_batch
       end
     end

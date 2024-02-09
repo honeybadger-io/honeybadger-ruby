@@ -224,6 +224,14 @@ module Honeybadger
       self[:max_queue_size]
     end
 
+    def events_batch_size
+      self[:'events.batch_size']
+    end
+
+    def events_timeout
+      self[:'events.timeout']
+    end
+
     def params_filters
       Array(self[:'request.filter_keys'])
     end
