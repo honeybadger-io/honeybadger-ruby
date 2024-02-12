@@ -11,6 +11,7 @@ describe Honeybadger::Backend::Server do
 
   it { should respond_to :notify }
   it { should respond_to :check_in }
+  it { should respond_to :event }
 
   describe "#check_in" do
     it "returns a response" do
@@ -79,6 +80,53 @@ describe Honeybadger::Backend::Server do
     def notify_backend
       subject.notify(:notices, payload)
     end
+  end
 
+  describe "#event" do
+    it "returns the response" do
+      stub_http
+      expect(send_event).to be_a Honeybadger::Backend::Response
+    end
+
+    it "adds auth headers" do
+      http = stub_http
+      expect(http).to receive(:post).with(anything, anything, hash_including({ 'X-API-Key' => 'abc123'}))
+      send_event
+    end
+
+    it "serialises json and compresses" do
+      http = stub_http
+      expect(http).to receive(:post) do |path, body, headers|
+        cleartext_body = Zlib::Inflate.inflate(body)
+        json = JSON.parse(cleartext_body)
+        expect(json["ts"]).to_not be_nil
+        expect(json["event_type"]).to eq("checkout")
+        expect(json["increment"]).to eq(0)
+      end
+      send_event
+    end
+
+    it "serialises json newline delimited and compresses" do
+      http = stub_http
+      expect(http).to receive(:post) do |path, body, headers|
+        cleartext_body = Zlib::Inflate.inflate(body)
+
+        the_jsons = cleartext_body.split("\n").map { |t| JSON.parse(t) }
+        expect(the_jsons.length).to eq(2)
+
+        expect(the_jsons[0]["ts"]).to_not be_nil
+        expect(the_jsons[0]["event_type"]).to eq("checkout")
+        expect(the_jsons[0]["sum"]).to eq("123.23")
+        expect(the_jsons[0]["increment"]).to eq(0)
+        expect(the_jsons[1]["increment"]).to eq(1)
+      end
+      send_event(2)
+    end
+
+    def send_event(count=1)
+      payload = []
+      count.times {|i| payload << {ts: DateTime.now.new_offset(0).rfc3339, event_type: "checkout", sum: "123.23", increment: i} }
+      subject.event(payload)
+    end
   end
 end

@@ -57,6 +57,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+        rubygems: latest
 
     - name: Build and test regular ruby
       run: |

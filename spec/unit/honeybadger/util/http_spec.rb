@@ -10,6 +10,7 @@ describe Honeybadger::Util::HTTP do
   subject { described_class.new(config) }
 
   it { should respond_to :post }
+  it { should respond_to :post_newline_delimited }
   it { should respond_to :get }
 
   it "sends a user agent with version number" do
@@ -55,6 +56,11 @@ describe Honeybadger::Util::HTTP do
   it "returns the response" do
     stub_http
     expect(http_post).to be_a Net::HTTPResponse
+  end
+
+  it "returns the response for post_newline_delimited" do
+    stub_http
+    expect(http_post_newline_delimited).to be_a Net::HTTPResponse
   end
 
   it "returns the response for #get" do
@@ -240,8 +246,28 @@ describe Honeybadger::Util::HTTP do
     end
   end
 
+  describe "#post_newline_delimited" do
+    it "should properly serialize NDJSON and compress" do
+      http = stub_http
+      expect(http).to receive(:post) do |path, body, headers|
+        expect(path).to eq("/v1/foo")
+        decompressed = Zlib::Inflate.inflate(body)
+        parts = decompressed.split("\n").map { |part| JSON.parse(part) }
+        expect(parts.length).to be(2)
+
+        Net::HTTPSuccess.new('1.2', '200', 'OK')
+      end
+      http_post_newline_delimited
+    end
+  end
+
   def http_post
     subject.post('/v1/foo', double('Notice', to_json: '{}'))
+  end
+
+  def http_post_newline_delimited
+    ts = DateTime.now.new_offset(0).rfc3339
+    subject.post_newline_delimited('/v1/foo', [{ts: ts, event_type: "test"}, {ts: ts, event_type: "test2"}])
   end
 
   def http_get

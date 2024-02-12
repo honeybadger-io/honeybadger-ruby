@@ -43,6 +43,7 @@ describe Honeybadger::Backend::Base do
   subject { described_class.new(config) }
 
   it { should respond_to :notify }
+  it { should respond_to :event }
 
   describe "#notify" do
     it "raises NotImplementedError" do

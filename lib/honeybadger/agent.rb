@@ -7,6 +7,7 @@ require 'honeybadger/notice'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
+require 'honeybadger/events_worker'
 require 'honeybadger/breadcrumbs'
 
 module Honeybadger
@@ -354,6 +355,7 @@ module Honeybadger
       yield
     ensure
       worker.flush
+      events_worker&.flush
     end
 
     # Stops the Honeybadger service.
@@ -362,7 +364,39 @@ module Honeybadger
     #   Honeybadger.stop # => nil
     def stop(force = false)
       worker.shutdown(force)
+      events_worker&.shutdown(force)
       true
+    end
+
+    # Sends event to events backend
+    #
+    # @example
+    #   # With event type as first argument (recommended):
+    #   Honeybadger.event("user_signed_up", user_id: 123)
+    #
+    #   # With just a payload:
+    #   Honeybadger.event(event_type: "user_signed_up", user_id: 123)
+    #
+    # @param event_name [String, Hash] a String describing the event or a Hash
+    #   when the second argument is omitted.
+    # @param payload [Hash] Additional data to be sent with the event as keyword arguments
+    #
+    # @return [void]
+    def event(event_type, payload = {})
+      init_events_worker
+
+      ts = DateTime.now.new_offset(0).rfc3339
+      merged = {ts: ts}
+
+      if event_type.is_a?(String)
+        merged.merge!(event_type: event_type)
+      else
+        merged.merge!(Hash(event_type))
+      end
+
+      merged.merge!(Hash(payload))
+
+      events_worker.push(merged)
     end
 
     # @api private
@@ -437,7 +471,7 @@ module Honeybadger
     end
 
     # @api private
-    attr_reader :worker
+    attr_reader :worker, :events_worker
 
     # @api private
     # @!method init!(...)
@@ -475,7 +509,13 @@ module Honeybadger
     end
 
     def init_worker
+      return if @worker
       @worker = Worker.new(config)
+    end
+
+    def init_events_worker
+      return if @events_worker
+      @events_worker = EventsWorker.new(config)
     end
 
     def with_error_handling

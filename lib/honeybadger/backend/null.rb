@@ -24,6 +24,10 @@ module Honeybadger
       def check_in(id)
         StubbedResponse.new
       end
+
+      def event(payload)
+        StubbedResponse.new
+      end
     end
   end
 end

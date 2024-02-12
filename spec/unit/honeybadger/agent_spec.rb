@@ -1,4 +1,5 @@
 require 'honeybadger/agent'
+require 'honeybadger/events_worker'
 require 'timecop'
 
 describe Honeybadger::Agent do
@@ -279,6 +280,40 @@ describe Honeybadger::Agent do
         expect(Honeybadger::Breadcrumbs::Breadcrumb).to receive(:new)
 
         subject.add_breadcrumb("Breadcrumb")
+      end
+    end
+  end
+
+  context "#event" do
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug) }
+    let(:events_worker) { double(Honeybadger::EventsWorker.new(config)) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    subject { instance }
+
+    before do
+      allow(instance).to receive(:events_worker).and_return(events_worker)
+    end
+
+    context "with event type as first argument" do
+      it "logs an event" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg[:event_type]).to eq("test_event")
+          expect(msg[:some_data]).to eq("is here")
+          expect(msg[:ts]).not_to be_nil
+        end
+        subject.event("test_event", some_data: "is here")
+      end
+    end
+
+    context "with payload as first argument" do
+      it "logs an event" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg[:event_type]).to eq("test_event")
+          expect(msg[:some_data]).to eq("is here")
+          expect(msg[:ts]).not_to be_nil
+        end
+        subject.event(event_type: "test_event", some_data: "is here")
       end
     end
   end

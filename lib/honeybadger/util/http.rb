@@ -49,6 +49,12 @@ module Honeybadger
         response
       end
 
+      def post_newline_delimited(endpoint, payload, headers = nil)
+        response = http_connection.post(endpoint, compress(payload.map(&:to_json).join("\n")), http_headers(headers))
+        debug { sprintf("http method=POST path=%s code=%d", endpoint.dump, response.code) }
+        response
+      end
+
       private
 
       attr_reader :config
