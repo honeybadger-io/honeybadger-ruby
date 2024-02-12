@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.5.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.4.1...v5.5.0) (2024-02-12)
+
+
+### Features
+
+* implements honeybadger.event by synchronous log call ([#512](https://github.com/honeybadger-io/honeybadger-ruby/issues/512)) ([dbe7e3d](https://github.com/honeybadger-io/honeybadger-ruby/commit/dbe7e3dc20cbb432254b055b356826a42a76c609))
+
 ## [5.4.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.4.0...v5.4.1) (2023-12-22)
 
 
