@@ -4,8 +4,12 @@ module Honeybadger
             
       Plugin.register {
         requirement { defined?(::Rails.application) && ::Rails.application }
-        requirement { 
-          ::Rails.application.config.active_job[:queue_adapter] == :async
+        requirement {
+          begin
+            ::Rails.application.config.active_job[:queue_adapter] == :async
+          rescue NoMethodError
+            false
+          end
         }
         
         execution {
