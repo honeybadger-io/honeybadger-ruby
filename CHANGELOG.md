@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.5.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.5.0...v5.5.1) (2024-02-26)
+
+
+### Bug Fixes
+
+* don't raise an exception when ActiveJob isn't loaded ([#523](https://github.com/honeybadger-io/honeybadger-ruby/issues/523)) ([40c7892](https://github.com/honeybadger-io/honeybadger-ruby/commit/40c7892b9f191eb9159b776880962fc079c5e665))
+
 ## [5.5.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.4.1...v5.5.0) (2024-02-12)
 
 
