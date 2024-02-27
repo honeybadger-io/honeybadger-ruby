@@ -291,9 +291,9 @@ module Honeybadger
         warn { sprintf('Event send failed: Payload is too large. code=%s', response.code) }
       when 201
         if throttle = dec_throttle
-          info { sprintf('Success ⚡ Event sent code=%s throttle=%s interval=%s', response.code, throttle, throttle_interval) }
+          debug { sprintf('Success ⚡ Event sent code=%s throttle=%s interval=%s', response.code, throttle, throttle_interval) }
         else
-          info { sprintf('Success ⚡ Event sent code=%s', response.code) }
+          debug { sprintf('Success ⚡ Event sent code=%s', response.code) }
         end
       when :stubbed
         info { sprintf('Success ⚡ Development mode is enabled; This event will be sent after app is deployed.') }
