@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.6.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.5.1...v5.6.0) (2024-03-05)
+
+
+### Features
+
+* track exceptions in :solid_queue ([#526](https://github.com/honeybadger-io/honeybadger-ruby/issues/526)) ([4e2d428](https://github.com/honeybadger-io/honeybadger-ruby/commit/4e2d4287bbbe0100d6f82a38b7314fc8dc5a1571)), closes [#518](https://github.com/honeybadger-io/honeybadger-ruby/issues/518)
+
 ## [5.5.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.5.0...v5.5.1) (2024-02-26)
 
 
