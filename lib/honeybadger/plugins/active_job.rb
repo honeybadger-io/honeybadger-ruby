@@ -2,7 +2,7 @@ module Honeybadger
   module Plugins
     module ActiveJob
       # Ignore inline and test adapters, as well as the adapters that we support with their own plugins
-      EXCLUDED_ADAPTERS = %i[inline test delayed_job faktory karafka resque shoryuken sucker_punch sidekiq].freeze
+      EXCLUDED_ADAPTERS = %i[inline test delayed_job faktory karafka resque shoryuken sidekiq sucker_punch].freeze
 
       Plugin.register {
         requirement { defined?(::Rails.application) && ::Rails.application }
