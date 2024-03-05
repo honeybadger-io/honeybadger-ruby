@@ -18,7 +18,7 @@ module Honeybadger
               begin
                 block.call
               rescue => error
-                Honeybadger.notify(error, parameters: {job_id:, arguments:})
+                Honeybadger.notify(error, parameters: {job_id: job_id, arguments: arguments})
                 raise error
               end
             end
