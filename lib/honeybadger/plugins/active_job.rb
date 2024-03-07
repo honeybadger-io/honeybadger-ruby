@@ -10,14 +10,13 @@ module Honeybadger
           context = context(job)
           block.call
         rescue StandardError => e
-          Honeybadger.notify(e, context:)
+          Honeybadger.notify(e, context: context, parameters: { arguments: job.arguments })
           raise e
         end
 
-        def context(job) # rubocop:disable Metrics/MethodLength
+        def context(job)
           {
-            arguments: job.arguments,
-            component: :good_job,
+            component: job.class,
             enqueued_at: job.enqueued_at,
             executions: job.executions,
             job_class: job.class,
