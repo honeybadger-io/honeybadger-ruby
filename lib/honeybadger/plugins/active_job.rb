@@ -18,7 +18,7 @@ module Honeybadger
           {
             component: job.class,
             action: 'perform',
-            enqueued_at: job.enqueued_at,
+            enqueued_at: job.try(:enqueued_at),
             executions: job.executions,
             job_class: job.class,
             job_id: job.job_id,
