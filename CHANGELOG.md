@@ -1,5 +1,12 @@
 # Change Log
 
+## [5.7.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.6.0...v5.7.0) (2024-03-12)
+
+
+### Features
+
+* add additional context to ActiveJob notifications ([#528](https://github.com/honeybadger-io/honeybadger-ruby/issues/528)) ([d6ae246](https://github.com/honeybadger-io/honeybadger-ruby/commit/d6ae246a24290d76bcd0c8deb9121707d88976fe))
+
 ## [5.6.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.5.1...v5.6.0) (2024-03-05)
 
 
