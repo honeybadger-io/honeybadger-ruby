@@ -27,7 +27,6 @@ jobs:
           - rails7.1.gemfile
           - resque.gemfile
           - sinatra.gemfile
-          - sinatra_1.gemfile
           - sidekiq.gemfile
           - sidekiq7.gemfile
           - standalone.gemfile

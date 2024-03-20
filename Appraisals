@@ -16,11 +16,6 @@ appraise "rack-1" do
   gem "rack", "< 2.0"
 end
 
-appraise "sinatra-1" do
-  gem "sinatra", "< 2.0"
-  gem "rack-test"
-end
-
 appraise "delayed_job" do
   gem "delayed_job", "< 4.1.2" # See https://github.com/collectiveidea/delayed_job/pull/931
   gem "activesupport", "> 3.1.12", "< 5.0.0" # Prevent buggy version from being installed
@@ -94,7 +89,7 @@ appraise "rack" do
 end
 
 appraise "sinatra" do
-  gem "sinatra", "~> 2.0.0.beta1"
+  gem "sinatra"
   gem "rack-test"
 end
 
