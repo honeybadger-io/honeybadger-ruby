@@ -23,8 +23,6 @@ jobs:
           - hanami.gemfile
           - rack.gemfile
           - rack_1.gemfile
-          - rails5.2.gemfile
-          - rails6.0.gemfile
           - rails6.1.gemfile
           - rails7.0.gemfile
           - rails7.1.gemfile
@@ -37,12 +35,6 @@ jobs:
         exclude:
           - gemfile: hanami.gemfile
             ruby: '2.7'
-          - gemfile: rails5.2.gemfile
-            ruby: '3.0'
-          - gemfile: rails5.2.gemfile
-            ruby: '3.1'
-          - gemfile: rails5.2.gemfile
-            ruby: '3.2'
 
     # Has to be top level to cache properly
     env:
@@ -71,7 +63,6 @@ jobs:
         ruby:
           - 'jruby-9.2.14.0'
         gemfile:
-          - rails6.0.gemfile
           - rails6.1.gemfile
           # TODO
           # - rails7.0.gemfile

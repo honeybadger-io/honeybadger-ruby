@@ -39,27 +39,7 @@ appraise 'sidekiq7' do
   gem 'sidekiq', '~> 7'
 end
 
-appraise 'rails5.2' do
-  RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 5.2" }
-  gem 'sqlite3', '~> 1.4', platforms: :mri
-  gem 'activerecord-jdbcsqlite3-adapter', '~> 52', platforms: :jruby
-  gem 'better_errors', require: false, platforms: :mri
-  gem 'rack-mini-profiler', require: false
-  gem 'rspec-rails'
-  gem 'tzinfo-data' # Needed for timezones to work on Windows
-end
-
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
-  appraise 'rails6.0' do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.0" }
-    gem 'sqlite3', '~> 1.4', platforms: :mri
-    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platforms: :jruby
-    gem 'better_errors', require: false, platforms: :mri
-    gem 'rack-mini-profiler', require: false
-    gem 'rspec-rails'
-    gem 'tzinfo-data' # Needed for timezones to work on Windows
-  end
-
   appraise 'rails6.1' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
     gem 'sqlite3', '~> 1.4', platforms: :mri
