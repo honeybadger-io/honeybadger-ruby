@@ -81,6 +81,16 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5.0')
     gem 'tzinfo-data' # Needed for timezones to work on Windows
   end
 
+  appraise 'rails7.1' do
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 7.1" }
+    gem 'sqlite3', '~> 1.4', platforms: :mri
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 60', platforms: :jruby
+    gem 'better_errors', require: false, platforms: :mri
+    gem 'rack-mini-profiler', require: false
+    gem 'rspec-rails'
+    gem 'tzinfo-data' # Needed for timezones to work on Windows
+  end
+
   # Rails edge
   appraise 'rails' do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, github: 'rails' }
