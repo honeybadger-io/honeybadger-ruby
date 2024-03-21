@@ -167,7 +167,7 @@ module Honeybadger
 
       def filter_key?(key, parents = nil)
         return false unless filters?
-        return true if regexps.any? { |r| key =~ r }
+        return true if key.respond_to?(:=~) && regexps.any? { |r| key =~ r }
         return true if deep_regexps && parents && (joined = parents.join(".")) && deep_regexps.any? { |r| joined =~ r }
         false
       end

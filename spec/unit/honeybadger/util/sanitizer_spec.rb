@@ -139,7 +139,8 @@ describe Honeybadger::Util::Sanitizer do
           'deeply' => { 'nested' => { 'string' => 'nested', 'regexp' => 'nested' } },
           'nested.string' => 'value',
           'nested.regexp' => 'value',
-          'block' => 'value'
+          'block' => 'value',
+          12345 => 'password'
         }
       end
 
@@ -157,7 +158,8 @@ describe Honeybadger::Util::Sanitizer do
           'deeply' => { 'nested' => { 'string' => '[FILTERED]', 'regexp' => '[FILTERED]' } },
           'nested.string' => '[FILTERED]',
           'nested.regexp' => '[FILTERED]',
-          'block' => 'block filter'
+          'block' => 'block filter',
+          12345 => 'password'
         }
       end
 
