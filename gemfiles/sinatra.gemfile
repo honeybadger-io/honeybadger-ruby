@@ -13,7 +13,7 @@ gem "webmock"
 gem "capistrano"
 gem "rake"
 gem "bump", "~> 0.10.0"
-gem "sinatra", "~> 2.0.0.beta1"
+gem "sinatra"
 gem "rack-test"
 
 group :development do
