@@ -281,6 +281,11 @@ module Honeybadger
         default: false,
         type: Boolean
       },
+      :'active_job.attempt_threshold' => {
+        description: 'The number of attempts before notifications will be sent.',
+        default: 0,
+        type: Integer
+      },
       :'delayed_job.attempt_threshold' => {
         description: 'The number of attempts before notifications will be sent.',
         default: 0,

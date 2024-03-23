@@ -10,7 +10,11 @@ module Honeybadger
           context = context(job)
           block.call
         rescue StandardError => e
-          Honeybadger.notify(e, context: context, parameters: { arguments: job.arguments })
+          Honeybadger.notify(
+            e,
+            context: context,
+            parameters: { arguments: job.arguments }
+          ) if job.executions >= Honeybadger.config[:'active_job.attempt_threshold'].to_i
           raise e
         end
 
