@@ -1,5 +1,18 @@
 # Change Log
 
+
+## [5.8.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.7.0...v5.8.0) (2024-03-23)
+
+
+### Features
+
+* add active_job.attempt_threshold configuration option ([#535](https://github.com/honeybadger-io/honeybadger-ruby/issues/535))
+
+
+### Bug Fixes
+
+* handle non-string hash keys when sanitizing ([#533](https://github.com/honeybadger-io/honeybadger-ruby/issues/533))
+
 ## [5.7.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.6.0...v5.7.0) (2024-03-12)
 
 
