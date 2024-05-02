@@ -383,6 +383,7 @@ module Honeybadger
     #
     # @return [void]
     def event(event_type, payload = {})
+      return unless config.insights_enabled?
       init_events_worker
 
       ts = DateTime.now.new_offset(0).rfc3339

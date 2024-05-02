@@ -343,6 +343,16 @@ module Honeybadger
         description: 'Enable/Disable automatic breadcrumbs from log messages.',
         default: true,
         type: Boolean
+      },
+      :'insights.enabled' => {
+        description: "Enable/Disable the Honeybadger Insights event notification sending service.",
+        default: true,
+        type: Boolean
+      },
+      :'insights.metrics' => {
+        description: "Enable/Disable Honeybadger Insights built-in instrumentation (must have insights.enabled set to true).",
+        default: false,
+        type: Boolean
       }
     }.freeze
 

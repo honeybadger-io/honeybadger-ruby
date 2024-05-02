@@ -262,6 +262,30 @@ module Honeybadger
       includes_token?(self[:plugins], name)
     end
 
+    def insights_enabled?
+      !!self[:'insights.enabled']
+    end
+
+    def metrics_enabled?
+      return false unless !(defined?(::Rails.application) && ::Rails.const_defined?("Console"))
+      !!self[:'insights.enabled'] && !!self[:'insights.metrics']
+    end
+
+    def cluster_collection?(name)
+      return false unless metrics_enabled?
+      !!self[:"#{name}.insights.cluster_collection"]
+    end
+
+    def collection_interval(name)
+      return false unless metrics_enabled?
+      self[:"#{name}.insights.collection_interval"]
+    end
+
+    def load_plugin_insights?(name)
+      return false unless metrics_enabled?
+      self[:"#{name}.insights.enabled"] != false
+    end
+
     def root_regexp
       return @root_regexp if @root_regexp
       return nil if @no_root
