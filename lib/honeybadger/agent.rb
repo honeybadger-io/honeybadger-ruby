@@ -8,6 +8,7 @@ require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
 require 'honeybadger/events_worker'
+require 'honeybadger/collector_worker'
 require 'honeybadger/breadcrumbs'
 
 module Honeybadger
@@ -400,6 +401,13 @@ module Honeybadger
       events_worker.push(merged)
     end
 
+    def collect(collector)
+      return unless config.metrics_enabled?
+
+      init_collector_worker
+      collector_worker.push(collector)
+    end
+
     # @api private
     attr_reader :config
 
@@ -472,7 +480,7 @@ module Honeybadger
     end
 
     # @api private
-    attr_reader :worker, :events_worker
+    attr_reader :worker, :events_worker, :collector_worker
 
     # @api private
     # @!method init!(...)
@@ -517,6 +525,11 @@ module Honeybadger
     def init_events_worker
       return if @events_worker
       @events_worker = EventsWorker.new(config)
+    end
+
+    def init_collector_worker
+      return if @collector_worker
+      @collector_worker = CollectorWorker.new(config)
     end
 
     def with_error_handling

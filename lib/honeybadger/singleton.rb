@@ -39,6 +39,7 @@ module Honeybadger
   def_delegator :'Honeybadger::Agent.instance', :clear!
   def_delegator :'Honeybadger::Agent.instance', :track_deployment
   def_delegator :'Honeybadger::Agent.instance', :event
+  def_delegator :'Honeybadger::Agent.instance', :collect
 
   # @!macro [attach] def_delegator
   #   @!method $2(...)

@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'honeybadger/instrumentation'
 
 module Honeybadger
   # +Honeybadger::Plugin+ defines the API for registering plugins with
@@ -112,11 +113,37 @@ module Honeybadger
     end
 
     # @api private
+    class CollectorExecution < Execution
+      include Honeybadger::InstrumentationHelper
+
+      def initialize(name, config, options, &block)
+        @name = name
+        @config = config
+        @options = options
+        @block = block
+        @ticks = @interval = config.collection_interval(name) || options.fetch(:interval, 1)
+      end
+
+      def tick
+        @ticks = @ticks - 1
+      end
+
+      def reset
+        @ticks = @interval
+      end
+
+      def register!
+        Honeybadger.collect(self)
+      end
+    end
+
+    # @api private
     def initialize(name)
       @name         = name
       @loaded       = false
       @requirements = []
       @executions   = []
+      @collectors   = []
     end
 
     # Define a requirement. All requirement blocks must return +true+ for the
@@ -165,6 +192,10 @@ module Honeybadger
       @executions << block
     end
 
+    def collect(options={}, &block)
+      @collectors << [options, block]
+    end
+
     # @api private
     def ok?(config)
       @requirements.all? {|r| Execution.new(config, &r).call }
@@ -181,6 +212,7 @@ module Honeybadger
       elsif ok?(config)
         config.logger.debug(sprintf('load plugin name=%s', name))
         @executions.each {|e| Execution.new(config, &e).call }
+        @collectors.each {|o,b| CollectorExecution.new(name, config, o, &b).register! }
         @loaded = true
       else
         config.logger.debug(sprintf('skip plugin name=%s reason=requirement', name))
@@ -191,6 +223,11 @@ module Honeybadger
       config.logger.error(sprintf("plugin error name=%s class=%s message=%s\n\t%s", name, e.class, e.message.dump, Array(e.backtrace).join("\n\t")))
       @loaded = true
       false
+    end
+
+    # @api private
+    def collectors
+      @collectors
     end
 
     # @api private
