@@ -1,4 +1,5 @@
 require 'honeybadger/plugin'
+require 'honeybadger/notification_subscriber'
 
 module Honeybadger
   module Plugins
@@ -66,6 +67,19 @@ module Honeybadger
           if defined?(::ActiveSupport::ErrorReporter) # Rails 7
             ::Rails.error.subscribe(ErrorSubscriber)
           end
+        end
+      end
+
+      Plugin.register :rails_metrics do
+        requirement { config.load_plugin_insights?(:rails_metrics) && defined?(::Rails.application) && ::Rails.application }
+
+        execution do
+          ::ActiveSupport::Notifications.subscribe(/(process_action|send_file|redirect_to|halted_callback)\.action_controller/, Honeybadger::ActionControllerSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe(/(write_fragment|read_fragment|expire_fragment)\.action_controller/, Honeybadger::ActionControllerCacheSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe(/^render_(template|partial|collection)\.action_view/, Honeybadger::ActionViewSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe("sql.active_record", Honeybadger::ActiveRecordSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe("process.action_mailer", Honeybadger::ActionMailerSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe(/(service_upload|service_download)\.active_storage/, Honeybadger::ActiveStorageSubscriber.new)
         end
       end
     end
