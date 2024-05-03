@@ -20,7 +20,7 @@ module Honeybadger
 
         def context(job) # rubocop:disable Metrics/MethodLength
           {
-            component: job.class,
+            component: 'active_job',
             action: 'perform',
             enqueued_at: job.try(:enqueued_at),
             executions: job.executions,

@@ -17,7 +17,7 @@ describe 'Rails ActiveJob Adapter Test', if: RAILS_PRESENT, type: :request do
     expect(Honeybadger::Backend::Test.notifications[:notices][0].params[:arguments][0]).to eq({ some: 'data' })
     expect(Honeybadger::Backend::Test.notifications[:notices][0].context).to \
       include(
-        component: ErrorJob,
+        component: 'active_job',
         action: 'perform',
         enqueued_at: anything,
         executions: 1,
