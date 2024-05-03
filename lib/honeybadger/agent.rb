@@ -357,6 +357,7 @@ module Honeybadger
     ensure
       worker.flush
       events_worker&.flush
+      collector_worker&.flush
     end
 
     # Stops the Honeybadger service.
@@ -366,6 +367,7 @@ module Honeybadger
     def stop(force = false)
       worker.shutdown(force)
       events_worker&.shutdown(force)
+      collector_worker&.shutdown(force)
       true
     end
 
