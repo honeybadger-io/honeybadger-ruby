@@ -1,7 +1,7 @@
 require 'honeybadger/logging'
 
 module Honeybadger
-  # A concurrent queue to notify the backend.
+  # A concurrent queue to execute plugin collect procs
   # @api private
   class CollectorWorker
     extend Forwardable
@@ -26,7 +26,7 @@ module Honeybadger
     end
 
     def push(msg)
-      return false if defined?(::Rails.application) && ::Rails.const_defined?("Console")
+      return false unless config.metrics_enabled?
       return false unless start
 
       queue.push(msg)
@@ -85,8 +85,6 @@ module Honeybadger
     private
 
     attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :interval_seconds, :start_at
-
-    def_delegator :config, :backend
 
     def shutdown?
       mutex.synchronize { @shutdown }
