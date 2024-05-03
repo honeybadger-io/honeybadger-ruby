@@ -1,4 +1,12 @@
 module Honeybadger
+  # +Honeybadger::Instrumentation+ defines the API for collecting metric data from anywhere
+  # in an application. These class methods may be used directly, or you can include the
+  # Honeybadger::InstrumentationHelper for a convient wrapper within a class.
+  #
+  # @example
+  #
+  #
+  #
   class Instrumentation
     def self.monotonic_timer
       start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
@@ -15,7 +23,7 @@ module Honeybadger
       raise 'No duration found' if duration.nil?
 
       attributes.merge!(metric_type: "histogram", metric_name: name)
-      Honeybadger.event(event_type: "hb.metrics", duration: duration, **attributes)
+      record(duration: duration, **attributes)
     end
 
     def self.increment_counter(name, count: 1, attributes: {})
@@ -28,11 +36,19 @@ module Honeybadger
       record(value: value, **attributes)
     end
 
+    # @api private
     def self.record(args)
       Honeybadger.event(args.merge(event_type: "hb.metrics", hostname: Honeybadger.config[:hostname].to_s))
     end
   end
 
+  # +Honeybadger::InstrumentationHelper+ is a module that can be included into any class. This module
+  # provides a convenient DSL around the instrumentation methods to prvoide a cleaner interface.
+  #
+  # @example
+  #
+  #
+  #
   module InstrumentationHelper
     def monotonic_timer
       Honeybadger::Instrumentation.monotonic_timer { yield }
@@ -69,6 +85,7 @@ module Honeybadger
       Honeybadger::Instrumentation.gauge(name, value: value, attributes: attributes)
     end
 
+    # @api private
     def extract_attributes(args)
       @metric_attributes ||= {}
       attributes = args.select { |a| a.is_a?(Hash) }.first || {}

@@ -8,6 +8,11 @@ module Honeybadger
   # optional dependencies and load the plugin for each dependency only if it's
   # present in the application.
   #
+  # Plugins may also define a collect block that is repeatedly called from
+  # within a thread. The CollectorWorker contains a loop that will call all
+  # enabled plugins' collect method, and then sleep for 1 second. This block
+  # is useful for collecting and/or sending metrics at regular intervals.
+  #
   # See the plugins/ directory for examples of official plugins. If you're
   # interested in developing a plugin for Honeybadger, see the Integration
   # Guide: https://docs.honeybadger.io/ruby/gem-reference/integration.html
@@ -38,6 +43,14 @@ module Honeybadger
   #             Honeybadger.notify(exception)
   #           end
   #         end
+  #
+  #         collect do
+  #           # This block will be periodically called at regular intervals. Here you can
+  #           # gather metrics or inspect services. See the Honeybadger::InstrumentationHelper
+  #           # module to see availble methods for metric collection.
+  #           gauge 'scheduled_jobs', -> { MyFramework.stats.scheduled_jobs.count }
+  #           gauge 'latency', -> { MyFramework.stats.latency }
+  #         end
   #       end
   #     end
   #   end
@@ -54,13 +67,15 @@ module Honeybadger
         @@instances
       end
 
-      # Register a new plugin with Honeybadger. See {#requirement} and {#execution}.
+      # Register a new plugin with Honeybadger. See {#requirement}, {#execution}, and
+      # {#collect}..
       #
       # @example
       #
       #   Honeybadger::Plugin.register 'my_framework' do
       #     requirement { }
       #     execution { }
+      #     collect { }
       #   end
       #
       # @param [String, Symbol] name The optional name of the plugin. Should use
@@ -192,6 +207,27 @@ module Honeybadger
       @executions << block
     end
 
+    # Define an collect block. Collect blocks will be added to an execution
+    # queue if requirement blocks return +true+. The block will be called as frequently
+    # as once per second, but can be configured to increase it's interval.
+    #
+    # @example
+    #
+    #   Honeybadger::Plugin.register 'my_framework' do
+    #     requirement { defined?(MyFramework) }
+    #
+    #     collect do
+    #       stats = MyFramework.stats
+    #       gauge 'capacity', -> { stats.capcity }
+    #     end
+    #
+    #     collect(interval: 10) do
+    #       stats = MyFramework.more_expensive_stats
+    #       gauge 'other_stat', -> { stats.expensive_metric }
+    #     end
+    #   end
+    #
+    # @return nil
     def collect(options={}, &block)
       @collectors << [options, block]
     end
