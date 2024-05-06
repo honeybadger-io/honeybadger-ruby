@@ -10,9 +10,14 @@ module Honeybadger
         execution do
           singleton_class.include(Honeybadger::InstrumentationHelper)
 
+          ::Autotuner.enabled = true
+
+          ::Autotuner.reporter = proc do |report|
+            Honeybadger.event("autotuner.report", report: report.to_s)
+          end
+
           metric_source 'autotuner'
 
-          ::Autotuner.enabled = true
           ::Autotuner.metrics_reporter = proc do |metrics|
             metrics.each do |key, val|
               gauge key, ->{ val }
