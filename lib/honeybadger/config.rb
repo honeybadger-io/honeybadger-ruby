@@ -273,6 +273,7 @@ module Honeybadger
 
     def cluster_collection?(name)
       return false unless metrics_enabled?
+      return true if self[:"#{name}.insights.cluster_collection"].nil?
       !!self[:"#{name}.insights.cluster_collection"]
     end
 
