@@ -21,5 +21,7 @@ jobs:
           echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
 
       - name: Verify PR title is in the correct format
+        env:
+            TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo "${{ github.event.pull_request.title }}" | npx commitlint -V
+          echo $TITLE | npx commitlint -V
