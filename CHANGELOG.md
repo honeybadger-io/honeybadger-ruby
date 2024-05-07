@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.8.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.8.0...v5.8.1) (2024-05-07)
+
+
+### Bug Fixes
+
+* store pr title before usage ([#542](https://github.com/honeybadger-io/honeybadger-ruby/issues/542)) ([d4cdfe7](https://github.com/honeybadger-io/honeybadger-ruby/commit/d4cdfe71d6a957be8c61bcb5c01f96b0735b5c97))
+
 ## [5.8.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.7.0...v5.8.0) (2024-03-23)
 
 
