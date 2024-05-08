@@ -40,14 +40,14 @@ module Honeybadger
         begin
           yield
         ensure
-          @mutex.synchronize { @local_context.pop }
+          @mutex.synchronize { @local_context&.pop }
         end
       end
     end
 
     def get_context
       @mutex.synchronize do
-        return nil unless @global_context
+        return @global_context unless @local_context
 
         @global_context.merge(@local_context.inject({}, :merge))
       end
