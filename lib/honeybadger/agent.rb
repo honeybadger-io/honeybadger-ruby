@@ -259,8 +259,8 @@ module Honeybadger
     #   (optional).
     #
     # @return [self] so that method calls can be chained.
-    def context(context = nil)
-      context_manager.set_context(context) unless context.nil?
+    def context(context = nil, &block)
+      context_manager.set_context(context, &block) unless context.nil?
       self
     end
 
