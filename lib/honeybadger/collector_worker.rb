@@ -33,10 +33,10 @@ module Honeybadger
     end
 
     def send_now(msg)
-      if msg.tick == 0
-        msg.call
-        msg.reset
-      end
+      return if msg.tick > 0
+
+      msg.call
+      msg.reset
     end
 
     def shutdown(force = false)
