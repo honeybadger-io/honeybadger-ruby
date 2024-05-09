@@ -274,7 +274,7 @@ module Honeybadger
     end
 
     def collection_interval(name)
-      return false unless insights_enabled?
+      return nil unless insights_enabled?
       self[:"#{name}.insights.collection_interval"]
     end
 
