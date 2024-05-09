@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.9.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.8.1...v5.9.0) (2024-05-09)
+
+
+### Features
+
+* implement local contexts ([#541](https://github.com/honeybadger-io/honeybadger-ruby/issues/541)) ([806718e](https://github.com/honeybadger-io/honeybadger-ruby/commit/806718e76bf8d132a632c75bea124a8b22a4cc97))
+
 ## [5.8.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.8.0...v5.8.1) (2024-05-07)
 
 
