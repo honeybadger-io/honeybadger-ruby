@@ -182,7 +182,7 @@ describe "Sidekiq Dependency" do
     end
 
     describe "collectors" do
-      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.metrics' => true, :'sidekiq.insights.cluster_collection' => true) }
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true, :'sidekiq.insights.cluster_collection' => true) }
       let(:queues) { [double('queue', name: 'default', latency: 1, size: 10)] }
       let(:workers) { [['pid', 'tid', double('work', payload: { queue: 'queue_name' })]] }
       let(:processes) { [{"concurrency" => 1, "busy" => 1}] }

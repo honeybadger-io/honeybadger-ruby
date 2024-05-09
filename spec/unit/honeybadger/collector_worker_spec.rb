@@ -6,7 +6,7 @@ require 'honeybadger/config'
 
 describe Honeybadger::CollectorWorker do
   let!(:instance) { described_class.new(config) }
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.metrics' => true) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
   let(:obj) { double('CollectionExecution', tick: 1) }
 
   subject { instance }

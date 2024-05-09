@@ -37,7 +37,7 @@ describe "Karafka Dependency" do
     end
 
     context "when Insights instrumentation is enabled" do
-      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.metrics' => true) }
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
       let(:error_event) { double('error event') }
       let(:consumed_event) { double('consumed event', payload: {}) }
 

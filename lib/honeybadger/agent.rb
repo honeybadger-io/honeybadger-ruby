@@ -386,7 +386,6 @@ module Honeybadger
     #
     # @return [void]
     def event(event_type, payload = {})
-      return unless config.insights_enabled?
       init_events_worker
 
       ts = DateTime.now.new_offset(0).rfc3339
@@ -404,7 +403,7 @@ module Honeybadger
     end
 
     def collect(collector)
-      return unless config.metrics_enabled?
+      return unless config.insights_enabled?
 
       init_collector_worker
       collector_worker.push(collector)

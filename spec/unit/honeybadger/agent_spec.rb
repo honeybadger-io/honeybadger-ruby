@@ -319,7 +319,7 @@ describe Honeybadger::Agent do
   end
 
   context "#collect" do
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, :'insights.metrics' => :debug) }
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
     let(:collector_worker) { double(Honeybadger::CollectorWorker.new(config)) }
     let(:instance) { Honeybadger::Agent.new(config) }
     let(:collection_execution) { double(Honeybadger::Plugin::CollectorExecution) }

@@ -26,7 +26,7 @@ module Honeybadger
     end
 
     def push(msg)
-      return false unless config.metrics_enabled?
+      return false unless config.insights_enabled?
       return false unless start
 
       queue.push(msg)

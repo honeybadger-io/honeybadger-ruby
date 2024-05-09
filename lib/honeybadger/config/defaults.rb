@@ -345,12 +345,7 @@ module Honeybadger
         type: Boolean
       },
       :'insights.enabled' => {
-        description: "Enable/Disable the Honeybadger Insights event notification sending service.",
-        default: true,
-        type: Boolean
-      },
-      :'insights.metrics' => {
-        description: "Enable/Disable Honeybadger Insights built-in instrumentation (must have insights.enabled set to true).",
+        description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
         default: false,
         type: Boolean
       }

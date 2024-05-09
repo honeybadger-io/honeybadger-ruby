@@ -263,27 +263,23 @@ module Honeybadger
     end
 
     def insights_enabled?
+      return false unless !(defined?(::Rails.application) && ::Rails.const_defined?("Console"))
       !!self[:'insights.enabled']
     end
 
-    def metrics_enabled?
-      return false unless !(defined?(::Rails.application) && ::Rails.const_defined?("Console"))
-      !!self[:'insights.enabled'] && !!self[:'insights.metrics']
-    end
-
     def cluster_collection?(name)
-      return false unless metrics_enabled?
+      return false unless insights_enabled?
       return true if self[:"#{name}.insights.cluster_collection"].nil?
       !!self[:"#{name}.insights.cluster_collection"]
     end
 
     def collection_interval(name)
-      return false unless metrics_enabled?
+      return false unless insights_enabled?
       self[:"#{name}.insights.collection_interval"]
     end
 
     def load_plugin_insights?(name)
-      return false unless metrics_enabled?
+      return false unless insights_enabled?
       self[:"#{name}.insights.enabled"] != false
     end
 

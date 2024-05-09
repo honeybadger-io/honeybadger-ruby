@@ -2,7 +2,7 @@ require 'honeybadger/plugins/net_http'
 require 'honeybadger/config'
 
 describe "Net::HTTP integration" do
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.metrics' => true) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
 
   before do
     Honeybadger::Plugin.instances[:net_http].reset!
