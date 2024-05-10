@@ -73,6 +73,26 @@ describe Honeybadger::Agent do
     end
   end
 
+  describe '#context' do
+    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+    subject(:instance) { described_class.new(config) }
+
+    it 'sets the context' do
+      instance.context({a: "context"})
+      expect(instance.get_context).to eq({a: "context"})
+    end
+
+    it 'allows chaining' do
+      expect(instance.context({a: "context"})).to eq(instance)
+    end
+
+    context 'with local context' do
+      it 'returns the return value of the block' do
+        expect(instance.context({ bar: :baz }) { :return_value }).to eq(:return_value)
+      end
+    end
+  end
+
   describe "#clear!" do
     it 'clears all transactional data' do
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
