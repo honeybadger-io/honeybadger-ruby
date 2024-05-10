@@ -105,9 +105,8 @@ module Honeybadger
 
     # @api private
     def extract_attributes(args)
-      @metric_attributes ||= {}
       attributes = args.select { |a| a.is_a?(Hash) }.first || {}
-      attributes.merge(metric_source: @metric_source).merge(@metric_attributes).compact
+      attributes.merge(metric_source: @metric_source).merge(@metric_attributes || {}).compact
     end
   end
 end

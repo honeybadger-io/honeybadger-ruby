@@ -1,7 +1,7 @@
-require "net/http"
+require 'net/http'
 require 'honeybadger/plugin'
 require 'honeybadger/instrumentation'
-require "resolv"
+require 'resolv'
 
 module Honeybadger
   module Plugins

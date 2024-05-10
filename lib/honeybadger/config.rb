@@ -263,7 +263,7 @@ module Honeybadger
     end
 
     def insights_enabled?
-      return false unless !(defined?(::Rails.application) && ::Rails.const_defined?("Console"))
+      return false if defined?(::Rails.application) && ::Rails.const_defined?("Console")
       !!self[:'insights.enabled']
     end
 

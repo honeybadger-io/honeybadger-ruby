@@ -70,7 +70,7 @@ module Honeybadger
         end
       end
 
-      Plugin.register :rails_metrics do
+      Plugin.register :rails do
         requirement { config.load_plugin_insights?(:rails_metrics) && defined?(::Rails.application) && ::Rails.application }
 
         execution do
