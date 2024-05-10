@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.10.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.9.0...v5.10.0) (2024-05-10)
+
+
+### Features
+
+* return block value if block was passed to Honeybadger.context ([#546](https://github.com/honeybadger-io/honeybadger-ruby/issues/546)) ([2d7c685](https://github.com/honeybadger-io/honeybadger-ruby/commit/2d7c68565a5b9013fbbad6da16a706f38a3306b0))
+
 ## [5.9.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.8.1...v5.9.0) (2024-05-09)
 
 
