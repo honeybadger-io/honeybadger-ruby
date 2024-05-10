@@ -186,10 +186,14 @@ module Honeybadger
             gauge 'capacity', ->{ processes.map { |process| process["concurrency"] }.sum }
 
             process_utilizations = processes.map do |process|
+              next unless process["concurrency"].to_f > 0
               process["busy"] / process["concurrency"].to_f
-            end.reject(&:nan?)
-            utilization = process_utilizations.sum / process_utilizations.size.to_f
-            gauge 'utilization', ->{ utilization } unless utilization.nan?
+            end.compact
+
+            if process_utilizations.any?
+              utilization = process_utilizations.sum / process_utilizations.length.to_f
+              gauge 'utilization', ->{ utilization }
+            end
           end
         end
       end
