@@ -5,6 +5,13 @@ module Honeybadger
   #
   # @example
   #
+  # class TicketsController < ApplicationController
+  #   def create
+  #     Honeybadger::Instrumentation.histogram('create.ticket', ->{
+  #       Ticket.create(params[:ticket])
+  #     })
+  #   end
+  # end
   #
   #
   class Instrumentation
@@ -47,6 +54,17 @@ module Honeybadger
   #
   # @example
   #
+  # class TicketsController < ApplicationController
+  #   include Honeybadger::InstrumentationHelper
+  #
+  #   def create
+  #     metric_source 'controller'
+  #
+  #     histogram 'create.ticket', ->{
+  #       Ticket.create(params[:ticket])
+  #     }
+  #   end
+  # end
   #
   #
   module InstrumentationHelper
