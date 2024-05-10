@@ -28,12 +28,7 @@ module Honeybadger
 
         def parsed_uri_data(request_data)
           uri = request_data.uri || build_uri(request_data)
-
-          {
-            protocol: uri.scheme,
-            host: uri.host,
-            path: uri.path
-          } rescue { url: uri.to_s }
+          { url: uri.to_s }
         end
 
         def build_uri(request_data)
