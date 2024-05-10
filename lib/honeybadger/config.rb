@@ -280,7 +280,8 @@ module Honeybadger
 
     def load_plugin_insights?(name)
       return false unless insights_enabled?
-      self[:"#{name}.insights.enabled"] != false
+      return true if self[:"#{name}.insights.enabled"].nil?
+      !!self[:"#{name}.insights.enabled"] != false
     end
 
     def root_regexp
