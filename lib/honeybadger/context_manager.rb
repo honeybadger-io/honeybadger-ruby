@@ -21,15 +21,36 @@ module Honeybadger
     # Internal helpers
 
 
-    def set_context(hash)
+    def set_context(hash, &block)
+      local = block_given?
       @mutex.synchronize do
-        @context ||= {}
-        @context.update(Context(hash))
+        @global_context ||= {}
+        @local_context ||= []
+
+        new_context = Context(hash)
+
+        if local
+          @local_context << new_context
+        else
+          @global_context.update(new_context)
+        end
+      end
+
+      if local
+        begin
+          yield
+        ensure
+          @mutex.synchronize { @local_context&.pop }
+        end
       end
     end
 
     def get_context
-      @mutex.synchronize { @context }
+      @mutex.synchronize do
+        return @global_context unless @local_context
+
+        @global_context.merge(@local_context.inject({}, :merge))
+      end
     end
 
     def set_rack_env(env)
@@ -46,10 +67,10 @@ module Honeybadger
 
     def _initialize
       @mutex.synchronize do
-        @context = nil
+        @global_context = nil
+        @local_context = nil
         @rack_env = nil
       end
     end
-
   end
 end

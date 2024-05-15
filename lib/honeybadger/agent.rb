@@ -259,9 +259,11 @@ module Honeybadger
     #   When present, tags will be applied to errors with this context
     #   (optional).
     #
-    # @return [self] so that method calls can be chained.
-    def context(context = nil)
-      context_manager.set_context(context) unless context.nil?
+    # @return [Object, self] value of the block if passed, otherwise self
+    def context(context = nil, &block)
+      block_result = context_manager.set_context(context, &block) unless context.nil?
+      return block_result if block_given?
+
       self
     end
 

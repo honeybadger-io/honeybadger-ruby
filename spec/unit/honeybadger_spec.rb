@@ -50,6 +50,7 @@ describe Honeybadger do
     let(:c) { {foo: :bar} }
 
     before { described_class.context(c) }
+    after { described_class.context.clear! }
 
     it "sets the context" do
       described_class.context(c)
@@ -66,6 +67,48 @@ describe Honeybadger do
 
     it "clears the context" do
       expect { described_class.context.clear! }.to change { described_class.get_context }.from(c).to(nil)
+    end
+
+    context 'with local context' do
+      it 'merges local context' do
+        allow(described_class).to receive(:get_context).and_call_original
+
+        described_class.context({ bar: :baz }) do
+          described_class.context({ bar: :qux }) do
+            expect(described_class.get_context).to eq({ foo: :bar, bar: :qux })
+          end
+          expect(described_class.get_context).to eq({ foo: :bar, bar: :baz })
+        end
+
+        expect(described_class).to have_received(:get_context).at_least(:twice)
+      end
+
+      it 'clears local context' do
+        allow(described_class).to receive(:get_context).and_call_original
+
+        described_class.context({ bar: :baz }) do
+          expect(described_class.get_context).to eq({ foo: :bar, bar: :baz })
+        end
+        expect(described_class.get_context).to eq({ foo: :bar })
+
+        expect(described_class).to have_received(:get_context).at_least(:twice)
+      end
+
+      it 'tracks local context correctly' do
+        allow(described_class).to receive(:get_context).and_call_original
+
+        begin
+          described_class.context({ bar: :qux }) do
+            described_class.context({ baz: :qux })
+
+            raise 'exception'
+          end
+        rescue StandardError
+          # noop
+        end
+
+        expect(described_class.get_context).to eq({ foo: :bar, baz: :qux })
+      end
     end
   end
 

@@ -1,6 +1,27 @@
 # Change Log
 
 
+## [5.10.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.9.0...v5.10.0) (2024-05-10)
+
+
+### Features
+
+* return block value if block was passed to Honeybadger.context ([#546](https://github.com/honeybadger-io/honeybadger-ruby/issues/546)) ([2d7c685](https://github.com/honeybadger-io/honeybadger-ruby/commit/2d7c68565a5b9013fbbad6da16a706f38a3306b0))
+
+## [5.9.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.8.1...v5.9.0) (2024-05-09)
+
+
+### Features
+
+* implement local contexts ([#541](https://github.com/honeybadger-io/honeybadger-ruby/issues/541)) ([806718e](https://github.com/honeybadger-io/honeybadger-ruby/commit/806718e76bf8d132a632c75bea124a8b22a4cc97))
+
+## [5.8.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.8.0...v5.8.1) (2024-05-07)
+
+
+### Bug Fixes
+
+* store pr title before usage ([#542](https://github.com/honeybadger-io/honeybadger-ruby/issues/542)) ([d4cdfe7](https://github.com/honeybadger-io/honeybadger-ruby/commit/d4cdfe71d6a957be8c61bcb5c01f96b0735b5c97))
+
 ## [5.8.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.7.0...v5.8.0) (2024-03-23)
 
 
