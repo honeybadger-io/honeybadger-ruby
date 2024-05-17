@@ -24,7 +24,7 @@ module Honeybadger
 
       if stats[:worker_status].is_a?(Array)
         stats[:worker_status].each do |worker_data|
-          context = { index: worker_data[:index] }
+          context = { worker: worker_data[:index] }
           record_puma_stats(worker_data[:last_status], context)
         end
       else
