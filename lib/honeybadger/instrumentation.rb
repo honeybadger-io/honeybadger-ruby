@@ -7,7 +7,7 @@ module Honeybadger
   #
   # class TicketsController < ApplicationController
   #   def create
-  #     Honeybadger::Instrumentation.measure('create.ticket', ->{
+  #     Honeybadger::Instrumentation.time('create.ticket', ->{
   #       Ticket.create(params[:ticket])
   #     })
   #   end
@@ -22,14 +22,14 @@ module Honeybadger
       [((finish_time - start_time) * 1000).round(2), result]
     end
 
-    def self.measure(name, attributes: {}, duration: nil)
+    def self.time(name, attributes: {}, duration: nil)
       if block_given?
         duration = monotonic_timer{ yield }[0]
       end
 
       raise 'No duration found' if duration.nil?
 
-      attributes.merge!(metric_type: "measure", metric_name: name)
+      attributes.merge!(metric_type: "time", metric_name: name)
       record(duration: duration, **attributes)
     end
 
@@ -60,7 +60,7 @@ module Honeybadger
   #   def create
   #     metric_source 'controller'
   #
-  #     measure 'create.ticket', ->{
+  #     time 'create.ticket', ->{
   #       Ticket.create(params[:ticket])
   #     }
   #   end
@@ -81,13 +81,13 @@ module Honeybadger
       @metric_attributes = attributes
     end
 
-    def measure(name, *args)
+    def time(name, *args)
       attributes = extract_attributes(args)
       body = args.select { |a| a.respond_to?(:call) }.first
       if body
-        Honeybadger::Instrumentation.measure(name, attributes: attributes) { body.call }
+        Honeybadger::Instrumentation.time(name, attributes: attributes) { body.call }
       elsif attributes.keys.include?(:duration)
-        Honeybadger::Instrumentation.measure(name, attributes: attributes, duration: attributes.delete(:duration))
+        Honeybadger::Instrumentation.time(name, attributes: attributes, duration: attributes.delete(:duration))
       end
     end
 
