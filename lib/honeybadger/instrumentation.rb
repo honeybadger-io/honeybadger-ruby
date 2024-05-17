@@ -1,3 +1,7 @@
+require 'honeybadger/timer'
+require 'honeybadger/counter'
+require 'honeybadger/gauge'
+
 module Honeybadger
   # +Honeybadger::Instrumentation+ defines the API for collecting metric data from anywhere
   # in an application. These class methods may be used directly, or you can include the
@@ -29,23 +33,21 @@ module Honeybadger
 
       raise 'No duration found' if duration.nil?
 
-      attributes.merge!(metric_type: "time", metric_name: name)
-      record(duration: duration, **attributes)
+      Honeybadger::Timer.register(name, attributes).tap do |timer|
+        timer.record(duration)
+      end
     end
 
     def self.increment_counter(name, count: 1, attributes: {})
-      attributes.merge!(metric_type: "counter", metric_name: name)
-      record(count: count, **attributes)
+      Honeybadger::Counter.register(name, attributes).tap do |counter|
+        counter.count(count)
+      end
     end
 
     def self.gauge(name, value:, attributes: {})
-      attributes.merge!(metric_type: "gauge", metric_name: name)
-      record(value: value, **attributes)
-    end
-
-    # @api private
-    def self.record(args)
-      Honeybadger.event(args.merge(event_type: "hb.metrics", hostname: Honeybadger.config[:hostname].to_s))
+      Honeybadger::Gauge.register(name, attributes).tap do |gauge|
+        gauge.record(value)
+      end
     end
   end
 

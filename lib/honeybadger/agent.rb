@@ -10,6 +10,8 @@ require 'honeybadger/worker'
 require 'honeybadger/events_worker'
 require 'honeybadger/collector_worker'
 require 'honeybadger/breadcrumbs'
+require 'honeybadger/registry'
+require 'honeybadger/registry_execution'
 
 module Honeybadger
   # The Honeybadger agent contains all the methods for interacting with the
@@ -411,6 +413,10 @@ module Honeybadger
       collector_worker.push(collector)
     end
 
+    def registry
+      @registry ||= Honeybadger::Registry.new
+    end
+
     # @api private
     attr_reader :config
 
@@ -533,6 +539,8 @@ module Honeybadger
     def init_collector_worker
       return if @collector_worker
       @collector_worker = CollectorWorker.new(config)
+      @collector_worker.push(Honeybadger::RegistryExecution.new(config, {}))
+      @collector_worker
     end
 
     def with_error_handling
