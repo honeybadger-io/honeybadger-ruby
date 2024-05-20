@@ -47,6 +47,7 @@ module Honeybadger
 
           if config.load_plugin_insights?(:active_job)
             ::ActiveSupport::Notifications.subscribe(/(enqueue_at|enqueue|enqueue_retry|enqueue_all|perform|retry_stopped|discard)\.active_job/, Honeybadger::ActiveJobSubscriber.new)
+            ::ActiveSupport::Notifications.subscribe('perform.active_job', Honeybadger::ActiveJobMetricsSubscriber.new)
           end
         end
       end

@@ -1,3 +1,4 @@
+require 'honeybadger/histogram'
 require 'honeybadger/timer'
 require 'honeybadger/counter'
 require 'honeybadger/gauge'
@@ -35,6 +36,18 @@ module Honeybadger
 
       Honeybadger::Timer.register(name, attributes).tap do |timer|
         timer.record(duration)
+      end
+    end
+
+    def self.histogram(name, attributes: {}, duration: nil)
+      if block_given?
+        duration = monotonic_timer{ yield }[0]
+      end
+
+      raise 'No duration found' if duration.nil?
+
+      Honeybadger::Histogram.register(name, attributes).tap do |histogram|
+        histogram.record(duration)
       end
     end
 
@@ -90,6 +103,16 @@ module Honeybadger
         Honeybadger::Instrumentation.time(name, attributes: attributes) { body.call }
       elsif attributes.keys.include?(:duration)
         Honeybadger::Instrumentation.time(name, attributes: attributes, duration: attributes.delete(:duration))
+      end
+    end
+
+    def histogram(name, *args)
+      attributes = extract_attributes(args)
+      body = args.select { |a| a.respond_to?(:call) }.first
+      if body
+        Honeybadger::Instrumentation.histogram(name, attributes: attributes) { body.call }
+      elsif attributes.keys.include?(:duration)
+        Honeybadger::Instrumentation.histogram(name, attributes: attributes, duration: attributes.delete(:duration))
       end
     end
 

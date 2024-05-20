@@ -7,15 +7,13 @@ module Honeybadger
 
     def register(metric)
       @mutex.synchronize do
-        @metrics[metric.name] ||= {}
-        @metrics[metric.name][metric.attributes] = metric
+        @metrics[metric.signature] = metric
       end
     end
 
-    def get(name, attributes)
+    def get(metric_type, name, attributes)
       @mutex.synchronize do
-        @metrics[name] ||= {}
-        @metrics[name][attributes]
+        @metrics[Honeybadger::Metric.signature(metric_type, name, attributes)]
       end
     end
 
@@ -27,8 +25,12 @@ module Honeybadger
 
     def metrics
       @mutex.synchronize do
-        @metrics.values.map(&:values).flatten
+        @metrics.values
       end
+    end
+
+    def debug_info
+      "#{Thread.current.inspect} #{Honeybadger::Agent.instance.collector_worker} #{object_id} #{@metrics.object_id} #{metrics.count} #{metrics.map(&:signature)}"
     end
   end
 end

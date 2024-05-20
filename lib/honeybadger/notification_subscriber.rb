@@ -1,3 +1,5 @@
+require 'honeybadger/instrumentation'
+
 module Honeybadger
   class NotificationSubscriber
     def start(name, id, payload)
@@ -14,6 +16,10 @@ module Honeybadger
         duration: ((@finish_time - @start_time) * 1000).round(2)
       }.merge(format_payload(payload).compact)
 
+      record(name, payload)
+    end
+
+    def record(name, payload)
       Honeybadger.event(name, payload)
     end
 
@@ -57,12 +63,28 @@ module Honeybadger
 
   class ActiveJobSubscriber < NotificationSubscriber
     def format_payload(payload)
-      job = payload.delete(:job)
-      payload.merge({
+      job = payload[:job]
+      payload.except(:job).merge({
         job_class: job.class,
         job_id: job.job_id,
         queue_name: job.queue_name
       })
+    end
+  end
+
+  class ActiveJobMetricsSubscriber < NotificationSubscriber
+    include Honeybadger::InstrumentationHelper
+
+    def format_payload(payload)
+      {
+        job_class: payload[:job].class,
+        queue_name: payload[:job].queue_name
+      }
+    end
+
+    def record(name, payload)
+      metric_source 'active_job'
+      histogram name, payload
     end
   end
 
