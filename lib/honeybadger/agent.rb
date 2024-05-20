@@ -414,7 +414,10 @@ module Honeybadger
     end
 
     def registry
-      @registry ||= Honeybadger::Registry.new
+      return @registry if defined?(@registry)
+      @registry = Honeybadger::Registry.new.tap do |r|
+        collect(Honeybadger::RegistryExecution.new(r, config, {}))
+      end
     end
 
     # @api private
@@ -539,7 +542,6 @@ module Honeybadger
     def init_collector_worker
       return if @collector_worker
       @collector_worker = CollectorWorker.new(config)
-      @collector_worker.push(Honeybadger::RegistryExecution.new(config, {}))
       @collector_worker
     end
 

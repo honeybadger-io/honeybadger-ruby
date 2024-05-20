@@ -1,6 +1,7 @@
 module Honeybadger
   class RegistryExecution
-    def initialize(config, options)
+    def initialize(registry, config, options)
+      @registry = registry
       @config = config
       @options = options
       @ticks = @interval = config[:'insights.registry_flush_interval'] || options.fetch(:interval, 60)
@@ -12,15 +13,11 @@ module Honeybadger
 
     def reset
       @ticks = @interval
-      Honeybadger.registry.flush
-    end
-
-    def register!
-      Honeybadger.collect(self)
+      @registry.flush
     end
 
     def call
-      Honeybadger.registry.metrics.each do |metric|
+      @registry.metrics.each do |metric|
         metric.event_payloads.each do |payload|
           Honeybadger.event(payload.merge(interval: @interval))
         end

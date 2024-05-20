@@ -28,9 +28,5 @@ module Honeybadger
         @metrics.values
       end
     end
-
-    def debug_info
-      "#{Thread.current.inspect} #{Honeybadger::Agent.instance.collector_worker} #{object_id} #{@metrics.object_id} #{metrics.count} #{metrics.map(&:signature)}"
-    end
   end
 end
