@@ -2,10 +2,7 @@ require 'honeybadger/metric'
 
 module Honeybadger
   class Histogram < Metric
-    DEFAULT_BINS = [
-      0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, # standard (from Prometheus)
-      30, 60, 120, 300, 1800, 3600, 21_600, # Sidekiq tasks may be very long-running
-    ]
+    DEFAULT_BINS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
 
     def record(value)
       @sampled += 1

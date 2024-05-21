@@ -84,7 +84,7 @@ module Honeybadger
 
     def record(name, payload)
       metric_source 'active_job'
-      histogram name, payload
+      histogram name, { bins: [30, 60, 120, 300, 1800, 3600, 21_600] }.merge(payload)
     end
   end
 
