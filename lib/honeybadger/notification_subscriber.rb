@@ -12,7 +12,7 @@ module Honeybadger
       return unless process?(name)
 
       payload = {
-        request_id: id,
+        instrumenter_id: id,
         duration: ((@finish_time - @start_time) * 1000).round(2)
       }.merge(format_payload(payload).compact)
 
@@ -34,7 +34,9 @@ module Honeybadger
 
   class ActionControllerSubscriber < NotificationSubscriber
     def format_payload(payload)
-      payload.except(:headers, :request, :response)
+      {
+        request_id: payload[:request]&.request_id || SecureRandom.uuid,
+      }.merge(payload.except(:headers, :request, :response))
     end
   end
 
