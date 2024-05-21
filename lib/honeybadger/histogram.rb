@@ -24,7 +24,7 @@ module Honeybadger
     end
 
     def payloads
-      [@bin_counts]
+      [{bins: @bin_counts}]
     end
   end
 end
