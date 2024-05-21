@@ -496,6 +496,21 @@ module Honeybadger
     # @see Config#backend
     def_delegators :config, :backend
 
+    # @api private
+    # @!method time
+    # @see Honeybadger::Instrumentation#time
+    def_delegator :'Honeybadger::Instrumentation', :time
+
+    # @api private
+    # @!method gauge
+    # @see Honeybadger::Instrumentation#gauge
+    def_delegator :'Honeybadger::Instrumentation', :gauge
+
+    # @api private
+    # @!method increment_counter
+    # @see Honeybadger::Instrumentation#increment_counter
+    def_delegator :'Honeybadger::Instrumentation', :increment_counter
+
     private
 
     def validate_notify_opts!(opts)

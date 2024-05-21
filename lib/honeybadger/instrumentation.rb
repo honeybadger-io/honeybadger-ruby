@@ -1,13 +1,13 @@
 module Honeybadger
   # +Honeybadger::Instrumentation+ defines the API for collecting metric data from anywhere
-  # in an application. These class methods may be used directly, or you can include the
-  # Honeybadger::InstrumentationHelper for a convient wrapper within a class.
+  # in an application. These class methods may be used directly, or from the Honeybadger singleton
+  # instance..
   #
   # @example
   #
   # class TicketsController < ApplicationController
   #   def create
-  #     Honeybadger::Instrumentation.time('create.ticket', ->{
+  #     Honeybadger.time('create.ticket', ->{
   #       Ticket.create(params[:ticket])
   #     })
   #   end
@@ -59,6 +59,7 @@ module Honeybadger
   #
   #   def create
   #     metric_source 'controller'
+  #     metric_attributes { foo: 'bar' } # These attributes get tagged to all metrics called after.
   #
   #     time 'create.ticket', ->{
   #       Ticket.create(params[:ticket])
