@@ -404,6 +404,7 @@ module Honeybadger
       events_worker.push(merged)
     end
 
+    # @api private
     def collect(collector)
       return unless config.insights_enabled?
 
