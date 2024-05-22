@@ -38,7 +38,7 @@ module Honeybadger
             raise
           ensure
             context.merge!(duration: duration, status: status)
-            Honeybadger.event('perform', context)
+            Honeybadger.event('sidekiq.perform', context)
 
             metric_source 'sidekiq'
             histogram 'perform', { bins: [30, 60, 120, 300, 1800, 3600, 21_600] }.merge(context.slice(:worker, :queue, :duration))
@@ -55,7 +55,7 @@ module Honeybadger
             queue: queue
           }
 
-          Honeybadger.event('enqueue', context)
+          Honeybadger.event('sidekiq.enqueue', context)
 
           yield
         end
