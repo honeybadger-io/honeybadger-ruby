@@ -3,6 +3,8 @@ require 'honeybadger/metric'
 module Honeybadger
   class Gauge < Metric
     def record(value)
+      return unless value
+
       @sampled += 1
 
       @total ||= 0

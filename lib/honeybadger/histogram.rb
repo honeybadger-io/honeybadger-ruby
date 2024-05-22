@@ -5,6 +5,8 @@ module Honeybadger
     DEFAULT_BINS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
 
     def record(value)
+      return unless value
+
       @sampled += 1
       @bin_counts ||= Hash.new(0)
       @bin_counts[find_bin(value)] += 1
