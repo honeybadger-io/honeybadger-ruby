@@ -570,7 +570,6 @@ module Honeybadger
     def init_collector_worker
       return if @collector_worker
       @collector_worker = CollectorWorker.new(config)
-      @collector_worker
     end
 
     def with_error_handling
