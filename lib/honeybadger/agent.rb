@@ -390,7 +390,7 @@ module Honeybadger
     def event(event_type, payload = {})
       init_events_worker
 
-      ts = DateTime.now.new_offset(0).rfc3339
+      ts = Time.now.utc.strftime("%FT%T.%LZ")
       merged = {ts: ts}
 
       if event_type.is_a?(String)
