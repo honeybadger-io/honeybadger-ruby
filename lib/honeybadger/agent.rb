@@ -401,6 +401,10 @@ module Honeybadger
         merged.merge!(Hash(event_type))
       end
 
+      if (request_id = context_manager.get_request_id)
+        merged.merge!(request_id: request_id)
+      end
+
       merged.merge!(Hash(payload))
 
       events_worker.push(merged)
@@ -488,9 +492,11 @@ module Honeybadger
     # @api private
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
+      context_manager.set_request_id(rack_env["action_dispatch.request_id"] || SecureRandom.uuid)
       yield
     ensure
       context_manager.set_rack_env(nil)
+      context_manager.set_request_id(nil)
     end
 
     # @api private

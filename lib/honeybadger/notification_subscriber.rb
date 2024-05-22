@@ -34,9 +34,7 @@ module Honeybadger
 
   class ActionControllerSubscriber < NotificationSubscriber
     def format_payload(payload)
-      {
-        request_id: payload[:request]&.request_id || SecureRandom.uuid,
-      }.merge(payload.except(:headers, :request, :response))
+      payload.except(:headers, :request, :response)
     end
   end
 
