@@ -61,15 +61,24 @@ module Honeybadger
       @mutex.synchronize { @rack_env }
     end
 
+    def set_request_id(request_id)
+      @mutex.synchronize { @request_id = request_id }
+    end
+
+    def get_request_id
+      @mutex.synchronize { @request_id }
+    end
+
     private
 
-    attr_accessor :custom, :rack_env
+    attr_accessor :custom, :rack_env, :request_id
 
     def _initialize
       @mutex.synchronize do
         @global_context = nil
         @local_context = nil
         @rack_env = nil
+        @request_id = nil
       end
     end
   end
