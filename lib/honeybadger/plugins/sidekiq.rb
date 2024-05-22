@@ -38,7 +38,7 @@ module Honeybadger
             raise
           ensure
             context.merge!(duration: duration, status: status)
-            Honeybadger.event('sidekiq.perform', context)
+            Honeybadger.event('perform.sidekiq', context)
           end
         end
       end
@@ -52,7 +52,7 @@ module Honeybadger
             queue: queue
           }
 
-          Honeybadger.event('sidekiq.enqueue', context)
+          Honeybadger.event('enqueue.sidekiq', context)
 
           yield
         end

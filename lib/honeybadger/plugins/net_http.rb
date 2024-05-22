@@ -18,7 +18,7 @@ module Honeybadger
               status: response_data.code.to_i
             }.merge(parsed_uri_data(request_data))
 
-            Honeybadger.event('net_http.request', context)
+            Honeybadger.event('request.net_http', context)
           end[1] # return the response data only
         end
 
