@@ -22,7 +22,7 @@ module Honeybadger
               partition: event.payload[:caller].messages.metadata.partition
             }
 
-            Honeybadger.event('consumer.consumed', context)
+            Honeybadger.event('karafka.consumer.consumed', context)
           end
         end
       end
