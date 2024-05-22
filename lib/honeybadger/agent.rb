@@ -10,6 +10,8 @@ require 'honeybadger/worker'
 require 'honeybadger/events_worker'
 require 'honeybadger/collector_worker'
 require 'honeybadger/breadcrumbs'
+require 'honeybadger/registry'
+require 'honeybadger/registry_execution'
 
 module Honeybadger
   # The Honeybadger agent contains all the methods for interacting with the
@@ -417,6 +419,14 @@ module Honeybadger
     end
 
     # @api private
+    def registry
+      return @registry if defined?(@registry)
+      @registry = Honeybadger::Registry.new.tap do |r|
+        collect(Honeybadger::RegistryExecution.new(r, config, {}))
+      end
+    end
+
+    # @api private
     attr_reader :config
 
     # Configure the Honeybadger agent via Ruby.
@@ -508,6 +518,11 @@ module Honeybadger
     def_delegator :'Honeybadger::Instrumentation', :time
 
     # @api private
+    # @!method histogram
+    # @see Honeybadger::Instrumentation#histogram
+    def_delegator :'Honeybadger::Instrumentation', :histogram
+
+    # @api private
     # @!method gauge
     # @see Honeybadger::Instrumentation#gauge
     def_delegator :'Honeybadger::Instrumentation', :gauge
@@ -516,6 +531,11 @@ module Honeybadger
     # @!method increment_counter
     # @see Honeybadger::Instrumentation#increment_counter
     def_delegator :'Honeybadger::Instrumentation', :increment_counter
+
+    # @api private
+    # @!method decrement_counter
+    # @see Honeybadger::Instrumentation#decrement_counter
+    def_delegator :'Honeybadger::Instrumentation', :decrement_counter
 
     private
 

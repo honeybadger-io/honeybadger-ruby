@@ -358,6 +358,11 @@ module Honeybadger
         description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
         default: false,
         type: Boolean
+      },
+      :'insights.registry_flush_interval' => {
+        description: "Number of seconds between registry flushes.",
+        default: 60,
+        type: Integer
       }
     }.freeze
 

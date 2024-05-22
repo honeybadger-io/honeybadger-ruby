@@ -4,6 +4,8 @@ module Honeybadger
   class PumaPlugin
     include Honeybadger::InstrumentationHelper
 
+    STATS_KEYS = %i(pool_capacity max_threads requests_count backlog running).freeze
+
     ::Puma::Plugin.create do
       def start(launcher)
         puma_plugin = ::Honeybadger::PumaPlugin.new
@@ -33,11 +35,9 @@ module Honeybadger
     end
 
     def record_puma_stats(stats, context={})
-      gauge "pool_capacity", context, ->{ stats[:pool_capacity] }
-      gauge "max_threads", context, ->{ stats[:max_threads] }
-      gauge "requests_count", context, ->{ stats[:requests_count] }
-      gauge "backlog", context, ->{ stats[:backlog] }
-      gauge "running", context, ->{ stats[:running] }
+      STATS_KEYS.each do |stat|
+        gauge stat, context, ->{ stats[stat] } if stats[stat]
+      end
     end
   end
 end
