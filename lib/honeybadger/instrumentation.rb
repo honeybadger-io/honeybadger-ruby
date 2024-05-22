@@ -57,6 +57,12 @@ module Honeybadger
       end
     end
 
+    def self.decrement_counter(name, count: 1, attributes: {})
+      Honeybadger::Counter.register(name, attributes).tap do |counter|
+        counter.count(count * -1)
+      end
+    end
+
     def self.gauge(name, value:, attributes: {})
       Honeybadger::Gauge.register(name, attributes).tap do |gauge|
         gauge.record(value)
@@ -121,6 +127,12 @@ module Honeybadger
       attributes = extract_attributes(args)
       count = args.select { |a| a.respond_to?(:call) }.first&.call || 1
       Honeybadger::Instrumentation.increment_counter(name, count: count, attributes: attributes)
+    end
+
+    def decrement_counter(name, *args)
+      attributes = extract_attributes(args)
+      count = args.select { |a| a.respond_to?(:call) }.first&.call || 1
+      Honeybadger::Instrumentation.decrement_counter(name, count: count, attributes: attributes)
     end
 
     def gauge(name, *args)

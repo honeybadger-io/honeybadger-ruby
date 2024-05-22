@@ -532,6 +532,11 @@ module Honeybadger
     # @see Honeybadger::Instrumentation#increment_counter
     def_delegator :'Honeybadger::Instrumentation', :increment_counter
 
+    # @api private
+    # @!method decrement_counter
+    # @see Honeybadger::Instrumentation#decrement_counter
+    def_delegator :'Honeybadger::Instrumentation', :decrement_counter
+
     private
 
     def validate_notify_opts!(opts)
