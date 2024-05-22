@@ -311,6 +311,16 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      :'sidekiq.insights.cluster_collection' => {
+        description: 'Collect cluster based metrics for Sidekiq.',
+        default: true,
+        type: Boolean
+      },
+      :'solid_queue.insights.cluster_collection' => {
+        description: 'Collect cluster based metrics for SolidQueue.',
+        default: true,
+        type: Boolean
+      },
       :'sinatra.enabled' => {
         description: 'Enable Sinatra auto-initialization.',
         default: true,
