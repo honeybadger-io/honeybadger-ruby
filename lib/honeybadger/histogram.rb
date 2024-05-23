@@ -3,6 +3,7 @@ require 'honeybadger/metric'
 module Honeybadger
   class Histogram < Metric
     DEFAULT_BINS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
+    INFINITY = 1e20 # not quite, but pretty much
 
     def record(value)
       return unless value
@@ -14,7 +15,7 @@ module Honeybadger
 
     def find_bin(value)
       bin = bins.find {|b| b >= value  }
-      bin = "+Inf" if bin.nil?
+      bin = INFINITY if bin.nil?
       bin
     end
 
@@ -23,7 +24,9 @@ module Honeybadger
     end
 
     def payloads
-      [{bins: @bin_counts}]
+      [{
+        bins: (bins + [INFINITY]).map { |bin| [bin.to_f, @bin_counts[bin]] }
+      }]
     end
   end
 end
