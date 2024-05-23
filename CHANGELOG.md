@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.10.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.10.0...v5.10.1) (2024-05-23)
+
+
+### Performance Improvements
+
+* don't insert middleware at all if they've been disabled ([#549](https://github.com/honeybadger-io/honeybadger-ruby/issues/549)) ([0060dcf](https://github.com/honeybadger-io/honeybadger-ruby/commit/0060dcf1a928c7048d7440bdf39da37cccaf057d))
+
 ## [5.10.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.9.0...v5.10.0) (2024-05-10)
 
 
