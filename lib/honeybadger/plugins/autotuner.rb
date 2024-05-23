@@ -13,7 +13,7 @@ module Honeybadger
           ::Autotuner.enabled = true
 
           ::Autotuner.reporter = proc do |report|
-            Honeybadger.event("autotuner.report", report: report.to_s)
+            Honeybadger.event("report.autotuner", report: report.to_s)
           end
 
           metric_source 'autotuner'
