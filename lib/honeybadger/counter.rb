@@ -3,7 +3,7 @@ require 'honeybadger/metric'
 module Honeybadger
   class Counter < Metric
     def count(by=1)
-      return unless value
+      return unless by
 
       @sampled += 1
 
