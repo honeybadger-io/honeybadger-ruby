@@ -2,7 +2,9 @@ module Honeybadger
   module Plugins
     module ActiveJob
       # Ignore inline and test adapters, as well as the adapters that we support with their own plugins
-      EXCLUDED_ADAPTERS = %i[inline test delayed_job faktory karafka resque shoryuken sidekiq sucker_punch].freeze
+      EXCLUDED_ADAPTERS = %i[inline test delayed_job faktory karafka resque shoryuken sidekiq sucker_punch]
+      # Don't report errors if GoodJob is reporting them
+      EXCLUDED_ADAPTERS << :good_job if defined?(::GoodJob) && !::GoodJob.on_thread_error.nil?
 
       class << self
         def perform_around(job, block)
