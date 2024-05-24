@@ -56,7 +56,8 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - 'jruby-9.2.14.0'
+          - 'jruby-9.3.14.0'
+          - 'jruby-9.4.7.0'
         gemfile:
           - rails6.1.gemfile
           # TODO
