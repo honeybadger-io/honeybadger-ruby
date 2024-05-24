@@ -131,12 +131,14 @@ module Honeybadger
     class CollectorExecution < Execution
       include Honeybadger::InstrumentationHelper
 
+      DEFAULT_COLLECTION_INTERVAL = 60
+
       def initialize(name, config, options, &block)
         @name = name
         @config = config
         @options = options
         @block = block
-        @ticks = @interval = config.collection_interval(name) || options.fetch(:interval, 1)
+        @ticks = @interval = config.collection_interval(name) || options.fetch(:interval, DEFAULT_COLLECTION_INTERVAL)
       end
 
       def tick
