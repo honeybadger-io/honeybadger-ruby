@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.10.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.10.1...v5.10.2) (2024-05-24)
+
+
+### Bug Fixes
+
+* don't duplicate the error handling done by GoodJob ([#551](https://github.com/honeybadger-io/honeybadger-ruby/issues/551)) ([a0bab0d](https://github.com/honeybadger-io/honeybadger-ruby/commit/a0bab0de01c9782948ff6dd38c88434e71bdfa3d)), closes [#537](https://github.com/honeybadger-io/honeybadger-ruby/issues/537)
+
 ## [5.10.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.10.0...v5.10.1) (2024-05-23)
 
 
