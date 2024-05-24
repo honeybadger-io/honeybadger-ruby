@@ -32,7 +32,7 @@ describe Honeybadger::InstrumentationHelper do
 
   describe '#time' do
     it 'creates a timer object' do
-      timer = test_object.time('test_timer', -> { sleep(0.1) })
+      timer = test_object.time('test_timer', ->{ sleep(0.1) })
 
       expect(timer).to be_a Honeybadger::Timer
       expect(timer.payloads[0][:latest]).to be > 0
@@ -41,7 +41,7 @@ describe Honeybadger::InstrumentationHelper do
 
   describe '#gauge' do
     it 'creates a gauge object' do
-      gauge = test_object.gauge('test_gauge', -> { 1 })
+      gauge = test_object.gauge('test_gauge', ->{ 1 })
       test_object.gauge('test_gauge', -> { 10 })
 
       expect(gauge).to be_a Honeybadger::Gauge
