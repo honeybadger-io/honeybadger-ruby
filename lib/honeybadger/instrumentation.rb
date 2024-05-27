@@ -6,7 +6,7 @@ require 'honeybadger/gauge'
 module Honeybadger
   # +Honeybadger::Instrumentation+ defines the API for collecting metric data from anywhere
   # in an application. These class methods may be used directly, or from the Honeybadger singleton
-  # instance.
+  # instance. There are three usage variations as show in the example below:
   #
   # @example
   #
@@ -26,6 +26,9 @@ module Honeybadger
   #
   #
   class Instrumentation
+
+    # returns two parameters, the first is the duration of the execution, and the second is
+    # the return value of the passed block
     def self.monotonic_timer
       start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       result = yield
@@ -72,6 +75,7 @@ module Honeybadger
     def self.increment_counter(name, *args)
       attributes = extract_attributes(args)
       by = extract_callable(args)&.call || attributes.delete(:by) || 1
+      by = yield if block_given?
 
       Honeybadger::Counter.register(name, attributes).tap do |counter|
         counter.count(by)
@@ -81,6 +85,7 @@ module Honeybadger
     def self.decrement_counter(name, *args)
       attributes = extract_attributes(args)
       by = extract_callable(args)&.call || attributes.delete(:by) || 1
+      by = yield if block_given?
 
       Honeybadger::Counter.register(name, attributes).tap do |counter|
         counter.count(by * -1)
@@ -90,6 +95,7 @@ module Honeybadger
     def self.gauge(name, *args)
       attributes = extract_attributes(args)
       value = extract_callable(args)&.call || attributes.delete(:value)
+      value = yield if block_given?
 
       Honeybadger::Gauge.register(name, attributes).tap do |gauge|
         gauge.record(value)

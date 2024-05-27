@@ -3,6 +3,7 @@ require 'honeybadger/instrumentation'
 module Honeybadger
   # +Honeybadger::InstrumentationHelper+ is a module that can be included into any class. This module
   # provides a convenient DSL around the instrumentation methods to prvoide a cleaner interface.
+  # There are three usage variations as show in the example below:
   #
   # @example
   #
@@ -27,6 +28,9 @@ module Honeybadger
   #
   #
   module InstrumentationHelper
+
+    # returns two parameters, the first is the duration of the execution, and the second is
+    # the return value of the passed block
     def monotonic_timer
       Honeybadger::Instrumentation.monotonic_timer { yield }
     end
@@ -46,7 +50,7 @@ module Honeybadger
       if callable
         Honeybadger::Instrumentation.time(name, attributes, ->{ callable.call })
       elsif block_given?
-        Honeybadger::Instrumentation.histogram(name, attributes, ->{ yield })
+        Honeybadger::Instrumentation.time(name, attributes, ->{ yield })
       elsif attributes.keys.include?(:duration)
         Honeybadger::Instrumentation.time(name, attributes)
       end
