@@ -138,15 +138,16 @@ module Honeybadger
         @config = config
         @options = options
         @block = block
-        @ticks = @interval = config.collection_interval(name) || options.fetch(:interval, DEFAULT_COLLECTION_INTERVAL)
+        @interval = config.collection_interval(name) || options.fetch(:interval, DEFAULT_COLLECTION_INTERVAL)
+        @end_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + @interval
       end
 
       def tick
-        @ticks = @ticks - 1
+        @end_time - ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       end
 
       def reset
-        @ticks = @interval
+        @end_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + @interval
       end
 
       def register!

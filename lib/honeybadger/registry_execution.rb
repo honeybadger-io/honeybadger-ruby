@@ -4,15 +4,16 @@ module Honeybadger
       @registry = registry
       @config = config
       @options = options
-      @ticks = @interval = config[:'insights.registry_flush_interval'] || options.fetch(:interval, 60)
+      @interval = config[:'insights.registry_flush_interval'] || options.fetch(:interval, 60)
+      @end_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + @interval
     end
 
     def tick
-      @ticks = @ticks - 1
+      @end_time - ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
     end
 
     def reset
-      @ticks = @interval
+      @end_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + @interval
       @registry.flush
     end
 
