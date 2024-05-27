@@ -9,7 +9,7 @@ module Honeybadger
   # present in the application.
   #
   # Plugins may also define a collect block that is repeatedly called from
-  # within a thread. The CollectorWorker contains a loop that will call all
+  # within a thread. The MetricsWorker contains a loop that will call all
   # enabled plugins' collect method, and then sleep for 1 second. This block
   # is useful for collecting and/or sending metrics at regular intervals.
   #

@@ -8,7 +8,7 @@ require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
 require 'honeybadger/events_worker'
-require 'honeybadger/collector_worker'
+require 'honeybadger/metrics_worker'
 require 'honeybadger/breadcrumbs'
 require 'honeybadger/registry'
 require 'honeybadger/registry_execution'
@@ -361,7 +361,7 @@ module Honeybadger
     ensure
       worker.flush
       events_worker&.flush
-      collector_worker&.flush
+      metrics_worker&.flush
     end
 
     # Stops the Honeybadger service.
@@ -371,7 +371,7 @@ module Honeybadger
     def stop(force = false)
       worker.shutdown(force)
       events_worker&.shutdown(force)
-      collector_worker&.shutdown(force)
+      metrics_worker&.shutdown(force)
       true
     end
 
@@ -414,8 +414,8 @@ module Honeybadger
     def collect(collector)
       return unless config.insights_enabled?
 
-      init_collector_worker
-      collector_worker.push(collector)
+      init_metrics_worker
+      metrics_worker.push(collector)
     end
 
     # @api private
@@ -500,7 +500,7 @@ module Honeybadger
     end
 
     # @api private
-    attr_reader :worker, :events_worker, :collector_worker
+    attr_reader :worker, :events_worker, :metrics_worker
 
     # @api private
     # @!method init!(...)
@@ -572,9 +572,9 @@ module Honeybadger
       @events_worker = EventsWorker.new(config)
     end
 
-    def init_collector_worker
-      return if @collector_worker
-      @collector_worker = CollectorWorker.new(config)
+    def init_metrics_worker
+      return if @metrics_worker
+      @metrics_worker = MetricsWorker.new(config)
     end
 
     def with_error_handling

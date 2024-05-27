@@ -340,19 +340,19 @@ describe Honeybadger::Agent do
 
   context "#collect" do
     let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
-    let(:collector_worker) { double(Honeybadger::CollectorWorker.new(config)) }
+    let(:metrics_worker) { double(Honeybadger::MetricsWorker.new(config)) }
     let(:instance) { Honeybadger::Agent.new(config) }
     let(:collection_execution) { double(Honeybadger::Plugin::CollectorExecution) }
 
     subject { instance }
 
     before do
-      allow(instance).to receive(:collector_worker).and_return(collector_worker)
+      allow(instance).to receive(:metrics_worker).and_return(metrics_worker)
     end
 
     context "with a collection execution instance" do
       it "adds to the worker" do
-        expect(collector_worker).to receive(:push) do |msg|
+        expect(metrics_worker).to receive(:push) do |msg|
           expect(msg).to eq(collection_execution)
         end
         subject.collect(collection_execution)
