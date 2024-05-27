@@ -1,4 +1,4 @@
-require 'honeybadger/instrumentation'
+require 'honeybadger/instrumentation_helper'
 
 module Honeybadger
   class NotificationSubscriber

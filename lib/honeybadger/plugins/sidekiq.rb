@@ -1,4 +1,4 @@
-require 'honeybadger/instrumentation'
+require 'honeybadger/instrumentation_helper'
 require 'honeybadger/plugin'
 require 'honeybadger/ruby'
 

@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'honeybadger/instrumentation'
+require 'honeybadger/instrumentation_helper'
 
 module Honeybadger
   # +Honeybadger::Plugin+ defines the API for registering plugins with
