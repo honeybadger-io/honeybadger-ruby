@@ -321,10 +321,20 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      :'sidekiq.insights.collection_interval' => {
+        description: 'The frequency in which Sidekiq cluster metrics are sampled.',
+        default: 60,
+        type: Integer
+      },
       :'solid_queue.insights.cluster_collection' => {
         description: 'Collect cluster based metrics for SolidQueue.',
         default: true,
         type: Boolean
+      },
+      :'solid_queue.insights.collection_interval' => {
+        description: 'The frequency in which SolidQueue cluster metrics are sampled.',
+        default: 60,
+        type: Integer
       },
       :'sinatra.enabled' => {
         description: 'Enable Sinatra auto-initialization.',
