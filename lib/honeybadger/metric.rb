@@ -32,7 +32,6 @@ module Honeybadger
     def base_payload
       attributes.merge({
         event_type: "metric.hb",
-        hostname: Honeybadger.config[:hostname].to_s,
         metric_name: name,
         metric_type: metric_type,
         sampled: sampled

@@ -101,6 +101,11 @@ module Honeybadger
         default: 30_000,
         type: Integer
       },
+      :'events.attach_hostname' => {
+        description: 'Add the hostname to all event paylaods.',
+        default: true,
+        type: Boolean
+      },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
         default: nil,

@@ -405,6 +405,10 @@ module Honeybadger
         merged.merge!(request_id: request_id)
       end
 
+      if Honeybadger.config[:'events.attach_hostname']
+        merged.merge!(hostname: Honeybadger.config[:hostname].to_s)
+      end
+
       merged.merge!(Hash(payload))
 
       events_worker.push(merged)
