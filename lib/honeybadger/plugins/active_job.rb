@@ -37,9 +37,14 @@ module Honeybadger
         requirement do
           defined?(::Rails.application) &&
             ::Rails.application.config.respond_to?(:active_job) &&
-            (queue_adapter = ::Rails.application.config.active_job[:queue_adapter]) &&
-            !EXCLUDED_ADAPTERS.include?(queue_adapter.to_sym) &&
-            !(defined?(::GoodJob) && ::GoodJob.on_thread_error.nil? && queue_adapter.to_sym == :good_job) # Don't report errors if GoodJob is reporting them
+            !EXCLUDED_ADAPTERS.include?(::Rails.application.config.active_job[:queue_adapter].to_sym)
+        end
+
+        # Don't report errors if GoodJob is reporting them
+        requirement do
+          ::Rails.application.config.active_job[:queue_adapter].to_sym != :good_job ||
+            !::Rails.application.config.respond_to?(:good_job) ||
+            ::Rails.application.config.good_job.on_thread_error.nil?
         end
 
         execution do
