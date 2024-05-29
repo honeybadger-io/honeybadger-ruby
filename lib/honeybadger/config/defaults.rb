@@ -106,6 +106,11 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      :'events.ignore' => {
+        description: 'A list of events to ignore.',
+        default: [],
+        type: Array
+      },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
         default: nil,

@@ -188,6 +188,12 @@ module Honeybadger
       DEFAULTS[:'exceptions.ignore'] | Array(ignore)
     end
 
+    def ignored_events
+      self[:'events.ignore'].map do |check|
+        check.is_a?(String) ? /^#{check}$/ : check
+      end
+    end
+
     def ca_bundle_path
       if self[:'connection.system_ssl_cert_chain'] && File.exist?(OpenSSL::X509::DEFAULT_CERT_FILE)
         OpenSSL::X509::DEFAULT_CERT_FILE

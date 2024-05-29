@@ -336,6 +336,48 @@ describe Honeybadger::Agent do
         subject.event(event_type: "test_event", some_data: "is here")
       end
     end
+
+    describe "ignoring events" do
+      let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.ignore' => ignored_events) }
+
+      after { subject.event(event_type: event_type, some_data: "is here") }
+
+      context "when configured with an event type matching string" do
+        let(:ignored_events) { ["report.system"] }
+        let(:event_type) { "report.system" }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "when configured with an event type non-matching string" do
+        let(:ignored_events) { ["non-matching"] }
+        let(:event_type) { "report.system" }
+
+        it "does push an event" do
+          expect(events_worker).to receive(:push)
+        end
+      end
+
+      context "when configured with an event type matching regex" do
+        let(:ignored_events) { [/.*\.system/] }
+        let(:event_type) { "report.system" }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "when configured with an event type non-matching regex" do
+        let(:ignored_events) { [/.*\.foo/] }
+        let(:event_type) { "report.system" }
+
+        it "does push an event" do
+          expect(events_worker).to receive(:push)
+        end
+      end
+    end
   end
 
   context "#collect" do
