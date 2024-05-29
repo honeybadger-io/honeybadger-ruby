@@ -5,12 +5,10 @@ module Honeybadger
   module Plugins
     module System
       Plugin.register :system do
-        requirement { true }
+        requirement { Util::Stats::HAS_MEM || Util::Stats::HAS_LOAD }
 
         collect do
-          Util::Stats.all.each do |resource, data|
-            Honeybadger.event('report.system', data.merge(resource: resource))
-          end
+          Honeybadger.event('report.system', Util::Stats.all)
         end
       end
     end
