@@ -411,7 +411,7 @@ module Honeybadger
 
       merged.merge!(Hash(payload))
 
-      return if config.ignored_events.any? { |check| merged[:event_type][check] }
+      return if config.ignored_events.any? { |check| merged[:event_type]&.match(check) }
 
       events_worker.push(merged)
     end

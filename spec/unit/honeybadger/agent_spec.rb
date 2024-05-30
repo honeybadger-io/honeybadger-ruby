@@ -377,6 +377,15 @@ describe Honeybadger::Agent do
           expect(events_worker).to receive(:push)
         end
       end
+
+      context "when event type is nil" do
+        let(:ignored_events) { [/test/] }
+        let(:event_type) { nil }
+
+        it "does push an event" do
+          expect(events_worker).to receive(:push)
+        end
+      end
     end
   end
 
