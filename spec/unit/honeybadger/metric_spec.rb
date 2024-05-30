@@ -28,7 +28,7 @@ describe Honeybadger::Metric do
       let(:name) { "capacity" }
       let(:attributes) { { foo: "bar" } }
 
-      it { should eq :"gauge-capacity-foo-bar" }
+      it { should eq Digest::SHA1.hexdigest("gauge-capacity-foo-bar").to_sym }
     end
   end
 
@@ -39,7 +39,7 @@ describe Honeybadger::Metric do
       let(:name) { "capacity" }
       let(:attributes) { { foo: "bar" } }
 
-      it { should eq :"metric-capacity-foo-bar" }
+      it { should eq Digest::SHA1.hexdigest("metric-capacity-foo-bar").to_sym }
     end
   end
 end

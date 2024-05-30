@@ -7,7 +7,7 @@ module Honeybadger
     end
 
     def self.signature(metric_type, name, attributes)
-      "#{metric_type}-#{name}-#{attributes.keys.join('-')}-#{attributes.values.join('-')}".to_sym
+      Digest::SHA1.hexdigest("#{metric_type}-#{name}-#{attributes.keys.join('-')}-#{attributes.values.join('-')}").to_sym
     end
 
     def self.register(metric_name, attributes)
