@@ -26,17 +26,26 @@ module Honeybadger
   #
   #
   class Instrumentation
+    attr_reader :agent
+
+    def initialize(agent)
+      @agent = agent
+    end
+
+    def registry
+      agent.registry
+    end
 
     # returns two parameters, the first is the duration of the execution, and the second is
     # the return value of the passed block
-    def self.monotonic_timer
+    def monotonic_timer
       start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       result = yield
       finish_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       [((finish_time - start_time) * 1000).round(2), result]
     end
 
-    def self.time(name, *args)
+    def time(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       duration = attributes.delete(:duration)
@@ -49,12 +58,12 @@ module Honeybadger
 
       raise 'No duration found' if duration.nil?
 
-      Honeybadger::Timer.register(name, attributes).tap do |timer|
+      Honeybadger::Timer.register(registry, name, attributes).tap do |timer|
         timer.record(duration)
       end
     end
 
-    def self.histogram(name, *args)
+    def histogram(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       duration = attributes.delete(:duration)
@@ -67,48 +76,48 @@ module Honeybadger
 
       raise 'No duration found' if duration.nil?
 
-      Honeybadger::Histogram.register(name, attributes).tap do |histogram|
+      Honeybadger::Histogram.register(registry, name, attributes).tap do |histogram|
         histogram.record(duration)
       end
     end
 
-    def self.increment_counter(name, *args)
+    def increment_counter(name, *args)
       attributes = extract_attributes(args)
       by = extract_callable(args)&.call || attributes.delete(:by) || 1
       by = yield if block_given?
 
-      Honeybadger::Counter.register(name, attributes).tap do |counter|
+      Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
         counter.count(by)
       end
     end
 
-    def self.decrement_counter(name, *args)
+    def decrement_counter(name, *args)
       attributes = extract_attributes(args)
       by = extract_callable(args)&.call || attributes.delete(:by) || 1
       by = yield if block_given?
 
-      Honeybadger::Counter.register(name, attributes).tap do |counter|
+      Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
         counter.count(by * -1)
       end
     end
 
-    def self.gauge(name, *args)
+    def gauge(name, *args)
       attributes = extract_attributes(args)
       value = extract_callable(args)&.call || attributes.delete(:value)
       value = yield if block_given?
 
-      Honeybadger::Gauge.register(name, attributes).tap do |gauge|
+      Honeybadger::Gauge.register(registry, name, attributes).tap do |gauge|
         gauge.record(value)
       end
     end
 
     # @api private
-    def self.extract_attributes(args)
+    def extract_attributes(args)
       args.select { |a| a.is_a?(Hash) }.first || {}
     end
 
     # @api private
-    def self.extract_callable(args)
+    def extract_callable(args)
       args.select { |a| a.respond_to?(:call) }.first
     end
   end

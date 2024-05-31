@@ -521,27 +521,31 @@ module Honeybadger
     # @api private
     # @!method time
     # @see Honeybadger::Instrumentation#time
-    def_delegator :'Honeybadger::Instrumentation', :time
+    def_delegator :instrumentation, :time
 
     # @api private
     # @!method histogram
     # @see Honeybadger::Instrumentation#histogram
-    def_delegator :'Honeybadger::Instrumentation', :histogram
+    def_delegator :instrumentation, :histogram
 
     # @api private
     # @!method gauge
     # @see Honeybadger::Instrumentation#gauge
-    def_delegator :'Honeybadger::Instrumentation', :gauge
+    def_delegator :instrumentation, :gauge
 
     # @api private
     # @!method increment_counter
     # @see Honeybadger::Instrumentation#increment_counter
-    def_delegator :'Honeybadger::Instrumentation', :increment_counter
+    def_delegator :instrumentation, :increment_counter
 
     # @api private
     # @!method decrement_counter
     # @see Honeybadger::Instrumentation#decrement_counter
-    def_delegator :'Honeybadger::Instrumentation', :decrement_counter
+    def_delegator :instrumentation, :decrement_counter
+
+    def instrumentation
+      @instrumentation ||= Honeybadger::Instrumentation.new(self)
+    end
 
     private
 

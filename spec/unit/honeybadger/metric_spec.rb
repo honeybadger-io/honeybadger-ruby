@@ -1,20 +1,22 @@
 # encoding: utf-8
 
 describe Honeybadger::Metric do
+  let(:registry) { Honeybadger::Registry.new }
+
   describe ".register" do
     let(:name) { "capacity" }
     let(:attributes) { { foo: "bar" } }
 
-    subject { described_class.register(name, attributes) }
+    subject { described_class.register(registry, name, attributes) }
 
     context "returns a new instance" do
       it { should be_a(Honeybadger::Metric) }
     end
 
     context "returns the same instance if called twice" do
-      let(:instance) { described_class.register(name, attributes) }
+      let(:instance) { described_class.register(registry, name, attributes) }
 
-      subject { described_class.register(name, attributes) }
+      subject { described_class.register(registry, name, attributes) }
 
       it { should eq(instance) }
     end

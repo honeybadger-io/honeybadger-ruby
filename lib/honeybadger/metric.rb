@@ -10,9 +10,9 @@ module Honeybadger
       Digest::SHA1.hexdigest("#{metric_type}-#{name}-#{attributes.keys.join('-')}-#{attributes.values.join('-')}").to_sym
     end
 
-    def self.register(metric_name, attributes)
-      Honeybadger.registry.get(metric_type, metric_name, attributes) ||
-        Honeybadger.registry.register(new(metric_name, attributes))
+    def self.register(registry, metric_name, attributes)
+      registry.get(metric_type, metric_name, attributes) ||
+        registry.register(new(metric_name, attributes))
     end
 
     def initialize(name, attributes)

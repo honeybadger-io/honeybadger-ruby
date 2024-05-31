@@ -32,11 +32,19 @@ module Honeybadger
     # returns two parameters, the first is the duration of the execution, and the second is
     # the return value of the passed block
     def monotonic_timer
-      Honeybadger::Instrumentation.monotonic_timer { yield }
+      metric_instrumentation.monotonic_timer { yield }
     end
 
     def metric_source(source)
       @metric_source = source
+    end
+
+    def metric_agent(agent)
+      @metric_agent = agent
+    end
+
+    def metric_instrumentation
+      @metric_instrumentation ||= @metric_agent ? Honeybadger::Instrumentation.new(@metric_agent) : Honeybadger.instrumentation
     end
 
     def metric_attributes(attributes)
@@ -48,11 +56,11 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        Honeybadger::Instrumentation.time(name, attributes, ->{ callable.call })
+        metric_instrumentation.time(name, attributes, ->{ callable.call })
       elsif block_given?
-        Honeybadger::Instrumentation.time(name, attributes, ->{ yield })
+        metric_instrumentation.time(name, attributes, ->{ yield })
       elsif attributes.keys.include?(:duration)
-        Honeybadger::Instrumentation.time(name, attributes)
+        metric_instrumentation.time(name, attributes)
       end
     end
 
@@ -60,11 +68,11 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        Honeybadger::Instrumentation.histogram(name, attributes, ->{ callable.call })
+        metric_instrumentation.histogram(name, attributes, ->{ callable.call })
       elsif block_given?
-        Honeybadger::Instrumentation.histogram(name, attributes, ->{ yield })
+        metric_instrumentation.histogram(name, attributes, ->{ yield })
       elsif attributes.keys.include?(:duration)
-        Honeybadger::Instrumentation.histogram(name, attributes)
+        metric_instrumentation.histogram(name, attributes)
       end
     end
 
@@ -72,9 +80,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       by = extract_callable(args)&.call || attributes.delete(:by) || 1
       if block_given?
-        Honeybadger::Instrumentation.increment_counter(name, attributes, ->{ yield })
+        metric_instrumentation.increment_counter(name, attributes, ->{ yield })
       else
-        Honeybadger::Instrumentation.increment_counter(name, attributes.merge(by: by))
+        metric_instrumentation.increment_counter(name, attributes.merge(by: by))
       end
     end
 
@@ -82,9 +90,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       by = extract_callable(args)&.call || attributes.delete(:by) || 1
       if block_given?
-        Honeybadger::Instrumentation.decrement_counter(name, attributes, ->{ yield })
+        metric_instrumentation.decrement_counter(name, attributes, ->{ yield })
       else
-        Honeybadger::Instrumentation.decrement_counter(name, attributes.merge(by: by))
+        metric_instrumentation.decrement_counter(name, attributes.merge(by: by))
       end
     end
 
@@ -92,21 +100,21 @@ module Honeybadger
       attributes = extract_attributes(args)
       value = extract_callable(args)&.call || attributes.delete(:value)
       if block_given?
-        Honeybadger::Instrumentation.gauge(name, attributes, ->{ yield })
+        metric_instrumentation.gauge(name, attributes, ->{ yield })
       else
-        Honeybadger::Instrumentation.gauge(name, attributes.merge(value: value))
+        metric_instrumentation.gauge(name, attributes.merge(value: value))
       end
     end
 
     # @api private
     def extract_attributes(args)
-      attributes = Honeybadger::Instrumentation.extract_attributes(args)
+      attributes = metric_instrumentation.extract_attributes(args)
       attributes.merge(metric_source: @metric_source).merge(@metric_attributes || {}).compact
     end
 
     # @api private
     def extract_callable(args)
-      Honeybadger::Instrumentation.extract_callable(args)
+      metric_instrumentation.extract_callable(args)
     end
   end
 end
