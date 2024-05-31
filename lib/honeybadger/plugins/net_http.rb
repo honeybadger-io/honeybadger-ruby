@@ -11,7 +11,7 @@ module Honeybadger
           return super unless started?
           return super if hb?
 
-          Honeybadger::Instrumentation.monotonic_timer { super }.tap do |duration, response_data|
+          Honeybadger.instrumentation.monotonic_timer { super }.tap do |duration, response_data|
             context = {
               duration: duration,
               method: request_data.method,

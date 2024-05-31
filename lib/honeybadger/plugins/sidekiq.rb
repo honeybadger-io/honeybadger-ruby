@@ -31,7 +31,7 @@ module Honeybadger
           end
 
           begin
-            duration = Honeybadger::Instrumentation.monotonic_timer { block.call }[0]
+            duration = Honeybadger.instrumentation.monotonic_timer { block.call }[0]
             status = 'success'
           rescue Exception => e
             status = 'failure'
