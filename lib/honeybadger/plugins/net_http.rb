@@ -28,7 +28,10 @@ module Honeybadger
 
         def parsed_uri_data(request_data)
           uri = request_data.uri || build_uri(request_data)
-          { url: uri.to_s }
+          {}.tap do |uri_data|
+            uri_data[:host] = uri.host
+            uri_data[:url] = uri.to_s if Honeybadger.config[:'net_http.insights.full_url']
+          end
         end
 
         def build_uri(request_data)

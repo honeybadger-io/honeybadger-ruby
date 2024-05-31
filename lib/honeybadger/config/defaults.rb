@@ -343,6 +343,11 @@ module Honeybadger
       },
       :'net_http.insights.enabled' => {
         description: 'Allow automatic instrumentation of Net::HTTP requests.',
+        default: true,
+        type: Boolean
+      },
+      :'net_http.insights.full_url' => {
+        description: 'Record the full request url during instrumentation.',
         default: false,
         type: Boolean
       },
