@@ -74,8 +74,9 @@ module Honeybadger
         requirement { config.load_plugin_insights?(:rails_metrics) && defined?(::Rails.application) && ::Rails.application }
 
         execution do
-          ::ActiveSupport::Notifications.subscribe(/(process_action|send_file|redirect_to|halted_callback)\.action_controller/, Honeybadger::ActionControllerSubscriber.new)
-          ::ActiveSupport::Notifications.subscribe(/(write_fragment|read_fragment|expire_fragment)\.action_controller/, Honeybadger::ActionControllerCacheSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe(/(process_action|send_file|redirect_to|halted_callback|unpermitted_parameters)\.action_controller/, Honeybadger::ActionControllerSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe(/(write_fragment|read_fragment|expire_fragment|exist_fragment\?)\.action_controller/, Honeybadger::ActionControllerCacheSubscriber.new)
+          ::ActiveSupport::Notifications.subscribe(/cache_(read|read_multi|generate|fetch_hit|write|write_multi|increment|decrement|delete|delete_multi|cleanup|prune|exist\?)\.active_support/, Honeybadger::ActiveSupportCacheSubscriber.new)
           ::ActiveSupport::Notifications.subscribe(/^render_(template|partial|collection)\.action_view/, Honeybadger::ActionViewSubscriber.new)
           ::ActiveSupport::Notifications.subscribe("sql.active_record", Honeybadger::ActiveRecordSubscriber.new)
           ::ActiveSupport::Notifications.subscribe("process.action_mailer", Honeybadger::ActionMailerSubscriber.new)

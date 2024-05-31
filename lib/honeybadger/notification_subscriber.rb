@@ -41,6 +41,9 @@ module Honeybadger
   class ActionControllerCacheSubscriber < NotificationSubscriber
   end
 
+  class ActiveSupportCacheSubscriber < NotificationSubscriber
+  end
+
   class ActionViewSubscriber < NotificationSubscriber
     PROJECT_ROOT = defined?(::Rails) ? ::Rails.root.to_s : ''
 
