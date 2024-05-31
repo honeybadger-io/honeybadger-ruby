@@ -107,7 +107,7 @@ module Honeybadger
         type: Boolean
       },
       :'events.ignore' => {
-        description: 'A list of events to ignore.',
+        description: 'A list of events to ignore. Use a string to specify exact matches, or regex for more flexibility.',
         default: [],
         type: Array
       },
