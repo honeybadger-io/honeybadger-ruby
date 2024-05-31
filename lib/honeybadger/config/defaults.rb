@@ -341,6 +341,11 @@ module Honeybadger
         default: 60,
         type: Integer
       },
+      :'net_http.insights.enabled' => {
+        description: 'Allow automatic instrumentation of Net::HTTP requests.',
+        default: false,
+        type: Boolean
+      },
       :'sinatra.enabled' => {
         description: 'Enable Sinatra auto-initialization.',
         default: true,
