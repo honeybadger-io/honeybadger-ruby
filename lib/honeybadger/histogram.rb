@@ -8,7 +8,7 @@ module Honeybadger
     def record(value)
       return unless value
 
-      @sampled += 1
+      @samples += 1
       @bin_counts ||= Hash.new(0)
       @bin_counts[find_bin(value)] += 1
     end

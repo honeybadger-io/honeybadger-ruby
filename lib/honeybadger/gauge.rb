@@ -5,14 +5,14 @@ module Honeybadger
     def record(value)
       return unless value
 
-      @sampled += 1
+      @samples += 1
 
       @total ||= 0
       @total = @total + value
 
       @min = value if @min.nil? || @min > value
       @max = value if @max.nil? || @max < value
-      @avg = @total.to_f / @sampled
+      @avg = @total.to_f / @samples
       @latest = value
     end
 

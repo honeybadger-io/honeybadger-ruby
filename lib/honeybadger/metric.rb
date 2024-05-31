@@ -1,6 +1,6 @@
 module Honeybadger
   class Metric
-    attr_reader :name, :attributes, :sampled
+    attr_reader :name, :attributes, :samples
 
     def self.metric_type
       name.split('::').last.downcase
@@ -18,7 +18,7 @@ module Honeybadger
     def initialize(name, attributes)
       @name = name
       @attributes = attributes || {}
-      @sampled = 0
+      @samples = 0
     end
 
     def metric_type
@@ -34,7 +34,7 @@ module Honeybadger
         event_type: "metric.hb",
         metric_name: name,
         metric_type: metric_type,
-        sampled: sampled
+        samples: samples
       })
     end
 

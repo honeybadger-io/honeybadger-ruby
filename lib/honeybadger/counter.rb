@@ -5,7 +5,7 @@ module Honeybadger
     def count(by=1)
       return unless by
 
-      @sampled += 1
+      @samples += 1
 
       @counter ||= 0
       @counter = @counter + by
