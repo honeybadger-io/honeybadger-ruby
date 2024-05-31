@@ -396,17 +396,17 @@ module Honeybadger
       merged = {ts: ts}
 
       if event_type.is_a?(String)
-        merged.merge!(event_type: event_type)
+        merged[:event_type] = event_type
       else
         merged.merge!(Hash(event_type))
       end
 
       if (request_id = context_manager.get_request_id)
-        merged.merge!(request_id: request_id)
+        merged[:request_id] = request_id
       end
 
       if config[:'events.attach_hostname']
-        merged.merge!(hostname: config[:hostname].to_s)
+        merged[:hostname] = config[:hostname].to_s
       end
 
       merged.merge!(Hash(payload))
