@@ -44,7 +44,7 @@ module Honeybadger
     def push(msg)
       return false unless start
 
-      if queue.size >= config.max_queue_size
+      if queue.size >= config.events_max_queue_size
         warn { sprintf('Unable to send event; reached max queue size of %s.', queue.size) }
         return false
       end

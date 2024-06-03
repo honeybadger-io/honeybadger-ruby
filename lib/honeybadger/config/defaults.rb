@@ -91,9 +91,14 @@ module Honeybadger
         default: 100,
         type: Integer
       },
+      :'events.max_queue_size' => {
+        description: 'Maximum number of event for the event worker queue.',
+        default: 10000,
+        type: Integer
+      },
       :'events.batch_size' => {
         description: 'Send events batch if n events have accumulated',
-        default: 100,
+        default: 1000,
         type: Integer
       },
       :'events.timeout' => {

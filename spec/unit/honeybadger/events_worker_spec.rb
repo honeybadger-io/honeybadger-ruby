@@ -117,7 +117,7 @@ describe Honeybadger::EventsWorker do
 
     context "when queue is full" do
       before do
-        allow(config).to receive(:max_queue_size).and_return(5)
+        allow(config).to receive(:events_max_queue_size).and_return(5)
         allow(instance).to receive(:queue).and_return(double(size: 5))
       end
 

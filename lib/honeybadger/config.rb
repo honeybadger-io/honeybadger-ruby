@@ -230,6 +230,10 @@ module Honeybadger
       self[:max_queue_size]
     end
 
+    def events_max_queue_size
+      self[:'events.max_queue_size']
+    end
+
     def events_batch_size
       self[:'events.batch_size']
     end
