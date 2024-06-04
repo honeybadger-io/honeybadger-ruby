@@ -1,6 +1,18 @@
 # Change Log
 
 
+## [5.11.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.10.2...v5.11.0) (2024-06-04)
+
+
+### Features
+
+* add insights instrumentation - events and metrics ([#539](https://github.com/honeybadger-io/honeybadger-ruby/issues/539)) ([d173ac5](https://github.com/honeybadger-io/honeybadger-ruby/commit/d173ac53b45be6b9036c292d8efc5002d8b354b1))
+
+
+### Bug Fixes
+
+* access GoodJob config via Rails.application.config ([#554](https://github.com/honeybadger-io/honeybadger-ruby/issues/554)) ([37b7786](https://github.com/honeybadger-io/honeybadger-ruby/commit/37b7786e9fefdaa23ccd45ca55a0573b0a832f58))
+
 ## [5.10.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.10.1...v5.10.2) (2024-05-24)
 
 
