@@ -1,3 +1,5 @@
+require 'honeybadger/notification_subscriber'
+
 module Honeybadger
   module Plugins
     module ActiveJob
@@ -33,7 +35,7 @@ module Honeybadger
         end
       end
 
-      Plugin.register do
+      Plugin.register :active_job do
         requirement do
           defined?(::Rails.application) &&
             ::Rails.application.config.respond_to?(:active_job) &&
@@ -49,6 +51,11 @@ module Honeybadger
 
         execution do
           ::ActiveJob::Base.set_callback(:perform, :around, &ActiveJob.method(:perform_around))
+
+          if config.load_plugin_insights?(:active_job)
+            ::ActiveSupport::Notifications.subscribe(/(enqueue_at|enqueue|enqueue_retry|enqueue_all|perform|retry_stopped|discard)\.active_job/, Honeybadger::ActiveJobSubscriber.new)
+            ::ActiveSupport::Notifications.subscribe('perform.active_job', Honeybadger::ActiveJobMetricsSubscriber.new)
+          end
         end
       end
     end

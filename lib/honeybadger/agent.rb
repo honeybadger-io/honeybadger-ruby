@@ -8,7 +8,10 @@ require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
 require 'honeybadger/events_worker'
+require 'honeybadger/metrics_worker'
 require 'honeybadger/breadcrumbs'
+require 'honeybadger/registry'
+require 'honeybadger/registry_execution'
 
 module Honeybadger
   # The Honeybadger agent contains all the methods for interacting with the
@@ -358,6 +361,7 @@ module Honeybadger
     ensure
       worker.flush
       events_worker&.flush
+      metrics_worker&.flush
     end
 
     # Stops the Honeybadger service.
@@ -367,6 +371,7 @@ module Honeybadger
     def stop(force = false)
       worker.shutdown(force)
       events_worker&.shutdown(force)
+      metrics_worker&.shutdown(force)
       true
     end
 
@@ -387,18 +392,44 @@ module Honeybadger
     def event(event_type, payload = {})
       init_events_worker
 
-      ts = DateTime.now.new_offset(0).rfc3339
+      ts = Time.now.utc.strftime("%FT%T.%LZ")
       merged = {ts: ts}
 
       if event_type.is_a?(String)
-        merged.merge!(event_type: event_type)
+        merged[:event_type] = event_type
       else
         merged.merge!(Hash(event_type))
       end
 
+      if (request_id = context_manager.get_request_id)
+        merged[:request_id] = request_id
+      end
+
+      if config[:'events.attach_hostname']
+        merged[:hostname] = config[:hostname].to_s
+      end
+
       merged.merge!(Hash(payload))
 
+      return if config.ignored_events.any? { |check| merged[:event_type]&.match?(check) }
+
       events_worker.push(merged)
+    end
+
+    # @api private
+    def collect(collector)
+      return unless config.insights_enabled?
+
+      init_metrics_worker
+      metrics_worker.push(collector)
+    end
+
+    # @api private
+    def registry
+      return @registry if defined?(@registry)
+      @registry = Honeybadger::Registry.new.tap do |r|
+        collect(Honeybadger::RegistryExecution.new(r, config, {}))
+      end
     end
 
     # @api private
@@ -467,13 +498,15 @@ module Honeybadger
     # @api private
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
+      context_manager.set_request_id(rack_env["action_dispatch.request_id"] || SecureRandom.uuid)
       yield
     ensure
       context_manager.set_rack_env(nil)
+      context_manager.set_request_id(nil)
     end
 
     # @api private
-    attr_reader :worker, :events_worker
+    attr_reader :worker, :events_worker, :metrics_worker
 
     # @api private
     # @!method init!(...)
@@ -484,6 +517,35 @@ module Honeybadger
     # @!method backend
     # @see Config#backend
     def_delegators :config, :backend
+
+    # @api private
+    # @!method time
+    # @see Honeybadger::Instrumentation#time
+    def_delegator :instrumentation, :time
+
+    # @api private
+    # @!method histogram
+    # @see Honeybadger::Instrumentation#histogram
+    def_delegator :instrumentation, :histogram
+
+    # @api private
+    # @!method gauge
+    # @see Honeybadger::Instrumentation#gauge
+    def_delegator :instrumentation, :gauge
+
+    # @api private
+    # @!method increment_counter
+    # @see Honeybadger::Instrumentation#increment_counter
+    def_delegator :instrumentation, :increment_counter
+
+    # @api private
+    # @!method decrement_counter
+    # @see Honeybadger::Instrumentation#decrement_counter
+    def_delegator :instrumentation, :decrement_counter
+
+    def instrumentation
+      @instrumentation ||= Honeybadger::Instrumentation.new(self)
+    end
 
     private
 
@@ -518,6 +580,11 @@ module Honeybadger
     def init_events_worker
       return if @events_worker
       @events_worker = EventsWorker.new(config)
+    end
+
+    def init_metrics_worker
+      return if @metrics_worker
+      @metrics_worker = MetricsWorker.new(config)
     end
 
     def with_error_handling

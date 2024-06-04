@@ -1,3 +1,4 @@
+require 'honeybadger/instrumentation_helper'
 require 'honeybadger/plugin'
 require 'honeybadger/ruby'
 
@@ -11,7 +12,58 @@ module Honeybadger
         end
       end
 
-      Plugin.register do
+      class ServerMiddlewareInstrumentation
+        include Honeybadger::InstrumentationHelper
+
+        def call(worker, msg, queue, &block)
+          if msg["wrapped"]
+            context = {
+              jid: msg["jid"],
+              worker: msg["wrapped"],
+              queue: queue
+            }
+          else
+            context = {
+              jid: msg["jid"],
+              worker: msg["class"],
+              queue: queue
+            }
+          end
+
+          begin
+            duration = Honeybadger.instrumentation.monotonic_timer { block.call }[0]
+            status = 'success'
+          rescue Exception => e
+            status = 'failure'
+            raise
+          ensure
+            context.merge!(duration: duration, status: status)
+            Honeybadger.event('perform.sidekiq', context)
+
+            metric_source 'sidekiq'
+            histogram 'perform', { bins: [30, 60, 120, 300, 1800, 3600, 21_600] }.merge(context.slice(:worker, :queue, :duration))
+          end
+        end
+      end
+
+      class ClientMiddlewareInstrumentation
+        include Honeybadger::InstrumentationHelper
+
+        def call(worker, msg, queue, _redis)
+          context = {
+            worker: msg["wrapped"] || msg["class"],
+            queue: queue
+          }
+
+          Honeybadger.event('enqueue.sidekiq', context)
+
+          yield
+        end
+      end
+
+      Plugin.register :sidekiq do
+        leader_checker = nil
+
         requirement { defined?(::Sidekiq) }
 
         execution do
@@ -69,6 +121,81 @@ module Honeybadger
 
                 Honeybadger.notify(ex, opts)
               }
+            end
+          end
+
+          if config.load_plugin_insights?(:sidekiq)
+            require "sidekiq"
+            require "sidekiq/api"
+            require "sidekiq/component"
+
+            class SidekiqClusterCollectionChecker
+              include ::Sidekiq::Component
+              def initialize(config)
+                @config = config
+              end
+
+              def collect?
+                return true unless defined?(::Sidekiq::Enterprise)
+                leader?
+              end
+            end
+
+            ::Sidekiq.configure_server do |config|
+              config.server_middleware { |chain| chain.add(ServerMiddlewareInstrumentation) }
+              config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
+              config.on(:startup) do
+                leader_checker = SidekiqClusterCollectionChecker.new(config)
+              end
+            end
+
+            ::Sidekiq.configure_client do |config|
+              config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
+            end
+          end
+        end
+
+        collect do
+          if config.cluster_collection?(:sidekiq) && (leader_checker.nil? || leader_checker.collect?)
+            metric_source 'sidekiq'
+
+            stats = ::Sidekiq::Stats.new
+
+            gauge 'active_workers', ->{ stats.workers_size }
+            gauge 'active_processes', ->{ stats.processes_size }
+            gauge 'jobs_processed', ->{ stats.processed }
+            gauge 'jobs_failed', ->{ stats.failed }
+            gauge 'jobs_scheduled', ->{ stats.scheduled_size }
+            gauge 'jobs_enqueued', ->{ stats.enqueued }
+            gauge 'jobs_dead', ->{ stats.dead_size }
+            gauge 'jobs_retry', ->{ stats.retry_size }
+
+            ::Sidekiq::Queue.all.each do |queue|
+              gauge 'queue_latency', { queue: queue.name }, ->{ (queue.latency * 1000).ceil }
+              gauge 'queue_depth', { queue: queue.name }, ->{ queue.size }
+            end
+
+            Hash.new(0).tap do |busy_counts|
+              ::Sidekiq::Workers.new.each do |_pid, _tid, work|
+                payload = work.respond_to?(:payload) ? work.payload : work["payload"]
+                payload = JSON.parse(payload) if payload.is_a?(String)
+                busy_counts[payload["queue"]] += 1
+              end
+            end.each do |queue_name, busy_count|
+              gauge 'queue_busy', { queue: queue_name }, ->{ busy_count }
+            end
+
+            processes = ::Sidekiq::ProcessSet.new.to_enum(:each).to_a
+            gauge 'capacity', ->{ processes.map { |process| process["concurrency"] }.sum }
+
+            process_utilizations = processes.map do |process|
+              next unless process["concurrency"].to_f > 0
+              process["busy"] / process["concurrency"].to_f
+            end.compact
+
+            if process_utilizations.any?
+              utilization = process_utilizations.sum / process_utilizations.length.to_f
+              gauge 'utilization', ->{ utilization }
             end
           end
         end

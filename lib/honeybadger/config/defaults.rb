@@ -91,15 +91,30 @@ module Honeybadger
         default: 100,
         type: Integer
       },
+      :'events.max_queue_size' => {
+        description: 'Maximum number of event for the event worker queue.',
+        default: 10000,
+        type: Integer
+      },
       :'events.batch_size' => {
         description: 'Send events batch if n events have accumulated',
-        default: 100,
+        default: 1000,
         type: Integer
       },
       :'events.timeout' => {
         description: 'Timeout after which the events batch will be sent regardless (in milliseconds)',
         default: 30_000,
         type: Integer
+      },
+      :'events.attach_hostname' => {
+        description: 'Add the hostname to all event paylaods.',
+        default: true,
+        type: Boolean
+      },
+      :'events.ignore' => {
+        description: 'A list of events to ignore. Use a string to specify exact matches, or regex for more flexibility.',
+        default: [],
+        type: Array
       },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
@@ -311,6 +326,36 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      :'sidekiq.insights.cluster_collection' => {
+        description: 'Collect cluster based metrics for Sidekiq.',
+        default: true,
+        type: Boolean
+      },
+      :'sidekiq.insights.collection_interval' => {
+        description: 'The frequency in which Sidekiq cluster metrics are sampled.',
+        default: 60,
+        type: Integer
+      },
+      :'solid_queue.insights.cluster_collection' => {
+        description: 'Collect cluster based metrics for SolidQueue.',
+        default: true,
+        type: Boolean
+      },
+      :'solid_queue.insights.collection_interval' => {
+        description: 'The frequency in which SolidQueue cluster metrics are sampled.',
+        default: 60,
+        type: Integer
+      },
+      :'net_http.insights.enabled' => {
+        description: 'Allow automatic instrumentation of Net::HTTP requests.',
+        default: true,
+        type: Boolean
+      },
+      :'net_http.insights.full_url' => {
+        description: 'Record the full request url during instrumentation.',
+        default: false,
+        type: Boolean
+      },
       :'sinatra.enabled' => {
         description: 'Enable Sinatra auto-initialization.',
         default: true,
@@ -343,6 +388,16 @@ module Honeybadger
         description: 'Enable/Disable automatic breadcrumbs from log messages.',
         default: true,
         type: Boolean
+      },
+      :'insights.enabled' => {
+        description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
+        default: false,
+        type: Boolean
+      },
+      :'insights.registry_flush_interval' => {
+        description: "Number of seconds between registry flushes.",
+        default: 60,
+        type: Integer
       }
     }.freeze
 

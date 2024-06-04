@@ -188,6 +188,12 @@ module Honeybadger
       DEFAULTS[:'exceptions.ignore'] | Array(ignore)
     end
 
+    def ignored_events
+      self[:'events.ignore'].map do |check|
+        check.is_a?(String) ? /^#{check}$/ : check
+      end
+    end
+
     def ca_bundle_path
       if self[:'connection.system_ssl_cert_chain'] && File.exist?(OpenSSL::X509::DEFAULT_CERT_FILE)
         OpenSSL::X509::DEFAULT_CERT_FILE
@@ -222,6 +228,10 @@ module Honeybadger
 
     def max_queue_size
       self[:max_queue_size]
+    end
+
+    def events_max_queue_size
+      self[:'events.max_queue_size']
     end
 
     def events_batch_size
@@ -260,6 +270,28 @@ module Honeybadger
       return false if includes_token?(self[:'skipped_plugins'], name)
       return true unless self[:plugins].kind_of?(Array)
       includes_token?(self[:plugins], name)
+    end
+
+    def insights_enabled?
+      return false if defined?(::Rails.application) && ::Rails.const_defined?("Console")
+      !!self[:'insights.enabled']
+    end
+
+    def cluster_collection?(name)
+      return false unless insights_enabled?
+      return true if self[:"#{name}.insights.cluster_collection"].nil?
+      !!self[:"#{name}.insights.cluster_collection"]
+    end
+
+    def collection_interval(name)
+      return nil unless insights_enabled?
+      self[:"#{name}.insights.collection_interval"]
+    end
+
+    def load_plugin_insights?(name)
+      return false unless insights_enabled?
+      return true if self[:"#{name}.insights.enabled"].nil?
+      !!self[:"#{name}.insights.enabled"]
     end
 
     def root_regexp

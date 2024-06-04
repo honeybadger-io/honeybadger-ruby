@@ -180,5 +180,56 @@ describe "Sidekiq Dependency" do
         end
       end
     end
+
+    describe "collectors" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true, :'sidekiq.insights.cluster_collection' => true) }
+      let(:queues) { [double('queue', name: 'default', latency: 1, size: 10)] }
+      let(:workers) { [['pid', 'tid', double('work', payload: { queue: 'queue_name' })]] }
+      let(:processes) { [{"concurrency" => 1, "busy" => 1}] }
+
+      let(:stats_shim) do
+        Class.new do
+          def workers_size; end
+          def processes_size; end
+          def processed; end
+          def failed; end
+          def scheduled_size; end
+          def enqueued; end
+          def dead_size; end
+          def retry_size; end
+        end
+      end
+
+      let(:queue_shim) do
+        Class.new do
+        end
+      end
+
+      let(:workers_shim) do
+        Class.new do
+        end
+      end
+
+      let(:process_set_shim) do
+        Class.new do
+        end
+      end
+
+      before do
+        ::Sidekiq.const_set(:Stats, stats_shim)
+        ::Sidekiq.const_set(:Queue, queue_shim)
+        ::Sidekiq.const_set(:Workers, workers_shim)
+        ::Sidekiq.const_set(:ProcessSet, process_set_shim)
+        allow(::Sidekiq::Queue).to receive(:all).and_return(queues)
+        allow(::Sidekiq::Workers).to receive(:new).and_return(workers)
+        allow(::Sidekiq::ProcessSet).to receive(:new).and_return(processes)
+      end
+
+      it "can execute collectors" do
+        Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
+          Honeybadger::Plugin::CollectorExecution.new('sidekiq', config, options, &collect_block).call
+        end
+      end
+    end
   end
 end
