@@ -10,6 +10,7 @@ jobs:
 
   ruby:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         ruby:
@@ -53,6 +54,7 @@ jobs:
 
   jruby:
     runs-on: ubuntu-20.04 # ubuntu-latest is currently 22.04, which doesn't have a supported JRuby 9 build yet
+    timeout-minutes: 10
     strategy:
       matrix:
         ruby:
