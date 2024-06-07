@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.11.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.11.0...v5.11.1) (2024-06-07)
+
+
+### Bug Fixes
+
+* do GoodJob.on_thread_error check via hash instead of method ([#558](https://github.com/honeybadger-io/honeybadger-ruby/issues/558)) ([d2aa464](https://github.com/honeybadger-io/honeybadger-ruby/commit/d2aa4640e371e3985310fb30ad5a356807d2bab3))
+
 ## [5.11.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.10.2...v5.11.0) (2024-06-04)
 
 
