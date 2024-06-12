@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.11.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.11.1...v5.11.2) (2024-06-12)
+
+
+### Bug Fixes
+
+* don't blow up if ActiveJob queue_adapter isn't a string or symbol ([#561](https://github.com/honeybadger-io/honeybadger-ruby/issues/561)) ([4550ea3](https://github.com/honeybadger-io/honeybadger-ruby/commit/4550ea393680a07599deb95f6b49e45112447efa)), closes [#560](https://github.com/honeybadger-io/honeybadger-ruby/issues/560)
+
 ## [5.11.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.11.0...v5.11.1) (2024-06-07)
 
 
