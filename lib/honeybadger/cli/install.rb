@@ -73,6 +73,10 @@ development_environments:
 
 # Enable verbose debug logging (useful for troubleshooting).
 debug: false
+
+# Enable Honeybadger Insights
+insights:
+  enable: #{options["insights"]}
 CONFIG
           end
         end
