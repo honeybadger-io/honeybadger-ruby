@@ -76,7 +76,7 @@ debug: false
 
 # Enable Honeybadger Insights
 insights:
-  enable: #{options["insights"]}
+  enabled: #{options["insights"]}
 CONFIG
           end
         end
