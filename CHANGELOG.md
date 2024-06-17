@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.12.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.11.2...v5.12.0) (2024-06-17)
+
+
+### Features
+
+* add --insights flag to install command ([#564](https://github.com/honeybadger-io/honeybadger-ruby/issues/564)) ([02a41c6](https://github.com/honeybadger-io/honeybadger-ruby/commit/02a41c67e4b33012057e4ae4c2bd23ca8c13c99b))
+
 ## [5.11.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.11.1...v5.11.2) (2024-06-12)
 
 
