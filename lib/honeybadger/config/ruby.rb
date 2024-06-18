@@ -89,13 +89,25 @@ module Honeybadger
       def before_notify(action = nil, &block)
         hooks = Array(get(:before_notify)).dup
 
-        if action && validate_before_action(action)
+        if action && validate_before_action(action, 'notify')
           hooks << action
-        elsif block_given? && validate_before_action(block)
+        elsif block_given? && validate_before_action(block, 'notify')
           hooks << block
         end
 
         hash[:before_notify] = hooks
+      end
+
+      def before_event(action = nil, &block)
+        hooks = Array(get(:before_event)).dup
+
+        if action && validate_before_action(action, 'event')
+          hooks << action
+        elsif block_given? && validate_before_action(block, 'event')
+          hooks << block
+        end
+
+        hash[:before_event] = hooks
       end
 
       def backtrace_filter(&block)
@@ -127,17 +139,17 @@ module Honeybadger
 
       private
 
-      def validate_before_action(action)
+      def validate_before_action(action, type)
         if !action.respond_to?(:call)
           logger.warn(
-            'You attempted to add a before notify hook that does not respond ' \
+            "You attempted to add a before #{type} hook that does not respond " \
             'to #call. We are discarding this hook so your intended behavior ' \
             'will not occur.'
           )
           false
         elsif action.arity != 1
           logger.warn(
-            'You attempted to add a before notify hook that has an arity ' \
+            "You attempted to add a before #{type} hook that has an arity " \
             'other than one. We are discarding this hook so your intended ' \
             'behavior will not occur.'
           )

@@ -337,7 +337,18 @@ describe Honeybadger::Agent do
       end
     end
 
-    describe "ignoring events" do
+    describe "ignoring events using before_event callback" do
+      let(:halt_hook) { ->(event) { event.halt! } }
+
+      before { subject.configure { |config| config.before_event(halt_hook) } }
+      after { subject.event(event_type: "event_type", some_data: "is here") }
+
+      it "does not push an event" do
+        expect(events_worker).not_to receive(:push)
+      end
+    end
+
+    describe "ignoring events using events.ignore config" do
       let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.ignore' => ignored_events) }
 
       after { subject.event(event_type: event_type, some_data: "is here") }
