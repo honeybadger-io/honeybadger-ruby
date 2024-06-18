@@ -92,6 +92,10 @@ module Honeybadger
       (ruby[:before_notify] || []).clone
     end
 
+    def before_event_hooks
+      (ruby[:before_event] || []).clone
+    end
+
     def exception_filter(&block)
       if block_given?
         warn('DEPRECATED: exception_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_filter')

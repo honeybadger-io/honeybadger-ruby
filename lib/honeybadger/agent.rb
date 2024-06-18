@@ -4,6 +4,7 @@ require 'honeybadger/version'
 require 'honeybadger/config'
 require 'honeybadger/context_manager'
 require 'honeybadger/notice'
+require 'honeybadger/event'
 require 'honeybadger/plugin'
 require 'honeybadger/logging'
 require 'honeybadger/worker'
@@ -392,28 +393,21 @@ module Honeybadger
     def event(event_type, payload = {})
       init_events_worker
 
-      ts = Time.now.utc.strftime("%FT%T.%LZ")
-      merged = {ts: ts}
-
-      if event_type.is_a?(String)
-        merged[:event_type] = event_type
-      else
-        merged.merge!(Hash(event_type))
+      extra_payload = {}.tap do |p|
+        p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
+        p[:hostname] = config[:hostname].to_s if config[:'events.attach_hostname']
       end
 
-      if (request_id = context_manager.get_request_id)
-        merged[:request_id] = request_id
+      event = Event.new(event_type, extra_payload.merge(payload))
+
+      config.before_event_hooks.each do |hook|
+        with_error_handling { hook.call(event) }
       end
 
-      if config[:'events.attach_hostname']
-        merged[:hostname] = config[:hostname].to_s
-      end
+      return if config.ignored_events.any? { |check| event.event_type&.match?(check) }
+      return if event.halted?
 
-      merged.merge!(Hash(payload))
-
-      return if config.ignored_events.any? { |check| merged[:event_type]&.match?(check) }
-
-      events_worker.push(merged)
+      events_worker.push(event.as_json)
     end
 
     # @api private
@@ -590,7 +584,7 @@ module Honeybadger
     def with_error_handling
       yield
     rescue => ex
-      error { "Rescued an error in a before notify hook: #{ex.message}" }
+      error { "Rescued an error in a before hook: #{ex.message}" }
     end
 
     @instance = new(Config.new)
