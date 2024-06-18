@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.13.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.12.0...v5.13.0) (2024-06-18)
+
+
+### Features
+
+* add before_event hook for intercepting events ([#567](https://github.com/honeybadger-io/honeybadger-ruby/issues/567)) ([2f86728](https://github.com/honeybadger-io/honeybadger-ruby/commit/2f8672814af3b12b3bfbc775de63b7a34b5087ad))
+
 ## [5.12.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.11.2...v5.12.0) (2024-06-17)
 
 
