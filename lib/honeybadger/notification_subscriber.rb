@@ -59,7 +59,8 @@ module Honeybadger
     def format_payload(payload)
       {
         query: payload[:sql].to_s.gsub(/\s+/, ' ').strip,
-        async: payload[:async]
+        async: payload[:async],
+        callers: caller.select { |line| line.match?(/^#{Rails.root.to_s}/) }
       }
     end
   end
