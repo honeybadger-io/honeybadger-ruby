@@ -404,7 +404,21 @@ module Honeybadger
         with_error_handling { hook.call(event) }
       end
 
-      return if config.ignored_events.any? { |check| event.event_type&.match?(check) }
+      return if config.ignored_events.any? do |check|
+        if check.is_a?(String) || check.is_a?(Regexp)
+          event.event_type&.match?(check)
+        elsif check.is_a?(Hash)
+          flat_hash(check).any? do |keys, value|
+            sym_keys = keys.map(&:to_sym)
+            if sym_keys == [:event_type]
+              event.event_type&.match?(value)
+            elsif event.dig(*sym_keys)
+              event.dig(*sym_keys).to_s.match?(value)
+            end
+          end
+        end
+      end
+
       return if event.halted?
 
       events_worker.push(event.as_json)
@@ -585,6 +599,12 @@ module Honeybadger
       yield
     rescue => ex
       error { "Rescued an error in a before hook: #{ex.message}" }
+    end
+
+    def flat_hash(h,f=[],g={})
+      return g.update({ f=>h }) unless h.is_a? Hash
+      h.each { |k,r| flat_hash(r,f+[k],g) }
+      g
     end
 
     @instance = new(Config.new)
