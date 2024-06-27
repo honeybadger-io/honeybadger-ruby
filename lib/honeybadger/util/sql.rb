@@ -12,7 +12,7 @@ module Honeybadger
           s.gsub!(/\s+/, " ")
           s.gsub!(ESCAPE_QUOTES, "".freeze)
           s.gsub!(SQUOTE_DATA, "'?'".freeze)
-          s.gsub!(DQUOTE_DATA, '"?"'.freeze) unless adapter_name.to_s.match?(DOUBLE_QUOTERS)
+          s.gsub!(DQUOTE_DATA, '"?"'.freeze) unless adapter.to_s.match?(DOUBLE_QUOTERS)
           s.gsub!(NUMBER_DATA, "?".freeze)
           s.strip!
         end
