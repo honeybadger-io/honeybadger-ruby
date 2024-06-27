@@ -1,4 +1,5 @@
 require 'honeybadger/instrumentation_helper'
+require 'honeybadger/util/sql'
 
 module Honeybadger
   class NotificationSubscriber
@@ -56,26 +57,11 @@ module Honeybadger
   end
 
   class ActiveRecordSubscriber < NotificationSubscriber
-    ESCAPE_QUOTES = /(\\"|\\')/
-    SQUOTE_DATA = /'(?:[^']|'')*'/
-    DQUOTE_DATA = /"(?:[^"]|"")*"/
-    NUMBER_DATA = /\b\d+\b/
-    DOUBLE_QUOTERS = /(postgres|sqlite|postgis)/i
-
     def format_payload(payload)
       {
-        query: sanitize_query(payload[:sql], payload[:connection].adapter_name).strip,
+        query: Util::SQL.obfuscate(payload[:sql], payload[:connection].adapter_name),
         async: payload[:async]
       }
-    end
-
-    def sanitize_query(query, adapter_name = nil)
-      query.to_s.gsub(/\s+/, " ").tap do |s|
-        s.gsub!(ESCAPE_QUOTES, "".freeze)
-        s.gsub!(SQUOTE_DATA, "'?'".freeze)
-        s.gsub!(DQUOTE_DATA, '"?"'.freeze) unless adapter_name.to_s.match?(DOUBLE_QUOTERS)
-        s.gsub!(NUMBER_DATA, "?".freeze)
-      end
     end
   end
 
