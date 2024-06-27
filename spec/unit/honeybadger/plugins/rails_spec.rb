@@ -7,6 +7,7 @@ end
 
 if RAILS_PRESENT
   require "honeybadger"
+  require "honeybadger/plugins/rails"
 
   describe "Rails notification subscriptions" do
     context "ActiveRecord" do
