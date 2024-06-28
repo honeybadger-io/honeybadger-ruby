@@ -1,4 +1,5 @@
 require 'honeybadger/instrumentation_helper'
+require 'honeybadger/util/sql'
 
 module Honeybadger
   class NotificationSubscriber
@@ -58,7 +59,7 @@ module Honeybadger
   class ActiveRecordSubscriber < NotificationSubscriber
     def format_payload(payload)
       {
-        query: payload[:sql].to_s.gsub(/\s+/, ' ').strip,
+        query: Util::SQL.obfuscate(payload[:sql], payload[:connection].adapter_name),
         async: payload[:async]
       }
     end
