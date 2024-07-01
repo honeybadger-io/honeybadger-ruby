@@ -1,6 +1,15 @@
 # Change Log
 
 
+## [5.13.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.0...v5.13.1) (2024-07-01)
+
+
+### Bug Fixes
+
+* do not check for rails console ([#574](https://github.com/honeybadger-io/honeybadger-ruby/issues/574)) ([ba74af8](https://github.com/honeybadger-io/honeybadger-ruby/commit/ba74af8b55393ea0a96962085ea48c4376380be3))
+* ignore content-less SQL statements ([#572](https://github.com/honeybadger-io/honeybadger-ruby/issues/572)) ([e7ecd36](https://github.com/honeybadger-io/honeybadger-ruby/commit/e7ecd36969922496e276a246406fe7d792de00e3))
+* sanitize SQL when reporting SQL queries ([#571](https://github.com/honeybadger-io/honeybadger-ruby/issues/571)) ([40d4a79](https://github.com/honeybadger-io/honeybadger-ruby/commit/40d4a79a5c1f758fe49779e63697d56599537235))
+
 ## [5.13.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.12.0...v5.13.0) (2024-06-18)
 
 
