@@ -193,9 +193,11 @@ module Honeybadger
     end
 
     def ignored_events
-      self[:'events.ignore'].map do |check|
-        check.is_a?(String) ? /^#{check}$/ : check
-      end
+      ignore_only = get(:'events.ignore_only')
+      return ignore_only if ignore_only
+      return DEFAULTS[:'events.ignore'] unless ignore = get(:'events.ignore')
+
+      DEFAULTS[:'events.ignore'] | Array(ignore)
     end
 
     def ca_bundle_path

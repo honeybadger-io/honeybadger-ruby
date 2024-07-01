@@ -350,8 +350,9 @@ describe Honeybadger::Agent do
 
     describe "ignoring events using events.ignore config" do
       let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.ignore' => ignored_events) }
+      let(:payload) { { some_data: "is here" } }
 
-      after { subject.event(event_type: event_type, some_data: "is here") }
+      after { subject.event(payload.merge(event_type: event_type)) }
 
       context "when configured with an event type matching string" do
         let(:ignored_events) { ["report.system"] }
@@ -394,6 +395,76 @@ describe Honeybadger::Agent do
         let(:event_type) { nil }
 
         it "does push an event" do
+          expect(events_worker).to receive(:push)
+        end
+      end
+
+      context "when configured with a hash" do
+        let(:ignored_events) { [{ "event_type" => "report.system" }] }
+        let(:event_type) { "report.system" }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "when configured with a hash with a nested payload" do
+        let(:ignored_events) { [{ "nested" => { "data"  => "test" }}] }
+        let(:event_type) { "report.system" }
+        let(:payload) { { nested: { data: "test" }} }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "by default ignores Rails::HealthController" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "perform_action.action_controller" }
+        let(:payload) { { controller: "Rails::HealthController" } }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "by default ignores active record BEGIN events" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { { query: "BEGIN" } }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "by default ignores active record COMMIT events" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { { query: "COMMIT" } }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "by default ignores solid_queue processor sql events" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { { query: 'UPDATE "solid_queue_processes" SET "last_heartbeat_at" = ? WHERE "solid_queue_processes"."id" = ?' } }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "override default ignores" do
+        let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.ignore_only' => ignore_only) }
+        let(:ignore_only) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { { query: "COMMIT" } }
+
+        it "does not push an event" do
           expect(events_worker).to receive(:push)
         end
       end
