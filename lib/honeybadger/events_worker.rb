@@ -216,7 +216,7 @@ module Honeybadger
         to_send
       end
 
-      debug { sprintf('Sending %s events', send_queue.length) }
+      debug { sprintf('Sending %s events', batch.length) }
       send_now(batch)
     end
 
