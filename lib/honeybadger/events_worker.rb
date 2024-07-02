@@ -208,6 +208,7 @@ module Honeybadger
       batch = mutex.synchronize do
         to_send = send_queue
         @send_queue = Queue.new
+        @send_queue = []
         @last_sent = Time.now
         if @dropped_events > 0
           warn { sprintf('Dropped %s messages due to exceeding max queue size of %s', @dropped_events, config.events_max_queue_size) }
