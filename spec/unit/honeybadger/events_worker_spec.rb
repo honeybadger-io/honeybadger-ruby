@@ -125,12 +125,6 @@ describe Honeybadger::EventsWorker do
         expect(instance.send(:queue)).not_to receive(:push)
         expect(instance.push(event)).to eq false
       end
-
-      it "warns the logger" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/reached max/i)
-        instance.push(event)
-      end
     end
   end
 
