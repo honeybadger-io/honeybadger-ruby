@@ -39,13 +39,14 @@ module Honeybadger
       @pid = Process.pid
       @send_queue = []
       @last_sent = nil
+      @dropped_events = 0
     end
 
     def push(msg)
       return false unless start
 
       if queue.size >= config.events_max_queue_size
-        warn { sprintf('Unable to send event; reached max queue size of %s.', queue.size) }
+        @dropped_events += 1
         return false
       end
 
@@ -208,6 +209,10 @@ module Honeybadger
       mutex.synchronize do
         @last_sent = Time.now
         send_queue.clear
+        if @dropped_events > 0
+          warn { sprintf('Dropped %s messages due to exceeding max queue size of %s', @dropped_events, config.events_max_queue_size) }
+        end
+        @dropped_events = 0
       end
     end
 
