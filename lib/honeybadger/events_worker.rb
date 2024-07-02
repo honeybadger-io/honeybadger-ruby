@@ -205,16 +205,19 @@ module Honeybadger
     end
 
     def send_batch
-      send_now(mutex.synchronize { send_queue })
-      mutex.synchronize do
+      batch = mutex.synchronize do
+        to_send = send_queue
+        @send_queue = Queue.new
         @last_sent = Time.now
-        debug { sprintf('Sending %s events', send_queue.length) }
-        send_queue.clear
         if @dropped_events > 0
           warn { sprintf('Dropped %s messages due to exceeding max queue size of %s', @dropped_events, config.events_max_queue_size) }
+          @dropped_events = 0
         end
-        @dropped_events = 0
+        to_send
       end
+
+      debug { sprintf('Sending %s events', send_queue.length) }
+      send_now(batch)
     end
 
     def check_and_send
