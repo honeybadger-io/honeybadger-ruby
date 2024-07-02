@@ -208,6 +208,7 @@ module Honeybadger
       send_now(mutex.synchronize { send_queue })
       mutex.synchronize do
         @last_sent = Time.now
+        debug { sprintf('Sending %s events', send_queue.length) }
         send_queue.clear
         if @dropped_events > 0
           warn { sprintf('Dropped %s messages due to exceeding max queue size of %s', @dropped_events, config.events_max_queue_size) }
