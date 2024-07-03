@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.13.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.1...v5.13.2) (2024-07-03)
+
+
+### Bug Fixes
+
+* buffer more and warn less ([#575](https://github.com/honeybadger-io/honeybadger-ruby/issues/575)) ([8e99e17](https://github.com/honeybadger-io/honeybadger-ruby/commit/8e99e17af65e8d0002e5e8204d5ded1cea891e86))
+
 ## [5.13.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.0...v5.13.1) (2024-07-01)
 
 
