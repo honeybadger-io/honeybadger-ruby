@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.13.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.2...v5.13.3) (2024-07-06)
+
+
+### Bug Fixes
+
+* disable insights when loading rails console ([#580](https://github.com/honeybadger-io/honeybadger-ruby/issues/580)) ([94844bd](https://github.com/honeybadger-io/honeybadger-ruby/commit/94844bd72922f27ecf40453ef7c901433067688b))
+
 ## [5.13.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.1...v5.13.2) (2024-07-03)
 
 
