@@ -32,6 +32,10 @@ module Honeybadger
         config.after_initialize do
           Honeybadger.load_plugins!
         end
+
+        console do
+          Honeybadger::Agent.instance.config[:'insights.enabled'] = false unless Honeybadger::Agent.instance.config.env.has_key?(:'insights.enabled')
+        end
       end
     end
   end
