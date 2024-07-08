@@ -20,7 +20,7 @@ module Honeybadger
       RECURSION = '[RECURSION]'.freeze
       TRUNCATED = '[TRUNCATED]'.freeze
 
-      IMMUTABLE = Set.new(%w[NilClass FalseClass TrueClass Symbol Numeric BigDecimal Method].freeze)
+      IMMUTABLE = [NilClass, FalseClass, TrueClass, Symbol, Numeric, Method].freeze
 
       MAX_STRING_SIZE = 65536
 
@@ -202,7 +202,7 @@ module Honeybadger
       end
 
       def can_dup?(obj)
-        !IMMUTABLE.include?(obj.class.to_s)
+        !IMMUTABLE.any? {|k| obj.kind_of?(k) }
       end
 
       def inspected?(string)
