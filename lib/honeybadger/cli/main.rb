@@ -49,6 +49,8 @@ WELCOME
 
       desc 'install API_KEY', 'Install Honeybadger into a new project'
       option :insights, type: :boolean, aliases: :'-i', default: false, desc: 'Enable Honeybadger Insights'
+      option :host, type: :string
+      option :ui_host, type: :string
       def install(api_key)
         Install.new(options, api_key).run
       rescue => e
