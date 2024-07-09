@@ -226,10 +226,11 @@ module Honeybadger
       when 413
         warn { sprintf('Error report failed: Payload is too large. id=%s code=%s', msg.id, response.code) }
       when 201
+        host = config.get(:'connection.host')
         if throttle = dec_throttle
-          info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s throttle=%s interval=%s', msg.id, msg.id, response.code, throttle, throttle_interval) }
+          info { sprintf('Success ⚡ https://#{host}/notice/%s id=%s code=%s throttle=%s interval=%s', msg.id, msg.id, response.code, throttle, throttle_interval) }
         else
-          info { sprintf('Success ⚡ https://app.honeybadger.io/notice/%s id=%s code=%s', msg.id, msg.id, response.code) }
+          info { sprintf('Success ⚡ https://#{host}/notice/%s id=%s code=%s', msg.id, msg.id, response.code) }
         end
       when :stubbed
         info { sprintf('Success ⚡ Development mode is enabled; this error will be reported if it occurs after you deploy your app. id=%s', msg.id) }
