@@ -1,6 +1,19 @@
 # Change Log
 
 
+## [5.14.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.3...v5.14.0) (2024-07-11)
+
+
+### Features
+
+* add --host and --ui_host flags to install command ([#584](https://github.com/honeybadger-io/honeybadger-ruby/issues/584)) ([5f171ba](https://github.com/honeybadger-io/honeybadger-ruby/commit/5f171badc0602df76a87e4caa0e06c9959648376))
+* add ability to link to a custom domain after creating a notice ([#583](https://github.com/honeybadger-io/honeybadger-ruby/issues/583)) ([5b32b23](https://github.com/honeybadger-io/honeybadger-ruby/commit/5b32b231bb5562b3d97066e3a41f39de76b2f4a3))
+
+
+### Bug Fixes
+
+* squash warning about BigDecimal ([#578](https://github.com/honeybadger-io/honeybadger-ruby/issues/578)) ([47ff813](https://github.com/honeybadger-io/honeybadger-ruby/commit/47ff8130047b723b9d85be07b308c4883320eabb))
+
 ## [5.13.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.2...v5.13.3) (2024-07-06)
 
 
