@@ -78,6 +78,10 @@ debug: false
 insights:
   enabled: #{options["insights"]}
 CONFIG
+            if (connection = options.slice("host", "ui_host")).any?
+              file.puts("\n# Override hosts\nconnection:")
+              connection.each {|k,v| file.puts("  #{k}: '#{v}'") }
+            end
           end
         end
 

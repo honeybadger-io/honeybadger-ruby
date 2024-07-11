@@ -51,6 +51,26 @@ feature "Installing honeybadger via the cli" do
         expect(YAML.load_file(config_file).dig("insights", "enabled")).to eq(false)
       end
     end
+    
+    context "with host and/or UI host flags" do
+      let(:yaml) { YAML.load_file(config_file) }
+      
+      it "configures the host" do
+        run_command_and_stop('honeybadger install asdf --host api.honeybadger.io', fail_on_error: true)
+        expect(yaml.dig("connection", "host")).to eq('api.honeybadger.io')
+      end
+      
+      it "configures the UI host" do
+        run_command_and_stop('honeybadger install asdf --ui_host app.honeybadger.io', fail_on_error: true)
+        expect(yaml.dig("connection", "ui_host")).to eq('app.honeybadger.io')
+      end
+      
+      it "configures both hosts" do
+        run_command_and_stop('honeybadger install asdf --host api.honeybadger.io --ui_host app.honeybadger.io', fail_on_error: true)
+        expect(yaml.dig("connection", "host")).to eq('api.honeybadger.io')
+        expect(yaml.dig("connection", "ui_host")).to eq('app.honeybadger.io')
+      end
+    end
 
     scenario "when the configuration file already exists" do
       before { File.write(config_file, <<-YML) }
