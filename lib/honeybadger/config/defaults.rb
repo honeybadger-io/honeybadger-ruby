@@ -166,6 +166,11 @@ module Honeybadger
         default: 'api.honeybadger.io'.freeze,
         type: String
       },
+      :'connection.ui_host' => {
+        description: 'The host to use when viewing data.',
+        default: 'app.honeybadger.io'.freeze,
+        type: String
+      },
       :'connection.port' => {
         description: 'The port to use when sending data.',
         default: nil,
