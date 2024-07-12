@@ -1,4 +1,5 @@
 require 'honeybadger/instrumentation_helper'
+require 'honeybadger/util/sql'
 
 module Honeybadger
   class NotificationSubscriber
@@ -9,7 +10,7 @@ module Honeybadger
     def finish(name, id, payload)
       @finish_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
 
-      return unless process?(name)
+      return unless process?(name, payload)
 
       payload = {
         instrumenter_id: id,
@@ -23,7 +24,7 @@ module Honeybadger
       Honeybadger.event(name, payload)
     end
 
-    def process?(event)
+    def process?(event, payload)
       true
     end
 
@@ -58,9 +59,15 @@ module Honeybadger
   class ActiveRecordSubscriber < NotificationSubscriber
     def format_payload(payload)
       {
-        query: payload[:sql].to_s.gsub(/\s+/, ' ').strip,
+        query: Util::SQL.obfuscate(payload[:sql], payload[:connection].adapter_name),
         async: payload[:async]
       }
+    end
+
+    def process?(event, payload)
+      return false if payload[:name] == "SCHEMA"
+      return false if payload[:sql]&.match?(/^(begin|commit)( transaction)?$/i)
+      true
     end
   end
 

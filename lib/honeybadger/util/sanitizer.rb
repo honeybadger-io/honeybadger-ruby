@@ -1,4 +1,3 @@
-require 'bigdecimal'
 require 'set'
 
 require 'honeybadger/conversions'
@@ -21,7 +20,7 @@ module Honeybadger
       RECURSION = '[RECURSION]'.freeze
       TRUNCATED = '[TRUNCATED]'.freeze
 
-      IMMUTABLE = [NilClass, FalseClass, TrueClass, Symbol, Numeric, BigDecimal, Method].freeze
+      IMMUTABLE = [NilClass, FalseClass, TrueClass, Symbol, Numeric, Method].freeze
 
       MAX_STRING_SIZE = 65536
 

@@ -1,6 +1,42 @@
 # Change Log
 
 
+## [5.14.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.3...v5.14.0) (2024-07-11)
+
+
+### Features
+
+* add --host and --ui_host flags to install command ([#584](https://github.com/honeybadger-io/honeybadger-ruby/issues/584)) ([5f171ba](https://github.com/honeybadger-io/honeybadger-ruby/commit/5f171badc0602df76a87e4caa0e06c9959648376))
+* add ability to link to a custom domain after creating a notice ([#583](https://github.com/honeybadger-io/honeybadger-ruby/issues/583)) ([5b32b23](https://github.com/honeybadger-io/honeybadger-ruby/commit/5b32b231bb5562b3d97066e3a41f39de76b2f4a3))
+
+
+### Bug Fixes
+
+* squash warning about BigDecimal ([#578](https://github.com/honeybadger-io/honeybadger-ruby/issues/578)) ([47ff813](https://github.com/honeybadger-io/honeybadger-ruby/commit/47ff8130047b723b9d85be07b308c4883320eabb))
+
+## [5.13.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.2...v5.13.3) (2024-07-06)
+
+
+### Bug Fixes
+
+* disable insights when loading rails console ([#580](https://github.com/honeybadger-io/honeybadger-ruby/issues/580)) ([94844bd](https://github.com/honeybadger-io/honeybadger-ruby/commit/94844bd72922f27ecf40453ef7c901433067688b))
+
+## [5.13.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.1...v5.13.2) (2024-07-03)
+
+
+### Bug Fixes
+
+* buffer more and warn less ([#575](https://github.com/honeybadger-io/honeybadger-ruby/issues/575)) ([8e99e17](https://github.com/honeybadger-io/honeybadger-ruby/commit/8e99e17af65e8d0002e5e8204d5ded1cea891e86))
+
+## [5.13.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.0...v5.13.1) (2024-07-01)
+
+
+### Bug Fixes
+
+* do not check for rails console ([#574](https://github.com/honeybadger-io/honeybadger-ruby/issues/574)) ([ba74af8](https://github.com/honeybadger-io/honeybadger-ruby/commit/ba74af8b55393ea0a96962085ea48c4376380be3))
+* ignore content-less SQL statements ([#572](https://github.com/honeybadger-io/honeybadger-ruby/issues/572)) ([e7ecd36](https://github.com/honeybadger-io/honeybadger-ruby/commit/e7ecd36969922496e276a246406fe7d792de00e3))
+* sanitize SQL when reporting SQL queries ([#571](https://github.com/honeybadger-io/honeybadger-ruby/issues/571)) ([40d4a79](https://github.com/honeybadger-io/honeybadger-ruby/commit/40d4a79a5c1f758fe49779e63697d56599537235))
+
 ## [5.13.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.12.0...v5.13.0) (2024-06-18)
 
 

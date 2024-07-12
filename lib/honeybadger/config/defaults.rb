@@ -98,7 +98,7 @@ module Honeybadger
       },
       :'events.max_queue_size' => {
         description: 'Maximum number of event for the event worker queue.',
-        default: 10000,
+        default: 100000,
         type: Integer
       },
       :'events.batch_size' => {
@@ -174,6 +174,11 @@ module Honeybadger
       :'connection.host' => {
         description: 'The host to use when sending data.',
         default: 'api.honeybadger.io'.freeze,
+        type: String
+      },
+      :'connection.ui_host' => {
+        description: 'The host to use when viewing data.',
+        default: 'app.honeybadger.io'.freeze,
         type: String
       },
       :'connection.port' => {
