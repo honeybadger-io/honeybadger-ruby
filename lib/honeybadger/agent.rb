@@ -405,16 +405,11 @@ module Honeybadger
       end
 
       return if config.ignored_events.any? do |check|
-        if check.is_a?(String) || check.is_a?(Regexp)
-          event.event_type&.match?(check)
-        elsif check.is_a?(Hash)
-          flat_hash(check).any? do |keys, value|
-            sym_keys = keys.map(&:to_sym)
-            if sym_keys == [:event_type]
-              event.event_type&.match?(value)
-            elsif event.dig(*sym_keys)
-              event.dig(*sym_keys).to_s.match?(value)
-            end
+        check.any? do |keys, value|
+          if keys == [:event_type]
+            event.event_type&.match?(value)
+          elsif event.dig(*keys)
+            event.dig(*keys).to_s.match?(value)
           end
         end
       end
@@ -599,15 +594,6 @@ module Honeybadger
       yield
     rescue => ex
       error { "Rescued an error in a before hook: #{ex.message}" }
-    end
-
-    # Converts a nested hash into a single layer where keys become arrays:
-    # ex: > flat_hash({ :nested => { :hash => "value" }})
-    #     > { [:nested, :hash] => "value" }
-    def flat_hash(h,f=[],g={})
-      return g.update({ f=>h }) unless h.is_a? Hash
-      h.each { |k,r| flat_hash(r,f+[k],g) }
-      g
     end
 
     @instance = new(Config.new)

@@ -418,6 +418,16 @@ describe Honeybadger::Agent do
         end
       end
 
+      context "when configured with a hash with string keys" do
+        let(:ignored_events) { [{ "nested" => { "data"  => "test" }}] }
+        let(:event_type) { "report.system" }
+        let(:payload) { { nested: { "data" => "test" }} }
+
+        it "does push an event" do
+          expect(events_worker).to receive(:push)
+        end
+      end
+
       context "by default ignores Rails::HealthController" do
         let(:ignored_events) { [] }
         let(:event_type) { "perform_action.action_controller" }
