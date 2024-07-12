@@ -405,7 +405,7 @@ module Honeybadger
       end
 
       return if config.ignored_events.any? do |check|
-        check.any? do |keys, value|
+        check.all? do |keys, value|
           if keys == [:event_type]
             event.event_type&.match?(value)
           elsif event.dig(*keys)
