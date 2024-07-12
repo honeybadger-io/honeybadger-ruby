@@ -430,7 +430,7 @@ describe Honeybadger::Agent do
 
       context "by default ignores Rails::HealthController" do
         let(:ignored_events) { [] }
-        let(:event_type) { "perform_action.action_controller" }
+        let(:event_type) { "process_action.action_controller" }
         let(:payload) { { controller: "Rails::HealthController" } }
 
         it "does not push an event" do
@@ -462,6 +462,16 @@ describe Honeybadger::Agent do
         let(:ignored_events) { [] }
         let(:event_type) { "sql.active_record" }
         let(:payload) { { query: 'UPDATE "solid_queue_processes" SET "last_heartbeat_at" = ? WHERE "solid_queue_processes"."id" = ?' } }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
+      context "by default ignores good_job processor sql events" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { { query: 'SELECT * FROM "good_jobs"' } }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
