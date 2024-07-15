@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.14.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.14.0...v5.14.1) (2024-07-15)
+
+
+### Bug Fixes
+
+* do not serialize adapter object ([#586](https://github.com/honeybadger-io/honeybadger-ruby/issues/586)) ([f724ebf](https://github.com/honeybadger-io/honeybadger-ruby/commit/f724ebf0a2c3e2402c64448779cf7e6386de8b47))
+
 ## [5.14.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.13.3...v5.14.0) (2024-07-11)
 
 
