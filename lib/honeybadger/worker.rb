@@ -228,9 +228,9 @@ module Honeybadger
       when 201
         host = config.get(:'connection.ui_host')
         if throttle = dec_throttle
-          info { sprintf('Success ⚡ https://#{host}/notice/%s id=%s code=%s throttle=%s interval=%s', msg.id, msg.id, response.code, throttle, throttle_interval) }
+          info { sprintf('Success ⚡ https://%s/notice/%s id=%s code=%s throttle=%s interval=%s', host, msg.id, msg.id, response.code, throttle, throttle_interval) }
         else
-          info { sprintf('Success ⚡ https://#{host}/notice/%s id=%s code=%s', msg.id, msg.id, response.code) }
+          info { sprintf('Success ⚡ https://%s/notice/%s id=%s code=%s', host, msg.id, msg.id, response.code) }
         end
       when :stubbed
         info { sprintf('Success ⚡ Development mode is enabled; this error will be reported if it occurs after you deploy your app. id=%s', msg.id) }
