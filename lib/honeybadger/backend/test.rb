@@ -13,6 +13,16 @@ module Honeybadger
         @notifications ||= Hash.new {|h,k| h[k] = [] }
       end
 
+      # The event list.
+      #
+      # @example
+      #   Test.events # => [{}, {}, ...]
+      #
+      # @return [Array<Hash>] List of event payloads.
+      def self.events
+        @events ||= []
+      end
+
       # @api public
       # The check in list.
       #
@@ -34,6 +44,11 @@ module Honeybadger
 
       def notify(feature, payload)
         notifications[feature] << payload
+        super
+      end
+
+      def event(payload)
+        events << payload
         super
       end
 

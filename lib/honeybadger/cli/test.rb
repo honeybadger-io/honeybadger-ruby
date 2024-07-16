@@ -24,9 +24,19 @@ module Honeybadger
           @callings ||= Hash.new {|h,k| h[k] = [] }
         end
 
+        def self.events
+          @events ||= []
+        end
+
         def notify(feature, payload)
           response = @backend.notify(feature, payload)
           self.class.callings[feature] << [payload, response]
+          response
+        end
+
+        def event(payload)
+          response = @backend.event(payload)
+          self.class.events << [payload, response]
           response
         end
       end
