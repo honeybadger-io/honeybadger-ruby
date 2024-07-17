@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [5.14.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.14.1...v5.14.2) (2024-07-17)
+
+
+### Bug Fixes
+
+* add []= delegator ([#590](https://github.com/honeybadger-io/honeybadger-ruby/issues/590)) ([9f1d6b5](https://github.com/honeybadger-io/honeybadger-ruby/commit/9f1d6b55e88497c4c37659fdfaeaa163c7794672))
+* add event method for cli backend test ([#588](https://github.com/honeybadger-io/honeybadger-ruby/issues/588)) ([1e047bb](https://github.com/honeybadger-io/honeybadger-ruby/commit/1e047bbcd17db676b96dd78eb918475e3a52ab1b))
+
 ## [5.14.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.14.0...v5.14.1) (2024-07-15)
 
 
