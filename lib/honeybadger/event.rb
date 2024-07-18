@@ -13,8 +13,7 @@ module Honeybadger
     # The payload data of the event
     attr_reader :payload
 
-    def_delegator :payload, :[]
-    def_delegator :payload, :dig
+    def_delegators :payload, :dig, :[], :[]=
 
     # @api private
     def initialize(event_type_or_payload, payload={})
