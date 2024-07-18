@@ -404,7 +404,18 @@ module Honeybadger
         with_error_handling { hook.call(event) }
       end
 
-      return if config.ignored_events.any? { |check| event.event_type&.match?(check) }
+      return if config.ignored_events.any? do |check|
+        with_error_handling do
+          check.all? do |keys, value|
+            if keys == [:event_type]
+              event.event_type&.match?(value)
+            elsif event.dig(*keys)
+              event.dig(*keys).to_s.match?(value)
+            end
+          end
+        end
+      end
+
       return if event.halted?
 
       events_worker.push(event.as_json)

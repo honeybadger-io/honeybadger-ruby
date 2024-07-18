@@ -31,6 +31,12 @@ module Honeybadger
                       'Sinatra::NotFound',
                       'Sidekiq::JobRetry::Skip'].map(&:freeze).freeze
 
+    IGNORE_EVENTS_DEFAULT = [
+      { event_type: 'sql.active_record', query: /^(begin|commit)( transaction)?$/i },
+      { event_type: 'sql.active_record', query: /(solid_queue|good_job)/i },
+      { event_type: 'process_action.action_controller', controller: 'Rails::HealthController' }
+    ].freeze
+
     DEVELOPMENT_ENVIRONMENTS = ['development', 'test', 'cucumber'].map(&:freeze).freeze
 
     DEFAULT_PATHS = ['honeybadger.yml', 'config/honeybadger.yml', "#{ENV['HOME']}/honeybadger.yml"].map(&:freeze).freeze
@@ -112,8 +118,13 @@ module Honeybadger
         type: Boolean
       },
       :'events.ignore' => {
-        description: 'A list of events to ignore. Use a string to specify exact matches, or regex for more flexibility.',
-        default: [],
+        description: 'A list of additional events to ignore. Use a hash to query nested payloads, match using a string or regex. Non-hash will match on the event_type.',
+        default: IGNORE_EVENTS_DEFAULT,
+        type: Array
+      },
+      :'events.ignore_only' => {
+        description: 'A list of events to ignore (overrides the default ignored events).',
+        default: nil,
         type: Array
       },
       plugins: {

@@ -66,7 +66,6 @@ module Honeybadger
 
     def process?(event, payload)
       return false if payload[:name] == "SCHEMA"
-      return false if payload[:sql]&.match?(/^(begin|commit)( transaction)?$/i)
       true
     end
   end

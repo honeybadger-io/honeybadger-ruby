@@ -192,10 +192,22 @@ module Honeybadger
       DEFAULTS[:'exceptions.ignore'] | Array(ignore)
     end
 
+    def raw_ignored_events
+      ignore_only = get(:'events.ignore_only')
+      return ignore_only if ignore_only
+      return DEFAULTS[:'events.ignore'] unless ignore = get(:'events.ignore')
+
+      DEFAULTS[:'events.ignore'] | Array(ignore)
+    end
+
     def ignored_events
-      self[:'events.ignore'].map do |check|
-        check.is_a?(String) ? /^#{check}$/ : check
-      end
+      @ignored_events ||= raw_ignored_events.map do |check|
+        if check.is_a?(String) || check.is_a?(Regexp)
+          { [:event_type] => check }
+        elsif check.is_a?(Hash)
+          flat_hash(check).transform_keys! { |key_array| key_array.map(&:to_sym) }
+        end
+      end.compact
     end
 
     def ca_bundle_path
@@ -454,6 +466,15 @@ module Honeybadger
           end
         end
       end
+    end
+
+    # Converts a nested hash into a single layer where keys become arrays:
+    # ex: > flat_hash({ :nested => { :hash => "value" }})
+    #     > { [:nested, :hash] => "value" }
+    def flat_hash(h,f=[],g={})
+      return g.update({ f=>h }) unless h.is_a? Hash
+      h.each { |k,r| flat_hash(r,f+[k],g) }
+      g
     end
   end
 end
