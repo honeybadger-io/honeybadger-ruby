@@ -2,7 +2,7 @@ module Honeybadger
   module Plugins
     module SolidQueue
       Plugin.register :solid_queue do
-        requirement { defined?(::SolidQueue) }
+        requirement { config.load_plugin_insights?(:solid_queue) && defined?(::SolidQueue) }
 
         collect do
           if config.cluster_collection?(:solid_queue)
