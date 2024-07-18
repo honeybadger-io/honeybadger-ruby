@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.15.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.14.2...v5.15.0) (2024-07-18)
+
+
+### Features
+
+* define default events to ignore, allow for override ([#570](https://github.com/honeybadger-io/honeybadger-ruby/issues/570)) ([a6f2177](https://github.com/honeybadger-io/honeybadger-ruby/commit/a6f2177eb69b75eafef235768187ccf6b3a538f0))
+
 ## [5.14.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.14.1...v5.14.2) (2024-07-17)
 
 
