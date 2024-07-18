@@ -207,7 +207,7 @@ module Honeybadger
         elsif check.is_a?(Hash)
           flat_hash(check).transform_keys! { |key_array| key_array.map(&:to_sym) }
         end
-      end
+      end.compact
     end
 
     def ca_bundle_path
