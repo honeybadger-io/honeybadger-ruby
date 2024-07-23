@@ -59,7 +59,7 @@ module Honeybadger
   class ActiveRecordSubscriber < NotificationSubscriber
     def format_payload(payload)
       {
-        query: Util::SQL.obfuscate(payload[:sql], payload[:connection].adapter_name),
+        query: Util::SQL.obfuscate(payload[:sql], payload[:connection]&.adapter_name),
         async: payload[:async]
       }
     end
