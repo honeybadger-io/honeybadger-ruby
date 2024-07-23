@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [5.15.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.0...v5.15.1) (2024-07-23)
+
+
+### Bug Fixes
+
+* safe navigate adapter_name for payload connection ([#593](https://github.com/honeybadger-io/honeybadger-ruby/issues/593)) ([368fb16](https://github.com/honeybadger-io/honeybadger-ruby/commit/368fb160d811252f83d0e262110a8c198557c7df))
+* sidekiq leader check only for version &gt; 6.5 ([#594](https://github.com/honeybadger-io/honeybadger-ruby/issues/594)) ([3bc005b](https://github.com/honeybadger-io/honeybadger-ruby/commit/3bc005b12d689da84ebe9b485eb53c508623d984))
+
 ## [5.15.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.14.2...v5.15.0) (2024-07-18)
 
 
