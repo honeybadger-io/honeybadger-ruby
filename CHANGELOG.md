@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.15.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.1...v5.15.2) (2024-07-25)
+
+
+### Bug Fixes
+
+* don't send "key" in cache event payloads ([#596](https://github.com/honeybadger-io/honeybadger-ruby/issues/596)) ([b05ba2d](https://github.com/honeybadger-io/honeybadger-ruby/commit/b05ba2da4c76f31bf4f51761542fa0211148ace5))
+
 ## [5.15.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.0...v5.15.1) (2024-07-23)
 
 
