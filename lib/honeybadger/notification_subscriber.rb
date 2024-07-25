@@ -40,9 +40,15 @@ module Honeybadger
   end
 
   class ActionControllerCacheSubscriber < NotificationSubscriber
+    def format_payload(payload)
+      payload.except(:key)
+    end
   end
 
   class ActiveSupportCacheSubscriber < NotificationSubscriber
+    def format_payload(payload)
+      payload.except(:key)
+    end
   end
 
   class ActionViewSubscriber < NotificationSubscriber
