@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.15.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.2...v5.15.3) (2024-07-25)
+
+
+### Bug Fixes
+
+* use top level Sidekiq namespace ([#598](https://github.com/honeybadger-io/honeybadger-ruby/issues/598)) ([8b95d19](https://github.com/honeybadger-io/honeybadger-ruby/commit/8b95d1910abbb015d17c132c1737acbf1fbd7c7f))
+
 ## [5.15.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.1...v5.15.2) (2024-07-25)
 
 
