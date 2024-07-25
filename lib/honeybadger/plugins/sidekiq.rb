@@ -128,7 +128,7 @@ module Honeybadger
             require "sidekiq"
             require "sidekiq/api"
 
-            if Gem::Version.new(Sidekiq::VERSION) >= Gem::Version.new('6.5')
+            if Gem::Version.new(::Sidekiq::VERSION) >= Gem::Version.new('6.5')
               require "sidekiq/component"
 
               class SidekiqClusterCollectionChecker
