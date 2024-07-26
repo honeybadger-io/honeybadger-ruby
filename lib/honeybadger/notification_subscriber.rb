@@ -55,15 +55,19 @@ module Honeybadger
 
   class ActiveSupportCacheMultiSubscriber < NotificationSubscriber
     def format_payload(payload)
-      return payload unless (key = payload.delete(:key))
+      payload[:key] = expand_cache_keys_from_payload(payload[:key])
+      payload[:hits] = expand_cache_keys_from_payload(payload[:hits])
+      payload
+    end
 
-      key = key.keys if key.is_a?(Hash)
+    def expand_cache_keys_from_payload(data)
+      return unless data
 
-      payload[:keys] = Array.wrap(key).map do |k|
+      data = data.keys if data.is_a?(Hash)
+
+      Array(data).map do |k|
         ::ActiveSupport::Cache.expand_cache_key(k)
       end
-
-      payload
     end
   end
 
