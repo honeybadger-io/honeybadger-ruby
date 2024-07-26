@@ -3,26 +3,22 @@
 require 'honeybadger/notification_subscriber'
 
 describe Honeybadger::ActiveSupportCacheMultiSubscriber do
-  class Poro
-    attr_reader :attribute1, :attribute2
-
-    def initialize
-      @attribute1 = "foo"
-      @attribute2 = "bar"
-    end
-
-    def cache_key
-      "#{attribute1}/#{attribute2}"
-    end
+  module ActiveSupport
+    module Cache; end
   end
 
   context "with a cache_write_multi.active_support payload" do
     let(:payload) do
-      obj = Poro.new
+      obj = Object.new
       {
-        key: {'one' => 'data', obj.cache_key => obj },
+        key: {'one' => 'data', 'object.cache_key' => obj },
         store: 'cache-store-name'
       }
+    end
+
+    before do
+      allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:key].keys[0]).and_return('one')
+      allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:key].keys[1]).and_return('foo/bar')
     end
 
     subject { described_class.new.format_payload(payload) }
@@ -37,11 +33,17 @@ describe Honeybadger::ActiveSupportCacheMultiSubscriber do
   context "with a cache_read_multi.active_support payload" do
     let(:payload) do
       {
-        key: ['one', Poro.new],
+        key: ['one', Object.new],
         hits: ['one'],
         store: 'cache-store-name',
         super_operation: :fetch_multi
       }
+    end
+
+    before do
+      allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:key][0]).and_return('one')
+      allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:key][1]).and_return('foo/bar')
+      allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:hits][0]).and_return('one')
     end
 
     subject { described_class.new.format_payload(payload) }
