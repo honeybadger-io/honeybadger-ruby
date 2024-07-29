@@ -41,13 +41,33 @@ module Honeybadger
 
   class ActionControllerCacheSubscriber < NotificationSubscriber
     def format_payload(payload)
-      payload.except(:key)
+      payload[:key] = ::ActiveSupport::Cache.expand_cache_key(payload[:key]) if payload[:key]
+      payload
     end
   end
 
   class ActiveSupportCacheSubscriber < NotificationSubscriber
     def format_payload(payload)
-      payload.except(:key)
+      payload[:key] = ::ActiveSupport::Cache.expand_cache_key(payload[:key]) if payload[:key]
+      payload
+    end
+  end
+
+  class ActiveSupportCacheMultiSubscriber < NotificationSubscriber
+    def format_payload(payload)
+      payload[:key] = expand_cache_keys_from_payload(payload[:key])
+      payload[:hits] = expand_cache_keys_from_payload(payload[:hits])
+      payload
+    end
+
+    def expand_cache_keys_from_payload(data)
+      return unless data
+
+      data = data.keys if data.is_a?(Hash)
+
+      Array(data).map do |k|
+        ::ActiveSupport::Cache.expand_cache_key(k)
+      end
     end
   end
 
