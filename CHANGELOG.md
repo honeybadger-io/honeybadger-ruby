@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.15.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.3...v5.15.4) (2024-07-29)
+
+
+### Bug Fixes
+
+* add back key for cache notification payloads ([#600](https://github.com/honeybadger-io/honeybadger-ruby/issues/600)) ([9779dd4](https://github.com/honeybadger-io/honeybadger-ruby/commit/9779dd4664a057bdb65a9144612f29c569ac4da5))
+
 ## [5.15.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.2...v5.15.3) (2024-07-25)
 
 
