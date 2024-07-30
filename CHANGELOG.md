@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.15.5](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.4...v5.15.5) (2024-07-30)
+
+
+### Bug Fixes
+
+* sanitize event payload data ([#602](https://github.com/honeybadger-io/honeybadger-ruby/issues/602)) ([f307212](https://github.com/honeybadger-io/honeybadger-ruby/commit/f307212cf9a3df43b8bacff1474c2f674ff3f1a3))
+
 ## [5.15.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.3...v5.15.4) (2024-07-29)
 
 
