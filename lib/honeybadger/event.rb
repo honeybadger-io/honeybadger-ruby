@@ -1,5 +1,7 @@
 require 'forwardable'
 
+require 'honeybadger/util/sanitizer'
+
 module Honeybadger
   class Event
     extend Forwardable
@@ -47,10 +49,11 @@ module Honeybadger
     #
     # @return [Hash] JSON representation of the event.
     def as_json(*args)
-      payload.tap do |p|
+      data = payload.tap do |p|
         p[:ts] = ts
         p[:event_type] = event_type if event_type
       end
+      Util::Sanitizer.sanitize(data)
     end
   end
 end
