@@ -19,8 +19,6 @@ end
 
 require 'active_job/railtie'
 
-ActiveSupport::Deprecation.silenced = true
-
 class RailsApp < Rails::Application
   # Rails 6+
   if Rails::VERSION::MAJOR >= 6
