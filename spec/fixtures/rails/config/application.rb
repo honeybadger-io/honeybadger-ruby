@@ -31,7 +31,7 @@ class RailsApp < Rails::Application
   config.serve_static_files = false
   config.consider_all_requests_local = false
 
-  config.active_job.queue_adapter = :async
+  config.active_job.queue_adapter = :test
 
   routes.append do
     get '/runtime_error', :to => 'rails#runtime_error'

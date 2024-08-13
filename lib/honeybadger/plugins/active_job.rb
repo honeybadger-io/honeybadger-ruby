@@ -3,8 +3,8 @@ require 'honeybadger/notification_subscriber'
 module Honeybadger
   module Plugins
     module ActiveJob
-      # Ignore inline and test adapters, as well as the adapters that we support with their own plugins
-      EXCLUDED_ADAPTERS = %i[inline test delayed_job faktory karafka resque shoryuken sidekiq sucker_punch]
+      # Ignore the adapters that we support with their own plugins
+      EXCLUDED_ADAPTERS = %i[delayed_job faktory karafka resque shoryuken sidekiq sucker_punch]
 
       class << self
         def perform_around(job, block)
