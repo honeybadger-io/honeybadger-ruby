@@ -5,7 +5,7 @@ RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties action
 appraise "standalone" do
 end
 
-if RUBY_PLATFORM !~ /java/
+if !RUBY_PLATFORM.match?(/java/)
   appraise "binding_of_caller" do
     gem "binding_of_caller"
   end
