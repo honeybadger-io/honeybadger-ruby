@@ -33,6 +33,9 @@ jobs:
           - sidekiq.gemfile
           - sidekiq7.gemfile
           - standalone.gemfile
+        exclude:
+          - ruby: '3.0'
+            gemfile: rails7.2.gemfile
 
     # Has to be top level to cache properly
     env:
