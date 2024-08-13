@@ -47,7 +47,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   end
 
   appraise "rails7.0" do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 7.0" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
@@ -57,7 +57,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   end
 
   appraise "rails7.1" do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 7.1" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.2" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
