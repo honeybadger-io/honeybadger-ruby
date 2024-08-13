@@ -29,7 +29,7 @@ describe 'Rails ActiveJob Adapter Test', if: RAILS_PRESENT, type: :request do
       )
   end
 
-  it 'does not report exceptions if the attempt threshold is not reached', focus: true do
+  it 'does not report exceptions if the attempt threshold is not reached' do
     Honeybadger.config[:'active_job.attempt_threshold'] = 2
 
     Honeybadger.flush do
