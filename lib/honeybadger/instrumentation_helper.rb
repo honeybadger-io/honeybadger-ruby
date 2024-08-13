@@ -2,31 +2,28 @@ require 'honeybadger/instrumentation'
 
 module Honeybadger
   # +Honeybadger::InstrumentationHelper+ is a module that can be included into any class. This module
-  # provides a convenient DSL around the instrumentation methods to prvoide a cleaner interface.
+  # provides a convenient DSL around the instrumentation methods to provide a cleaner interface.
   # There are three usage variations as show in the example below:
   #
   # @example
+  #   class TicketsController < ApplicationController
+  #     include Honeybadger::InstrumentationHelper
   #
-  # class TicketsController < ApplicationController
-  #   include Honeybadger::InstrumentationHelper
+  #     def create
+  #       metric_source 'controller'
+  #       metric_attributes { foo: 'bar' } # These attributes get tagged to all metrics called after.
   #
-  #   def create
-  #     metric_source 'controller'
-  #     metric_attributes { foo: 'bar' } # These attributes get tagged to all metrics called after.
+  #       # pass a block
+  #       time('create.ticket') { Ticket.create(params[:ticket]) }
   #
-  #     # pass a block
-  #     time('create.ticket') { Ticket.create(params[:ticket]) }
+  #       # pass a lambda argument
+  #       time 'create.ticket', ->{ Ticket.create(params[:ticket]) }
   #
-  #     # pass a lambda argument
-  #     time 'create.ticket', ->{ Ticket.create(params[:ticket]) }
-  #
-  #     # pass the duration argument
-  #     duration = timing_method { Ticket.create(params[:ticket]) }
-  #     time 'create.ticket', duration: duration
+  #       # pass the duration argument
+  #       duration = timing_method { Ticket.create(params[:ticket]) }
+  #       time 'create.ticket', duration: duration
+  #     end
   #   end
-  # end
-  #
-  #
   module InstrumentationHelper
 
     # returns two parameters, the first is the duration of the execution, and the second is
