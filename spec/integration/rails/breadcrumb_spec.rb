@@ -56,7 +56,7 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
       category: "query",
       message: /Active Record - .*/,
       metadata: include({
-        sql: /INSERT INTO \? \(\?\)/
+        sql: /INSERT INTO "things" \("name"\) VALUES \(\?\)/
       })
     })
   end

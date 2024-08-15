@@ -5,7 +5,7 @@ RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties action
 appraise "standalone" do
 end
 
-if RUBY_PLATFORM !~ /java/
+if !RUBY_PLATFORM.match?(/java/)
   appraise "binding_of_caller" do
     gem "binding_of_caller"
   end
@@ -47,7 +47,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   end
 
   appraise "rails7.0" do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 7.0" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
@@ -57,9 +57,19 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   end
 
   appraise "rails7.1" do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 7.1" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.2" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+    gem "better_errors", require: false, platforms: :mri
+    gem "rack-mini-profiler", require: false
+    gem "rspec-rails"
+    gem "tzinfo-data" # Needed for timezones to work on Windows
+  end
+
+  appraise "rails7.2" do
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.3" }
+    gem "sqlite3", "~> 2", platforms: :mri
+    gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"

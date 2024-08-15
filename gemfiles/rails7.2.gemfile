@@ -13,14 +13,14 @@ gem "webmock"
 gem "capistrano"
 gem "rake"
 gem "bump", "~> 0.10.0"
-gem "activesupport", "< 7.1"
-gem "activemodel", "< 7.1"
-gem "activerecord", "< 7.1"
-gem "activejob", "< 7.1"
-gem "railties", "< 7.1"
-gem "actionpack", "< 7.1"
-gem "sqlite3", "~> 1.4", platforms: :mri
-gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+gem "activesupport", "< 7.3"
+gem "activemodel", "< 7.3"
+gem "activerecord", "< 7.3"
+gem "activejob", "< 7.3"
+gem "railties", "< 7.3"
+gem "actionpack", "< 7.3"
+gem "sqlite3", "~> 2", platforms: :mri
+gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
