@@ -9,20 +9,19 @@ module Honeybadger
   # instance. There are three usage variations as show in the example below:
   #
   # @example
+  #   class TicketsController < ApplicationController
+  #     def create
+  #       # pass a block
+  #       Honeybadger.time('create.ticket') { Ticket.create(params[:ticket]) }
   #
-  # class TicketsController < ApplicationController
-  #   def create
-  #     # pass a block
-  #     Honeybadger.time('create.ticket') { Ticket.create(params[:ticket]) }
+  #       # pass a lambda argument
+  #       Honeybadger.time 'create.ticket', ->{ Ticket.create(params[:ticket]) }
   #
-  #     # pass a lambda argument
-  #     Honeybadger.time 'create.ticket', ->{ Ticket.create(params[:ticket]) }
-  #
-  #     # pass the duration argument
-  #     duration = timing_method { Ticket.create(params[:ticket]) }
-  #     Honeybadger.time 'create.ticket', duration: duration
+  #       # pass the duration argument
+  #       duration = timing_method { Ticket.create(params[:ticket]) }
+  #       Honeybadger.time 'create.ticket', duration: duration
+  #     end
   #   end
-  # end
   #
   #
   class Instrumentation
