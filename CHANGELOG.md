@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.15.6](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.5...v5.15.6) (2024-08-15)
+
+
+### Bug Fixes
+
+* init karafka plugin only if monitor is available ([#606](https://github.com/honeybadger-io/honeybadger-ruby/issues/606)) ([cb0f89c](https://github.com/honeybadger-io/honeybadger-ruby/commit/cb0f89cddd7f8ad4b977a3b8665d0d12a59300d1))
+
 ## [5.15.5](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.4...v5.15.5) (2024-07-30)
 
 
