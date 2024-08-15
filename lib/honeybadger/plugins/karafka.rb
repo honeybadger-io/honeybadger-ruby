@@ -3,7 +3,7 @@ require 'honeybadger/plugin'
 module Honeybadger
   module Plugins
     Plugin.register :karafka do
-      requirement { defined?(::Karafka) }
+      requirement { defined?(::Karafka) && ::Karafka.respond_to?(:monitor) }
 
       execution do
         ::Karafka.monitor.subscribe('error.occurred') do |event|
