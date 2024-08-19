@@ -11,7 +11,7 @@ module Honeybadger
   #
   #     def create
   #       metric_source 'controller'
-  #       metric_attributes { foo: 'bar' } # These attributes get tagged to all metrics called after.
+  #       metric_attributes(foo: 'bar') # These attributes get tagged to all metrics called after.
   #
   #       # pass a block
   #       time('create.ticket') { Ticket.create(params[:ticket]) }
