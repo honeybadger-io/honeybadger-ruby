@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.16.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.6...v5.16.0) (2024-09-19)
+
+
+### Features
+
+* add karafka processing_lag to event ([#613](https://github.com/honeybadger-io/honeybadger-ruby/issues/613)) ([a527eea](https://github.com/honeybadger-io/honeybadger-ruby/commit/a527eea37eb3d351dd6731ea3c469dcb2609fea6))
+
 ## [5.15.6](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.5...v5.15.6) (2024-08-15)
 
 
