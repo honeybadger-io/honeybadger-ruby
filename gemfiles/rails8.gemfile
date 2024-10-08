@@ -10,21 +10,20 @@ gem "rspec-its"
 gem "ruby-prof", platforms: :mri, require: false
 gem "timecop"
 gem "webmock"
-gem "capistrano", "~> 3.0"
+gem "capistrano"
 gem "rake"
 gem "bump", "~> 0.10.0"
-gem "activesupport", github: "rails"
-gem "activemodel", github: "rails"
-gem "activerecord", github: "rails"
-gem "activejob", github: "rails"
-gem "railties", github: "rails"
-gem "actionpack", github: "rails"
-gem "rack", github: "rack/rack", branch: "2-2-stable"
-gem "arel", github: "rails/arel"
+gem "activesupport", "~> 8.0.0.beta1"
+gem "activemodel", "~> 8.0.0.beta1"
+gem "activerecord", "~> 8.0.0.beta1"
+gem "activejob", "~> 8.0.0.beta1"
+gem "railties", "~> 8.0.0.beta1"
+gem "actionpack", "~> 8.0.0.beta1"
 gem "sqlite3", "~> 2", platforms: :mri
+gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
+gem "rack-mini-profiler", require: false
 gem "rspec-rails"
-gem "listen"
 gem "tzinfo-data"
 
 group :development do
