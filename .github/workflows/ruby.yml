@@ -28,6 +28,7 @@ jobs:
           - rails7.0.gemfile
           - rails7.1.gemfile
           - rails7.2.gemfile
+          - rails8.gemfile
           - resque.gemfile
           - sinatra.gemfile
           - sidekiq.gemfile
@@ -36,6 +37,10 @@ jobs:
         exclude:
           - ruby: '3.0'
             gemfile: rails7.2.gemfile
+          - ruby: '3.0'
+            gemfile: rails8.gemfile
+          - ruby: '3.1'
+            gemfile: rails8.gemfile
 
     # Has to be top level to cache properly
     env:
