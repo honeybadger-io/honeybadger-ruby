@@ -85,8 +85,6 @@ module Honeybadger
         extra_tags += consumer_tags(event.payload[:caller])
       end
 
-      Honeybadger.notify(event[:error], tags: default_tags + extra_tags)
-
       if ::Honeybadger.config.load_plugin_insights_events?(:karafka)
         Honeybadger.event("error.occurred.karafka", error: event[:error], tags: default_tags + extra_tags)
       end
