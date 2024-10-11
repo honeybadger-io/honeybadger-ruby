@@ -70,6 +70,8 @@ module Honeybadger
         metric_instrumentation.histogram(name, attributes, ->{ yield })
       elsif attributes.keys.include?(:duration)
         metric_instrumentation.histogram(name, attributes)
+      elsif attributes.keys.include?(:count)
+        metric_instrumentation.histogram(name, attributes)
       end
     end
 

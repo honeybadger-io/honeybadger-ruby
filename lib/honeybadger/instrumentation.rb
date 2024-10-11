@@ -66,6 +66,7 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       duration = attributes.delete(:duration)
+      count = attributes.delete(:count)
 
       if callable
         duration = monotonic_timer{ callable.call }[0]
@@ -73,10 +74,11 @@ module Honeybadger
         duration = monotonic_timer{ yield }[0]
       end
 
-      raise 'No duration found' if duration.nil?
+      raise 'No duration or count found' if duration.nil? && count.nil?
 
       Honeybadger::Histogram.register(registry, name, attributes).tap do |histogram|
-        histogram.record(duration)
+        histogram.record(duration) unless duration.nil?
+        histogram.record(count) unless count.nil?
       end
     end
 
