@@ -362,6 +362,21 @@ module Honeybadger
         default: 60,
         type: Integer
       },
+      :'karafka.insights.enabled' => {
+        description: 'Enable automatic data collection for Karafka.',
+        default: true,
+        type: Boolean
+      },
+      :'karafka.insights.events' => {
+        description: 'Enable automatic event capturing for Karafka.',
+        default: true,
+        type: Boolean
+      },
+      :'karafka.insights.metrics' => {
+        description: 'Enable automatic metric data collection for Karafka.',
+        default: true,
+        type: Boolean
+      },
       :'net_http.insights.enabled' => {
         description: 'Allow automatic instrumentation of Net::HTTP requests.',
         default: true,

@@ -294,11 +294,13 @@ module Honeybadger
 
     def insights_events_enabled?
       return false unless insights_enabled?
+      return true if self[:"insights.events"].nil?
       !!self[:'insights.events']
     end
 
     def insights_metrics_enabled?
       return false unless insights_enabled?
+      return true if self[:"insights.metrics"].nil?
       !!self[:'insights.metrics']
     end
 

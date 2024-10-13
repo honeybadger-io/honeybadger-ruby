@@ -26,7 +26,7 @@ module Honeybadger
         end
 
         if config.load_plugin_insights?(:karafka)
-          ::Karafka.monitor.subscribe(::Honeybadger::KarafkaListener.new)
+          ::Karafka.monitor.subscribe(::Honeybadger::KarafkaSubscriber.new)
         end
       end
     end

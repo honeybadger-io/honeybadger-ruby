@@ -1,7 +1,7 @@
 require 'honeybadger/instrumentation_helper'
 
 module Honeybadger
-  class KarafkaListener
+  class KarafkaSubscriber
     include ::Honeybadger::InstrumentationHelper
     include ::Karafka::Core::Configurable
     extend Forwardable
