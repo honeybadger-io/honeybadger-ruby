@@ -9,6 +9,15 @@ module Honeybadger
       return unless value
 
       @samples += 1
+
+      @total ||= 0
+      @total = @total + value
+
+      @min = value if @min.nil? || @min > value
+      @max = value if @max.nil? || @max < value
+      @avg = @total.to_f / @samples
+      @latest = value
+
       @bin_counts ||= Hash.new(0)
       @bin_counts[find_bin(value)] += 1
     end
@@ -25,6 +34,10 @@ module Honeybadger
 
     def payloads
       [{
+        min: @min,
+        max: @max,
+        avg: @avg,
+        latest: @latest,
         bins: (bins + [INFINITY]).map { |bin| [bin.to_f, @bin_counts[bin]] }
       }]
     end
