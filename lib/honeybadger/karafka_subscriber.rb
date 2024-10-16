@@ -168,7 +168,7 @@ module Honeybadger
       jq_stats = event[:jobs_queue].statistics
 
       if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-        gauge('worker.total_threads', value: config.concurrency, **default_tags)
+        gauge('worker.total_threads', value: Karafka::App.config.concurrency, **default_tags)
         histogram('worker.processing', count: jq_stats[:busy], **default_tags)
         histogram('worker.enqueued_jobs', count: jq_stats[:enqueued], **default_tags)
       end
