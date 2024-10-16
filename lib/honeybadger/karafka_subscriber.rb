@@ -57,8 +57,8 @@ module Honeybadger
 
     # @param block [Proc] configuration block
     def initialize(&block)
-      metric_source(source)
       configure
+      metric_source(source)
       setup(&block) if block
     end
 
