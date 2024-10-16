@@ -29,22 +29,22 @@ module Honeybadger
     # Note, that the once with `_d` come from Karafka, not rdkafka or Kafka
     setting :rd_kafka_metrics, default: [
       # Client metrics
-      RdKafkaMetric.new(:increment_counter, :root, 'messages.consumed', 'rxmsgs_d'),
-      RdKafkaMetric.new(:increment_counter, :root, 'messages.consumed.bytes', 'rxmsg_bytes'),
+      RdKafkaMetric.new(:increment_counter, :root, 'messages_consumed', 'rxmsgs_d'),
+      RdKafkaMetric.new(:increment_counter, :root, 'messages_consumed_bytes', 'rxmsg_bytes'),
 
       # Broker metrics
-      RdKafkaMetric.new(:increment_counter, :brokers, 'consume.attempts', 'txretries_d'),
-      RdKafkaMetric.new(:increment_counter, :brokers, 'consume.errors', 'txerrs_d'),
-      RdKafkaMetric.new(:increment_counter, :brokers, 'receive.errors', 'rxerrs_d'),
-      RdKafkaMetric.new(:increment_counter, :brokers, 'connection.connects', 'connects_d'),
-      RdKafkaMetric.new(:increment_counter, :brokers, 'connection.disconnects', 'disconnects_d'),
-      RdKafkaMetric.new(:gauge, :brokers, 'network.latency.avg', %w[rtt avg]),
-      RdKafkaMetric.new(:gauge, :brokers, 'network.latency.p95', %w[rtt p95]),
-      RdKafkaMetric.new(:gauge, :brokers, 'network.latency.p99', %w[rtt p99]),
+      RdKafkaMetric.new(:increment_counter, :brokers, 'consume_attempts', 'txretries_d'),
+      RdKafkaMetric.new(:increment_counter, :brokers, 'consume_errors', 'txerrs_d'),
+      RdKafkaMetric.new(:increment_counter, :brokers, 'receive_errors', 'rxerrs_d'),
+      RdKafkaMetric.new(:increment_counter, :brokers, 'connection_connects', 'connects_d'),
+      RdKafkaMetric.new(:increment_counter, :brokers, 'connection_disconnects', 'disconnects_d'),
+      RdKafkaMetric.new(:gauge, :brokers, 'network_latency_avg', %w[rtt avg]),
+      RdKafkaMetric.new(:gauge, :brokers, 'network_latency_p95', %w[rtt p95]),
+      RdKafkaMetric.new(:gauge, :brokers, 'network_latency_p99', %w[rtt p99]),
 
       # Topics metrics
-      RdKafkaMetric.new(:gauge, :topics, 'consumer.lags', 'consumer_lag_stored'),
-      RdKafkaMetric.new(:gauge, :topics, 'consumer.lags_delta', 'consumer_lag_stored_d')
+      RdKafkaMetric.new(:gauge, :topics, 'consumer_lags', 'consumer_lag_stored'),
+      RdKafkaMetric.new(:gauge, :topics, 'consumer_lags_delta', 'consumer_lag_stored_d')
     ].freeze
 
     # Metrics that sum values on topics levels and not on partition levels
@@ -148,8 +148,8 @@ module Honeybadger
       extra_tags = { consumer_group: consumer_group_id }
 
       if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-        histogram('listener.polling.time_taken', duration: time_taken, **default_tags.merge(extra_tags))
-        histogram('listener.polling.messages', count: messages_count, **default_tags.merge(extra_tags))
+        histogram('listener_polling_time_taken', duration: time_taken, **default_tags.merge(extra_tags))
+        histogram('listener_polling_messages', count: messages_count, **default_tags.merge(extra_tags))
       end
     end
 
@@ -176,13 +176,13 @@ module Honeybadger
       end
 
       if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-        increment_counter('consumer.messages', by: messages.count, **tags)
-        increment_counter('consumer.batches', by: 1, **tags)
-        gauge('consumer.offset', value: metadata.last_offset, **tags)
-        histogram('consumer.consumed.time_taken', duration: event[:time], **tags)
-        histogram('consumer.batch_size', count: messages.count, **tags)
-        histogram('consumer.processing_lag', duration: metadata.processing_lag, **tags)
-        histogram('consumer.consumption_lag', duration: metadata.consumption_lag, **tags)
+        increment_counter('consumer_messages', by: messages.count, **tags)
+        increment_counter('consumer_batches', by: 1, **tags)
+        gauge('consumer_offset', value: metadata.last_offset, **tags)
+        histogram('consumer_consumed_time_taken', duration: event[:time], **tags)
+        histogram('consumer_batch_size', count: messages.count, **tags)
+        histogram('consumer_processing_lag', duration: metadata.processing_lag, **tags)
+        histogram('consumer_consumption_lag', duration: metadata.consumption_lag, **tags)
       end
     end
 
@@ -198,7 +198,7 @@ module Honeybadger
               def on_consumer_#{after}(event)
                 tags = default_tags.merge(consumer_tags(event.payload[:caller]))
 
-                increment_counter('consumer.#{name}', by: 1, **tags)
+                increment_counter('consumer_#{name}', by: 1, **tags)
               end
       RUBY
     end
@@ -209,9 +209,9 @@ module Honeybadger
       jq_stats = event[:jobs_queue].statistics
 
       if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-        gauge('worker.total_threads', value: Karafka::App.config.concurrency, **default_tags)
-        histogram('worker.processing', count: jq_stats[:busy], **default_tags)
-        histogram('worker.enqueued_jobs', count: jq_stats[:enqueued], **default_tags)
+        gauge('worker_total_threads', value: Karafka::App.config.concurrency, **default_tags)
+        histogram('worker_processing', count: jq_stats[:busy], **default_tags)
+        histogram('worker_enqueued_jobs', count: jq_stats[:enqueued], **default_tags)
       end
     end
 
@@ -222,7 +222,7 @@ module Honeybadger
       jq_stats = event[:jobs_queue].statistics
 
       if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-        histogram('worker.processing', count: jq_stats[:busy], **default_tags)
+        histogram('worker_processing', count: jq_stats[:busy], **default_tags)
       end
     end
 
