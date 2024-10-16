@@ -12,10 +12,12 @@ module Honeybadger
       histogram: :duration
     }
 
-    def_delegators :config, :rd_kafka_metrics, :default_tags
+    def_delegators :config, :rd_kafka_metrics, :aggregated_rd_kafka_metrics, :default_tags, :source
 
     # Value object for storing a single rdkafka metric publishing details
     RdKafkaMetric = Struct.new(:type, :scope, :name, :key_location)
+
+    setting :source, default: 'karafka'
 
     # Default tags we want to publish (for example hostname)
     # Format as followed (example for hostname): `["host:#{Socket.gethostname}"]`
@@ -45,11 +47,17 @@ module Honeybadger
       RdKafkaMetric.new(:gauge, :topics, 'consumer.lags_delta', 'consumer_lag_stored_d')
     ].freeze
 
+    # Metrics that sum values on topics levels and not on partition levels
+    setting :aggregated_rd_kafka_metrics, default: [
+      # Topic aggregated metrics
+      RdKafkaMetric.new(:gauge, :topics, 'consumer_aggregated_lag', 'consumer_lag_stored')
+    ].freeze
+
     configure
 
     # @param block [Proc] configuration block
     def initialize(&block)
-      metric_source("karafka")
+      metric_source(source)
       configure
       setup(&block) if block
     end
@@ -64,15 +72,48 @@ module Honeybadger
     #
     # @param event [Karafka::Core::Monitoring::Event]
     def on_statistics_emitted(event)
+      return unless ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+
       statistics = event[:statistics]
       consumer_group_id = event[:consumer_group_id]
 
-      base_tags = default_tags.merge(
-        "consumer_group" => consumer_group_id
-      )
+      base_tags = default_tags.merge(consumer_group: consumer_group_id)
 
-      rd_kafka_metrics.each do |metric|
-        report_metric(metric, statistics, base_tags) if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+      config.rd_kafka_metrics.each do |metric|
+        report_metric(metric, statistics, base_tags)
+      end
+
+      report_aggregated_topics_metrics(statistics, consumer_group_id)
+    end
+
+    # Publishes aggregated topic-level metrics that are sum of per partition metrics
+    #
+    # @param statistics [Hash] hash with all the statistics emitted
+    # @param consumer_group_id [String] cg in context which we operate
+    def report_aggregated_topics_metrics(statistics, consumer_group_id)
+      config.aggregated_rd_kafka_metrics.each do |metric|
+        statistics.fetch('topics').each do |topic_name, topic_values|
+          sum = 0
+
+          topic_values['partitions'].each do |partition_name, partition_statistics|
+            next if partition_name == '-1'
+            # Skip until lag info is available
+            next if partition_statistics['consumer_lag'] == -1
+            next if partition_statistics['consumer_lag_stored'] == -1
+
+            sum += partition_statistics.dig(*metric.key_location)
+          end
+
+          public_send(
+            metric.type,
+            metric.name,
+            METRIC_STAT_KEY[metric.type] => sum,
+            **default_tags.merge({
+              consumer_group: consumer_group_id,
+              topic: topic_name
+            })
+          )
+        end
       end
     end
 
@@ -80,7 +121,7 @@ module Honeybadger
     #
     # @param event [Karafka::Core::Monitoring::Event]
     def on_error_occurred(event)
-      extra_tags = { "type" => event[:type] }
+      extra_tags = { type: event[:type] }
 
       if event.payload[:caller].respond_to?(:messages)
         extra_tags.merge!(consumer_tags(event.payload[:caller]))
@@ -104,7 +145,7 @@ module Honeybadger
 
       consumer_group_id = event[:subscription_group].consumer_group.id
 
-      extra_tags = { "consumer_group" => consumer_group_id }
+      extra_tags = { consumer_group: consumer_group_id }
 
       if ::Honeybadger.config.load_plugin_insights_metrics?(:karafka)
         histogram('listener.polling.time_taken', duration: time_taken, **default_tags.merge(extra_tags))
@@ -211,7 +252,7 @@ module Honeybadger
             metric.type,
             metric.name,
             METRIC_STAT_KEY[metric.type] => broker_statistics.dig(*metric.key_location),
-            **base_tags.merge({ "broker" => broker_statistics['nodename'] })
+            **base_tags.merge({ broker: broker_statistics['nodename'] })
           )
         end
       when :topics
@@ -231,8 +272,8 @@ module Honeybadger
               metric.name,
               METRIC_STAT_KEY[metric.type] => partition_statistics.dig(*metric.key_location),
               **base_tags.merge({
-                "topic" => topic_name,
-                "partition" => partition_name
+                topic: topic_name,
+                partition: partition_name
               })
             )
           end
@@ -252,9 +293,9 @@ module Honeybadger
       consumer_group_id = consumer.topic.consumer_group.id
 
       {
-        "topic" => metadata.topic,
-        "partition" => metadata.partition,
-        "consumer_group" => consumer_group_id
+        topic: metadata.topic,
+        partition: metadata.partition,
+        consumer_group: consumer_group_id
       }
     end
   end
