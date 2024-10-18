@@ -7,7 +7,9 @@ module Honeybadger
       requirement { defined?(::Karafka) && ::Karafka.respond_to?(:monitor) }
 
       execution do
-        ::Karafka.monitor.subscribe(::Honeybadger::Karafka::ErrorsListener.new)
+        errors_listener = ::Honeybadger::Karafka::ErrorsListener.new
+        ::Karafka.monitor.subscribe(errors_listener)
+        ::Karafka.producer.monitor.subscribe(errors_listener) if ::Karafka.respond_to?(:producer)
 
         if config.load_plugin_insights?(:karafka)
           ::Karafka.monitor.subscribe(::Honeybadger::Karafka::InsightsListener.new)
