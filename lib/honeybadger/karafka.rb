@@ -75,12 +75,6 @@ module Honeybadger
       include ::Karafka::Core::Configurable
       extend Forwardable
 
-      METRIC_STAT_KEY = {
-        increment_counter: :by,
-        gauge: :value,
-        histogram: :duration
-      }
-
       def_delegators :config, :rd_kafka_metrics, :aggregated_rd_kafka_metrics, :default_tags, :client
 
       # Value object for storing a single rdkafka metric publishing details
@@ -172,11 +166,11 @@ module Honeybadger
               sum += partition_statistics.dig(*metric.key_location)
             end
 
-            client.public_send(
+            public_send(
               metric.type,
               metric.name,
-              METRIC_STAT_KEY[metric.type] => sum,
-              **default_tags.merge({
+              sum,
+              default_tags.merge({
                 consumer_group: consumer_group_id,
                 topic: topic_name
               })
@@ -200,7 +194,7 @@ module Honeybadger
         end
 
         if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          client.increment_counter('error_occurred', by: 1, **default_tags.merge(extra_tags))
+          increment_counter('error_occurred', 1, default_tags.merge(extra_tags))
         end
       end
 
@@ -216,8 +210,8 @@ module Honeybadger
         extra_tags = { consumer_group: consumer_group_id }
 
         if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          client.histogram('listener_polling_time_taken', duration: time_taken, **default_tags.merge(extra_tags))
-          client.histogram('listener_polling_messages', count: messages_count, **default_tags.merge(extra_tags))
+          histogram('listener_polling_time_taken', time_taken, default_tags.merge(extra_tags))
+          histogram('listener_polling_messages', messages_count, default_tags.merge(extra_tags))
         end
       end
 
@@ -244,13 +238,13 @@ module Honeybadger
         end
 
         if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          client.increment_counter('consumer_messages', by: messages.count, **tags)
-          client.increment_counter('consumer_batches', by: 1, **tags)
-          client.gauge('consumer_offset', value: metadata.last_offset, **tags)
-          client.histogram('consumer_consumed_time_taken', duration: event[:time], **tags)
-          client.histogram('consumer_batch_size', count: messages.count, **tags)
-          client.histogram('consumer_processing_lag', duration: metadata.processing_lag, **tags)
-          client.histogram('consumer_consumption_lag', duration: metadata.consumption_lag, **tags)
+          increment_counter('consumer_messages', messages.count, tags)
+          increment_counter('consumer_batches', 1, tags)
+          gauge('consumer_offset', metadata.last_offset, tags)
+          histogram('consumer_consumed_time_taken', event[:time], tags)
+          histogram('consumer_batch_size', messages.count, tags)
+          histogram('consumer_processing_lag', metadata.processing_lag, tags)
+          histogram('consumer_consumption_lag', metadata.consumption_lag, tags)
         end
       end
 
@@ -266,7 +260,7 @@ module Honeybadger
               def on_consumer_#{after}(event)
                 tags = default_tags.merge(consumer_tags(event.payload[:caller]))
 
-                client.increment_counter('consumer_#{name}', by: 1, **tags)
+                increment_counter('consumer_#{name}', 1, tags)
               end
         RUBY
       end
@@ -277,9 +271,9 @@ module Honeybadger
         jq_stats = event[:jobs_queue].statistics
 
         if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          client.gauge('worker_total_threads', value: ::Karafka::App.config.concurrency, **default_tags)
-          client.histogram('worker_processing', count: jq_stats[:busy], **default_tags)
-          client.histogram('worker_enqueued_jobs', count: jq_stats[:enqueued], **default_tags)
+          gauge('worker_total_threads', ::Karafka::App.config.concurrency, default_tags)
+          histogram('worker_processing', jq_stats[:busy], default_tags)
+          histogram('worker_enqueued_jobs', jq_stats[:enqueued], default_tags)
         end
       end
 
@@ -290,8 +284,20 @@ module Honeybadger
         jq_stats = event[:jobs_queue].statistics
 
         if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          client.histogram('worker_processing', count: jq_stats[:busy], **default_tags)
+          histogram('worker_processing', jq_stats[:busy], default_tags)
         end
+      end
+
+      def increment_counter(metric_name, by, tags)
+        client.increment_counter(metric_name, by: by, **tags)
+      end
+
+      def gauge(metric_name, value, tags)
+        client.gauge(metric_name, value: value, **tags)
+      end
+
+      def histogram(metric_name, duration, tags)
+        client.histogram(metric_name, duration: duration, **tags)
       end
 
       private
@@ -303,11 +309,11 @@ module Honeybadger
       def report_metric(metric, statistics, base_tags)
         case metric.scope
         when :root
-          client.public_send(
+          public_send(
             metric.type,
             metric.name,
-            METRIC_STAT_KEY[metric.type] => statistics.fetch(*metric.key_location),
-            **base_tags
+            statistics.fetch(*metric.key_location),
+            base_tags
           )
         when :brokers
           statistics.fetch('brokers').each_value do |broker_statistics|
@@ -316,11 +322,11 @@ module Honeybadger
             # node ids
             next if broker_statistics['nodeid'] == -1
 
-            client.public_send(
+            public_send(
               metric.type,
               metric.name,
-              METRIC_STAT_KEY[metric.type] => broker_statistics.dig(*metric.key_location),
-              **base_tags.merge({ broker: broker_statistics['nodename'] })
+              broker_statistics.dig(*metric.key_location),
+              base_tags.merge(broker: broker_statistics['nodename'])
             )
           end
         when :topics
@@ -335,11 +341,11 @@ module Honeybadger
               next if partition_statistics['fetch_state'] == 'stopped'
               next if partition_statistics['fetch_state'] == 'none'
 
-              client.public_send(
+              public_send(
                 metric.type,
                 metric.name,
-                METRIC_STAT_KEY[metric.type] => partition_statistics.dig(*metric.key_location),
-                **base_tags.merge({
+                partition_statistics.dig(*metric.key_location),
+                base_tags.merge({
                   topic: topic_name,
                   partition: partition_name
                 })
