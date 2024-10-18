@@ -1,5 +1,5 @@
 require 'honeybadger/plugin'
-require 'honeybadger/karafka_subscriber'
+require 'honeybadger/karafka'
 
 module Honeybadger
   module Plugins
@@ -7,26 +7,10 @@ module Honeybadger
       requirement { defined?(::Karafka) && ::Karafka.respond_to?(:monitor) }
 
       execution do
-        Karafka.monitor.subscribe "error.occurred" do |event|
-          tags = ["type:#{event[:type]}"]
-
-          if (consumer = event.payload[:caller]).respond_to?(:messages)
-            messages = consumer.messages
-            metadata = messages.metadata
-            consumer_group_id = consumer.topic.consumer_group.id
-
-            tags += [
-              "topic:#{metadata.topic}",
-              "partition:#{metadata.partition}",
-              "consumer_group:#{consumer_group_id}"
-            ]
-          end
-
-          Honeybadger.notify(event[:error], tags: tags)
-        end
+        ::Karafka.monitor.subscribe(::Honeybadger::Karafka::ErrorsListener.new)
 
         if config.load_plugin_insights?(:karafka)
-          ::Karafka.monitor.subscribe(::Honeybadger::KarafkaSubscriber.new)
+          ::Karafka.monitor.subscribe(::Honeybadger::Karafka::InsightsListener.new)
         end
       end
     end
