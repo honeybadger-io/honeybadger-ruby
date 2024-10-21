@@ -47,58 +47,56 @@ module Honeybadger
     def time(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      duration = attributes.delete(:duration)
+      value = attributes.delete(:duration) || attributes.delete(:value)
 
       if callable
-        duration = monotonic_timer{ callable.call }[0]
+        value = monotonic_timer{ callable.call }[0]
       elsif block_given?
-        duration = monotonic_timer{ yield }[0]
+        value = monotonic_timer{ yield }[0]
       end
 
-      raise 'No duration found' if duration.nil?
+      raise 'No value found' if value.nil?
 
       Honeybadger::Timer.register(registry, name, attributes).tap do |timer|
-        timer.record(duration)
+        timer.record(value)
       end
     end
 
     def histogram(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      duration = attributes.delete(:duration)
-      count = attributes.delete(:count)
+      value = attributes.delete(:duration) || attributes.delete(:value)
 
       if callable
-        duration = monotonic_timer{ callable.call }[0]
+        value = monotonic_timer{ callable.call }[0]
       elsif block_given?
-        duration = monotonic_timer{ yield }[0]
+        value = monotonic_timer{ yield }[0]
       end
 
-      raise 'No duration or count found' if duration.nil? && count.nil?
+      raise 'No value found' if value.nil?
 
       Honeybadger::Histogram.register(registry, name, attributes).tap do |histogram|
-        histogram.record(duration) unless duration.nil?
-        histogram.record(count) unless count.nil?
+        histogram.record(value)
       end
     end
 
     def increment_counter(name, *args)
       attributes = extract_attributes(args)
-      by = extract_callable(args)&.call || attributes.delete(:by) || 1
-      by = yield if block_given?
+      value = extract_callable(args)&.call || attributes.delete(:by) || attributes.delete(:value) || 1
+      value = yield if block_given?
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
-        counter.count(by)
+        counter.count(value)
       end
     end
 
     def decrement_counter(name, *args)
       attributes = extract_attributes(args)
-      by = extract_callable(args)&.call || attributes.delete(:by) || 1
-      by = yield if block_given?
+      value = extract_callable(args)&.call || attributes.delete(:by) || attributes.delete(:value) || 1
+      value = yield if block_given?
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
-        counter.count(by * -1)
+        counter.count(value * -1)
       end
     end
 
