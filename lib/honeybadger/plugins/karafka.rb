@@ -1,5 +1,4 @@
 require 'honeybadger/plugin'
-require 'honeybadger/karafka'
 
 module Honeybadger
   module Plugins
@@ -7,6 +6,8 @@ module Honeybadger
       requirement { defined?(::Karafka) && ::Karafka.respond_to?(:monitor) }
 
       execution do
+        require 'honeybadger/karafka'
+
         errors_listener = ::Honeybadger::Karafka::ErrorsListener.new
         ::Karafka.monitor.subscribe(errors_listener)
         ::Karafka.producer.monitor.subscribe(errors_listener) if ::Karafka.respond_to?(:producer)

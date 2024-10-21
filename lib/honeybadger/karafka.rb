@@ -2,57 +2,14 @@ require 'honeybadger/instrumentation_helper'
 
 module Honeybadger
   module Karafka
-    class Client
-      include ::Honeybadger::InstrumentationHelper
-      include ::Karafka::Core::Configurable
-      extend Forwardable
-
-      def_delegators :config, :source, :agent
-
-      setting :source, default: 'karafka'
-      setting :agent, default: ::Honeybadger::Agent.instance
-
-      configure
-
-      # @param block [Proc] configuration block
-      def initialize(&block)
-        configure
-        setup(&block) if block
-        metric_source(source)
-        metric_agent(agent)
-      end
-
-      # @param block [Proc] configuration block
-      # @note We define this alias to be consistent with `WaterDrop#setup`
-      def setup(&block)
-        configure(&block)
-      end
-    end
-
     class ErrorsListener
-      include ::Karafka::Core::Configurable
-      extend Forwardable
-
-      def_delegators :config, :client
-
-      setting :client, default: Client.new
-
-      # @param block [Proc] configuration block
-      def initialize(&block)
-        configure
-        setup(&block) if block
-      end
-
-      # @param block [Proc] configuration block
-      # @note We define this alias to be consistent with `WaterDrop#setup`
-      def setup(&block)
-        configure(&block)
-      end
-
       # Sends error details to Honeybadger
       #
       # @param event [Karafka::Core::Monitoring::Event]
       def on_error_occurred(event)
+        context = {
+          type: event[:type]
+        }
         tags = ["type:#{event[:type]}"]
 
         if (consumer = event.payload[:caller]).respond_to?(:messages)
@@ -60,37 +17,26 @@ module Honeybadger
           metadata = messages.metadata
           consumer_group_id = consumer.topic.consumer_group.id
 
-          tags += [
-            "topic:#{metadata.topic}",
-            "partition:#{metadata.partition}",
-            "consumer_group:#{consumer_group_id}"
-          ]
+          context[:topic] = metadata.topic
+          context[:partition] = metadata.partition
+          context[:consumer_group] = consumer_group_id
         end
 
-        client.agent.notify(event[:error], tags: tags)
+        Honeybadger.notify(event[:error], context: context)
       end
     end
 
     class InsightsListener
-      include ::Karafka::Core::Configurable
-      extend Forwardable
-
-      def_delegators :config, :rd_kafka_metrics, :aggregated_rd_kafka_metrics, :default_tags, :client
+      include ::Honeybadger::InstrumentationHelper
 
       # Value object for storing a single rdkafka metric publishing details
       RdKafkaMetric = Struct.new(:type, :scope, :name, :key_location)
-
-      setting :client, default: Client.new
-
-      # Default tags we want to publish (for example hostname)
-      # Format as followed (example for hostname): `{ host: Socket.gethostname }`
-      setting :default_tags, default: {}
 
       # All the rdkafka metrics we want to publish
       #
       # By default we publish quite a lot so this can be tuned
       # Note, that the once with `_d` come from Karafka, not rdkafka or Kafka
-      setting :rd_kafka_metrics, default: [
+      RD_KAFKA_METRICS = [
         # Client metrics
         RdKafkaMetric.new(:increment_counter, :root, 'messages_consumed', 'rxmsgs_d'),
         RdKafkaMetric.new(:increment_counter, :root, 'messages_consumed_bytes', 'rxmsg_bytes'),
@@ -111,37 +57,27 @@ module Honeybadger
       ].freeze
 
       # Metrics that sum values on topics levels and not on partition levels
-      setting :aggregated_rd_kafka_metrics, default: [
+      AGGREGATED_RD_KAFKA_METRICS = [
         # Topic aggregated metrics
         RdKafkaMetric.new(:gauge, :topics, 'consumer_aggregated_lag', 'consumer_lag_stored')
       ].freeze
 
-      configure
-
-      # @param block [Proc] configuration block
-      def initialize(&block)
-        configure
-        setup(&block) if block
-      end
-
-      # @param block [Proc] configuration block
-      # @note We define this alias to be consistent with `WaterDrop#setup`
-      def setup(&block)
-        configure(&block)
+      def initialize
+        metric_source("karafka")
       end
 
       # Hooks up to Karafka instrumentation for emitted statistics
       #
       # @param event [Karafka::Core::Monitoring::Event]
       def on_statistics_emitted(event)
-        return unless client.agent.config.load_plugin_insights_metrics?(:karafka)
+        return unless Honeybadger.config.load_plugin_insights_metrics?(:karafka)
 
         statistics = event[:statistics]
         consumer_group_id = event[:consumer_group_id]
 
-        base_tags = default_tags.merge(consumer_group: consumer_group_id)
+        base_tags = { consumer_group: consumer_group_id }
 
-        config.rd_kafka_metrics.each do |metric|
+        RD_KAFKA_METRICS.each do |metric|
           report_metric(metric, statistics, base_tags)
         end
 
@@ -153,7 +89,7 @@ module Honeybadger
       # @param statistics [Hash] hash with all the statistics emitted
       # @param consumer_group_id [String] cg in context which we operate
       def report_aggregated_topics_metrics(statistics, consumer_group_id)
-        config.aggregated_rd_kafka_metrics.each do |metric|
+        AGGREGATED_RD_KAFKA_METRICS.each do |metric|
           statistics.fetch('topics').each do |topic_name, topic_values|
             sum = 0
 
@@ -169,11 +105,9 @@ module Honeybadger
             public_send(
               metric.type,
               metric.name,
-              sum,
-              default_tags.merge({
-                consumer_group: consumer_group_id,
-                topic: topic_name
-              })
+              value: sum,
+              consumer_group: consumer_group_id,
+              topic: topic_name
             )
           end
         end
@@ -189,12 +123,12 @@ module Honeybadger
           extra_tags.merge!(consumer_tags(event.payload[:caller]))
         end
 
-        if client.agent.config.load_plugin_insights_events?(:karafka)
-          client.agent.event("error.occurred.karafka", error: event[:error], **default_tags.merge(extra_tags))
+        if Honeybadger.config.load_plugin_insights_events?(:karafka)
+          Honeybadger.event("error.occurred.karafka", error: event[:error], **extra_tags)
         end
 
-        if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          increment_counter('error_occurred', 1, default_tags.merge(extra_tags))
+        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+          increment_counter('error_occurred', value: 1, **extra_tags)
         end
       end
 
@@ -209,9 +143,9 @@ module Honeybadger
 
         extra_tags = { consumer_group: consumer_group_id }
 
-        if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          histogram('listener_polling_time_taken', time_taken, default_tags.merge(extra_tags))
-          histogram('listener_polling_messages', messages_count, default_tags.merge(extra_tags))
+        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+          histogram('listener_polling_time_taken', value: time_taken, **extra_tags)
+          histogram('listener_polling_messages', value: messages_count, **extra_tags)
         end
       end
 
@@ -223,28 +157,27 @@ module Honeybadger
         messages = consumer.messages
         metadata = messages.metadata
 
-        tags = default_tags.merge(consumer_tags(consumer))
+        tags = consumer_tags(consumer)
 
-        if client.agent.config.load_plugin_insights_events?(:karafka)
-          event_context = {
+        if Honeybadger.config.load_plugin_insights_events?(:karafka)
+          event_context = tags.merge({
             consumer: consumer.class.name,
-            topic: metadata.topic,
             duration: event[:time],
             processing_lag: metadata.processing_lag,
             consumption_lag: metadata.consumption_lag,
             processed: messages.count
-          }
-          client.agent.event("consumer.consumed.karafka", event_context)
+          })
+          Honeybadger.event("consumer.consumed.karafka", event_context)
         end
 
-        if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          increment_counter('consumer_messages', messages.count, tags)
-          increment_counter('consumer_batches', 1, tags)
-          gauge('consumer_offset', metadata.last_offset, tags)
-          histogram('consumer_consumed_time_taken', event[:time], tags)
-          histogram('consumer_batch_size', messages.count, tags)
-          histogram('consumer_processing_lag', metadata.processing_lag, tags)
-          histogram('consumer_consumption_lag', metadata.consumption_lag, tags)
+        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+          increment_counter('consumer_messages', value: messages.count, **tags)
+          increment_counter('consumer_batches', value: 1, **tags)
+          gauge('consumer_offset', value: metadata.last_offset, **tags)
+          histogram('consumer_consumed_time_taken', value: event[:time], **tags)
+          histogram('consumer_batch_size', value: messages.count, **tags)
+          histogram('consumer_processing_lag', value: metadata.processing_lag, **tags)
+          histogram('consumer_consumption_lag', value: metadata.consumption_lag, **tags)
         end
       end
 
@@ -258,9 +191,9 @@ module Honeybadger
               #
               # @param event [Karafka::Core::Monitoring::Event]
               def on_consumer_#{after}(event)
-                tags = default_tags.merge(consumer_tags(event.payload[:caller]))
+                tags = consumer_tags(event.payload[:caller])
 
-                increment_counter('consumer_#{name}', 1, tags)
+                increment_counter('consumer_#{name}', value: 1, **tags)
               end
         RUBY
       end
@@ -270,10 +203,10 @@ module Honeybadger
       def on_worker_process(event)
         jq_stats = event[:jobs_queue].statistics
 
-        if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          gauge('worker_total_threads', ::Karafka::App.config.concurrency, default_tags)
-          histogram('worker_processing', jq_stats[:busy], default_tags)
-          histogram('worker_enqueued_jobs', jq_stats[:enqueued], default_tags)
+        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+          gauge('worker_total_threads', value: ::Karafka::App.config.concurrency)
+          histogram('worker_processing', value: jq_stats[:busy])
+          histogram('worker_enqueued_jobs', value: jq_stats[:enqueued])
         end
       end
 
@@ -283,21 +216,9 @@ module Honeybadger
       def on_worker_processed(event)
         jq_stats = event[:jobs_queue].statistics
 
-        if client.agent.config.load_plugin_insights_metrics?(:karafka)
-          histogram('worker_processing', jq_stats[:busy], default_tags)
+        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+          histogram('worker_processing', value: jq_stats[:busy])
         end
-      end
-
-      def increment_counter(metric_name, by, tags)
-        client.increment_counter(metric_name, by: by, **tags)
-      end
-
-      def gauge(metric_name, value, tags)
-        client.gauge(metric_name, value: value, **tags)
-      end
-
-      def histogram(metric_name, duration, tags)
-        client.histogram(metric_name, duration: duration, **tags)
       end
 
       private
@@ -312,8 +233,8 @@ module Honeybadger
           public_send(
             metric.type,
             metric.name,
-            statistics.fetch(*metric.key_location),
-            base_tags
+            value: statistics.fetch(*metric.key_location),
+            **base_tags
           )
         when :brokers
           statistics.fetch('brokers').each_value do |broker_statistics|
@@ -325,8 +246,8 @@ module Honeybadger
             public_send(
               metric.type,
               metric.name,
-              broker_statistics.dig(*metric.key_location),
-              base_tags.merge(broker: broker_statistics['nodename'])
+              value: broker_statistics.dig(*metric.key_location),
+              **base_tags.merge(broker: broker_statistics['nodename'])
             )
           end
         when :topics
@@ -344,8 +265,8 @@ module Honeybadger
               public_send(
                 metric.type,
                 metric.name,
-                partition_statistics.dig(*metric.key_location),
-                base_tags.merge({
+                value: partition_statistics.dig(*metric.key_location),
+                **base_tags.merge({
                   topic: topic_name,
                   partition: partition_name
                 })
