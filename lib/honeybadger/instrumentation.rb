@@ -47,12 +47,14 @@ module Honeybadger
     def time(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = attributes.delete(:duration) || attributes.delete(:value)
+      value = nil
 
       if callable
         value = monotonic_timer{ callable.call }[0]
       elsif block_given?
         value = monotonic_timer{ yield }[0]
+      else
+        value = attributes.delete(:duration) || attributes.delete(:value)
       end
 
       raise 'No value found' if value.nil?
@@ -65,12 +67,14 @@ module Honeybadger
     def histogram(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = attributes.delete(:duration) || attributes.delete(:value)
+      value = nil
 
       if callable
         value = monotonic_timer{ callable.call }[0]
       elsif block_given?
         value = monotonic_timer{ yield }[0]
+      else
+        value = attributes.delete(:duration) || attributes.delete(:value)
       end
 
       raise 'No value found' if value.nil?
@@ -82,8 +86,16 @@ module Honeybadger
 
     def increment_counter(name, *args)
       attributes = extract_attributes(args)
-      value = extract_callable(args)&.call || attributes.delete(:by) || attributes.delete(:value) || 1
-      value = yield if block_given?
+      callable = extract_callable(args)
+      value = nil
+
+      if callable
+        value = callable.call
+      elsif block_given?
+        value = yield
+      else
+        value = attributes.delete(:by) || attributes.delete(:value)
+      end
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
         counter.count(value)
@@ -92,8 +104,16 @@ module Honeybadger
 
     def decrement_counter(name, *args)
       attributes = extract_attributes(args)
-      value = extract_callable(args)&.call || attributes.delete(:by) || attributes.delete(:value) || 1
-      value = yield if block_given?
+      callable = extract_callable(args)
+      value = nil
+
+      if callable
+        value = callable.call
+      elsif block_given?
+        value = yield
+      else
+        value = attributes.delete(:by) || attributes.delete(:value)
+      end
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
         counter.count(value * -1)
@@ -102,8 +122,16 @@ module Honeybadger
 
     def gauge(name, *args)
       attributes = extract_attributes(args)
-      value = extract_callable(args)&.call || attributes.delete(:value)
-      value = yield if block_given?
+      callable = extract_callable(args)
+      value = nil
+
+      if callable
+        value = callable.call
+      elsif block_given?
+        value = yield
+      else
+        value = attributes.delete(:value)
+      end
 
       Honeybadger::Gauge.register(registry, name, attributes).tap do |gauge|
         gauge.record(value)
