@@ -149,6 +149,7 @@ module Honeybadger
       opts[:rack_env] ||= context_manager.get_rack_env
       opts[:global_context] ||= context_manager.get_context
       opts[:breadcrumbs] ||= breadcrumbs.dup
+      opts[:request_id] ||= context_manager.get_request_id
 
       notice = Notice.new(config, opts)
 
