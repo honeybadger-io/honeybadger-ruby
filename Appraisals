@@ -77,7 +77,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   end
 
   appraise "rails8" do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 8.0.0.beta1" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 8.0.0.rc1" }
     gem "sqlite3", "~> 2", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
