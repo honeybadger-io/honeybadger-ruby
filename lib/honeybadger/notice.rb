@@ -216,6 +216,13 @@ module Honeybadger
       self.api_key = opts[:api_key] || config[:api_key]
       self.tags = construct_tags(opts[:tags]) | construct_tags(context[:tags])
 
+      self.url        = opts[:url]        || request_hash[:url]      || nil
+      self.action     = opts[:action]     || request_hash[:action]   || nil
+      self.component  = opts[:controller] || opts[:component]        || request_hash[:component] || nil
+      self.params     = opts[:parameters] || opts[:params]           || request_hash[:params] || {}
+      self.session    = opts[:session]    || request_hash[:session]  || {}
+      self.cgi_data   = opts[:cgi_data]   || request_hash[:cgi_data] || {}
+      self.details    = opts[:details]    || {}
       self.request_id = opts[:request_id] || nil
 
       self.session = opts[:session][:data] if opts[:session] && opts[:session][:data]
