@@ -93,6 +93,10 @@ describe Honeybadger::Notice do
     expect(notice.url).to eq url
   end
 
+  it "accepts a request_id" do
+    expect(build_notice(request_id: 'abc').request_id).to eq 'abc'
+  end
+
   it "sets the error class from an exception or hash" do
     assert_accepts_exception_attribute :error_class do |exception|
       exception.class.name
@@ -633,6 +637,10 @@ describe Honeybadger::Notice do
       metadata = notice.as_json[:breadcrumbs][:trail][0][:metadata]
       expect(metadata[:password]).to eq "[FILTERED]"
       expect(metadata[:deep]).to eq "[DEPTH]"
+    end
+
+    it "includes the request_id" do
+      expect(build_notice(request_id: "abc").as_json[:correlation_context][:request_id]).to eq "abc"
     end
   end
 
