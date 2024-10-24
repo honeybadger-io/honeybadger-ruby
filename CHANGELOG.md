@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.17.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.16.0...v5.17.0) (2024-10-22)
+
+
+### Features
+
+* add request_id to notices ([#619](https://github.com/honeybadger-io/honeybadger-ruby/issues/619)) ([fa4d878](https://github.com/honeybadger-io/honeybadger-ruby/commit/fa4d878ad0f0a5c37e49adeab1c53e6ffa463295)), closes [#616](https://github.com/honeybadger-io/honeybadger-ruby/issues/616)
+
 ## [5.16.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.15.6...v5.16.0) (2024-09-19)
 
 
