@@ -411,6 +411,11 @@ module Honeybadger
         default: false,
         type: Boolean
       },
+      :'insights.console.enabled' => {
+        description: "Enable/Disable Honeybadger Insights built-in instrumentation in a Rails console.",
+        default: false,
+        type: Boolean
+      },
       :'insights.registry_flush_interval' => {
         description: "Number of seconds between registry flushes.",
         default: 60,
