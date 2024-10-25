@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.18.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.17.0...v5.18.0) (2024-10-25)
+
+
+### Features
+
+* add a separate configuration for Insights in a console ([#623](https://github.com/honeybadger-io/honeybadger-ruby/issues/623)) ([a89488e](https://github.com/honeybadger-io/honeybadger-ruby/commit/a89488e535ff04ec2e362807f0001471ba5c6fe3))
+
 ## [5.17.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.16.0...v5.17.0) (2024-10-22)
 
 
