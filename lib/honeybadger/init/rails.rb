@@ -34,7 +34,7 @@ module Honeybadger
         end
 
         console do
-          Honeybadger::Agent.instance.config[:'insights.enabled'] = false unless Honeybadger::Agent.instance.config.env.has_key?(:'insights.enabled')
+          Honeybadger::Agent.instance.config[:'insights.enabled'] = Honeybadger::Agent.instance.config[:'insights.console.enabled']
         end
       end
     end

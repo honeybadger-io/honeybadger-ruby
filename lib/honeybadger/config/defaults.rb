@@ -34,6 +34,7 @@ module Honeybadger
     IGNORE_EVENTS_DEFAULT = [
       { event_type: 'sql.active_record', query: /^(begin|commit)( transaction)?$/i },
       { event_type: 'sql.active_record', query: /(solid_queue|good_job)/i },
+      { event_type: 'sql.active_record', name: /^GoodJob/ },
       { event_type: 'process_action.action_controller', controller: 'Rails::HealthController' }
     ].freeze
 
@@ -422,6 +423,11 @@ module Honeybadger
       },
       :'insights.enabled' => {
         description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
+        default: false,
+        type: Boolean
+      },
+      :'insights.console.enabled' => {
+        description: "Enable/Disable Honeybadger Insights built-in instrumentation in a Rails console.",
         default: false,
         type: Boolean
       },
