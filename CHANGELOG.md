@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.19.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.18.0...v5.19.0) (2024-10-29)
+
+
+### Features
+
+* improved karafka plugin for insights ([#625](https://github.com/honeybadger-io/honeybadger-ruby/issues/625)) ([21880fc](https://github.com/honeybadger-io/honeybadger-ruby/commit/21880fc92493abb044ba3c0d64299ad8b92ad5f3))
+
 ## [5.18.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.17.0...v5.18.0) (2024-10-25)
 
 
