@@ -292,18 +292,6 @@ module Honeybadger
       !!self[:'insights.enabled']
     end
 
-    def insights_events_enabled?
-      return false unless insights_enabled?
-      return true if self[:"insights.events"].nil?
-      !!self[:'insights.events']
-    end
-
-    def insights_metrics_enabled?
-      return false unless insights_enabled?
-      return true if self[:"insights.metrics"].nil?
-      !!self[:'insights.metrics']
-    end
-
     def cluster_collection?(name)
       return false unless insights_enabled?
       return true if self[:"#{name}.insights.cluster_collection"].nil?
@@ -323,7 +311,6 @@ module Honeybadger
 
     def load_plugin_insights_events?(name)
       return false unless insights_enabled?
-      return false unless insights_events_enabled?
       return false unless load_plugin_insights?(name)
       return true if self[:"#{name}.insights.events"].nil?
       !!self[:"#{name}.insights.events"]
@@ -331,7 +318,6 @@ module Honeybadger
 
     def load_plugin_insights_metrics?(name)
       return false unless insights_enabled?
-      return false unless insights_metrics_enabled?
       return false unless load_plugin_insights?(name)
       return true if self[:"#{name}.insights.metrics"].nil?
       !!self[:"#{name}.insights.metrics"]
