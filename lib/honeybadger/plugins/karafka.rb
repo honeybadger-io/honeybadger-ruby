@@ -6,25 +6,14 @@ module Honeybadger
       requirement { defined?(::Karafka) && ::Karafka.respond_to?(:monitor) }
 
       execution do
-        ::Karafka.monitor.subscribe("error.occurred") do |event|
-          Honeybadger.notify(event[:error])
-          Honeybadger.event("error.occurred.karafka", error: event[:error]) if config.load_plugin_insights?(:karafka)
-        end
+        require 'honeybadger/karafka'
+
+        errors_listener = ::Honeybadger::Karafka::ErrorsListener.new
+        ::Karafka.monitor.subscribe(errors_listener)
+        ::Karafka.producer.monitor.subscribe(errors_listener) if ::Karafka.respond_to?(:producer)
 
         if config.load_plugin_insights?(:karafka)
-          ::Karafka.monitor.subscribe("consumer.consumed") do |event|
-            context = {
-              duration: event.payload[:time],
-              consumer: event.payload[:caller].class.to_s,
-              id: event.payload[:caller].id,
-              topic: event.payload[:caller].messages.metadata.topic,
-              messages_count: event.payload[:caller].messages.metadata.size,
-              processing_lag: event.payload[:caller].messages.metadata.processing_lag,
-              partition: event.payload[:caller].messages.metadata.partition
-            }
-
-            Honeybadger.event("consumer.consumed.karafka", context)
-          end
+          ::Karafka.monitor.subscribe(::Honeybadger::Karafka::InsightsListener.new)
         end
       end
     end

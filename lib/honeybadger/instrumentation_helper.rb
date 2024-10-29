@@ -56,7 +56,7 @@ module Honeybadger
         metric_instrumentation.time(name, attributes, ->{ callable.call })
       elsif block_given?
         metric_instrumentation.time(name, attributes, ->{ yield })
-      elsif attributes.keys.include?(:duration)
+      else
         metric_instrumentation.time(name, attributes)
       end
     end
@@ -68,38 +68,44 @@ module Honeybadger
         metric_instrumentation.histogram(name, attributes, ->{ callable.call })
       elsif block_given?
         metric_instrumentation.histogram(name, attributes, ->{ yield })
-      elsif attributes.keys.include?(:duration)
+      else
         metric_instrumentation.histogram(name, attributes)
       end
     end
 
     def increment_counter(name, *args)
       attributes = extract_attributes(args)
-      by = extract_callable(args)&.call || attributes.delete(:by) || 1
-      if block_given?
+      callable = extract_callable(args)
+      if callable
+        metric_instrumentation.increment_counter(name, attributes, ->{ callable.call })
+      elsif block_given?
         metric_instrumentation.increment_counter(name, attributes, ->{ yield })
       else
-        metric_instrumentation.increment_counter(name, attributes.merge(by: by))
+        metric_instrumentation.increment_counter(name, attributes)
       end
     end
 
     def decrement_counter(name, *args)
       attributes = extract_attributes(args)
-      by = extract_callable(args)&.call || attributes.delete(:by) || 1
-      if block_given?
+      callable = extract_callable(args)
+      if callable
+        metric_instrumentation.decrement_counter(name, attributes, ->{ callable.call })
+      elsif block_given?
         metric_instrumentation.decrement_counter(name, attributes, ->{ yield })
       else
-        metric_instrumentation.decrement_counter(name, attributes.merge(by: by))
+        metric_instrumentation.decrement_counter(name, attributes)
       end
     end
 
     def gauge(name, *args)
       attributes = extract_attributes(args)
-      value = extract_callable(args)&.call || attributes.delete(:value)
-      if block_given?
+      callable = extract_callable(args)
+      if callable
+        metric_instrumentation.gauge(name, attributes, ->{ callable.call })
+      elsif block_given?
         metric_instrumentation.gauge(name, attributes, ->{ yield })
       else
-        metric_instrumentation.gauge(name, attributes.merge(value: value))
+        metric_instrumentation.gauge(name, attributes)
       end
     end
 
