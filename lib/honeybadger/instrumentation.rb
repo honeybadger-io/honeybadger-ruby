@@ -94,7 +94,7 @@ module Honeybadger
       elsif block_given?
         value = yield
       else
-        value = attributes.delete(:by) || attributes.delete(:value)
+        value = attributes.delete(:by) || attributes.delete(:value) || 1
       end
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
@@ -112,7 +112,7 @@ module Honeybadger
       elsif block_given?
         value = yield
       else
-        value = attributes.delete(:by) || attributes.delete(:value)
+        value = attributes.delete(:by) || attributes.delete(:value) || 1
       end
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
