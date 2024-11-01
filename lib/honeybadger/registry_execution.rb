@@ -19,6 +19,7 @@ module Honeybadger
 
     def call
       @registry.metrics.each do |metric|
+        next if metric.samples == 0
         metric.event_payloads.each do |payload|
           Honeybadger.event(payload.merge(interval: @interval))
         end

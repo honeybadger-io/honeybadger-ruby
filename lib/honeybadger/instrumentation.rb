@@ -57,10 +57,12 @@ module Honeybadger
         value = attributes.delete(:duration) || attributes.delete(:value)
       end
 
-      raise 'No value found' if value.nil?
-
       Honeybadger::Timer.register(registry, name, attributes).tap do |timer|
-        timer.record(value)
+        if value.nil?
+          agent.config.logger.warn("No value found for timer #{name}. Must specify either duration or value. Skipping.")
+        else
+          timer.record(value)
+        end
       end
     end
 
@@ -77,10 +79,12 @@ module Honeybadger
         value = attributes.delete(:duration) || attributes.delete(:value)
       end
 
-      raise 'No value found' if value.nil?
-
       Honeybadger::Histogram.register(registry, name, attributes).tap do |histogram|
-        histogram.record(value)
+        if value.nil?
+          agent.config.logger.warn("No value found for histogram #{name}. Must specify either duration or value. Skipping.")
+        else
+          histogram.record(value)
+        end
       end
     end
 
@@ -134,7 +138,11 @@ module Honeybadger
       end
 
       Honeybadger::Gauge.register(registry, name, attributes).tap do |gauge|
-        gauge.record(value)
+        if value.nil?
+          agent.config.logger.warn("No value found for gauge #{name}. Must specify value. Skipping.")
+        else
+          gauge.record(value)
+        end
       end
     end
 
