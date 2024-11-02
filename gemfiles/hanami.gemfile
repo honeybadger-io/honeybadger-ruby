@@ -16,6 +16,7 @@ gem "bump", "~> 0.10.0"
 gem "hanami", "~> 2.0"
 gem "hanami-router", "~> 2.0"
 gem "rack-test"
+gem "dry-system", "~> 1.0.1"
 
 group :development do
   gem "guard"
