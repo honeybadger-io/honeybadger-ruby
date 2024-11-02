@@ -16,6 +16,10 @@ gem "bump", "~> 0.10.0"
 gem "hanami", "~> 2.0"
 gem "hanami-router", "~> 2.0"
 gem "rack-test"
+
+# Pin the dry-system gem because hanami 2.1.1 relies on a method
+# (#find_and_load_provider) that was removed from dry-system 1.1.0. Once hanami
+# 2.2.0 is released, we can remove this gem and rely on the dependency only.
 gem "dry-system", "~> 1.0.1"
 
 group :development do
