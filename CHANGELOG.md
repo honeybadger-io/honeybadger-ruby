@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.19.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.19.0...v5.19.1) (2024-11-02)
+
+
+### Bug Fixes
+
+* don't raise errors in instrumentation metrics ([#627](https://github.com/honeybadger-io/honeybadger-ruby/issues/627)) ([1231dae](https://github.com/honeybadger-io/honeybadger-ruby/commit/1231dae0c48a2fab4cdaa14f7308ab3e0b44c287))
+
 ## [5.19.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.18.0...v5.19.0) (2024-10-29)
 
 
