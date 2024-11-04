@@ -31,8 +31,8 @@ module Honeybadger
             if config[:'exceptions.enabled']
               # These two must come before the ErrorNotifier, since an error/response
               # passes through middleware from inner to outer (bottom to top)
-              install_honeybadger_middleware(Honeybadger::Rack::UserFeedback)
-              install_honeybadger_middleware(Honeybadger::Rack::UserInformer)
+              install_honeybadger_middleware(Honeybadger::Rack::UserFeedback) if config[:'feedback.enabled']
+              install_honeybadger_middleware(Honeybadger::Rack::UserInformer) if config[:'user_informer.enabled']
               install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier)
             end
           end
