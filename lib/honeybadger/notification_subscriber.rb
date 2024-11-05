@@ -3,6 +3,29 @@ require 'honeybadger/util/sql'
 
 module Honeybadger
   class NotificationSubscriber
+    include Honeybadger::InstrumentationHelper
+
+    Metric = Struct.new(:type, :event, :value_key, :context)
+
+    RAILS_METRICS = [
+      Metric.new(:gauge, 'sql.active_record', :duration, %i[query]),
+
+      Metric.new(:gauge, 'process_action.action_controller', :duration, %i[method controller action format status]),
+      Metric.new(:gauge, 'process_action.action_controller', :db_runtime, %i[method controller action format status]),
+      Metric.new(:gauge, 'process_action.action_controller', :view_runtime, %i[method controller action format status]),
+
+      Metric.new(:gauge, 'cache_read.active_support', :duration, %i[store key]),
+      Metric.new(:gauge, 'cache_fetch_hit.active_support', :duration, %i[store key]),
+      Metric.new(:gauge, 'cache_write.active_support', :duration, %i[store key]),
+      Metric.new(:gauge, 'cache_exist?.active_support', :duration, %i[store key]),
+
+      Metric.new(:gauge, 'render_partial.action_view', :duration, %i[view]),
+      Metric.new(:gauge, 'render_template.action_view', :duration, %i[view]),
+      Metric.new(:gauge, 'render_collection.action_view', :duration, %i[view]),
+
+      Metric.new(:gauge, 'perform.active_job', :duration, %i[job_class queue_name])
+    ]
+
     def start(name, id, payload)
       @start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
     end
@@ -21,7 +44,27 @@ module Honeybadger
     end
 
     def record(name, payload)
-      Honeybadger.event(name, payload)
+      if Honeybadger.config.load_plugin_insights_events?(:rails)
+        Honeybadger.event(name, payload)
+      end
+
+      if Honeybadger.config.load_plugin_insights_metrics?(:rails) && (metrics = find_metrics(name, payload))
+        metric_source 'rails'
+        metrics.each do |metric|
+          public_send(
+            metric.type,
+            [metric.value_key, metric.event].join('.'),
+            value: payload[metric.value_key],
+            **payload.slice(*metric.context)
+          )
+        end
+      end
+    end
+
+    def find_metrics(name, payload)
+      RAILS_METRICS.select do |metric|
+        metric.event.to_s == name.to_s && payload.keys.include?(metric.value_key) && (payload.keys & metric.context).any?
+      end
     end
 
     def process?(event, payload)
@@ -106,22 +149,6 @@ module Honeybadger
         job_id: job.job_id,
         queue_name: job.queue_name
       })
-    end
-  end
-
-  class ActiveJobMetricsSubscriber < NotificationSubscriber
-    include Honeybadger::InstrumentationHelper
-
-    def format_payload(payload)
-      {
-        job_class: payload[:job].class.to_s,
-        queue_name: payload[:job].queue_name
-      }
-    end
-
-    def record(name, payload)
-      metric_source 'active_job'
-      histogram name, { bins: [30, 60, 120, 300, 1800, 3600, 21_600] }.merge(payload)
     end
   end
 

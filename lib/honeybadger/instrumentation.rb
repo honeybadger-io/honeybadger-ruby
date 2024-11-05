@@ -134,7 +134,7 @@ module Honeybadger
       elsif block_given?
         value = yield
       else
-        value = attributes.delete(:value)
+        value = attributes.delete(:duration) || attributes.delete(:value)
       end
 
       Honeybadger::Gauge.register(registry, name, attributes).tap do |gauge|
