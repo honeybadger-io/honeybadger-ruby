@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [5.19.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.19.1...v5.19.2) (2024-11-05)
+
+
+### Bug Fixes
+
+* don't run middleware in Sinatra when not configured ([#629](https://github.com/honeybadger-io/honeybadger-ruby/issues/629)) ([d84c2b1](https://github.com/honeybadger-io/honeybadger-ruby/commit/d84c2b15f61b1a019be6329981d8f5323115d1e9))
+* pin rspec-its gem to 1.3.1 ([#631](https://github.com/honeybadger-io/honeybadger-ruby/issues/631)) ([5f78b8a](https://github.com/honeybadger-io/honeybadger-ruby/commit/5f78b8adfb1b86c233bf9ad3ddb69dc702341e11))
+
 ## [5.19.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.19.0...v5.19.1) (2024-11-02)
 
 
