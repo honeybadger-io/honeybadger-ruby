@@ -1,4 +1,5 @@
 begin
+  require 'ostruct'
   require 'sidekiq'
   SIDEKIQ_PRESENT = true
 rescue LoadError
