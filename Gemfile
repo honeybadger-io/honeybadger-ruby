@@ -6,7 +6,7 @@ gem 'allocation_stats', platforms: :mri, require: false
 gem 'appraisal', '~> 2.1'
 gem 'aruba', '~> 2.0'
 gem 'rspec', '~> 3.0'
-gem 'rspec-its'
+gem "rspec-its", "~> 1.3.1"
 gem 'ruby-prof', platforms: :mri, require: false
 gem 'timecop'
 gem 'webmock'
