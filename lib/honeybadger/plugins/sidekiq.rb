@@ -44,7 +44,7 @@ module Honeybadger
 
             if Honeybadger.config.load_plugin_insights_metrics?(:sidekiq)
               metric_source 'sidekiq'
-              histogram 'perform', { bins: [30, 60, 120, 300, 1800, 3600, 21_600] }.merge(context.slice(:worker, :queue, :duration))
+              gauge 'perform', context.slice(:worker, :queue, :duration)
             end
           end
         end
