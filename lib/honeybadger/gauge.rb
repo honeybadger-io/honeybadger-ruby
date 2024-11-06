@@ -19,6 +19,7 @@ module Honeybadger
     def payloads
       [
         {
+          total: @total,
           min: @min,
           max: @max,
           avg: @avg,
