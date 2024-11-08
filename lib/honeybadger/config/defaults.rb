@@ -32,6 +32,7 @@ module Honeybadger
                       'Sidekiq::JobRetry::Skip'].map(&:freeze).freeze
 
     IGNORE_EVENTS_DEFAULT = [
+      { event_type: 'metric.hb', metric_name: 'duration.sql.active_record', query: /^(begin|commit)( transaction)?$/i },
       { event_type: 'sql.active_record', query: /^(begin|commit)( transaction)?$/i },
       { event_type: 'sql.active_record', query: /(solid_queue|good_job)/i },
       { event_type: 'sql.active_record', name: /^GoodJob/ },
@@ -375,7 +376,7 @@ module Honeybadger
       },
       :'sidekiq.insights.metrics' => {
         description: 'Enable automatic metric data collection for Sidekiq.',
-        default: true,
+        default: false,
         type: Boolean
       },
       :'rails.insights.enabled' => {
@@ -390,7 +391,7 @@ module Honeybadger
       },
       :'rails.insights.metrics' => {
         description: 'Enable automatic metric data collection for Ruby on Rails.',
-        default: true,
+        default: false,
         type: Boolean
       },
       :'karafka.insights.enabled' => {
@@ -405,7 +406,7 @@ module Honeybadger
       },
       :'karafka.insights.metrics' => {
         description: 'Enable automatic metric data collection for Karafka.',
-        default: true,
+        default: false,
         type: Boolean
       },
       :'net_http.insights.enabled' => {
@@ -420,7 +421,7 @@ module Honeybadger
       },
       :'net_http.insights.metrics' => {
         description: 'Enable automatic metric data collection for Net::HTTP requests.',
-        default: true,
+        default: false,
         type: Boolean
       },
       :'net_http.insights.full_url' => {

@@ -5,27 +5,6 @@ module Honeybadger
   class NotificationSubscriber
     include Honeybadger::InstrumentationHelper
 
-    Metric = Struct.new(:type, :event, :value_key, :context)
-
-    RAILS_METRICS = [
-      Metric.new(:gauge, 'sql.active_record', :duration, %i[query]),
-
-      Metric.new(:gauge, 'process_action.action_controller', :duration, %i[method controller action format status]),
-      Metric.new(:gauge, 'process_action.action_controller', :db_runtime, %i[method controller action format status]),
-      Metric.new(:gauge, 'process_action.action_controller', :view_runtime, %i[method controller action format status]),
-
-      Metric.new(:gauge, 'cache_read.active_support', :duration, %i[store key]),
-      Metric.new(:gauge, 'cache_fetch_hit.active_support', :duration, %i[store key]),
-      Metric.new(:gauge, 'cache_write.active_support', :duration, %i[store key]),
-      Metric.new(:gauge, 'cache_exist?.active_support', :duration, %i[store key]),
-
-      Metric.new(:gauge, 'render_partial.action_view', :duration, %i[view]),
-      Metric.new(:gauge, 'render_template.action_view', :duration, %i[view]),
-      Metric.new(:gauge, 'render_collection.action_view', :duration, %i[view]),
-
-      Metric.new(:gauge, 'perform.active_job', :duration, %i[job_class queue_name])
-    ]
-
     def start(name, id, payload)
       @start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
     end
@@ -48,22 +27,22 @@ module Honeybadger
         Honeybadger.event(name, payload)
       end
 
-      if Honeybadger.config.load_plugin_insights_metrics?(:rails) && (metrics = find_metrics(name, payload))
+      if Honeybadger.config.load_plugin_insights_metrics?(:rails)
         metric_source 'rails'
-        metrics.each do |metric|
-          public_send(
-            metric.type,
-            [metric.value_key, metric.event].join('.'),
-            value: payload[metric.value_key],
-            **payload.slice(*metric.context)
-          )
-        end
+        record_metrics(name, payload)
       end
     end
 
-    def find_metrics(name, payload)
-      RAILS_METRICS.select do |metric|
-        metric.event.to_s == name.to_s && payload.keys.include?(metric.value_key) && (payload.keys & metric.context).any?
+    def record_metrics(name, payload)
+      case name
+      when 'sql.active_record'
+        gauge('duration.sql.active_record', value: payload[:duration], **payload.slice(:query))
+      when 'process_action.action_controller'
+        gauge('duration.process_action.action_controller', value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge('db_runtime.process_action.action_controller', value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge('view_runtime.process_action.action_controller', value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+      when /^cache_.*.active_support$/
+        gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
       end
     end
 
