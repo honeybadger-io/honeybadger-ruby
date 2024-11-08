@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.20.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.19.2...v5.20.0) (2024-11-08)
+
+
+### Features
+
+* add aggregated metrics for rails and more ([#630](https://github.com/honeybadger-io/honeybadger-ruby/issues/630)) ([12db5a4](https://github.com/honeybadger-io/honeybadger-ruby/commit/12db5a4d44a9597c0999d32a150283799d856d66))
+
 ## [5.19.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.19.1...v5.19.2) (2024-11-05)
 
 
