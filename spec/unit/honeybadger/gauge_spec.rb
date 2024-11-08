@@ -10,6 +10,6 @@ describe Honeybadger::Gauge do
 
     before { metric.record(1) }
 
-    it { should eq [{ avg: 1.0, latest: 1, max: 1, min: 1 }] }
+    it { should eq [{ total: 1, avg: 1.0, latest: 1, max: 1, min: 1 }] }
   end
 end

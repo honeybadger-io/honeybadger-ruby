@@ -3,6 +3,8 @@ require 'honeybadger/util/sql'
 
 module Honeybadger
   class NotificationSubscriber
+    include Honeybadger::InstrumentationHelper
+
     def start(name, id, payload)
       @start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
     end
@@ -21,7 +23,29 @@ module Honeybadger
     end
 
     def record(name, payload)
-      Honeybadger.event(name, payload)
+      if Honeybadger.config.load_plugin_insights_events?(:rails)
+        Honeybadger.event(name, payload)
+      end
+
+      if Honeybadger.config.load_plugin_insights_metrics?(:rails)
+        metric_source 'rails'
+        record_metrics(name, payload)
+      end
+    end
+
+    def record_metrics(name, payload)
+      case name
+      when 'sql.active_record'
+        gauge('duration.sql.active_record', value: payload[:duration], **payload.slice(:query))
+      when 'process_action.action_controller'
+        gauge('duration.process_action.action_controller', value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge('db_runtime.process_action.action_controller', value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge('view_runtime.process_action.action_controller', value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+      when 'perform.active_job'
+        gauge('duration.perform.active_job', value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when /^cache_.*.active_support$/
+        gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
+      end
     end
 
     def process?(event, payload)
@@ -106,22 +130,6 @@ module Honeybadger
         job_id: job.job_id,
         queue_name: job.queue_name
       })
-    end
-  end
-
-  class ActiveJobMetricsSubscriber < NotificationSubscriber
-    include Honeybadger::InstrumentationHelper
-
-    def format_payload(payload)
-      {
-        job_class: payload[:job].class.to_s,
-        queue_name: payload[:job].queue_name
-      }
-    end
-
-    def record(name, payload)
-      metric_source 'active_job'
-      histogram name, { bins: [30, 60, 120, 300, 1800, 3600, 21_600] }.merge(payload)
     end
   end
 

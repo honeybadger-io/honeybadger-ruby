@@ -13,6 +13,7 @@ describe Honeybadger::Histogram do
     it do
       should eq [
         {
+          total: 1,
           avg: 1.0,
           latest: 1,
           max: 1,

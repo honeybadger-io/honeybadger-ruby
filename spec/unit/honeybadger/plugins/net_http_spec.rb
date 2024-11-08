@@ -6,10 +6,10 @@ describe "Net::HTTP integration" do
 
   before do
     Honeybadger::Plugin.instances[:net_http].reset!
+    Honeybadger::Plugin.instances[:net_http].load!(config)
   end
 
   it "includes integration module into Net::HTTP" do
-    Honeybadger::Plugin.instances[:net_http].load!(config)
     expect(Net::HTTP.ancestors).to include(Honeybadger::Plugins::Net::HTTP)
   end
 
@@ -24,11 +24,33 @@ describe "Net::HTTP integration" do
     end
 
     context "report domain and full url" do
-      before { ::Honeybadger.config[:'net_http.insights.full_url'] = true }
+      before { config[:'net_http.insights.full_url'] = true }
 
       it "contains a domain and url" do
         expect(Honeybadger).to receive(:event).with('request.net_http', hash_including({method: "GET", status: 200, url: "http://example.com", host: "example.com"}))
         Net::HTTP.get(URI.parse('http://example.com'))
+      end
+    end
+
+    context "metrics collection enabled" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true, :'net_http.insights.metrics' => true) }
+
+      context "report domain only" do
+        it "contains a domain" do
+          expect(Honeybadger).to receive(:event).with('request.net_http', hash_including({method: "GET", status: 200, host: "example.com"}))
+          expect(Honeybadger).to receive(:gauge).with('duration.request', hash_including({method: "GET", status: 200, host: "example.com"}))
+          Net::HTTP.get(URI.parse('http://example.com'))
+        end
+      end
+
+      context "report domain and full url" do
+        before { config[:'net_http.insights.full_url'] = true }
+
+        it "contains a domain and url" do
+          expect(Honeybadger).to receive(:event).with('request.net_http', hash_including({method: "GET", status: 200, url: "http://example.com", host: "example.com"}))
+          expect(Honeybadger).to receive(:gauge).with('duration.request', hash_including({method: "GET", status: 200, host: "example.com"}))
+          Net::HTTP.get(URI.parse('http://example.com'))
+        end
       end
     end
   end

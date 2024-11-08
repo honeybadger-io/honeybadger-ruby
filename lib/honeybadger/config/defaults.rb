@@ -32,6 +32,7 @@ module Honeybadger
                       'Sidekiq::JobRetry::Skip'].map(&:freeze).freeze
 
     IGNORE_EVENTS_DEFAULT = [
+      { event_type: 'metric.hb', metric_name: 'duration.sql.active_record', query: /^(begin|commit)( transaction)?$/i },
       { event_type: 'sql.active_record', query: /^(begin|commit)( transaction)?$/i },
       { event_type: 'sql.active_record', query: /(solid_queue|good_job)/i },
       { event_type: 'sql.active_record', name: /^GoodJob/ },
@@ -363,6 +364,36 @@ module Honeybadger
         default: 60,
         type: Integer
       },
+      :'sidekiq.insights.enabled' => {
+        description: 'Enable automatic data collection for Sidekiq.',
+        default: true,
+        type: Boolean
+      },
+      :'sidekiq.insights.events' => {
+        description: 'Enable automatic event capturing for Sidekiq.',
+        default: true,
+        type: Boolean
+      },
+      :'sidekiq.insights.metrics' => {
+        description: 'Enable automatic metric data collection for Sidekiq.',
+        default: false,
+        type: Boolean
+      },
+      :'rails.insights.enabled' => {
+        description: 'Enable automatic data collection for Ruby on Rails.',
+        default: true,
+        type: Boolean
+      },
+      :'rails.insights.events' => {
+        description: 'Enable automatic event capturing for Ruby on Rails.',
+        default: true,
+        type: Boolean
+      },
+      :'rails.insights.metrics' => {
+        description: 'Enable automatic metric data collection for Ruby on Rails.',
+        default: false,
+        type: Boolean
+      },
       :'karafka.insights.enabled' => {
         description: 'Enable automatic data collection for Karafka.',
         default: true,
@@ -375,12 +406,22 @@ module Honeybadger
       },
       :'karafka.insights.metrics' => {
         description: 'Enable automatic metric data collection for Karafka.',
-        default: true,
+        default: false,
         type: Boolean
       },
       :'net_http.insights.enabled' => {
         description: 'Allow automatic instrumentation of Net::HTTP requests.',
         default: true,
+        type: Boolean
+      },
+      :'net_http.insights.events' => {
+        description: 'Enable automatic event capturing for Net::HTTP requests.',
+        default: true,
+        type: Boolean
+      },
+      :'net_http.insights.metrics' => {
+        description: 'Enable automatic metric data collection for Net::HTTP requests.',
+        default: false,
         type: Boolean
       },
       :'net_http.insights.full_url' => {
