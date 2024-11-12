@@ -351,7 +351,7 @@ module Honeybadger
       },
       :'sidekiq.insights.collection_interval' => {
         description: 'The frequency in which Sidekiq cluster metrics are sampled.',
-        default: 60,
+        default: 5,
         type: Integer
       },
       :'solid_queue.insights.cluster_collection' => {
@@ -361,7 +361,7 @@ module Honeybadger
       },
       :'solid_queue.insights.collection_interval' => {
         description: 'The frequency in which SolidQueue cluster metrics are sampled.',
-        default: 60,
+        default: 5,
         type: Integer
       },
       :'sidekiq.insights.enabled' => {
