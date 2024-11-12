@@ -70,6 +70,10 @@ module Honeybadger
       #
       # @param event [Karafka::Core::Monitoring::Event]
       def on_statistics_emitted(event)
+        if Honeybadger.config.load_plugin_insights_events?(:karafka)
+          Honeybadger.event("statistics_emitted.karafka", event.payload)
+        end
+
         return unless Honeybadger.config.load_plugin_insights_metrics?(:karafka)
 
         statistics = event[:statistics]
@@ -138,9 +142,7 @@ module Honeybadger
       def on_connection_listener_fetch_loop_received(event)
         time_taken = event[:time]
         messages_count = event[:messages_buffer].size
-
         consumer_group_id = event[:subscription_group].consumer_group.id
-
         extra_tags = { consumer_group: consumer_group_id }
 
         if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
@@ -191,9 +193,10 @@ module Honeybadger
               #
               # @param event [Karafka::Core::Monitoring::Event]
               def on_consumer_#{after}(event)
-                tags = consumer_tags(event.payload[:caller])
-
-                increment_counter('consumer_#{name}', value: 1, **tags)
+                if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+                  tags = consumer_tags(event.payload[:caller])
+                  increment_counter('consumer_#{name}', value: 1, **tags)
+                end
               end
         RUBY
       end
