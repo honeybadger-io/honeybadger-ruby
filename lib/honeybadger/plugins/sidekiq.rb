@@ -167,47 +167,67 @@ module Honeybadger
           end
         end
 
+        collect_sidekiq_stats = -> do
+          stats = ::Sidekiq::Stats.new
+          data = stats.as_json
+          data[:queues] = {}
+
+          ::Sidekiq::Queue.all.each do |queue|
+            data[:queues][queue.name] ||= {}
+            data[:queues][queue.name][:latency] = (queue.latency * 1000).ceil
+            data[:queues][queue.name][:depth] = queue.size
+          end
+
+          Hash.new(0).tap do |busy_counts|
+            ::Sidekiq::Workers.new.each do |_pid, _tid, work|
+              payload = work.respond_to?(:payload) ? work.payload : work["payload"]
+              payload = JSON.parse(payload) if payload.is_a?(String)
+              busy_counts[payload["queue"]] += 1
+            end
+          end.each do |queue_name, busy_count|
+            data[:queues][queue_name] ||= {}
+            data[:queues][queue_name][:busy] = busy_count
+          end
+
+          processes = ::Sidekiq::ProcessSet.new.to_enum(:each).to_a
+          data[:capacity] = processes.map { |process| process["concurrency"] }.sum
+
+          process_utilizations = processes.map do |process|
+            next unless process["concurrency"].to_f > 0
+            process["busy"] / process["concurrency"].to_f
+          end.compact
+
+          if process_utilizations.any?
+            utilization = process_utilizations.sum / process_utilizations.length.to_f
+            data[:utilization] = utilization
+          end
+
+          data
+        end
+
         collect do
           if config.cluster_collection?(:sidekiq) && (leader_checker.nil? || leader_checker.collect?)
-            metric_source 'sidekiq'
+            stats = collect_sidekiq_stats.call
 
-            stats = ::Sidekiq::Stats.new
-
-            gauge 'active_workers', ->{ stats.workers_size }
-            gauge 'active_processes', ->{ stats.processes_size }
-            gauge 'jobs_processed', ->{ stats.processed }
-            gauge 'jobs_failed', ->{ stats.failed }
-            gauge 'jobs_scheduled', ->{ stats.scheduled_size }
-            gauge 'jobs_enqueued', ->{ stats.enqueued }
-            gauge 'jobs_dead', ->{ stats.dead_size }
-            gauge 'jobs_retry', ->{ stats.retry_size }
-
-            ::Sidekiq::Queue.all.each do |queue|
-              gauge 'queue_latency', { queue: queue.name }, ->{ (queue.latency * 1000).ceil }
-              gauge 'queue_depth', { queue: queue.name }, ->{ queue.size }
+            if Honeybadger.config.load_plugin_insights_events?(:sidekiq)
+              Honeybadger.event('stats.sidekiq', stats.except('stats').merge(stats['stats']))
             end
 
-            Hash.new(0).tap do |busy_counts|
-              ::Sidekiq::Workers.new.each do |_pid, _tid, work|
-                payload = work.respond_to?(:payload) ? work.payload : work["payload"]
-                payload = JSON.parse(payload) if payload.is_a?(String)
-                busy_counts[payload["queue"]] += 1
+            if Honeybadger.config.load_plugin_insights_metrics?(:sidekiq)
+              metric_source 'sidekiq'
+
+              stats['stats'].each do |name, value|
+                gauge name, value: value
               end
-            end.each do |queue_name, busy_count|
-              gauge 'queue_busy', { queue: queue_name }, ->{ busy_count }
-            end
 
-            processes = ::Sidekiq::ProcessSet.new.to_enum(:each).to_a
-            gauge 'capacity', ->{ processes.map { |process| process["concurrency"] }.sum }
+              stats[:queues].each do |queue_name, data|
+                data.each do |key, value|
+                  gauge "queue_#{key}", queue: queue_name, value: value
+                end
+              end
 
-            process_utilizations = processes.map do |process|
-              next unless process["concurrency"].to_f > 0
-              process["busy"] / process["concurrency"].to_f
-            end.compact
-
-            if process_utilizations.any?
-              utilization = process_utilizations.sum / process_utilizations.length.to_f
-              gauge 'utilization', ->{ utilization }
+              gauge 'capacity', value: stats[:capacity] if stats[:capacity]
+              gauge 'utilization', value: stats[:utilization] if stats[:utilization]
             end
           end
         end
