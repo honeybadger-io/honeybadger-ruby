@@ -377,6 +377,16 @@ module Honeybadger
       true
     end
 
+    # Stops the Honeybadger Insights related services.
+    #
+    # @example
+    #   Honeybadger.stop_insights # => nil
+    def stop_insights(force = false)
+      events_worker&.shutdown(force)
+      metrics_worker&.shutdown(force)
+      true
+    end
+
     # Sends event to events backend
     #
     # @example
