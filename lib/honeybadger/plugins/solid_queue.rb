@@ -5,7 +5,8 @@ module Honeybadger
         requirement { config.load_plugin_insights?(:solid_queue) && defined?(::SolidQueue) }
 
         collect_solid_queue_stats = -> do
-          stats = {
+          data = {}
+          data[:stats] = {
             jobs_in_progress: ::SolidQueue::ClaimedExecution.count,
             jobs_blocked: ::SolidQueue::BlockedExecution.count,
             jobs_failed: ::SolidQueue::FailedExecution.count,
@@ -15,13 +16,13 @@ module Honeybadger
             active_dispatchers: ::SolidQueue::Process.where(kind: "Dispatcher").count
           }
 
-          stats[:queues] = Hash.new({})
+          data[:queues] = Hash.new({})
 
           ::SolidQueue::Queue.all.each do |queue|
-            stats[:queues][queue.name][:depth] = queue.size
+            data[:queues][queue.name][:depth] = queue.size
           end
 
-          stats
+          data
         end
 
         collect do
@@ -29,12 +30,12 @@ module Honeybadger
 
           if config.cluster_collection?(:solid_queue)
             if Honeybadger.config.load_plugin_insights_events?(:solid_queue)
-              Honeybadger.event('stasts.solid_queue', stats)
+              Honeybadger.event('stats.solid_queue', stats.except(:stats).merge(stats[:stats]))
             end
 
             if Honeybadger.config.load_plugin_insights_metrics?(:solid_queue)
               metric_source 'solid_queue'
-              stats.except(:queue_depth).each do |stat_name, value|
+              stats[:stats].each do |stat_name, value|
                 gauge stat_name, value: value
               end
 
