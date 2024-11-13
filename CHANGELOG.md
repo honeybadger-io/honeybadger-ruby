@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.20.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.20.0...v5.20.1) (2024-11-13)
+
+
+### Bug Fixes
+
+* cli test for rails 8 ([#639](https://github.com/honeybadger-io/honeybadger-ruby/issues/639)) ([ec74cfd](https://github.com/honeybadger-io/honeybadger-ruby/commit/ec74cfd95519cd49509ff63fb34a7673f5c76323))
+
 ## [5.20.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.19.2...v5.20.0) (2024-11-08)
 
 
