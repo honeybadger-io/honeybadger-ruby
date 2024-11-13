@@ -142,6 +142,7 @@ module Honeybadger
         end
         CONTROLLER
 
+        ::Rails.application.try(:reload_routes_unless_loaded)
         ::Rails.application.routes.tap do |r|
           # RouteSet#disable_clear_and_finalize prevents existing routes from
           # being cleared. We'll set it back to the original value when we're
