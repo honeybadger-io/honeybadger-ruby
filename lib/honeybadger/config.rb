@@ -289,7 +289,7 @@ module Honeybadger
     end
 
     def insights_enabled?
-      !!self[:'insights.enabled']
+      public? && !!self[:'insights.enabled']
     end
 
     def cluster_collection?(name)
