@@ -344,26 +344,6 @@ module Honeybadger
         default: true,
         type: Boolean
       },
-      :'sidekiq.insights.cluster_collection' => {
-        description: 'Collect cluster based metrics for Sidekiq.',
-        default: true,
-        type: Boolean
-      },
-      :'sidekiq.insights.collection_interval' => {
-        description: 'The frequency in which Sidekiq cluster metrics are sampled.',
-        default: 60,
-        type: Integer
-      },
-      :'solid_queue.insights.cluster_collection' => {
-        description: 'Collect cluster based metrics for SolidQueue.',
-        default: true,
-        type: Boolean
-      },
-      :'solid_queue.insights.collection_interval' => {
-        description: 'The frequency in which SolidQueue cluster metrics are sampled.',
-        default: 60,
-        type: Integer
-      },
       :'sidekiq.insights.enabled' => {
         description: 'Enable automatic data collection for Sidekiq.',
         default: true,
@@ -378,6 +358,41 @@ module Honeybadger
         description: 'Enable automatic metric data collection for Sidekiq.',
         default: false,
         type: Boolean
+      },
+      :'sidekiq.insights.cluster_collection' => {
+        description: 'Collect cluster based metrics for Sidekiq.',
+        default: true,
+        type: Boolean
+      },
+      :'sidekiq.insights.collection_interval' => {
+        description: 'The frequency in which Sidekiq cluster metrics are sampled.',
+        default: 5,
+        type: Integer
+      },
+      :'solid_queue.insights.enabled' => {
+        description: 'Enable automatic data collection for SolidQueue.',
+        default: true,
+        type: Boolean
+      },
+      :'solid_queue.insights.events' => {
+        description: 'Enable automatic event capturing for SolidQueue.',
+        default: true,
+        type: Boolean
+      },
+      :'solid_queue.insights.metrics' => {
+        description: 'Enable automatic metric data collection for SolidQueue.',
+        default: false,
+        type: Boolean
+      },
+      :'solid_queue.insights.cluster_collection' => {
+        description: 'Collect cluster based metrics for SolidQueue.',
+        default: true,
+        type: Boolean
+      },
+      :'solid_queue.insights.collection_interval' => {
+        description: 'The frequency in which SolidQueue cluster metrics are sampled.',
+        default: 5,
+        type: Integer
       },
       :'rails.insights.enabled' => {
         description: 'Enable automatic data collection for Ruby on Rails.',

@@ -197,6 +197,9 @@ describe "Sidekiq Dependency" do
           def enqueued; end
           def dead_size; end
           def retry_size; end
+          def as_json
+            {}
+          end
         end
       end
 
