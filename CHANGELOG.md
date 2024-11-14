@@ -1,6 +1,15 @@
 # Change Log
 
 
+## [5.21.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.20.1...v5.21.0) (2024-11-14)
+
+
+### Features
+
+* add event stats for sidekiq and sq ([#638](https://github.com/honeybadger-io/honeybadger-ruby/issues/638)) ([0d15bf5](https://github.com/honeybadger-io/honeybadger-ruby/commit/0d15bf543d4c425a2d9f6000d328dc0e71261647))
+* disable all workers in rails console ([#636](https://github.com/honeybadger-io/honeybadger-ruby/issues/636)) ([d0bcb42](https://github.com/honeybadger-io/honeybadger-ruby/commit/d0bcb4278ad84d02e3706766269582067bc76e29))
+* emit an event for karafka stats ([#637](https://github.com/honeybadger-io/honeybadger-ruby/issues/637)) ([e7e74b5](https://github.com/honeybadger-io/honeybadger-ruby/commit/e7e74b51324f7c718b1adc634cee4233d0c91813))
+
 ## [5.20.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.20.0...v5.20.1) (2024-11-13)
 
 
