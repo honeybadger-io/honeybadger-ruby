@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.22.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.21.0...v5.22.0) (2024-11-14)
+
+
+### Features
+
+* only allow for insights to be enabled when public ([#642](https://github.com/honeybadger-io/honeybadger-ruby/issues/642)) ([2d3ab26](https://github.com/honeybadger-io/honeybadger-ruby/commit/2d3ab26ca3673b5b01082d55737bf7907c02e799))
+
 ## [5.21.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.20.1...v5.21.0) (2024-11-14)
 
 
