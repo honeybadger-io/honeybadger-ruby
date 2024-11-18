@@ -491,6 +491,31 @@ module Honeybadger
         description: "Number of seconds between registry flushes.",
         default: 60,
         type: Integer
+      },
+      :'puma.insights.events' => {
+        description: 'Enable automatic event capturing for Puma stats.',
+        default: true,
+        type: Boolean
+      },
+      :'puma.insights.metrics' => {
+        description: 'Enable automatic metric data aggregation for Puma stats.',
+        default: false,
+        type: Boolean
+      },
+      :'puma.insights.collection_interval' => {
+        description: 'The frequency in which the Honeybadger gem will collect Puma stats.',
+        default: 1,
+        type: Integer
+      },
+      :'autotuner.insights.events' => {
+        description: 'Enable automatic event capturing for Autotuner stats.',
+        default: true,
+        type: Boolean
+      },
+      :'autotuner.insights.metrics' => {
+        description: 'Enable automatic metric data aggregation for Autotuner stats.',
+        default: false,
+        type: Boolean
       }
     }.freeze
 
