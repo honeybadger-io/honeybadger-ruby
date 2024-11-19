@@ -64,6 +64,7 @@ module Honeybadger
         end
 
         execution do
+          return unless Honeybadger.config[:'exceptions.enabled']
           ::Resque::Job.send(:include, Installer)
         end
       end
