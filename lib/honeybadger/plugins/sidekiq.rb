@@ -73,60 +73,62 @@ module Honeybadger
         requirement { defined?(::Sidekiq) }
 
         execution do
-          ::Sidekiq.configure_server do |sidekiq|
-            sidekiq.server_middleware do |chain|
-              chain.prepend Middleware
-            end
-          end
-
-          if defined?(::Sidekiq::VERSION) && ::Sidekiq::VERSION > '3'
+          if Honeybadger.config[:'exceptions.enabled']
             ::Sidekiq.configure_server do |sidekiq|
+              sidekiq.server_middleware do |chain|
+                chain.prepend Middleware
+              end
+            end
 
-              sidekiq_default_configuration = (::Sidekiq::VERSION > '7') ?
-                ::Sidekiq.default_configuration : Class.new
+            if defined?(::Sidekiq::VERSION) && ::Sidekiq::VERSION > '3'
+              ::Sidekiq.configure_server do |sidekiq|
 
-              sidekiq.error_handlers << lambda { |ex, sidekiq_params, sidekiq_config = sidekiq_default_configuration|
-                params = sidekiq_params.dup
-                if defined?(::Sidekiq::Config)
-                  if params[:_config].is_a?(::Sidekiq::Config) # Sidekiq > 6 and < 7.1.5
-                    params[:_config] = params[:_config].instance_variable_get(:@options)
-                  else # Sidekiq >= 7.1.5
-                    params[:_config] = sidekiq_config.instance_variable_get(:@options)
+                sidekiq_default_configuration = (::Sidekiq::VERSION > '7') ?
+                  ::Sidekiq.default_configuration : Class.new
+
+                sidekiq.error_handlers << lambda { |ex, sidekiq_params, sidekiq_config = sidekiq_default_configuration|
+                  params = sidekiq_params.dup
+                  if defined?(::Sidekiq::Config)
+                    if params[:_config].is_a?(::Sidekiq::Config) # Sidekiq > 6 and < 7.1.5
+                      params[:_config] = params[:_config].instance_variable_get(:@options)
+                    else # Sidekiq >= 7.1.5
+                      params[:_config] = sidekiq_config.instance_variable_get(:@options)
+                    end
                   end
-                end
 
-                job = params[:job] || params
+                  job = params[:job] || params
 
-                job_retry = job['retry'.freeze]
+                  job_retry = job['retry'.freeze]
 
-                if (threshold = config[:'sidekiq.attempt_threshold'].to_i) > 0 && job_retry
-                  # We calculate the job attempts to determine the need to
-                  # skip. Sidekiq's first job execution will have nil for the
-                  # 'retry_count' job key. The first retry will have 0 set for
-                  # the 'retry_count' key, incrementing on each execution
-                  # afterwards.
-                  retry_count = job['retry_count'.freeze]
-                  attempt = retry_count ? retry_count + 1 : 0
+                  if (threshold = config[:'sidekiq.attempt_threshold'].to_i) > 0 && job_retry
+                    # We calculate the job attempts to determine the need to
+                    # skip. Sidekiq's first job execution will have nil for the
+                    # 'retry_count' job key. The first retry will have 0 set for
+                    # the 'retry_count' key, incrementing on each execution
+                    # afterwards.
+                    retry_count = job['retry_count'.freeze]
+                    attempt = retry_count ? retry_count + 1 : 0
 
-                  max_retries = (::Sidekiq::VERSION > '7') ?
-                    ::Sidekiq.default_configuration[:max_retries] : sidekiq.options[:max_retries]
-                  # Ensure we account for modified max_retries setting
-                  default_max_retry_attempts = defined?(::Sidekiq::JobRetry::DEFAULT_MAX_RETRY_ATTEMPTS) ? ::Sidekiq::JobRetry::DEFAULT_MAX_RETRY_ATTEMPTS : 25
-                  retry_limit = job_retry == true ? (max_retries || default_max_retry_attempts) : job_retry.to_i
+                    max_retries = (::Sidekiq::VERSION > '7') ?
+                      ::Sidekiq.default_configuration[:max_retries] : sidekiq.options[:max_retries]
+                    # Ensure we account for modified max_retries setting
+                    default_max_retry_attempts = defined?(::Sidekiq::JobRetry::DEFAULT_MAX_RETRY_ATTEMPTS) ? ::Sidekiq::JobRetry::DEFAULT_MAX_RETRY_ATTEMPTS : 25
+                    retry_limit = job_retry == true ? (max_retries || default_max_retry_attempts) : job_retry.to_i
 
-                  limit = [retry_limit, threshold].min
+                    limit = [retry_limit, threshold].min
 
-                  return if attempt < limit
-                end
+                    return if attempt < limit
+                  end
 
-                opts = { parameters: params }
-                if config[:'sidekiq.use_component']
-                  opts[:component] = job['wrapped'.freeze] || job['class'.freeze]
-                  opts[:action] = 'perform' if opts[:component]
-                end
+                  opts = { parameters: params }
+                  if config[:'sidekiq.use_component']
+                    opts[:component] = job['wrapped'.freeze] || job['class'.freeze]
+                    opts[:action] = 'perform' if opts[:component]
+                  end
 
-                Honeybadger.notify(ex, opts)
-              }
+                  Honeybadger.notify(ex, opts)
+                }
+              end
             end
           end
 
