@@ -125,7 +125,7 @@ module Honeybadger
     # @return [String] UUID reference to the notice within Honeybadger.
     # @return [false] when ignored.
     def notify(exception_or_opts = nil, opts = {}, **kwargs)
-      if !config[:'notices.enabled']
+      if !config[:'exceptions.enabled']
         debug { 'disabled feature=notices' }
         return false
       end
