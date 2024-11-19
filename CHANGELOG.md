@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.23.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.22.0...v5.23.0) (2024-11-19)
+
+
+### Features
+
+* update puma and autotuner plugins ([#644](https://github.com/honeybadger-io/honeybadger-ruby/issues/644)) ([1ed9687](https://github.com/honeybadger-io/honeybadger-ruby/commit/1ed96874c31c0273bc28cb917043f19140fd8204))
+
 ## [5.22.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.21.0...v5.22.0) (2024-11-14)
 
 
