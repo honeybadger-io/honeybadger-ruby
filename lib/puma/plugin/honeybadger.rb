@@ -12,7 +12,7 @@ module Honeybadger
         in_background do
           loop do
             puma_plugin.record
-            sleep 1
+            sleep [::Honeybadger.config.collection_interval(:puma).to_i, 1].max
           end
         end
       end
@@ -35,8 +35,14 @@ module Honeybadger
     end
 
     def record_puma_stats(stats, context={})
-      STATS_KEYS.each do |stat|
-        gauge stat, context, ->{ stats[stat] } if stats[stat]
+      if Honeybadger.config.load_plugin_insights_events?(:puma)
+        Honeybadger.event('stats.puma', context.merge(stats))
+      end
+
+      if Honeybadger.config.load_plugin_insights_metrics?(:puma)
+        STATS_KEYS.each do |stat|
+          gauge stat, context, ->{ stats[stat] } if stats[stat]
+        end
       end
     end
   end
