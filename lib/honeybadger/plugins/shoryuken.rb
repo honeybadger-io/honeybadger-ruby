@@ -40,7 +40,6 @@ module Honeybadger
         requirement { defined?(::Shoryuken) }
 
         execution do
-          return unless Honeybadger.config[:'exceptions.enabled']
           ::Shoryuken.configure_server do |config|
             config.server_middleware do |chain|
               chain.add Middleware

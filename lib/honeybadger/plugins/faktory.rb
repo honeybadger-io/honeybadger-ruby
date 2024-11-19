@@ -15,7 +15,6 @@ module Honeybadger
         requirement { defined?(::Faktory) }
 
         execution do
-          return unless Honeybadger.config[:'exceptions.enabled']
           ::Faktory.configure_worker do |faktory|
             faktory.worker_middleware do |chain|
               chain.prepend Middleware
