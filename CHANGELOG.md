@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.24.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.23.0...v5.24.0) (2024-11-21)
+
+
+### Features
+
+* skip middleware, plugins, and exception reporting when exceptions are disabled ([#646](https://github.com/honeybadger-io/honeybadger-ruby/issues/646)) ([6c4d7d5](https://github.com/honeybadger-io/honeybadger-ruby/commit/6c4d7d53f7356717894269b5fc9095621c9e8014))
+
 ## [5.23.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.22.0...v5.23.0) (2024-11-19)
 
 
