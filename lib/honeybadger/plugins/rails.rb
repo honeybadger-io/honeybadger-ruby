@@ -64,7 +64,7 @@ module Honeybadger
             ::ActionDispatch::ShowExceptions.prepend(ExceptionsCatcher)
           end
 
-          if defined?(::ActiveSupport::ErrorReporter) # Rails 7
+          if Honeybadger.config[:'exceptions.enabled'] && defined?(::ActiveSupport::ErrorReporter) # Rails 7
             ::Rails.error.subscribe(ErrorSubscriber)
           end
         end
