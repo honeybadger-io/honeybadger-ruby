@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.25.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.24.0...v5.25.0) (2024-11-26)
+
+
+### Features
+
+* set context during rails error report ([#649](https://github.com/honeybadger-io/honeybadger-ruby/issues/649)) ([dee37e1](https://github.com/honeybadger-io/honeybadger-ruby/commit/dee37e157b0913e24a5d368e3d2cbe733f87214e))
+
 ## [5.24.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.23.0...v5.24.0) (2024-11-21)
 
 
