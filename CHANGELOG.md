@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.26.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.25.0...v5.26.0) (2024-11-27)
+
+
+### Features
+
+* use after_change for context changes ([#651](https://github.com/honeybadger-io/honeybadger-ruby/issues/651)) ([2cfc766](https://github.com/honeybadger-io/honeybadger-ruby/commit/2cfc766660d0462168aded9c34712904f8a1f774))
+
 ## [5.25.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.24.0...v5.25.0) (2024-11-26)
 
 
