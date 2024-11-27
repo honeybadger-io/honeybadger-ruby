@@ -32,8 +32,6 @@ module Honeybadger
 
       class ErrorSubscriber
         def self.report(exception, handled:, severity:, context: {}, source: nil)
-          Honeybadger.context(context)
-
           # We only report handled errors (`Rails.error.handle`)
           # Unhandled errors will be caught by our integrations (eg middleware),
           # which have richer context than the Rails error reporter
@@ -43,7 +41,7 @@ module Honeybadger
 
           tags = ["severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
-          Honeybadger.notify(exception, tags: tags)
+          Honeybadger.notify(exception, context: context, tags: tags)
         end
 
         def self.source_ignored?(source)
@@ -67,6 +65,12 @@ module Honeybadger
           end
 
           if Honeybadger.config[:'exceptions.enabled'] && defined?(::ActiveSupport::ErrorReporter) # Rails 7
+            if defined?(::ActiveSupport::ExecutionContext)
+              ::ActiveSupport::ExecutionContext.after_change do
+                Honeybadger.context(::ActiveSupport::ExecutionContext.to_h)
+              end
+            end
+
             ::Rails.error.subscribe(ErrorSubscriber)
           end
         end
