@@ -10,6 +10,8 @@ gem "rspec-its", "~> 1.3.1"
 gem 'ruby-prof', platforms: :mri, require: false
 gem 'timecop'
 gem 'webmock'
+gem 'bigdecimal'
+gem 'base64'
 
 # Required by feature specs.
 gem 'capistrano'
