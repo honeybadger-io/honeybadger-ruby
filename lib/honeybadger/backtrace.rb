@@ -7,7 +7,7 @@ module Honeybadger
     # Handles backtrace parsing line by line.
     class Line
       # Backtrace line regexp (optionally allowing leading X: for windows support).
-      INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in `([^']+)')?$}.freeze
+      INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in (?:`|')([^']+)')?$}.freeze
 
       # The file portion of the line (such as app/models/user.rb).
       attr_reader :file
