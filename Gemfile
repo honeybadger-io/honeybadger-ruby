@@ -12,6 +12,7 @@ gem 'timecop'
 gem 'webmock'
 gem 'bigdecimal'
 gem 'base64'
+gem 'mutex_m'
 
 # Required by feature specs.
 gem 'capistrano'
