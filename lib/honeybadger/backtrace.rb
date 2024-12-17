@@ -7,6 +7,7 @@ module Honeybadger
     # Handles backtrace parsing line by line.
     class Line
       # Backtrace line regexp (optionally allowing leading X: for windows support).
+      # Capture quoted strings either with leading backtick (pre Ruby 3.4) or single quote.
       INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in (?:`|')([^']+)')?$}.freeze
 
       # The file portion of the line (such as app/models/user.rb).
