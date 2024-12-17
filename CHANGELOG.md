@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.26.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.0...v5.26.1) (2024-12-17)
+
+
+### Bug Fixes
+
+* support Ruby 3.4 quote syntax in backtraces ([1655a04](https://github.com/honeybadger-io/honeybadger-ruby/commit/1655a041d707be1dcd8dd30314cc2383af084d8f))
+
 ## [5.26.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.25.0...v5.26.0) (2024-11-27)
 
 
