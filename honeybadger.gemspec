@@ -36,4 +36,5 @@ Gem::Specification.new do |s|
   s.executables << 'honeybadger'
 
   s.add_dependency 'logger'
+  s.add_dependency 'ostruct'
 end
