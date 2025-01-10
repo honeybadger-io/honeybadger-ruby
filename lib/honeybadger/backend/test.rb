@@ -42,13 +42,17 @@ module Honeybadger
         self.class.check_ins
       end
 
+      def events
+        self.class.events
+      end
+
       def notify(feature, payload)
         notifications[feature] << payload
         super
       end
 
       def event(payload)
-        events << payload
+        events.concat(payload.dup)
         super
       end
 

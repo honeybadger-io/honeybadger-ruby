@@ -6,17 +6,16 @@ module Honeybadger
     include Honeybadger::InstrumentationHelper
 
     def start(name, id, payload)
-      @start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
+      payload[:_start_time] = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
     end
 
     def finish(name, id, payload)
-      @finish_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
-
+      finish_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       return unless process?(name, payload)
 
       payload = {
         instrumenter_id: id,
-        duration: ((@finish_time - @start_time) * 1000).round(2)
+        duration: ((finish_time - payload.delete(:_start_time)) * 1000).round(2)
       }.merge(format_payload(payload).compact)
 
       record(name, payload)
