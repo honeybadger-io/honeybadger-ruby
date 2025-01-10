@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.26.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.1...v5.26.2) (2025-01-10)
+
+
+### Bug Fixes
+
+* ensure instrumentation durations are unique during threaded executions ([#658](https://github.com/honeybadger-io/honeybadger-ruby/issues/658)) ([4c3f0a6](https://github.com/honeybadger-io/honeybadger-ruby/commit/4c3f0a6e69e826b6664d4385009e67fb94c5160e))
+
 ## [5.26.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.0...v5.26.1) (2024-12-17)
 
 
