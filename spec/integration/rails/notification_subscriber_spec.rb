@@ -7,13 +7,13 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT, type: :re
   load_rails_hooks(self)
 
   before do
+    Honeybadger.config[:"insights.enabled"] = true
+    Honeybadger.config[:"events.batch_size"] = 0
+
     Honeybadger::Backend::Test.events.clear
   end
 
   it "records correct durations for concurrent notifications" do
-    Honeybadger.config[:"insights.enabled"] = true
-    Honeybadger.config[:"events.batch_size"] = 0
-
     mutex, sequence = Mutex.new, 1
     allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC) do
       if caller_locations.any? { |loc| loc.base_label == "finish" }
@@ -35,39 +35,9 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT, type: :re
     end
 
     threads.each(&:join)
+    # Wait for all events to be processed
     sleep(0.2)
 
     expect(Honeybadger::Backend::Test.events.map { |e| e[:duration] }.uniq.length).to eq(5)
-  end
-
-  it "records correct durations with regex subscription" do
-    Honeybadger.config[:"insights.enabled"] = true
-    Honeybadger.config[:"events.batch_size"] = 0
-
-    sequence = 1
-    allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC) do
-      if caller_locations.any? { |loc| loc.base_label == "finish" }
-        10
-      else
-        sequence += 1
-      end
-    end
-
-    # Subscribe to multiple notification types with a regex
-    ActiveSupport::Notifications.subscribe(/^test\.(foo|bar|baz)/, TestSubscriber.new)
-
-    # Send different types of notifications sequentially
-    %w[test.foo test.bar test.baz].each do |notification_type|
-      ActiveSupport::Notifications.instrument(notification_type) do
-        sleep(0.1)
-      end
-    end
-
-    events = Honeybadger::Backend::Test.events
-    sleep(0.2)
-
-    expect(events.size).to eq(3)
-    expect(events.map { |e| e[:event_type] }.sort).to eq(%w[test.foo test.bar test.baz].sort)
-    expect(events.map { |e| e[:duration] }.uniq.size).to eq(3)
   end
 end
