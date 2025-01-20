@@ -1,5 +1,4 @@
 require "timecop"
-require "thread"
 
 require "honeybadger/metrics_worker"
 require "honeybadger/config"

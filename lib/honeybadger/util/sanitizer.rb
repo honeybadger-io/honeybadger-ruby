@@ -59,7 +59,7 @@ module Honeybadger
         return BASIC_OBJECT if basic_object?(data)
 
         if recursive?(data)
-          return RECURSION if stack && stack.include?(data.object_id)
+          return RECURSION if stack&.include?(data.object_id)
 
           stack = stack ? stack.dup : Set.new
           stack << data.object_id

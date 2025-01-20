@@ -84,7 +84,7 @@ module Honeybadger
     # Blocks until queue is processed up to this point in time.
     def flush
       mutex.synchronize do
-        if thread && thread.alive?
+        if thread&.alive?
           queue.push(FLUSH)
           queue.push(marker)
           marker.wait(mutex)

@@ -63,7 +63,7 @@ describe Honeybadger::Logging::ConfigLogger do
     it { should respond_to severity }
   end
 
-  context "when not attached to terminal", unless: STDOUT.tty? do
+  context "when not attached to terminal", unless: $stdout.tty? do
     LOG_SEVERITIES.each do |severity|
       it "delegates ##{severity} to configured logger" do
         # Debug is logged at the info level.
@@ -74,7 +74,7 @@ describe Honeybadger::Logging::ConfigLogger do
     end
   end
 
-  context "when attached to terminal", if: STDOUT.tty? do
+  context "when attached to terminal", if: $stdout.tty? do
     [:debug, :info, :warn].each do |severity|
       it "suppresses ##{severity} from configured logger" do
         expect(logger).not_to receive(:add)

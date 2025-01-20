@@ -56,7 +56,7 @@ describe "Local variables integration", order: :defined do
       describe Honeybadger::Plugins::LocalVariables::ExceptionExtension do
         subject do
           # Test in isolation rather than installing the plugin globally.
-          Class.new(Exception) do |klass|
+          Class.new(RuntimeError) do |klass|
             klass.send(:include, Honeybadger::Plugins::LocalVariables::ExceptionExtension)
           end.new
         end

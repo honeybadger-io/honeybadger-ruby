@@ -1,5 +1,4 @@
 require "timecop"
-require "thread"
 
 require "honeybadger/events_worker"
 require "honeybadger/config"

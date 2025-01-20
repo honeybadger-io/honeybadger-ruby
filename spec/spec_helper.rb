@@ -19,7 +19,7 @@ rescue LoadError
   nil
 end
 
-Dir[File.expand_path("../support/**/*.rb", __FILE__)].each { |f| require f }
+Dir[File.expand_path("../support/**/*.rb", __FILE__)].sort.each { |f| require f }
 
 TMP_DIR = Pathname.new(File.expand_path("../../tmp", __FILE__))
 FIXTURES_PATH = Pathname.new(File.expand_path("../fixtures/", __FILE__))

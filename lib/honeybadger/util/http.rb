@@ -66,7 +66,7 @@ module Honeybadger
       def http_headers(headers = nil)
         {}.tap do |hash|
           hash.merge!(HEADERS)
-          hash.merge!({"X-API-Key" => config[:api_key].to_s})
+          hash["X-API-Key"] = config[:api_key].to_s
           hash.merge!(headers) if headers
         end
       end

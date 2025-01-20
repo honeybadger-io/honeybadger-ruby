@@ -1,4 +1,4 @@
-class BacktracedException < Exception
+class BacktracedException < RuntimeError
   attr_accessor :backtrace
   def initialize(opts)
     @backtrace = opts[:backtrace]

@@ -310,8 +310,7 @@ module Honeybadger
     end
 
     def ignore_by_callbacks?
-      config.exception_filter &&
-        config.exception_filter.call(self)
+      config.exception_filter&.call(self)
     end
 
     # Gets a property named "attribute" of an exception, either from
@@ -489,7 +488,7 @@ module Honeybadger
           end
         }
 
-      result_hash = Hash[results]
+      result_hash = results.to_h
       request_sanitizer.sanitize(result_hash)
     end
 
@@ -532,11 +531,11 @@ module Honeybadger
     # Returns the Exception cause.
     def exception_cause(exception)
       e = exception
-      if e.respond_to?(:cause) && e.cause && e.cause.is_a?(Exception)
+      if e.respond_to?(:cause) && e.cause&.is_a?(Exception)
         e.cause
-      elsif e.respond_to?(:original_exception) && e.original_exception && e.original_exception.is_a?(Exception)
+      elsif e.respond_to?(:original_exception) && e.original_exception&.is_a?(Exception)
         e.original_exception
-      elsif e.respond_to?(:continued_exception) && e.continued_exception && e.continued_exception.is_a?(Exception)
+      elsif e.respond_to?(:continued_exception) && e.continued_exception&.is_a?(Exception)
         e.continued_exception
       end
     end

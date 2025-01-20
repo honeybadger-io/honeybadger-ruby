@@ -291,7 +291,7 @@ module Honeybadger
       },
       "exceptions.rescue_rake": {
         description: "Enable reporting exceptions in rake tasks.",
-        default: !STDOUT.tty?,
+        default: !$stdout.tty?,
         type: Boolean
       },
       "exceptions.notify_at_exit": {
@@ -519,6 +519,6 @@ module Honeybadger
       }
     }.freeze
 
-    DEFAULTS = Hash[OPTIONS.map { |k, v| [k, v[:default]] }].freeze
+    DEFAULTS = OPTIONS.map { |k, v| [k, v[:default]] }.to_h.freeze
   end
 end

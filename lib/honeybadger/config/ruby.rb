@@ -46,7 +46,7 @@ module Honeybadger
       end
 
       def setter?(method_name)
-        return false unless method_name.to_s =~ /=\z/
+        return false unless method_name.to_s.end_with?("=")
         key = key(method_name)
         KEYS.any? { |k| k == key }
       end

@@ -104,7 +104,7 @@ module Honeybadger
               f.gets
               l += 1
             }
-            return Hash[duration.times.map { (line = f.gets) ? [(l += 1), line] : nil }.compact]
+            return duration.times.map { (line = f.gets) ? [(l += 1), line] : nil }.compact.to_h
           end
         else
           {}

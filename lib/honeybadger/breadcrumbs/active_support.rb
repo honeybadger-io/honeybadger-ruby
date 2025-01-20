@@ -19,7 +19,7 @@ module Honeybadger
             transform: lambda do |data|
               if data[:sql]
                 connection = data.delete(:connection)
-                adapter = (connection && connection.adapter_name.downcase) || active_record_connection_db_config[:adapter]
+                adapter = connection&.adapter_name&.downcase || active_record_connection_db_config[:adapter]
                 data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
               end
               data
