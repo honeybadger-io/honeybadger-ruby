@@ -1,0 +1,8 @@
+# https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+pre-commit:
+  parallel: true
+  commands:
+    standard:
+      tags: backend style
+      glob: "*.rb"
+      run: bundle exec standardrb {staged_files}

@@ -44,8 +44,7 @@ namespace :spec do
   task all: [:units, :integrations, :features]
 end
 
-require "standard/rake"
 desc "Alias for spec:all (default task)"
 task spec: :"spec:all"
 task test: :spec
-task default: [:standard, :spec]
+task default: :spec
