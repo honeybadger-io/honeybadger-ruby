@@ -1,35 +1,35 @@
-require 'json'
-require 'securerandom'
-require 'forwardable'
+require "json"
+require "securerandom"
+require "forwardable"
 
-require 'honeybadger/version'
-require 'honeybadger/backtrace'
-require 'honeybadger/conversions'
-require 'honeybadger/util/stats'
-require 'honeybadger/util/sanitizer'
-require 'honeybadger/util/request_hash'
-require 'honeybadger/util/request_payload'
+require "honeybadger/version"
+require "honeybadger/backtrace"
+require "honeybadger/conversions"
+require "honeybadger/util/stats"
+require "honeybadger/util/sanitizer"
+require "honeybadger/util/request_hash"
+require "honeybadger/util/request_payload"
 
 module Honeybadger
   # @api private
   NOTIFIER = {
-    name: 'honeybadger-ruby'.freeze,
-    url: 'https://github.com/honeybadger-io/honeybadger-ruby'.freeze,
+    name: "honeybadger-ruby".freeze,
+    url: "https://github.com/honeybadger-io/honeybadger-ruby".freeze,
     version: VERSION,
-    language: 'ruby'.freeze
+    language: "ruby".freeze
   }.freeze
 
   # @api private
   # Substitution for gem root in backtrace lines.
-  GEM_ROOT = '[GEM_ROOT]'.freeze
+  GEM_ROOT = "[GEM_ROOT]".freeze
 
   # @api private
   # Substitution for project root in backtrace lines.
-  PROJECT_ROOT = '[PROJECT_ROOT]'.freeze
+  PROJECT_ROOT = "[PROJECT_ROOT]".freeze
 
   # @api private
   # Empty String (used for equality comparisons and assignment).
-  STRING_EMPTY = ''.freeze
+  STRING_EMPTY = "".freeze
 
   # @api private
   # A Regexp which matches non-blank characters.
@@ -177,10 +177,10 @@ module Honeybadger
         c = (PROJECT_ROOT_CACHE[config[:root]] ||= {})
         return c[line] if c.has_key?(line)
         c[line] ||= if config.root_regexp
-                      line.sub(config.root_regexp, PROJECT_ROOT)
-                    else
-                      line
-                    end
+          line.sub(config.root_regexp, PROJECT_ROOT)
+        else
+          line
+        end
       },
       lambda { |line| line.sub(RELATIVE_ROOT, STRING_EMPTY) },
       lambda { |line| line if line !~ %r{lib/honeybadger} }
@@ -188,9 +188,9 @@ module Honeybadger
 
     # @api private
     def initialize(config, opts = {})
-      @now   = Time.now.utc
-      @pid   = Process.pid
-      @id    = SecureRandom.uuid
+      @now = Time.now.utc
+      @pid = Process.pid
+      @id = SecureRandom.uuid
       @stats = Util::Stats.all
 
       @opts = opts
@@ -201,10 +201,10 @@ module Honeybadger
 
       @exception = unwrap_exception(opts[:exception])
 
-      self.error_class = exception_attribute(:error_class, 'Notice') {|exception| exception.class.name }
-      self.error_message = exception_attribute(:error_message, 'No message provided') do |exception|
+      self.error_class = exception_attribute(:error_class, "Notice") { |exception| exception.class.name }
+      self.error_message = exception_attribute(:error_message, "No message provided") do |exception|
         message = exception.respond_to?(:detailed_message) ?
-          exception.detailed_message(highlight: false).sub(" (#{exception.class.name})", '') # Gems like error_highlight append the exception class name
+          exception.detailed_message(highlight: false).sub(" (#{exception.class.name})", "") # Gems like error_highlight append the exception class name
           : exception.message
         "#{exception.class.name}: #{message}"
       end
@@ -216,13 +216,13 @@ module Honeybadger
       self.api_key = opts[:api_key] || config[:api_key]
       self.tags = construct_tags(opts[:tags]) | construct_tags(context[:tags])
 
-      self.url        = opts[:url]        || request_hash[:url]      || nil
-      self.action     = opts[:action]     || request_hash[:action]   || nil
-      self.component  = opts[:controller] || opts[:component]        || request_hash[:component] || nil
-      self.params     = opts[:parameters] || opts[:params]           || request_hash[:params] || {}
-      self.session    = opts[:session]    || request_hash[:session]  || {}
-      self.cgi_data   = opts[:cgi_data]   || request_hash[:cgi_data] || {}
-      self.details    = opts[:details]    || {}
+      self.url = opts[:url] || request_hash[:url] || nil
+      self.action = opts[:action] || request_hash[:action] || nil
+      self.component = opts[:controller] || opts[:component] || request_hash[:component] || nil
+      self.params = opts[:parameters] || opts[:params] || request_hash[:params] || {}
+      self.session = opts[:session] || request_hash[:session] || {}
+      self.cgi_data = opts[:cgi_data] || request_hash[:cgi_data] || {}
+      self.details = opts[:details] || {}
       self.request_id = opts[:request_id] || nil
 
       self.session = opts[:session][:data] if opts[:session] && opts[:session][:data]
@@ -305,7 +305,7 @@ module Honeybadger
 
     def ignore_by_origin?
       return false if opts[:origin] != :rake
-      return false if config[:'exceptions.rescue_rake']
+      return false if config[:"exceptions.rescue_rake"]
       true
     end
 
@@ -353,7 +353,7 @@ module Honeybadger
     #
     # Returns true or false.
     def ignore_by_class?(ignored_class = nil)
-      @ignore_by_class ||= Proc.new do |ignored_class|
+      @ignore_by_class ||= proc do |ignored_class|
         case error_class
         when (ignored_class.respond_to?(:name) ? ignored_class.name : ignored_class)
           true
@@ -388,7 +388,7 @@ module Honeybadger
         cgi_data: cgi_data,
         sanitizer: request_sanitizer
       }
-      request.delete_if {|k,v| config.excluded_request_keys.include?(k) }
+      request.delete_if { |k, v| config.excluded_request_keys.include?(k) }
       Util::RequestPayload.build(request)
     end
 
@@ -471,24 +471,22 @@ module Honeybadger
           if BINDING_HAS_SOURCE_LOCATION
             b.source_location[0]
           else
-            b.eval('__FILE__')
+            b.eval("__FILE__")
           end =~ /^#{Regexp.escape(config[:root].to_s)}/
         }
       end
 
       binding ||= exception.__honeybadger_bindings_stack[0]
 
-      vars = binding.eval('local_variables')
+      vars = binding.eval("local_variables")
       results =
-        vars.inject([]) { |acc, arg|
+        vars.each_with_object([]) { |arg, acc|
           begin
             result = binding.eval(arg.to_s)
             acc << [arg, result]
           rescue NameError
             # Do Nothing
           end
-
-          acc
         }
 
       result_hash = Hash[results]
@@ -499,7 +497,7 @@ module Honeybadger
     #
     # Returns true to send local_variables.
     def send_local_variables?(config)
-      config[:'exceptions.local_variables']
+      config[:"exceptions.local_variables"]
     end
 
     # Parse Backtrace from exception backtrace.
@@ -512,7 +510,7 @@ module Honeybadger
         backtrace,
         filters: construct_backtrace_filters(opts),
         config: config,
-        source_radius: config[:'exceptions.source_radius']
+        source_radius: config[:"exceptions.source_radius"]
       ).to_a
     end
 
@@ -523,7 +521,7 @@ module Honeybadger
     #
     # Returns the Exception to report.
     def unwrap_exception(exception)
-      return exception unless config[:'exceptions.unwrap']
+      return exception unless config[:"exceptions.unwrap"]
       exception_cause(exception) || exception
     end
 
@@ -566,7 +564,7 @@ module Honeybadger
     #
     # Returns the Array of causes in Hash payload format.
     def prepare_causes(causes)
-      causes.map {|c|
+      causes.map { |c|
         {
           class: c.error_class,
           message: c.error_message,
@@ -580,7 +578,7 @@ module Honeybadger
     end
 
     def rails_params_filters
-      rack_env && Array(rack_env['action_dispatch.parameter_filter']) or []
+      rack_env && Array(rack_env["action_dispatch.parameter_filter"]) or []
     end
   end
 end

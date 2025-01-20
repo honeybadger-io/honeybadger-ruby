@@ -1,28 +1,28 @@
-require 'timecop'
-require 'thread'
+require "timecop"
+require "thread"
 
-require 'honeybadger/worker'
-require 'honeybadger/config'
-require 'honeybadger/backend'
-require 'honeybadger/notice'
+require "honeybadger/worker"
+require "honeybadger/config"
+require "honeybadger/backend"
+require "honeybadger/notice"
 
 describe Honeybadger::Worker do
   let!(:instance) { described_class.new(config) }
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: 'null') }
-  let(:obj) { double('Badger', id: :foo, to_json: '{}') }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: "null") }
+  let(:obj) { double("Badger", id: :foo, to_json: "{}") }
 
   subject { instance }
 
   after do
     Thread.list.each do |thread|
-      next unless thread.kind_of?(Honeybadger::Worker::Thread)
+      next unless thread.is_a?(Honeybadger::Worker::Thread)
       Thread.kill(thread)
     end
   end
 
   context "when an exception happens in the worker loop" do
     before do
-      allow(instance.send(:queue)).to receive(:pop).and_raise('fail')
+      allow(instance.send(:queue)).to receive(:pop).and_raise("fail")
     end
 
     it "does not raise when shutting down" do
@@ -51,7 +51,7 @@ describe Honeybadger::Worker do
   context "when an exception happens during processing" do
     before do
       allow(instance).to receive(:sleep)
-      allow(instance).to receive(:handle_response).and_raise('fail')
+      allow(instance).to receive(:handle_response).and_raise("fail")
     end
 
     def flush
@@ -221,7 +221,7 @@ describe Honeybadger::Worker do
 
     context "when throttled during shutdown" do
       before do
-        allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429) )
+        allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429))
       end
 
       it "shuts down immediately" do
@@ -346,7 +346,7 @@ describe Honeybadger::Worker do
     end
 
     context "when error" do
-      let(:response) { Honeybadger::Backend::Response.new(:error, nil, 'test error message') }
+      let(:response) { Honeybadger::Backend::Response.new(:error, nil, "test error message") }
 
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/test error message/)

@@ -7,10 +7,10 @@ module Honeybadger
         org_severity, org_message, org_progname = severity, message, progname
         if defined?(Dry::Logger::Entry) && progname.is_a?(Dry::Logger::Entry) # Hanami uses dry-logger
           message, progname = progname.message || progname.exception, progname.progname
-        else
-          message, progname = [progname, nil] if message.nil?
+        elsif message.nil?
+          message, progname = [progname, nil]
         end
-        message = message && message.to_s.strip
+        message &&= message.to_s.strip
         unless should_ignore_log?(message, progname)
           Honeybadger.add_breadcrumb(message, category: :log, metadata: {
             severity: format_severity(severity),
@@ -25,9 +25,9 @@ module Honeybadger
 
       def should_ignore_log?(message, progname)
         message.nil? ||
-        message == "" ||
-        Thread.current[:__hb_within_log_subscriber] ||
-        progname == "honeybadger"
+          message == "" ||
+          Thread.current[:__hb_within_log_subscriber] ||
+          progname == "honeybadger"
       end
     end
 
@@ -39,7 +39,7 @@ module Honeybadger
     # class that provides LogSubscriber events, we want to filter out those
     # logs as they just become noise.
     module LogSubscriberInjector
-      %w(info debug warn error fatal unknown).each do |level|
+      %w[info debug warn error fatal unknown].each do |level|
         define_method(level) do |*args, &block|
           begin
             Thread.current[:__hb_within_log_subscriber] = true
@@ -52,4 +52,3 @@ module Honeybadger
     end
   end
 end
-

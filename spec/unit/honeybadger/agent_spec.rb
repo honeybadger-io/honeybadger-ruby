@@ -1,9 +1,9 @@
-require 'honeybadger/agent'
-require 'honeybadger/events_worker'
-require 'timecop'
+require "honeybadger/agent"
+require "honeybadger/events_worker"
+require "timecop"
 
 describe Honeybadger::Agent do
-  NULL_BLOCK = Proc.new{}.freeze
+  NULL_BLOCK = proc {}.freeze
 
   describe "class methods" do
     subject { described_class }
@@ -12,90 +12,90 @@ describe Honeybadger::Agent do
   end
 
   describe "#check_in" do
-    it 'parses check_in id from a url' do
-      stub_request(:get, "https://api.honeybadger.io/v1/check_in/1MqIo1").
-         to_return(status: 200)
+    it "parses check_in id from a url" do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/1MqIo1")
+        .to_return(status: 200)
 
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
 
-      instance.check_in('https://api.honeybadger.io/v1/check_in/1MqIo1')
+      instance.check_in("https://api.honeybadger.io/v1/check_in/1MqIo1")
     end
 
-    it 'returns true for successful check ins' do
-      stub_request(:get, "https://api.honeybadger.io/v1/check_in/foobar").
-         to_return(status: 200)
+    it "returns true for successful check ins" do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/foobar")
+        .to_return(status: 200)
 
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
 
-      expect(instance.check_in('foobar')).to eq(true)
-      expect(instance.check_in('/foobar')).to eq(true)
-      expect(instance.check_in('/foobar/')).to eq(true)
+      expect(instance.check_in("foobar")).to eq(true)
+      expect(instance.check_in("/foobar")).to eq(true)
+      expect(instance.check_in("/foobar/")).to eq(true)
     end
 
-    it 'returns false for failed check ins' do
-      stub_request(:get, "https://api.honeybadger.io/v1/check_in/danny").
-         to_return(status: 400)
+    it "returns false for failed check ins" do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/danny")
+        .to_return(status: 400)
 
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
 
-      expect(instance.check_in('danny')).to eq(false)
+      expect(instance.check_in("danny")).to eq(false)
     end
   end
 
-  describe '#track_deployment' do
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+  describe "#track_deployment" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
     subject(:instance) { described_class.new(config) }
 
-    it 'returns true for successful deployment tracking' do
-      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
-         to_return(status: 200)
+    it "returns true for successful deployment tracking" do
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys")
+        .to_return(status: 200)
 
       expect(instance.track_deployment).to eq(true)
     end
 
-    it 'returns false for unsuccessful deployment tracking' do
-      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
-         to_return(status: 400)
+    it "returns false for unsuccessful deployment tracking" do
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys")
+        .to_return(status: 400)
 
       expect(instance.track_deployment).to eq(false)
     end
 
-    it 'passes the revision to the servce' do
+    it "passes the revision to the servce" do
       allow_any_instance_of(Honeybadger::Util::HTTP).to receive(:compress) { |_, body| body }
-      stub_request(:post, "https://api.honeybadger.io/v1/deploys").
-         with(body: { environment: nil, revision: '1234', local_username: nil, repository: nil }).
-         to_return(status: 200)
+      stub_request(:post, "https://api.honeybadger.io/v1/deploys")
+        .with(body: {environment: nil, revision: "1234", local_username: nil, repository: nil})
+        .to_return(status: 200)
 
-      expect(instance.track_deployment(revision: '1234')).to eq(true)
+      expect(instance.track_deployment(revision: "1234")).to eq(true)
     end
   end
 
-  describe '#context' do
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+  describe "#context" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
     subject(:instance) { described_class.new(config) }
 
-    it 'sets the context' do
+    it "sets the context" do
       instance.context({a: "context"})
       expect(instance.get_context).to eq({a: "context"})
     end
 
-    it 'allows chaining' do
+    it "allows chaining" do
       expect(instance.context({a: "context"})).to eq(instance)
     end
 
-    context 'with local context' do
-      it 'returns the return value of the block' do
-        expect(instance.context({ bar: :baz }) { :return_value }).to eq(:return_value)
+    context "with local context" do
+      it "returns the return value of the block" do
+        expect(instance.context({bar: :baz}) { :return_value }).to eq(:return_value)
       end
     end
   end
 
   describe "#clear!" do
-    it 'clears all transactional data' do
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+    it "clears all transactional data" do
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
       instance.context({a: "context"})
       instance.add_breadcrumb("Chomp")
@@ -109,63 +109,63 @@ describe Honeybadger::Agent do
 
   describe "#notify" do
     it "generates a backtrace" do
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
 
       expect(instance.worker).to receive(:push) do |notice|
-        expect(notice.backtrace.to_a[0]).to match('lib/honeybadger/agent.rb')
+        expect(notice.backtrace.to_a[0]).to match("lib/honeybadger/agent.rb")
       end
 
-      instance.notify(error_message: 'testing backtrace generation')
+      instance.notify(error_message: "testing backtrace generation")
     end
 
     it "does not mutate passed in opts" do
-      opts = {error_message: 'test'}
+      opts = {error_message: "test"}
       prev = opts.dup
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
-      instance.notify('test', opts)
+      instance.notify("test", opts)
       expect(prev).to eq(opts)
     end
 
     it "does take keyword arguments" do
-      opts = {error_message: 'test'}
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      opts = {error_message: "test"}
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
-     
+
       expect(instance.worker).to receive(:push) do |notice|
-        expect(notice.error_message).to match('test')
+        expect(notice.error_message).to match("test")
       end
       instance.notify(**opts)
     end
 
     it "does take keyword arguments as second argument" do
-      opts = {tags: 'testing, kwargs'}
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      opts = {tags: "testing, kwargs"}
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
-      
+
       expect(instance.worker).to receive(:push) do |notice|
-        expect(notice.error_message).to match('test')
-        expect(notice.tags).to eq(['testing', 'kwargs'])
+        expect(notice.error_message).to match("test")
+        expect(notice.tags).to eq(["testing", "kwargs"])
       end
-      instance.notify('test', **opts)
+      instance.notify("test", **opts)
     end
 
     it "does take explicit hash as second argument" do
-      opts = {tags: 'testing, hash'}
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      opts = {tags: "testing, hash"}
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
-      
+
       expect(instance.worker).to receive(:push) do |notice|
-        expect(notice.error_message).to match('test')
-        expect(notice.tags).to eq(['testing', 'hash'])
+        expect(notice.error_message).to match("test")
+        expect(notice.tags).to eq(["testing", "hash"])
       end
-      instance.notify('test', opts)
+      instance.notify("test", opts)
     end
 
     it "does not report an already reported exception" do
       instance = described_class.new(Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER))
       exception = RuntimeError.new
-      notice_id = '4g09ko4f'
+      notice_id = "4g09ko4f"
       exception.instance_variable_set(:@__hb_notice_id, notice_id)
       expect(instance.notify(exception)).to be notice_id
       expect(Honeybadger::Notice).to_not receive(:new)
@@ -219,7 +219,7 @@ describe Honeybadger::Agent do
 
     describe "breadcrumbs" do
       let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector) }
-      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, :'breadcrumbs.enabled' => true) }
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, "breadcrumbs.enabled": true) }
 
       subject { described_class.new(config) }
 
@@ -228,7 +228,7 @@ describe Honeybadger::Agent do
         expect(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
         expect(subject).to receive(:add_breadcrumb).with(
           "Honeybadger Notice",
-          metadata: { error_message: "passed breadcrumbs?" },
+          metadata: {error_message: "passed breadcrumbs?"},
           category: "notice"
         )
         expect(breadcrumbs).to receive(:dup).and_return(duped_breadcrumbs)
@@ -241,7 +241,7 @@ describe Honeybadger::Agent do
 
   context "breadcrumbs" do
     let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector, clear!: nil) }
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
     subject { described_class.new(config) }
 
     before do
@@ -249,22 +249,22 @@ describe Honeybadger::Agent do
     end
 
     describe "#breadcrumbs" do
-      context 'when local_context: true' do
-        let(:config) { { local_context: true } }
+      context "when local_context: true" do
+        let(:config) { {local_context: true} }
 
-        it 'creates instance local breadcrumb' do
+        it "creates instance local breadcrumb" do
           subject.breadcrumbs
           expect(Thread.current[:__hb_breadcrumbs]).to be nil
         end
 
-        it 'instantiates the breadcrumb collector with the right config' do
+        it "instantiates the breadcrumb collector with the right config" do
           allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_call_original
           subject.breadcrumbs
           expect(Honeybadger::Breadcrumbs::Collector).to have_received(:new).with(instance_of(Honeybadger::Config))
         end
       end
 
-      it 'stores breadcrumbs in thread local' do
+      it "stores breadcrumbs in thread local" do
         bc = subject.breadcrumbs
         expect(Thread.current[:__hb_breadcrumbs]).to eq(bc)
       end
@@ -285,14 +285,14 @@ describe Honeybadger::Agent do
         subject.add_breadcrumb("This is the message", metadata: {a: "b"}, category: "neat")
       end
 
-      it 'has sane defaults' do
+      it "has sane defaults" do
         crumb = Honeybadger::Breadcrumbs::Breadcrumb.new(category: "custom", message: "Basic Message", metadata: {})
         expect(breadcrumbs).to receive(:add!).with(crumb)
 
         subject.add_breadcrumb("Basic Message")
       end
 
-      it 'sanitizes breadcrumb before adding' do
+      it "sanitizes breadcrumb before adding" do
         sanitizer = instance_double(Honeybadger::Util::Sanitizer)
         allow(breadcrumbs).to receive(:add!)
         expect(Honeybadger::Util::Sanitizer).to receive(:new).with(max_depth: 2).and_return(sanitizer)
@@ -305,7 +305,7 @@ describe Honeybadger::Agent do
   end
 
   context "#event" do
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug) }
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug) }
     let(:events_worker) { double(Honeybadger::EventsWorker.new(config)) }
     let(:instance) { Honeybadger::Agent.new(config) }
 
@@ -349,8 +349,8 @@ describe Honeybadger::Agent do
     end
 
     describe "ignoring events using events.ignore config" do
-      let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.ignore' => ignored_events) }
-      let(:payload) { { some_data: "is here" } }
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, "events.ignore": ignored_events) }
+      let(:payload) { {some_data: "is here"} }
 
       after { subject.event(payload.merge(event_type: event_type)) }
 
@@ -400,7 +400,7 @@ describe Honeybadger::Agent do
       end
 
       context "when configured with a hash" do
-        let(:ignored_events) { [{ "event_type" => "report.system" }] }
+        let(:ignored_events) { [{"event_type" => "report.system"}] }
         let(:event_type) { "report.system" }
 
         it "does not push an event" do
@@ -409,9 +409,9 @@ describe Honeybadger::Agent do
       end
 
       context "when configured with a hash with a nested payload" do
-        let(:ignored_events) { [{ "nested" => { "data"  => "test" }}] }
+        let(:ignored_events) { [{"nested" => {"data" => "test"}}] }
         let(:event_type) { "report.system" }
-        let(:payload) { { nested: { data: "test" }} }
+        let(:payload) { {nested: {data: "test"}} }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
@@ -419,9 +419,9 @@ describe Honeybadger::Agent do
       end
 
       context "when configured with a hash with string keys" do
-        let(:ignored_events) { [{ "nested" => { "data"  => "test" }}] }
+        let(:ignored_events) { [{"nested" => {"data" => "test"}}] }
         let(:event_type) { "report.system" }
-        let(:payload) { { nested: { "data" => "test" }} }
+        let(:payload) { {nested: {"data" => "test"}} }
 
         it "does push an event" do
           expect(events_worker).to receive(:push)
@@ -431,7 +431,7 @@ describe Honeybadger::Agent do
       context "by default ignores Rails::HealthController" do
         let(:ignored_events) { [] }
         let(:event_type) { "process_action.action_controller" }
-        let(:payload) { { controller: "Rails::HealthController" } }
+        let(:payload) { {controller: "Rails::HealthController"} }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
@@ -441,7 +441,7 @@ describe Honeybadger::Agent do
       context "by default ignores active record BEGIN events" do
         let(:ignored_events) { [] }
         let(:event_type) { "sql.active_record" }
-        let(:payload) { { query: "BEGIN" } }
+        let(:payload) { {query: "BEGIN"} }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
@@ -451,7 +451,7 @@ describe Honeybadger::Agent do
       context "by default ignores active record COMMIT events" do
         let(:ignored_events) { [] }
         let(:event_type) { "sql.active_record" }
-        let(:payload) { { query: "COMMIT" } }
+        let(:payload) { {query: "COMMIT"} }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
@@ -461,7 +461,7 @@ describe Honeybadger::Agent do
       context "by default ignores solid_queue processor sql events" do
         let(:ignored_events) { [] }
         let(:event_type) { "sql.active_record" }
-        let(:payload) { { query: 'UPDATE "solid_queue_processes" SET "last_heartbeat_at" = ? WHERE "solid_queue_processes"."id" = ?' } }
+        let(:payload) { {query: 'UPDATE "solid_queue_processes" SET "last_heartbeat_at" = ? WHERE "solid_queue_processes"."id" = ?'} }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
@@ -471,7 +471,7 @@ describe Honeybadger::Agent do
       context "by default ignores good_job processor sql events" do
         let(:ignored_events) { [] }
         let(:event_type) { "sql.active_record" }
-        let(:payload) { { query: 'SELECT * FROM "good_jobs"' } }
+        let(:payload) { {query: 'SELECT * FROM "good_jobs"'} }
 
         it "does not push an event" do
           expect(events_worker).not_to receive(:push)
@@ -479,10 +479,10 @@ describe Honeybadger::Agent do
       end
 
       context "override default ignores" do
-        let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.ignore_only' => ignore_only) }
+        let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, "events.ignore_only": ignore_only) }
         let(:ignore_only) { [] }
         let(:event_type) { "sql.active_record" }
-        let(:payload) { { query: "COMMIT" } }
+        let(:payload) { {query: "COMMIT"} }
 
         it "does not push an event" do
           expect(events_worker).to receive(:push)
@@ -492,7 +492,7 @@ describe Honeybadger::Agent do
   end
 
   context "#collect" do
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
     let(:metrics_worker) { double(Honeybadger::MetricsWorker.new(config)) }
     let(:instance) { Honeybadger::Agent.new(config) }
     let(:collection_execution) { double(Honeybadger::Plugin::CollectorExecution) }
@@ -547,7 +547,7 @@ describe Honeybadger::Agent do
       end
 
       context "when no block is given" do
-        let(:block) { Proc.new { expecting.call } }
+        let(:block) { proc { expecting.call } }
         let(:expecting) { double(call: true) }
 
         it { should eq true }
@@ -564,11 +564,11 @@ describe Honeybadger::Agent do
       end
 
       context "when an exception occurs" do
-        let(:block) { Proc.new { fail 'oops' } }
+        let(:block) { proc { fail "oops" } }
 
         it "flushes worker" do
           expect(instance.worker).to receive(:flush)
-          expect { subject }.to raise_error /oops/
+          expect { subject }.to raise_error(/oops/)
         end
       end
     end

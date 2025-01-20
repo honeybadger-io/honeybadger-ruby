@@ -1,4 +1,4 @@
-require 'honeybadger/backend/null'
+require "honeybadger/backend/null"
 
 module Honeybadger
   module Backend
@@ -10,7 +10,7 @@ module Honeybadger
       #
       # @return [Hash] Notifications hash.
       def self.notifications
-        @notifications ||= Hash.new {|h,k| h[k] = [] }
+        @notifications ||= Hash.new { |h, k| h[k] = [] }
       end
 
       # The event list.

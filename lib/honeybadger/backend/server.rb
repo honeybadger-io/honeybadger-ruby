@@ -1,20 +1,20 @@
-require 'net/http'
-require 'json'
-require 'zlib'
-require 'openssl'
+require "net/http"
+require "json"
+require "zlib"
+require "openssl"
 
-require 'honeybadger/backend/base'
-require 'honeybadger/util/http'
+require "honeybadger/backend/base"
+require "honeybadger/util/http"
 
 module Honeybadger
   module Backend
     class Server < Base
       ENDPOINTS = {
-        notices: '/v1/notices'.freeze,
-        deploys: '/v1/deploys'.freeze,
+        notices: "/v1/notices".freeze,
+        deploys: "/v1/deploys".freeze
       }.freeze
-      CHECK_IN_ENDPOINT = '/v1/check_in'.freeze
-      EVENTS_ENDPOINT = '/v1/events'.freeze
+      CHECK_IN_ENDPOINT = "/v1/check_in".freeze
+      EVENTS_ENDPOINT = "/v1/events".freeze
 
       HTTP_ERRORS = Util::HTTP::ERRORS
 
@@ -64,7 +64,7 @@ module Honeybadger
       def payload_headers(payload)
         if payload.respond_to?(:api_key) && payload.api_key
           {
-            'X-API-Key' => payload.api_key
+            "X-API-Key" => payload.api_key
           }
         end
       end

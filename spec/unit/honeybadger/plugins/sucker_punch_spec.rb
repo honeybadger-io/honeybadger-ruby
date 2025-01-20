@@ -1,5 +1,5 @@
-require 'honeybadger/plugins/sucker_punch'
-require 'honeybadger/config'
+require "honeybadger/plugins/sucker_punch"
+require "honeybadger/config"
 
 describe "SuckerPunch Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }

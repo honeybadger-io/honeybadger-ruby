@@ -1,12 +1,12 @@
-require 'erb'
-require 'forwardable'
-require 'honeybadger/cli/main'
-require 'honeybadger/cli/helpers'
-require 'honeybadger/util/http'
-require 'honeybadger/util/stats'
-require 'open3'
-require 'ostruct'
-require 'thor/shell'
+require "erb"
+require "forwardable"
+require "honeybadger/cli/main"
+require "honeybadger/cli/helpers"
+require "honeybadger/util/http"
+require "honeybadger/util/stats"
+require "open3"
+require "ostruct"
+require "thor/shell"
 
 module Honeybadger
   module CLI
@@ -14,34 +14,34 @@ module Honeybadger
       extend Forwardable
       include Helpers::BackendCmd
 
-      FAILED_TEMPLATE = <<-MSG
-Honeybadger detected failure or error output for the command:
-`<%= args.join(' ') %>`
+      FAILED_TEMPLATE = <<~MSG
+        Honeybadger detected failure or error output for the command:
+        `<%= args.join(' ') %>`
+        
+        PROCESS ID: <%= pid %>
+        
+        RESULT CODE: <%= code %>
+        
+        ERROR OUTPUT:
+        <%= stderr %>
+        
+        STANDARD OUTPUT:
+        <%= stdout %>
+      MSG
 
-PROCESS ID: <%= pid %>
+      NO_EXEC_TEMPLATE = <<~MSG
+        Honeybadger failed to execute the following command:
+        `<%= args.join(' ') %>`
+        
+        The command was not executable. Try adjusting permissions on the file.
+      MSG
 
-RESULT CODE: <%= code %>
-
-ERROR OUTPUT:
-<%= stderr %>
-
-STANDARD OUTPUT:
-<%= stdout %>
-MSG
-
-      NO_EXEC_TEMPLATE = <<-MSG
-Honeybadger failed to execute the following command:
-`<%= args.join(' ') %>`
-
-The command was not executable. Try adjusting permissions on the file.
-MSG
-
-      NOT_FOUND_TEMPLATE = <<-MSG
-Honeybadger failed to execute the following command:
-`<%= args.join(' ') %>`
-
-The command was not found. Make sure it exists in your PATH.
-MSG
+      NOT_FOUND_TEMPLATE = <<~MSG
+        Honeybadger failed to execute the following command:
+        `<%= args.join(' ') %>`
+        
+        The command was not found. Make sure it exists in your PATH.
+      MSG
 
       def initialize(options, args, config)
         @options = options
@@ -59,17 +59,17 @@ MSG
           api_key: config.get(:api_key),
           notifier: NOTIFIER,
           error: {
-            class: 'honeybadger exec error',
+            class: "honeybadger exec error",
             message: result.msg
           },
           request: {
             component: executable,
             context: {
-              command: args.join(' '),
+              command: args.join(" "),
               code: result.code,
               pid: result.pid,
               pwd: Dir.pwd,
-              path: ENV['PATH']
+              path: ENV["PATH"]
             }
           },
           server: {
@@ -112,7 +112,7 @@ MSG
       end
 
       def exec_cmd
-        stdout, stderr, status = Open3.capture3(args.join(' '))
+        stdout, stderr, status = Open3.capture3(args.join(" "))
 
         success = status.success? && stderr =~ BLANK
         pid = status.pid

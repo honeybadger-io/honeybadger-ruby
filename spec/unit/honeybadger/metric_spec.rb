@@ -1,11 +1,9 @@
-# encoding: utf-8
-
 describe Honeybadger::Metric do
   let(:registry) { Honeybadger::Registry.new }
 
   describe ".register" do
     let(:name) { "capacity" }
-    let(:attributes) { { foo: "bar" } }
+    let(:attributes) { {foo: "bar"} }
 
     subject { described_class.register(registry, name, attributes) }
 
@@ -28,7 +26,7 @@ describe Honeybadger::Metric do
     context "with metric_type, name, and attributes" do
       let(:metric_type) { "gauge" }
       let(:name) { "capacity" }
-      let(:attributes) { { foo: "bar" } }
+      let(:attributes) { {foo: "bar"} }
 
       it { should eq Digest::SHA1.hexdigest("gauge-capacity-foo-bar").to_sym }
     end
@@ -39,7 +37,7 @@ describe Honeybadger::Metric do
 
     context "with name, and attributes" do
       let(:name) { "capacity" }
-      let(:attributes) { { foo: "bar" } }
+      let(:attributes) { {foo: "bar"} }
 
       it { should eq Digest::SHA1.hexdigest("metric-capacity-foo-bar").to_sym }
     end

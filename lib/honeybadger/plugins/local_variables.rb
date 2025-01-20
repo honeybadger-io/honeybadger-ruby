@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/backtrace'
+require "honeybadger/plugin"
+require "honeybadger/backtrace"
 
 module Honeybadger
   module Plugins
@@ -24,7 +24,7 @@ module Honeybadger
       end
 
       Plugin.register do
-        requirement { config[:'exceptions.local_variables'] }
+        requirement { config[:"exceptions.local_variables"] }
         requirement { defined?(::BindingOfCaller) }
         requirement do
           if res = defined?(::BetterErrors)

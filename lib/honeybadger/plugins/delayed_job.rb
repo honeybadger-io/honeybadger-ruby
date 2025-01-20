@@ -1,4 +1,4 @@
-require 'honeybadger/plugin'
+require "honeybadger/plugin"
 
 module Honeybadger
   Plugin.register do
@@ -15,8 +15,8 @@ module Honeybadger
     end
 
     execution do
-      return unless Honeybadger.config[:'exceptions.enabled']
-      require 'honeybadger/plugins/delayed_job/plugin'
+      return unless Honeybadger.config[:"exceptions.enabled"]
+      require "honeybadger/plugins/delayed_job/plugin"
       ::Delayed::Worker.plugins << Plugins::DelayedJob::Plugin
     end
   end

@@ -1,7 +1,7 @@
-require 'honeybadger/histogram'
-require 'honeybadger/timer'
-require 'honeybadger/counter'
-require 'honeybadger/gauge'
+require "honeybadger/histogram"
+require "honeybadger/timer"
+require "honeybadger/counter"
+require "honeybadger/gauge"
 
 module Honeybadger
   # +Honeybadger::Instrumentation+ defines the API for collecting metric data from anywhere
@@ -47,14 +47,13 @@ module Honeybadger
     def time(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = nil
 
-      if callable
-        value = monotonic_timer{ callable.call }[0]
+      value = if callable
+        monotonic_timer { callable.call }[0]
       elsif block_given?
-        value = monotonic_timer{ yield }[0]
+        monotonic_timer { yield }[0]
       else
-        value = attributes.delete(:duration) || attributes.delete(:value)
+        attributes.delete(:duration) || attributes.delete(:value)
       end
 
       Honeybadger::Timer.register(registry, name, attributes).tap do |timer|
@@ -69,14 +68,13 @@ module Honeybadger
     def histogram(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = nil
 
-      if callable
-        value = monotonic_timer{ callable.call }[0]
+      value = if callable
+        monotonic_timer { callable.call }[0]
       elsif block_given?
-        value = monotonic_timer{ yield }[0]
+        monotonic_timer { yield }[0]
       else
-        value = attributes.delete(:duration) || attributes.delete(:value)
+        attributes.delete(:duration) || attributes.delete(:value)
       end
 
       Honeybadger::Histogram.register(registry, name, attributes).tap do |histogram|
@@ -91,14 +89,13 @@ module Honeybadger
     def increment_counter(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = nil
 
-      if callable
-        value = callable.call
+      value = if callable
+        callable.call
       elsif block_given?
-        value = yield
+        yield
       else
-        value = attributes.delete(:by) || attributes.delete(:value) || 1
+        attributes.delete(:by) || attributes.delete(:value) || 1
       end
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
@@ -109,14 +106,13 @@ module Honeybadger
     def decrement_counter(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = nil
 
-      if callable
-        value = callable.call
+      value = if callable
+        callable.call
       elsif block_given?
-        value = yield
+        yield
       else
-        value = attributes.delete(:by) || attributes.delete(:value) || 1
+        attributes.delete(:by) || attributes.delete(:value) || 1
       end
 
       Honeybadger::Counter.register(registry, name, attributes).tap do |counter|
@@ -127,14 +123,13 @@ module Honeybadger
     def gauge(name, *args)
       attributes = extract_attributes(args)
       callable = extract_callable(args)
-      value = nil
 
-      if callable
-        value = callable.call
+      value = if callable
+        callable.call
       elsif block_given?
-        value = yield
+        yield
       else
-        value = attributes.delete(:duration) || attributes.delete(:value)
+        attributes.delete(:duration) || attributes.delete(:value)
       end
 
       Honeybadger::Gauge.register(registry, name, attributes).tap do |gauge|

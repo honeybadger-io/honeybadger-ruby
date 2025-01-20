@@ -1,11 +1,11 @@
-require 'rubygems'
-require 'bundler/setup'
-require 'honeybadger/version'
+require "rubygems"
+require "bundler/setup"
+require "honeybadger/version"
 
 module Release
-  CHANGELOG_FILE    = 'CHANGELOG.md'.freeze
-  CHANGELOG_HEADING = '## [Unreleased]'
-  EXIT_CMD          = 'bundle update honeybadger && git add -p'
+  CHANGELOG_FILE = "CHANGELOG.md".freeze
+  CHANGELOG_HEADING = "## [Unreleased]"
+  EXIT_CMD = "bundle update honeybadger && git add -p"
 
   def self.run_before(version)
     bump_changelog(version)
@@ -18,7 +18,7 @@ module Release
   def self.bump_changelog(version)
     contents = File.read(CHANGELOG_FILE)
     if contents =~ Regexp.new(Regexp.escape("## [#{version}]"))
-      puts "ERROR: #{ version } already exists in CHANGELOG.md"
+      puts "ERROR: #{version} already exists in CHANGELOG.md"
       exit 1
     end
 

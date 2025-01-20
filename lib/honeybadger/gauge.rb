@@ -1,4 +1,4 @@
-require 'honeybadger/metric'
+require "honeybadger/metric"
 
 module Honeybadger
   class Gauge < Metric
@@ -8,7 +8,7 @@ module Honeybadger
       @samples += 1
 
       @total ||= 0
-      @total = @total + value
+      @total += value
 
       @min = value if @min.nil? || @min > value
       @max = value if @max.nil? || @max < value

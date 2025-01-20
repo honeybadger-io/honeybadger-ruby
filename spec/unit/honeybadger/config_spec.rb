@@ -1,10 +1,10 @@
-require 'honeybadger/config'
-require 'honeybadger/backend/base'
-require 'net/http'
+require "honeybadger/config"
+require "honeybadger/backend/base"
+require "net/http"
 
 describe Honeybadger::Config do
   specify { expect(subject[:env]).to eq nil }
-  specify { expect(subject[:'delayed_job.attempt_threshold']).to eq 0 }
+  specify { expect(subject[:"delayed_job.attempt_threshold"]).to eq 0 }
   specify { expect(subject[:debug]).to eq false }
 
   describe "#init!" do
@@ -22,31 +22,31 @@ describe Honeybadger::Config do
       end
 
       it "prefers ENV to options" do
-        env['HONEYBADGER_API_KEY'] = 'dan'
-        config.init!({api_key: 'muj'}, env)
-        expect(config[:api_key]).to eq 'dan'
+        env["HONEYBADGER_API_KEY"] = "dan"
+        config.init!({api_key: "muj"}, env)
+        expect(config[:api_key]).to eq "dan"
       end
 
       it "prefers file to options" do
-        config.init!(:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar')
-        expect(config[:api_key]).to eq 'zxcv'
+        config.init!("config.path": FIXTURES_PATH.join("honeybadger.yml"), api_key: "bar")
+        expect(config[:api_key]).to eq "zxcv"
       end
 
       it "prefers ENV to file" do
-        env['HONEYBADGER_API_KEY'] = 'foo'
-        config.init!({:'config.path' => FIXTURES_PATH.join('honeybadger.yml'), api_key: 'bar'}, env)
-        expect(config[:api_key]).to eq 'foo'
+        env["HONEYBADGER_API_KEY"] = "foo"
+        config.init!({"config.path": FIXTURES_PATH.join("honeybadger.yml"), api_key: "bar"}, env)
+        expect(config[:api_key]).to eq "foo"
       end
     end
 
     context "when a logging path is defined" do
-      let(:log_file) { TMP_DIR.join('honeybadger.log') }
+      let(:log_file) { TMP_DIR.join("honeybadger.log") }
 
       before { log_file.delete if log_file.exist? }
 
       it "creates a log file" do
         expect(log_file.exist?).to eq false
-        Honeybadger::Config.new.init!(:'logging.path' => log_file)
+        Honeybadger::Config.new.init!("logging.path": log_file)
         expect(log_file.exist?).to eq true
       end
     end
@@ -56,15 +56,15 @@ describe Honeybadger::Config do
         allow(NULL_LOGGER).to receive(:add)
         expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/, "honeybadger")
         config = Honeybadger::Config.new.init!(logger: NULL_LOGGER)
-        config.logger.error('foo')
+        config.logger.error("foo")
       end
     end
 
     context "when the config path is defined" do
-      let(:config_file) { TMP_DIR.join('honeybadger.yml') }
-      let(:instance) { Honeybadger::Config.new(:'config.path' => config_file) }
+      let(:config_file) { TMP_DIR.join("honeybadger.yml") }
+      let(:instance) { Honeybadger::Config.new("config.path": config_file) }
 
-      before { File.write(config_file, '') }
+      before { File.write(config_file, "") }
       after { File.unlink(config_file) }
 
       def init_instance
@@ -74,7 +74,7 @@ describe Honeybadger::Config do
       context "when a config error occurs while loading file" do
         before do
           allow(instance.logger).to receive(:add)
-          allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new('ouch'))
+          allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(Honeybadger::Config::ConfigError.new("ouch"))
         end
 
         it "raises the exception" do
@@ -85,7 +85,7 @@ describe Honeybadger::Config do
       context "when a generic error occurs while loading file" do
         before do
           allow(instance.logger).to receive(:add)
-          allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new('ouch'))
+          allow(Honeybadger::Config::Yaml).to receive(:new).and_raise(RuntimeError.new("ouch"))
         end
 
         it "raises the exception" do
@@ -100,33 +100,33 @@ describe Honeybadger::Config do
     let(:opts) { {} }
 
     context "when a normal option doesn't exist" do
-      it 'returns the default option value' do
+      it "returns the default option value" do
         expect(instance.get(:development_environments)).to eq Honeybadger::Config::DEFAULTS[:development_environments]
       end
     end
 
     context "when a normal option exists" do
-      let(:opts) { { :development_environments => ['foo']} }
+      let(:opts) { {development_environments: ["foo"]} }
 
-      it 'returns the option value' do
-        expect(instance.get(:development_environments)).to eq ['foo']
+      it "returns the option value" do
+        expect(instance.get(:development_environments)).to eq ["foo"]
       end
     end
   end
 
   describe "#ignored_classes" do
     let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, debug: true}.merge!(opts)) }
-    let(:opts) { { :'exceptions.ignore' => ['foo']} }
+    let(:opts) { {"exceptions.ignore": ["foo"]} }
 
     it "returns the exceptions.ignore option value plus defaults" do
-      expect(instance.ignored_classes).to eq(Honeybadger::Config::DEFAULTS[:'exceptions.ignore'] | ['foo'])
+      expect(instance.ignored_classes).to eq(Honeybadger::Config::DEFAULTS[:"exceptions.ignore"] | ["foo"])
     end
 
     context "when exceptions.ignore_only is configured" do
-      let(:opts) { { :'exceptions.ignore' => ['foo'], :'exceptions.ignore_only' => ['bar']} }
+      let(:opts) { {"exceptions.ignore": ["foo"], "exceptions.ignore_only": ["bar"]} }
 
       it "returns the override" do
-        expect(instance.ignored_classes).to eq(['bar'])
+        expect(instance.ignored_classes).to eq(["bar"])
       end
     end
   end
@@ -155,7 +155,7 @@ describe Honeybadger::Config do
     end
 
     context "framework is configured" do
-      before { subject[:framework] = 'rack' }
+      before { subject[:framework] = "rack" }
 
       its(:detected_framework) { should eq :rack }
     end
@@ -164,7 +164,7 @@ describe Honeybadger::Config do
       before do
         rails = Module.new
         version = Module.new
-        version.const_set(:STRING, '4.1.5')
+        version.const_set(:STRING, "4.1.5")
         rails.const_set(:VERSION, version)
         Object.const_set(:Rails, rails)
       end
@@ -172,31 +172,34 @@ describe Honeybadger::Config do
       after { Object.send(:remove_const, :Rails) }
 
       its(:detected_framework) { should eq :rails }
-      its(:framework_name) { should match /Rails 4\.1\.5/ }
+      its(:framework_name) { should match(/Rails 4\.1\.5/) }
     end
 
     context "Sinatra is installed" do
       before do
         sinatra = Module.new
-        sinatra.const_set(:VERSION, '1.4.5')
+        sinatra.const_set(:VERSION, "1.4.5")
         Object.const_set(:Sinatra, sinatra)
       end
 
       after { Object.send(:remove_const, :Sinatra) }
 
       its(:detected_framework) { should eq :sinatra }
-      its(:framework_name) { should match /Sinatra 1\.4\.5/ }
+      its(:framework_name) { should match(/Sinatra 1\.4\.5/) }
     end
 
     context "Rack is installed" do
       before do
-        Object.const_set(:Rack, Module.new { def self.release; '1.0'; end; })
+        Object.const_set(:Rack, Module.new {
+                                  def self.release
+                                    "1.0"
+                                  end; })
       end
 
       after { Object.send(:remove_const, :Rack) }
 
       its(:detected_framework) { should eq :rack }
-      its(:framework_name) { should match /Rack 1\.0/ }
+      its(:framework_name) { should match(/Rack 1\.0/) }
     end
   end
 
@@ -209,7 +212,7 @@ describe Honeybadger::Config do
     end
 
     context "when environment is not a development environment" do
-      before { subject[:env] = 'production' }
+      before { subject[:env] = "production" }
       its(:default_backend) { should be_a Honeybadger::Backend::Server }
 
       context "when disabled explicitly" do
@@ -219,7 +222,7 @@ describe Honeybadger::Config do
     end
 
     context "when environment is a development environment" do
-      before { subject[:env] = 'development' }
+      before { subject[:env] = "development" }
       its(:default_backend) { should be_a Honeybadger::Backend::Null }
 
       context "when enabled explicitly" do
@@ -240,13 +243,13 @@ describe Honeybadger::Config do
     end
 
     context "when root is present" do
-      let(:root) { '/bar' }
-      it { should match '/bar/baz' }
-      it { should_not match '/foo/bar/baz' }
+      let(:root) { "/bar" }
+      it { should match "/bar/baz" }
+      it { should_not match "/foo/bar/baz" }
     end
 
     context "when root is blank" do
-      let(:root) { '' }
+      let(:root) { "" }
       it { should be_nil }
     end
   end
@@ -265,17 +268,17 @@ describe Honeybadger::Config do
 
         expect(CONFIGURE_LOGGER).to receive(:add).with(Logger::Severity::ERROR, /foo/, "honeybadger")
 
-        honeybadger.logger.error('foo')
+        honeybadger.logger.error("foo")
       end
     end
 
     it "configures multiple before_notify hooks" do
       subject.configure do |config|
-        config.before_notify {|n| n }
+        config.before_notify { |n| n }
       end
 
       subject.configure do |config|
-        config.before_notify {|n| n }
+        config.before_notify { |n| n }
       end
 
       expect(subject.before_notify_hooks.size).to eq(2)
@@ -286,11 +289,11 @@ describe Honeybadger::Config do
       unknown_key_response = nil
 
       subject.configure do |config|
-        known_key_response = config.respond_to?("api_key")
+        known_key_response = config.respond_to?(:api_key)
       end
 
       subject.configure do |config|
-        unknown_key_response = config.respond_to?("ejfhjskdhfkdjhf=")
+        unknown_key_response = config.respond_to?(:ejfhjskdhfkdjhf=)
       end
 
       expect(known_key_response).to eq(true)

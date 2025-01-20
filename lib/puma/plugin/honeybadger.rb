@@ -1,10 +1,10 @@
-require 'honeybadger/instrumentation_helper'
+require "honeybadger/instrumentation_helper"
 
 module Honeybadger
   class PumaPlugin
     include Honeybadger::InstrumentationHelper
 
-    STATS_KEYS = %i(pool_capacity max_threads requests_count backlog running).freeze
+    STATS_KEYS = %i[pool_capacity max_threads requests_count backlog running].freeze
 
     ::Puma::Plugin.create do
       def start(launcher)
@@ -19,14 +19,18 @@ module Honeybadger
     end
 
     def record
-      metric_source 'puma'
+      metric_source "puma"
 
-      stats = ::Puma.stats rescue {}
+      stats = begin
+        ::Puma.stats
+      rescue
+        {}
+      end
       stats = stats.is_a?(Hash) ? stats : JSON.parse(stats, symbolize_names: true)
 
       if stats[:worker_status].is_a?(Array)
         stats[:worker_status].each do |worker_data|
-          context = { worker: worker_data[:index] }
+          context = {worker: worker_data[:index]}
           record_puma_stats(worker_data[:last_status], context)
         end
       else
@@ -34,14 +38,14 @@ module Honeybadger
       end
     end
 
-    def record_puma_stats(stats, context={})
+    def record_puma_stats(stats, context = {})
       if Honeybadger.config.load_plugin_insights_events?(:puma)
-        Honeybadger.event('stats.puma', context.merge(stats))
+        Honeybadger.event("stats.puma", context.merge(stats))
       end
 
       if Honeybadger.config.load_plugin_insights_metrics?(:puma)
         STATS_KEYS.each do |stat|
-          gauge stat, context, ->{ stats[stat] } if stats[stat]
+          gauge stat, context, -> { stats[stat] } if stats[stat]
         end
       end
     end
