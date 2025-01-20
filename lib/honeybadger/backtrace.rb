@@ -172,11 +172,15 @@ module Honeybadger
 
     attr_writer :lines, :application_lines
 
-    def self.split_multiline_backtrace(backtrace)
-      if backtrace.size == 1
-        backtrace.first.to_s.split(/\n\s*/)
-      else
-        backtrace
+    class << self
+      private
+
+      def split_multiline_backtrace(backtrace)
+        if backtrace.size == 1
+          backtrace.first.to_s.split(/\n\s*/)
+        else
+          backtrace
+        end
       end
     end
   end
