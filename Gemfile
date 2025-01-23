@@ -13,6 +13,7 @@ gem "webmock"
 gem "bigdecimal"
 gem "base64"
 gem "mutex_m"
+gem "rdoc" # Used in Rakefile, removed from default gems in Ruby 3.5.0
 
 # Required by feature specs.
 gem "capistrano"
@@ -30,6 +31,5 @@ group :development do
   gem "guard-rspec"
   gem "pry"
   gem "pry-byebug", platforms: :mri
-  gem "rdoc"
   gem "standard"
 end
