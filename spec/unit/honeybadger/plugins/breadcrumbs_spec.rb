@@ -1,5 +1,5 @@
-require 'honeybadger/plugins/breadcrumbs'
-require 'honeybadger/config'
+require "honeybadger/plugins/breadcrumbs"
+require "honeybadger/config"
 
 describe "Breadcrumbs Plugin" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
@@ -13,8 +13,8 @@ describe "Breadcrumbs Plugin" do
   describe Honeybadger::Plugins::RailsBreadcrumbs do
     describe ".subscribe_to_notification" do
       let(:name) { "a.notification" }
-      let(:config) {{ foo: "bar" }}
-      let(:data) {{a: :b}}
+      let(:config) { {foo: "bar"} }
+      let(:data) { {a: :b} }
 
       it "registers with activesupport and delgates to send_breadcrumb_notification" do
         expect(described_class).to receive(:send_breadcrumb_notification).with(name, 10, config, data)
@@ -56,7 +56,7 @@ describe "Breadcrumbs Plugin" do
 
       describe ":message" do
         it "can allow a string" do
-          config = { message: "config message" }
+          config = {message: "config message"}
           expect(Honeybadger).to receive(:add_breadcrumb).with("config message", anything)
           described_class.send_breadcrumb_notification("noop", 100, config, {})
         end
@@ -95,7 +95,7 @@ describe "Breadcrumbs Plugin" do
         end
 
         it "includes event if proc returns true" do
-          config = { exclude_when: ->(_){ false } }
+          config = {exclude_when: ->(_) { false }}
           expect(Honeybadger).to receive(:add_breadcrumb)
           described_class.send_breadcrumb_notification("name", 33, config, {})
         end
@@ -106,7 +106,7 @@ describe "Breadcrumbs Plugin" do
         it "can filter metadata" do
           data = {a: :b, c: :d}
           removed_data = {c: :d}
-          config = { select_keys: [:a] }
+          config = {select_keys: [:a]}
 
           expect(Honeybadger).to receive(:add_breadcrumb).with(anything, hash_including(metadata: hash_not_including(removed_data)))
           described_class.send_breadcrumb_notification("_", 0, config, data)
@@ -115,7 +115,7 @@ describe "Breadcrumbs Plugin" do
 
       describe ":transform" do
         it "transforms data payload" do
-          data     = {old: "data"}
+          data = {old: "data"}
           new_data = {new: "data"}
           config = {
             transform: lambda do |d|
@@ -128,7 +128,6 @@ describe "Breadcrumbs Plugin" do
           described_class.send_breadcrumb_notification("name", 33, config, data)
         end
       end
-
     end
   end
 end

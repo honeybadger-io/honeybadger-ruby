@@ -63,16 +63,17 @@ jobs:
         bundle exec rake
 
   jruby:
-    runs-on: ubuntu-20.04 # ubuntu-latest is currently 22.04, which doesn't have a supported JRuby 9 build yet
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     strategy:
       matrix:
         ruby:
-          - 'jruby-9.2.14.0'
+          - 'jruby-9.4.9.0'
         gemfile:
           - rails6.1.gemfile
-          # TODO
-          # - rails7.0.gemfile
+          - rails7.0.gemfile
+          - rails7.1.gemfile
+          - rails7.2.gemfile
 
     # Has to be top level to cache properly
     env:

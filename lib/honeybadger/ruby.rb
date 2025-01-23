@@ -1,2 +1,2 @@
-require 'honeybadger/const'
-require 'honeybadger/singleton'
+require "honeybadger/const"
+require "honeybadger/singleton"

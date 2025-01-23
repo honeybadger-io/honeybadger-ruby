@@ -1,7 +1,7 @@
-require 'stringio'
-require 'honeybadger/backtrace'
-require 'honeybadger/config'
-require 'honeybadger/notice'
+require "stringio"
+require "honeybadger/backtrace"
+require "honeybadger/config"
+require "honeybadger/notice"
 
 describe Honeybadger::Backtrace do
   let(:config) { Honeybadger::Config.new }
@@ -15,14 +15,14 @@ describe Honeybadger::Backtrace do
     backtrace = Honeybadger::Backtrace.parse(array)
 
     line = backtrace.lines.first
-    expect(line.number).to eq '13'
-    expect(line.file).to eq 'app/models/user.rb'
-    expect(line.method).to eq 'magic'
+    expect(line.number).to eq "13"
+    expect(line.file).to eq "app/models/user.rb"
+    expect(line.method).to eq "magic"
 
     line = backtrace.lines.last
-    expect(line.number).to eq '8'
-    expect(line.file).to eq 'app/controllers/users_controller.rb'
-    expect(line.method).to eq 'index'
+    expect(line.number).to eq "8"
+    expect(line.file).to eq "app/controllers/users_controller.rb"
+    expect(line.method).to eq "index"
   end
 
   it "parses a windows backtrace into lines" do
@@ -34,14 +34,14 @@ describe Honeybadger::Backtrace do
     backtrace = Honeybadger::Backtrace.parse(array)
 
     line = backtrace.lines.first
-    expect(line.number).to eq '13'
-    expect(line.file).to eq 'C:/Program Files/Server/app/models/user.rb'
-    expect(line.method).to eq 'magic'
+    expect(line.number).to eq "13"
+    expect(line.file).to eq "C:/Program Files/Server/app/models/user.rb"
+    expect(line.method).to eq "magic"
 
     line = backtrace.lines.last
-    expect(line.number).to eq '8'
-    expect(line.file).to eq 'C:/Program Files/Server/app/controllers/users_controller.rb'
-    expect(line.method).to eq 'index'
+    expect(line.number).to eq "8"
+    expect(line.file).to eq "C:/Program Files/Server/app/controllers/users_controller.rb"
+    expect(line.method).to eq "index"
   end
 
   it "infers types from backtace lines" do
@@ -49,12 +49,12 @@ describe Honeybadger::Backtrace do
       double(to_s: "app/models/user.rb:13:in `magic'"),
       double(to_s: "app/controllers/users_controller.rb:8:in `index'")
     ])
-    backtrace = Honeybadger::Backtrace.parse(array_thing, filters: [lambda {|l| l.sub('foo', 'bar') }])
+    backtrace = Honeybadger::Backtrace.parse(array_thing, filters: [lambda { |l| l.sub("foo", "bar") }])
     line = backtrace.lines.first
 
-    expect(line.number).to eq '13'
-    expect(line.file).to eq 'app/models/user.rb'
-    expect(line.method).to eq 'magic'
+    expect(line.number).to eq "13"
+    expect(line.file).to eq "app/models/user.rb"
+    expect(line.method).to eq "magic"
   end
 
   it "is equal with equal lines" do
@@ -65,10 +65,10 @@ describe Honeybadger::Backtrace do
   end
 
   it "parses massive one-line exceptions into multiple lines" do
-    original_backtrace = Honeybadger::Backtrace.
-      parse(["one:1:in `one'\n   two:2:in `two'\n      three:3:in `three`"])
-    expected_backtrace = Honeybadger::Backtrace.
-      parse(["one:1:in `one'", "two:2:in `two'", "three:3:in `three`"])
+    original_backtrace = Honeybadger::Backtrace
+      .parse(["one:1:in `one'\n   two:2:in `two'\n      three:3:in `three`"])
+    expected_backtrace = Honeybadger::Backtrace
+      .parse(["one:1:in `one'", "two:2:in `two'", "three:3:in `three`"])
 
     expect(expected_backtrace).to eq original_backtrace
   end
@@ -92,7 +92,7 @@ describe Honeybadger::Backtrace do
         "app/controllers/users_controller.rb:8:in `index'"
       ]
 
-      ['app/models/user.rb', 'app/concerns/authenticated_controller.rb', 'app/controllers/users_controller.rb'].each do |file|
+      ["app/models/user.rb", "app/concerns/authenticated_controller.rb", "app/controllers/users_controller.rb"].each do |file|
         expect(File).to receive(:exist?).with(file).and_return(true)
         expect(File).to receive(:open).with(file).and_yield(StringIO.new(source))
       end
@@ -140,20 +140,22 @@ describe Honeybadger::Backtrace do
 
   context "with a project root" do
     before(:each) do
-      @project_root = '/some/path'
+      @project_root = "/some/path"
       config[:root] = @project_root
 
       @backtrace_with_root = Honeybadger::Backtrace.parse(
         ["#{@project_root}/app/models/user.rb:7:in `latest'",
-         "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
-         "#{@project_root}/vendor/plugins/foo/bar.rb:42:in `baz'",
-         "/lib/something.rb:41:in `open'"],
-         :filters => default_filters, :config => config)
+          "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
+          "#{@project_root}/vendor/plugins/foo/bar.rb:42:in `baz'",
+          "/lib/something.rb:41:in `open'"],
+        filters: default_filters, config: config
+      )
       @backtrace_without_root = Honeybadger::Backtrace.parse(
         ["[PROJECT_ROOT]/app/models/user.rb:7:in `latest'",
-         "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
-         "[PROJECT_ROOT]/vendor/plugins/foo/bar.rb:42:in `baz'",
-         "/lib/something.rb:41:in `open'"])
+          "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
+          "[PROJECT_ROOT]/vendor/plugins/foo/bar.rb:42:in `baz'",
+          "/lib/something.rb:41:in `open'"]
+      )
     end
 
     it "filters out the project root" do
@@ -172,37 +174,39 @@ describe Honeybadger::Backtrace do
   context "with a project root equals to a part of file name" do
     before(:each) do
       # Heroku-like
-      @project_root = '/app'
+      @project_root = "/app"
       config[:root] = @project_root
     end
 
     it "filters out the project root" do
       backtrace_with_root = Honeybadger::Backtrace.parse(
         ["#{@project_root}/app/models/user.rb:7:in `latest'",
-         "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
-         "/lib/app/something.rb:41:in `open'"],
-         :filters => default_filters, :config => config)
-         backtrace_without_root = Honeybadger::Backtrace.parse(
-           ["[PROJECT_ROOT]/app/models/user.rb:7:in `latest'",
-            "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
-            "/lib/app/something.rb:41:in `open'"])
+          "#{@project_root}/app/controllers/users_controller.rb:13:in `index'",
+          "/lib/app/something.rb:41:in `open'"],
+        filters: default_filters, config: config
+      )
+      backtrace_without_root = Honeybadger::Backtrace.parse(
+        ["[PROJECT_ROOT]/app/models/user.rb:7:in `latest'",
+          "[PROJECT_ROOT]/app/controllers/users_controller.rb:13:in `index'",
+          "/lib/app/something.rb:41:in `open'"]
+      )
 
-         expect(backtrace_without_root).to eq backtrace_with_root
+      expect(backtrace_without_root).to eq backtrace_with_root
     end
   end
 
   context "with a blank project root" do
     before(:each) do
-      config[:root] = ''
+      config[:root] = ""
     end
 
     it "does not filter line numbers with respect to any project root" do
       backtrace = ["/app/models/user.rb:7:in `latest'",
-                   "/app/controllers/users_controller.rb:13:in `index'",
-                   "/lib/something.rb:41:in `open'"]
+        "/app/controllers/users_controller.rb:13:in `index'",
+        "/lib/something.rb:41:in `open'"]
 
       backtrace_with_root =
-        Honeybadger::Backtrace.parse(backtrace, :filters => default_filters, :config => config)
+        Honeybadger::Backtrace.parse(backtrace, filters: default_filters, config: config)
 
       backtrace_without_root =
         Honeybadger::Backtrace.parse(backtrace)
@@ -212,20 +216,20 @@ describe Honeybadger::Backtrace do
   end
 
   it "removes notifier trace" do
-    inside_notifier  = ['lib/honeybadger.rb:13:in `voodoo`']
-    outside_notifier = ['users_controller:8:in `index`']
+    inside_notifier = ["lib/honeybadger.rb:13:in `voodoo`"]
+    outside_notifier = ["users_controller:8:in `index`"]
 
     without_inside = Honeybadger::Backtrace.parse(outside_notifier)
-    with_inside    = Honeybadger::Backtrace.parse(inside_notifier + outside_notifier,
-                                                  :filters => default_filters)
+    with_inside = Honeybadger::Backtrace.parse(inside_notifier + outside_notifier,
+      filters: default_filters)
 
     expect(without_inside).to eq with_inside
   end
 
   it "runs filters on the backtrace" do
-    filters = [lambda { |line| line.sub('foo', 'bar') }]
+    filters = [lambda { |line| line.sub("foo", "bar") }]
     input = Honeybadger::Backtrace.parse(["foo:13:in `one'", "baz:14:in `two'"],
-                                         :filters => filters)
+      filters: filters)
     expected = Honeybadger::Backtrace.parse(["bar:13:in `one'", "baz:14:in `two'"])
     expect(expected).to eq input
   end
@@ -238,7 +242,7 @@ describe Honeybadger::Backtrace do
 
   it "generates json from to_array template" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
-    array = [{'foo' => 'bar'}]
+    array = [{"foo" => "bar"}]
     expect(backtrace).to receive(:to_ary).once.and_return(array)
     json = backtrace.to_json
 
@@ -250,7 +254,7 @@ describe Honeybadger::Backtrace do
 
   def build_backtrace_array
     ["app/models/user.rb:13:in `magic'",
-     "app/controllers/users_controller.rb:8:in `index'"]
+      "app/controllers/users_controller.rb:8:in `index'"]
   end
 
   def default_filters

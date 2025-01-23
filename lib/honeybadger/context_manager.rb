@@ -1,4 +1,4 @@
-require 'honeybadger/conversions'
+require "honeybadger/conversions"
 
 module Honeybadger
   # @api private
@@ -19,7 +19,6 @@ module Honeybadger
     end
 
     # Internal helpers
-
 
     def set_context(hash, &block)
       local = block_given?

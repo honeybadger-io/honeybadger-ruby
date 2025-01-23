@@ -19,7 +19,7 @@ module Honeybadger
           data[:queues] = {}
 
           ::SolidQueue::Queue.all.each do |queue|
-            data[:queues][queue.name] = { depth: queue.size }
+            data[:queues][queue.name] = {depth: queue.size}
           end
 
           data
@@ -30,11 +30,11 @@ module Honeybadger
 
           if config.cluster_collection?(:solid_queue)
             if Honeybadger.config.load_plugin_insights_events?(:solid_queue)
-              Honeybadger.event('stats.solid_queue', stats.except(:stats).merge(stats[:stats]))
+              Honeybadger.event("stats.solid_queue", stats.except(:stats).merge(stats[:stats]))
             end
 
             if Honeybadger.config.load_plugin_insights_metrics?(:solid_queue)
-              metric_source 'solid_queue'
+              metric_source "solid_queue"
               stats[:stats].each do |stat_name, value|
                 gauge stat_name, value: value
               end

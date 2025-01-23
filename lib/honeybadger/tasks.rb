@@ -5,18 +5,18 @@ namespace :honeybadger do
 
   desc "Verify your gem installation by sending a test exception to the honeybadger service"
   task :test do
-    warn_task_moved('test')
+    warn_task_moved("test")
   end
 
   desc "Notify Honeybadger of a new deploy."
   task :deploy do
-    warn_task_moved('deploy')
+    warn_task_moved("deploy")
   end
 
   namespace :heroku do
     desc "Install Heroku deploy notifications addon"
     task :add_deploy_notification do
-      warn_task_moved('heroku:add_deploy_notification', 'honeybadger heroku help install_deploy_notification')
+      warn_task_moved("heroku:add_deploy_notification", "honeybadger heroku help install_deploy_notification")
     end
   end
 end

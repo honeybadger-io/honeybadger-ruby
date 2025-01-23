@@ -1,13 +1,13 @@
-require 'erb'
-require 'uri'
-require 'forwardable'
+require "erb"
+require "uri"
+require "forwardable"
 
 begin
-  require 'i18n'
+  require "i18n"
 rescue LoadError
   module Honeybadger
     module I18n
-      def self.t(key, options={})
+      def self.t(key, options = {})
         options[:default]
       end
     end
@@ -23,18 +23,18 @@ module Honeybadger
 
       def initialize(app, agent = nil)
         @app = app
-        @agent = agent.kind_of?(Agent) && agent
+        @agent = agent.is_a?(Agent) && agent
       end
 
       def call(env)
         status, headers, body = @app.call(env)
-        if env['honeybadger.error_id'] && form = render_form(env['honeybadger.error_id'])
+        if env["honeybadger.error_id"] && form = render_form(env["honeybadger.error_id"])
           new_body = []
           body.each do |chunk|
             new_body << chunk.gsub("<!-- HONEYBADGER FEEDBACK -->", form)
           end
           body.close if body.respond_to?(:close)
-          headers['Content-Length'] = new_body.reduce(0) { |a,e| a += e.bytesize }.to_s
+          headers["Content-Length"] = new_body.reduce(0) { |a, e| a + e.bytesize }.to_s
           body = new_body
         end
         [status, headers, body]
@@ -43,7 +43,7 @@ module Honeybadger
       # @private
       # @todo Make this method and others actually private.
       def action
-        URI.parse("#{config.connection_protocol}://#{config[:'connection.host']}:#{config.connection_port}/v1/feedback/").to_s
+        URI.parse("#{config.connection_protocol}://#{config[:"connection.host"]}:#{config.connection_port}/v1/feedback/").to_s
       rescue URI::InvalidURIError
         nil
       end
@@ -56,7 +56,7 @@ module Honeybadger
 
       # @private
       def custom_template_file
-        @custom_template_file ||= File.join(config[:root], 'lib', 'honeybadger', 'templates', 'feedback_form.erb')
+        @custom_template_file ||= File.join(config[:root], "lib", "honeybadger", "templates", "feedback_form.erb")
       end
 
       # @private
@@ -69,7 +69,7 @@ module Honeybadger
         if custom_template_file?
           custom_template_file
         else
-          File.expand_path('../../templates/feedback_form.erb', __FILE__)
+          File.expand_path("../../templates/feedback_form.erb", __FILE__)
         end
       end
 
@@ -81,7 +81,6 @@ module Honeybadger
       def agent
         @agent || Honeybadger::Agent.instance
       end
-
     end
   end
 end

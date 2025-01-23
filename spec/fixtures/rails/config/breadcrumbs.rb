@@ -31,7 +31,7 @@ class BreadcrumbController < ApplicationController
   private
 
   def notice
-    Honeybadger.notify(StandardError.new('test backend'))
+    Honeybadger.notify(StandardError.new("test backend"))
     head 200
   end
 end
@@ -41,4 +41,3 @@ Rails.application.routes.append do
     get "/breadcrumbs/#{action}", to: "breadcrumb##{action}"
   end
 end
-

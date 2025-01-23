@@ -1,2 +1,2 @@
-require 'honeybadger'
-raise 'badgers!'
+require "honeybadger"
+raise "badgers!"

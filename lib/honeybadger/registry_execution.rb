@@ -4,7 +4,7 @@ module Honeybadger
       @registry = registry
       @config = config
       @options = options
-      @interval = config[:'insights.registry_flush_interval'] || options.fetch(:interval, 60)
+      @interval = config[:"insights.registry_flush_interval"] || options.fetch(:interval, 60)
       @end_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + @interval
     end
 

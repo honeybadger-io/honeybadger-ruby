@@ -1,4 +1,4 @@
-require 'honeybadger/util/lambda'
+require "honeybadger/util/lambda"
 
 describe Honeybadger::Util::Lambda do
   subject { described_class }

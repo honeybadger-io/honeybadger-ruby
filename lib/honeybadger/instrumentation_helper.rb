@@ -1,4 +1,4 @@
-require 'honeybadger/instrumentation'
+require "honeybadger/instrumentation"
 
 module Honeybadger
   # +Honeybadger::InstrumentationHelper+ is a module that can be included into any class. This module
@@ -25,7 +25,6 @@ module Honeybadger
   #     end
   #   end
   module InstrumentationHelper
-
     # returns two parameters, the first is the duration of the execution, and the second is
     # the return value of the passed block
     def monotonic_timer
@@ -53,9 +52,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        metric_instrumentation.time(name, attributes, ->{ callable.call })
+        metric_instrumentation.time(name, attributes, -> { callable.call })
       elsif block_given?
-        metric_instrumentation.time(name, attributes, ->{ yield })
+        metric_instrumentation.time(name, attributes, -> { yield })
       else
         metric_instrumentation.time(name, attributes)
       end
@@ -65,9 +64,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        metric_instrumentation.histogram(name, attributes, ->{ callable.call })
+        metric_instrumentation.histogram(name, attributes, -> { callable.call })
       elsif block_given?
-        metric_instrumentation.histogram(name, attributes, ->{ yield })
+        metric_instrumentation.histogram(name, attributes, -> { yield })
       else
         metric_instrumentation.histogram(name, attributes)
       end
@@ -77,9 +76,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        metric_instrumentation.increment_counter(name, attributes, ->{ callable.call })
+        metric_instrumentation.increment_counter(name, attributes, -> { callable.call })
       elsif block_given?
-        metric_instrumentation.increment_counter(name, attributes, ->{ yield })
+        metric_instrumentation.increment_counter(name, attributes, -> { yield })
       else
         metric_instrumentation.increment_counter(name, attributes)
       end
@@ -89,9 +88,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        metric_instrumentation.decrement_counter(name, attributes, ->{ callable.call })
+        metric_instrumentation.decrement_counter(name, attributes, -> { callable.call })
       elsif block_given?
-        metric_instrumentation.decrement_counter(name, attributes, ->{ yield })
+        metric_instrumentation.decrement_counter(name, attributes, -> { yield })
       else
         metric_instrumentation.decrement_counter(name, attributes)
       end
@@ -101,9 +100,9 @@ module Honeybadger
       attributes = extract_attributes(args)
       callable = extract_callable(args)
       if callable
-        metric_instrumentation.gauge(name, attributes, ->{ callable.call })
+        metric_instrumentation.gauge(name, attributes, -> { callable.call })
       elsif block_given?
-        metric_instrumentation.gauge(name, attributes, ->{ yield })
+        metric_instrumentation.gauge(name, attributes, -> { yield })
       else
         metric_instrumentation.gauge(name, attributes)
       end

@@ -1,16 +1,16 @@
-require 'sinatra'
-require 'honeybadger'
+require "sinatra"
+require "honeybadger"
 
 GC::Profiler.enable
 
 # class Badgers < Sinatra::Application
 
-get '/' do
-  'Hello world!'
+get "/" do
+  "Hello world!"
 end
 
-get '/test/failure' do
-  fail 'Sinatra has left the building'
+get "/test/failure" do
+  fail "Sinatra has left the building"
 end
 
 # end

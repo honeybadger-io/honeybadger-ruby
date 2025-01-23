@@ -1,7 +1,7 @@
-require 'net/http'
-require 'honeybadger/plugin'
-require 'honeybadger/instrumentation'
-require 'resolv'
+require "net/http"
+require "honeybadger/plugin"
+require "honeybadger/instrumentation"
+require "resolv"
 
 module Honeybadger
   module Plugins
@@ -25,31 +25,31 @@ module Honeybadger
             }.merge(parsed_uri_data(request_data))
 
             if @@hb_config.load_plugin_insights_events?(:net_http)
-              Honeybadger.event('request.net_http', context)
+              Honeybadger.event("request.net_http", context)
             end
 
             if @@hb_config.load_plugin_insights_metrics?(:net_http)
               context.delete(:url)
-              Honeybadger.gauge('duration.request', context.merge(metric_source: 'net_http'))
+              Honeybadger.gauge("duration.request", context.merge(metric_source: "net_http"))
             end
           end[1] # return the response data only
         end
 
         def hb?
-          address.to_s[/#{@@hb_config[:'connection.host'].to_s}/]
+          address.to_s[/#{@@hb_config[:"connection.host"]}/]
         end
 
         def parsed_uri_data(request_data)
           uri = request_data.uri || build_uri(request_data)
           {}.tap do |uri_data|
             uri_data[:host] = uri.host
-            uri_data[:url] = uri.to_s if @@hb_config[:'net_http.insights.full_url']
+            uri_data[:url] = uri.to_s if @@hb_config[:"net_http.insights.full_url"]
           end
         end
 
         def build_uri(request_data)
-          hostname = (address[/#{Resolv::IPv6::Regex}/]) ? "[#{address}]" : address
-          URI.parse("#{use_ssl? ? 'https' : 'http'}://#{hostname}#{request_data.path}")
+          hostname = address[/#{Resolv::IPv6::Regex}/o] ? "[#{address}]" : address
+          URI.parse("#{use_ssl? ? "https" : "http"}://#{hostname}#{request_data.path}")
         end
 
         Plugin.register :net_http do

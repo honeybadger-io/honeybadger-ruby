@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/ruby'
+require "honeybadger/plugin"
+require "honeybadger/ruby"
 
 module Honeybadger
   module Plugins
@@ -25,7 +25,7 @@ module Honeybadger
       requirement { defined?(::Thor.no_commands) }
 
       execution do
-        return unless Honeybadger.config[:'exceptions.enabled']
+        return unless Honeybadger.config[:"exceptions.enabled"]
         ::Thor.send(:include, Thor)
       end
     end

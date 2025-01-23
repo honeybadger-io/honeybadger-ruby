@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/ruby'
+require "honeybadger/plugin"
+require "honeybadger/ruby"
 
 module Honeybadger
   module Plugins
@@ -22,17 +22,17 @@ module Honeybadger
         private
 
         def attempt_threshold
-          ::Honeybadger.config[:'shoryuken.attempt_threshold'].to_i
+          ::Honeybadger.config[:"shoryuken.attempt_threshold"].to_i
         end
 
         def receive_count(sqs_msg)
           return 0 if sqs_msg.is_a?(Array)
 
-          sqs_msg.attributes['ApproximateReceiveCount'.freeze].to_i
+          sqs_msg.attributes["ApproximateReceiveCount".freeze].to_i
         end
 
         def notification_params(body)
-          body.is_a?(Array) ? { batch: body } : { body: body }
+          body.is_a?(Array) ? {batch: body} : {body: body}
         end
       end
 
@@ -40,7 +40,7 @@ module Honeybadger
         requirement { defined?(::Shoryuken) }
 
         execution do
-          return unless Honeybadger.config[:'exceptions.enabled']
+          return unless Honeybadger.config[:"exceptions.enabled"]
           ::Shoryuken.configure_server do |config|
             config.server_middleware do |chain|
               chain.add Middleware

@@ -1,5 +1,5 @@
-require 'honeybadger/instrumentation_helper'
-require 'honeybadger/util/sql'
+require "honeybadger/instrumentation_helper"
+require "honeybadger/util/sql"
 
 module Honeybadger
   class NotificationSubscriber
@@ -27,21 +27,21 @@ module Honeybadger
       end
 
       if Honeybadger.config.load_plugin_insights_metrics?(:rails)
-        metric_source 'rails'
+        metric_source "rails"
         record_metrics(name, payload)
       end
     end
 
     def record_metrics(name, payload)
       case name
-      when 'sql.active_record'
-        gauge('duration.sql.active_record', value: payload[:duration], **payload.slice(:query))
-      when 'process_action.action_controller'
-        gauge('duration.process_action.action_controller', value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
-        gauge('db_runtime.process_action.action_controller', value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
-        gauge('view_runtime.process_action.action_controller', value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
-      when 'perform.active_job'
-        gauge('duration.perform.active_job', value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "sql.active_record"
+        gauge("duration.sql.active_record", value: payload[:duration], **payload.slice(:query))
+      when "process_action.action_controller"
+        gauge("duration.process_action.action_controller", value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge("db_runtime.process_action.action_controller", value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge("view_runtime.process_action.action_controller", value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+      when "perform.active_job"
+        gauge("duration.perform.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
       when /^cache_.*.active_support$/
         gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
       end
@@ -95,11 +95,11 @@ module Honeybadger
   end
 
   class ActionViewSubscriber < NotificationSubscriber
-    PROJECT_ROOT = defined?(::Rails) ? ::Rails.root.to_s : ''
+    PROJECT_ROOT = defined?(::Rails) ? ::Rails.root.to_s : ""
 
     def format_payload(payload)
       {
-        view: payload[:identifier].to_s.gsub(PROJECT_ROOT, '[PROJECT_ROOT]'),
+        view: payload[:identifier].to_s.gsub(PROJECT_ROOT, "[PROJECT_ROOT]"),
         layout: payload[:layout]
       }
     end

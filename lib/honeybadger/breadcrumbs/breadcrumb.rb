@@ -1,4 +1,4 @@
-require 'time'
+require "time"
 
 module Honeybadger
   module Breadcrumbs
@@ -31,7 +31,6 @@ module Honeybadger
       def <=>(other)
         to_h <=> other.to_h
       end
-
 
       # Is the Breadcrumb active or not. Inactive Breadcrumbs not be included
       # with any outgoing payloads.

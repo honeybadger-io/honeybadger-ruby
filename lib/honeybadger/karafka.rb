@@ -1,4 +1,4 @@
-require 'honeybadger/instrumentation_helper'
+require "honeybadger/instrumentation_helper"
 
 module Honeybadger
   module Karafka
@@ -10,7 +10,6 @@ module Honeybadger
         context = {
           type: event[:type]
         }
-        tags = ["type:#{event[:type]}"]
 
         if (consumer = event.payload[:caller]).respond_to?(:messages)
           messages = consumer.messages
@@ -38,28 +37,28 @@ module Honeybadger
       # Note, that the once with `_d` come from Karafka, not rdkafka or Kafka
       RD_KAFKA_METRICS = [
         # Client metrics
-        RdKafkaMetric.new(:increment_counter, :root, 'messages_consumed', 'rxmsgs_d'),
-        RdKafkaMetric.new(:increment_counter, :root, 'messages_consumed_bytes', 'rxmsg_bytes'),
+        RdKafkaMetric.new(:increment_counter, :root, "messages_consumed", "rxmsgs_d"),
+        RdKafkaMetric.new(:increment_counter, :root, "messages_consumed_bytes", "rxmsg_bytes"),
 
         # Broker metrics
-        RdKafkaMetric.new(:increment_counter, :brokers, 'consume_attempts', 'txretries_d'),
-        RdKafkaMetric.new(:increment_counter, :brokers, 'consume_errors', 'txerrs_d'),
-        RdKafkaMetric.new(:increment_counter, :brokers, 'receive_errors', 'rxerrs_d'),
-        RdKafkaMetric.new(:increment_counter, :brokers, 'connection_connects', 'connects_d'),
-        RdKafkaMetric.new(:increment_counter, :brokers, 'connection_disconnects', 'disconnects_d'),
-        RdKafkaMetric.new(:gauge, :brokers, 'network_latency_avg', %w[rtt avg]),
-        RdKafkaMetric.new(:gauge, :brokers, 'network_latency_p95', %w[rtt p95]),
-        RdKafkaMetric.new(:gauge, :brokers, 'network_latency_p99', %w[rtt p99]),
+        RdKafkaMetric.new(:increment_counter, :brokers, "consume_attempts", "txretries_d"),
+        RdKafkaMetric.new(:increment_counter, :brokers, "consume_errors", "txerrs_d"),
+        RdKafkaMetric.new(:increment_counter, :brokers, "receive_errors", "rxerrs_d"),
+        RdKafkaMetric.new(:increment_counter, :brokers, "connection_connects", "connects_d"),
+        RdKafkaMetric.new(:increment_counter, :brokers, "connection_disconnects", "disconnects_d"),
+        RdKafkaMetric.new(:gauge, :brokers, "network_latency_avg", %w[rtt avg]),
+        RdKafkaMetric.new(:gauge, :brokers, "network_latency_p95", %w[rtt p95]),
+        RdKafkaMetric.new(:gauge, :brokers, "network_latency_p99", %w[rtt p99]),
 
         # Topics metrics
-        RdKafkaMetric.new(:gauge, :topics, 'consumer_lags', 'consumer_lag_stored'),
-        RdKafkaMetric.new(:gauge, :topics, 'consumer_lags_delta', 'consumer_lag_stored_d')
+        RdKafkaMetric.new(:gauge, :topics, "consumer_lags", "consumer_lag_stored"),
+        RdKafkaMetric.new(:gauge, :topics, "consumer_lags_delta", "consumer_lag_stored_d")
       ].freeze
 
       # Metrics that sum values on topics levels and not on partition levels
       AGGREGATED_RD_KAFKA_METRICS = [
         # Topic aggregated metrics
-        RdKafkaMetric.new(:gauge, :topics, 'consumer_aggregated_lag', 'consumer_lag_stored')
+        RdKafkaMetric.new(:gauge, :topics, "consumer_aggregated_lag", "consumer_lag_stored")
       ].freeze
 
       def initialize
@@ -79,7 +78,7 @@ module Honeybadger
         statistics = event[:statistics]
         consumer_group_id = event[:consumer_group_id]
 
-        base_tags = { consumer_group: consumer_group_id }
+        base_tags = {consumer_group: consumer_group_id}
 
         RD_KAFKA_METRICS.each do |metric|
           report_metric(metric, statistics, base_tags)
@@ -94,14 +93,14 @@ module Honeybadger
       # @param consumer_group_id [String] cg in context which we operate
       def report_aggregated_topics_metrics(statistics, consumer_group_id)
         AGGREGATED_RD_KAFKA_METRICS.each do |metric|
-          statistics.fetch('topics').each do |topic_name, topic_values|
+          statistics.fetch("topics").each do |topic_name, topic_values|
             sum = 0
 
-            topic_values['partitions'].each do |partition_name, partition_statistics|
-              next if partition_name == '-1'
+            topic_values["partitions"].each do |partition_name, partition_statistics|
+              next if partition_name == "-1"
               # Skip until lag info is available
-              next if partition_statistics['consumer_lag'] == -1
-              next if partition_statistics['consumer_lag_stored'] == -1
+              next if partition_statistics["consumer_lag"] == -1
+              next if partition_statistics["consumer_lag_stored"] == -1
 
               sum += partition_statistics.dig(*metric.key_location)
             end
@@ -121,7 +120,7 @@ module Honeybadger
       #
       # @param event [Karafka::Core::Monitoring::Event]
       def on_error_occurred(event)
-        extra_tags = { type: event[:type] }
+        extra_tags = {type: event[:type]}
 
         if event.payload[:caller].respond_to?(:messages)
           extra_tags.merge!(consumer_tags(event.payload[:caller]))
@@ -132,7 +131,7 @@ module Honeybadger
         end
 
         if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-          increment_counter('error_occurred', value: 1, **extra_tags)
+          increment_counter("error_occurred", value: 1, **extra_tags)
         end
       end
 
@@ -143,11 +142,11 @@ module Honeybadger
         time_taken = event[:time]
         messages_count = event[:messages_buffer].size
         consumer_group_id = event[:subscription_group].consumer_group.id
-        extra_tags = { consumer_group: consumer_group_id }
+        extra_tags = {consumer_group: consumer_group_id}
 
         if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-          histogram('listener_polling_time_taken', value: time_taken, **extra_tags)
-          histogram('listener_polling_messages', value: messages_count, **extra_tags)
+          histogram("listener_polling_time_taken", value: time_taken, **extra_tags)
+          histogram("listener_polling_messages", value: messages_count, **extra_tags)
         end
       end
 
@@ -173,13 +172,13 @@ module Honeybadger
         end
 
         if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-          increment_counter('consumer_messages', value: messages.count, **tags)
-          increment_counter('consumer_batches', value: 1, **tags)
-          gauge('consumer_offset', value: metadata.last_offset, **tags)
-          histogram('consumer_consumed_time_taken', value: event[:time], **tags)
-          histogram('consumer_batch_size', value: messages.count, **tags)
-          histogram('consumer_processing_lag', value: metadata.processing_lag, **tags)
-          histogram('consumer_consumption_lag', value: metadata.consumption_lag, **tags)
+          increment_counter("consumer_messages", value: messages.count, **tags)
+          increment_counter("consumer_batches", value: 1, **tags)
+          gauge("consumer_offset", value: metadata.last_offset, **tags)
+          histogram("consumer_consumed_time_taken", value: event[:time], **tags)
+          histogram("consumer_batch_size", value: messages.count, **tags)
+          histogram("consumer_processing_lag", value: metadata.processing_lag, **tags)
+          histogram("consumer_consumption_lag", value: metadata.consumption_lag, **tags)
         end
       end
 
@@ -189,15 +188,15 @@ module Honeybadger
         ticked: :tick
       }.each do |after, name|
         class_eval <<~RUBY, __FILE__, __LINE__ + 1
-              # Keeps track of user code execution
-              #
-              # @param event [Karafka::Core::Monitoring::Event]
-              def on_consumer_#{after}(event)
-                if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-                  tags = consumer_tags(event.payload[:caller])
-                  increment_counter('consumer_#{name}', value: 1, **tags)
-                end
-              end
+          # Keeps track of user code execution
+          #
+          # @param event [Karafka::Core::Monitoring::Event]
+          def on_consumer_#{after}(event)
+            if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+              tags = consumer_tags(event.payload[:caller])
+              increment_counter('consumer_#{name}', value: 1, **tags)
+            end
+          end
         RUBY
       end
 
@@ -207,9 +206,9 @@ module Honeybadger
         jq_stats = event[:jobs_queue].statistics
 
         if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-          gauge('worker_total_threads', value: ::Karafka::App.config.concurrency)
-          histogram('worker_processing', value: jq_stats[:busy])
-          histogram('worker_enqueued_jobs', value: jq_stats[:enqueued])
+          gauge("worker_total_threads", value: ::Karafka::App.config.concurrency)
+          histogram("worker_processing", value: jq_stats[:busy])
+          histogram("worker_enqueued_jobs", value: jq_stats[:enqueued])
         end
       end
 
@@ -220,7 +219,7 @@ module Honeybadger
         jq_stats = event[:jobs_queue].statistics
 
         if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
-          histogram('worker_processing', value: jq_stats[:busy])
+          histogram("worker_processing", value: jq_stats[:busy])
         end
       end
 
@@ -240,30 +239,30 @@ module Honeybadger
             **base_tags
           )
         when :brokers
-          statistics.fetch('brokers').each_value do |broker_statistics|
+          statistics.fetch("brokers").each_value do |broker_statistics|
             # Skip bootstrap nodes
             # Bootstrap nodes have nodeid -1, other nodes have positive
             # node ids
-            next if broker_statistics['nodeid'] == -1
+            next if broker_statistics["nodeid"] == -1
 
             public_send(
               metric.type,
               metric.name,
               value: broker_statistics.dig(*metric.key_location),
-              **base_tags.merge(broker: broker_statistics['nodename'])
+              **base_tags.merge(broker: broker_statistics["nodename"])
             )
           end
         when :topics
-          statistics.fetch('topics').each do |topic_name, topic_values|
-            topic_values['partitions'].each do |partition_name, partition_statistics|
-              next if partition_name == '-1'
+          statistics.fetch("topics").each do |topic_name, topic_values|
+            topic_values["partitions"].each do |partition_name, partition_statistics|
+              next if partition_name == "-1"
               # Skip until lag info is available
-              next if partition_statistics['consumer_lag'] == -1
-              next if partition_statistics['consumer_lag_stored'] == -1
+              next if partition_statistics["consumer_lag"] == -1
+              next if partition_statistics["consumer_lag_stored"] == -1
 
               # Skip if we do not own the fetch assignment
-              next if partition_statistics['fetch_state'] == 'stopped'
-              next if partition_statistics['fetch_state'] == 'none'
+              next if partition_statistics["fetch_state"] == "stopped"
+              next if partition_statistics["fetch_state"] == "none"
 
               public_send(
                 metric.type,

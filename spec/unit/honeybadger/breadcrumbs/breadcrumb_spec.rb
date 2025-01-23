@@ -1,10 +1,10 @@
-require 'timecop'
-require 'honeybadger/breadcrumbs/ring_buffer'
+require "timecop"
+require "honeybadger/breadcrumbs/ring_buffer"
 
 describe Honeybadger::Breadcrumbs::Breadcrumb do
   let(:category) { :test }
   let(:message) { "A test message" }
-  let(:metadata) {{ a: "foo" }}
+  let(:metadata) { {a: "foo"} }
 
   subject { described_class.new(category: category, message: message, metadata: metadata) }
 
@@ -28,7 +28,7 @@ describe Honeybadger::Breadcrumbs::Breadcrumb do
   end
 
   describe "#comparable" do
-    it 'can be compared on hash content' do
+    it "can be compared on hash content" do
       expect(subject == subject.dup).to be(true)
     end
   end

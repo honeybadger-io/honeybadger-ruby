@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/notification_subscriber'
+require "honeybadger/plugin"
+require "honeybadger/notification_subscriber"
 
 module Honeybadger
   module Plugins
@@ -15,7 +15,7 @@ module Honeybadger
         # @return The super value of the middleware's +#render_exception()+
         #   method.
         def render_exception(arg, exception, *args)
-          if arg.kind_of?(::ActionDispatch::Request)
+          if arg.is_a?(::ActionDispatch::Request)
             request = arg
             env = request.env
           else
@@ -23,10 +23,14 @@ module Honeybadger
             env = arg
           end
 
-          env['honeybadger.exception'] = exception
-          env['honeybadger.request.url'] = request.url rescue nil
+          env["honeybadger.exception"] = exception
+          env["honeybadger.request.url"] = begin
+            request.url
+          rescue
+            nil
+          end
 
-          super(arg, exception, *args)
+          super
         end
       end
 
@@ -45,7 +49,7 @@ module Honeybadger
         end
 
         def self.source_ignored?(source)
-          source && ::Honeybadger.config[:'rails.subscriber_ignore_sources'].any? do |ignored_source|
+          source && ::Honeybadger.config[:"rails.subscriber_ignore_sources"].any? do |ignored_source|
             ignored_source.is_a?(Regexp) ? ignored_source.match?(source) : (ignored_source == source)
           end
         end
@@ -55,7 +59,7 @@ module Honeybadger
         requirement { defined?(::Rails.application) && ::Rails.application }
 
         execution do
-          require 'rack/request'
+          require "rack/request"
           if defined?(::ActionDispatch::DebugExceptions)
             # Rails 3.2.x+
             ::ActionDispatch::DebugExceptions.prepend(ExceptionsCatcher)
@@ -64,7 +68,7 @@ module Honeybadger
             ::ActionDispatch::ShowExceptions.prepend(ExceptionsCatcher)
           end
 
-          if Honeybadger.config[:'exceptions.enabled'] && defined?(::ActiveSupport::ErrorReporter) # Rails 7
+          if Honeybadger.config[:"exceptions.enabled"] && defined?(::ActiveSupport::ErrorReporter) # Rails 7
             if defined?(::ActiveSupport::ExecutionContext)
               ::ActiveSupport::ExecutionContext.after_change do
                 Honeybadger.context(::ActiveSupport::ExecutionContext.to_h)

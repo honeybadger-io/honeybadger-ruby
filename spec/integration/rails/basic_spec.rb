@@ -1,4 +1,4 @@
-require_relative '../rails_helper'
+require_relative "../rails_helper"
 
 describe "Rails integration", if: RAILS_PRESENT, type: :request do
   load_rails_hooks(self)

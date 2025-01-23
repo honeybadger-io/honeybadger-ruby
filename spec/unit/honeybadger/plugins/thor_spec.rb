@@ -1,5 +1,5 @@
-require 'honeybadger/plugins/thor'
-require 'honeybadger/config'
+require "honeybadger/plugins/thor"
+require "honeybadger/config"
 
 describe "Thor Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }

@@ -1,5 +1,5 @@
-require 'forwardable'
-require 'honeybadger/instrumentation_helper'
+require "forwardable"
+require "honeybadger/instrumentation_helper"
 
 module Honeybadger
   # +Honeybadger::Plugin+ defines the API for registering plugins with
@@ -84,7 +84,7 @@ module Honeybadger
       # @return nil
       def register(name = nil, &block)
         name ||= name_from_caller(caller) or
-          raise(ArgumentError, 'Plugin name is required, but was nil.')
+          raise(ArgumentError, "Plugin name is required, but was nil.")
         instances[key = name.to_sym] and fail("Already registered: #{name}")
         instances[key] = new(name).tap { |d| d.instance_eval(&block) }
       end
@@ -95,7 +95,7 @@ module Honeybadger
           if config.load_plugin?(name)
             plugin.load!(config)
           else
-            config.logger.debug(sprintf('skip plugin name=%s reason=disabled', name))
+            config.logger.debug(sprintf("skip plugin name=%s reason=disabled", name))
           end
         end
       end
@@ -157,11 +157,11 @@ module Honeybadger
 
     # @api private
     def initialize(name)
-      @name         = name
-      @loaded       = false
+      @name = name
+      @loaded = false
       @requirements = []
-      @executions   = []
-      @collectors   = []
+      @executions = []
+      @collectors = []
     end
 
     # Define a requirement. All requirement blocks must return +true+ for the
@@ -231,13 +231,13 @@ module Honeybadger
     #   end
     #
     # @return nil
-    def collect(options={}, &block)
+    def collect(options = {}, &block)
       @collectors << [options, block]
     end
 
     # @api private
     def ok?(config)
-      @requirements.all? {|r| Execution.new(config, &r).call }
+      @requirements.all? { |r| Execution.new(config, &r).call }
     rescue => e
       config.logger.error(sprintf("plugin error name=%s class=%s message=%s\n\t%s", name, e.class, e.message.dump, Array(e.backtrace).join("\n\t")))
       false
@@ -246,15 +246,15 @@ module Honeybadger
     # @api private
     def load!(config)
       if @loaded
-        config.logger.debug(sprintf('skip plugin name=%s reason=loaded', name))
+        config.logger.debug(sprintf("skip plugin name=%s reason=loaded", name))
         return false
       elsif ok?(config)
-        config.logger.debug(sprintf('load plugin name=%s', name))
-        @executions.each {|e| Execution.new(config, &e).call }
-        @collectors.each {|o,b| CollectorExecution.new(name, config, o, &b).register! }
+        config.logger.debug(sprintf("load plugin name=%s", name))
+        @executions.each { |e| Execution.new(config, &e).call }
+        @collectors.each { |o, b| CollectorExecution.new(name, config, o, &b).register! }
         @loaded = true
       else
-        config.logger.debug(sprintf('skip plugin name=%s reason=requirement', name))
+        config.logger.debug(sprintf("skip plugin name=%s reason=requirement", name))
       end
 
       @loaded
@@ -265,9 +265,7 @@ module Honeybadger
     end
 
     # @api private
-    def collectors
-      @collectors
-    end
+    attr_reader :collectors
 
     # @api private
     def loaded?

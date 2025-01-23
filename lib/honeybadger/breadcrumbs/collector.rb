@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Honeybadger
   module Breadcrumbs
@@ -35,7 +35,7 @@ module Honeybadger
       #
       # @return [self] Filtered breadcrumbs
       def add!(breadcrumb)
-        return unless @config[:'breadcrumbs.enabled']
+        return unless @config[:"breadcrumbs.enabled"]
         @buffer.add!(breadcrumb)
 
         self
@@ -48,7 +48,7 @@ module Honeybadger
       # block returns a falsy value
       #
       def drop_previous_breadcrumb_if
-        @buffer.drop if (previous && block_given? && yield(previous))
+        @buffer.drop if previous && block_given? && yield(previous)
       end
 
       # All active breadcrumbs you want to remove a breadcrumb from the trail,
@@ -61,7 +61,7 @@ module Honeybadger
 
       def to_h
         {
-          enabled: @config[:'breadcrumbs.enabled'],
+          enabled: @config[:"breadcrumbs.enabled"],
           trail: trail.map(&:to_h)
         }
       end

@@ -6,13 +6,13 @@
 #
 #     bundle exec jruby -J-Xrunhprof spec/benchmark.rb
 
-require 'honeybadger'
-require 'benchmark'
+require "honeybadger"
+require "benchmark"
 
 benchmark = Benchmark.measure do
-  if Honeybadger.start({:api_key => 'badgers', :backend => 'null'})
+  if Honeybadger.start({api_key: "badgers", backend: "null"})
     1000.times do
-      Honeybadger.notify(error_class: 'RubyProf', error_message: 'Profiling Honeybadger -- this should never actually be reported.')
+      Honeybadger.notify(error_class: "RubyProf", error_message: "Profiling Honeybadger -- this should never actually be reported.")
     end
   end
 end

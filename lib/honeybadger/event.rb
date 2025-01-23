@@ -1,6 +1,6 @@
-require 'forwardable'
+require "forwardable"
 
-require 'honeybadger/util/sanitizer'
+require "honeybadger/util/sanitizer"
 
 module Honeybadger
   class Event
@@ -18,7 +18,7 @@ module Honeybadger
     def_delegators :payload, :dig, :[], :[]=
 
     # @api private
-    def initialize(event_type_or_payload, payload={})
+    def initialize(event_type_or_payload, payload = {})
       if event_type_or_payload.is_a?(String)
         @event_type = event_type_or_payload
         @payload = payload

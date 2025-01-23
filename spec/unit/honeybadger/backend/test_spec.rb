@@ -1,5 +1,5 @@
-require 'honeybadger/backend/test'
-require 'honeybadger/config'
+require "honeybadger/backend/test"
+require "honeybadger/config"
 
 describe Honeybadger::Backend::Test do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
@@ -25,9 +25,9 @@ describe Honeybadger::Backend::Test do
   end
 
   describe "#notify" do
-    let(:notice) { double('Notice') }
+    let(:notice) { double("Notice") }
 
-    subject { instance.notify(:notices, double('Notice')) }
+    subject { instance.notify(:notices, double("Notice")) }
 
     it "saves notifications for review" do
       expect { instance.notify(:notices, notice) }.to change { instance.notifications[:notices] }.from([]).to([notice])

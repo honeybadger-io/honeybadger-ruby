@@ -1,34 +1,34 @@
 # A test harness for RakeHandler
 #
-require 'rake'
-require 'rubygems'
+require "rake"
+require "rubygems"
 
 # Should catch exception
 task :honeybadger do
   stub_tty_output(false)
-  require 'honeybadger'
+  require "honeybadger"
   raise_exception
 end
 
 # Should not catch exception as tty_output is true
 task :honeybadger_autodetect_from_terminal do
   stub_tty_output(true)
-  require 'honeybadger'
+  require "honeybadger"
   raise_exception
 end
 
 def stub_tty_output(value)
   if value
-    def STDOUT.tty?
+    def $stdout.tty?
       true
     end
   else
-    def STDOUT.tty?
+    def $stdout.tty?
       false
     end
   end
 end
 
 def raise_exception
-  raise 'Jim has left the building :('
+  raise "Jim has left the building :("
 end

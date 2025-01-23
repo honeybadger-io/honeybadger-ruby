@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Honeybadger
   module Rack
@@ -9,23 +9,23 @@ module Honeybadger
 
       def initialize(app, agent = nil)
         @app = app
-        @agent = agent.kind_of?(Agent) && agent
+        @agent = agent.is_a?(Agent) && agent
       end
 
       def replacement(with)
-        config[:'user_informer.info'].gsub(/\{\{\s*error_id\s*\}\}/, with.to_s)
+        config[:"user_informer.info"].gsub(/\{\{\s*error_id\s*\}\}/, with.to_s)
       end
 
       def call(env)
         status, headers, body = @app.call(env)
-        if env['honeybadger.error_id']
+        if env["honeybadger.error_id"]
           new_body = []
-          replace  = replacement(env['honeybadger.error_id'])
+          replace = replacement(env["honeybadger.error_id"])
           body.each do |chunk|
             new_body << chunk.gsub("<!-- HONEYBADGER ERROR -->", replace)
           end
           body.close if body.respond_to?(:close)
-          headers['Content-Length'] = new_body.reduce(0) { |a,e| a += e.bytesize }.to_s
+          headers["Content-Length"] = new_body.reduce(0) { |a, e| a + e.bytesize }.to_s
           body = new_body
         end
         [status, headers, body]

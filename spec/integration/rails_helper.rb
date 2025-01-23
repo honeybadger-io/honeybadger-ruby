@@ -1,9 +1,9 @@
 begin
-  # Require these early to work around https://github.com/jruby/jruby#6547 
+  # Require these early to work around https://github.com/jruby/jruby#6547
   #   can be pulled out > 9.2.14 of jruby.
-  require 'i18n'
-  require 'i18n/backend/simple'
-  require 'rails'
+  require "i18n"
+  require "i18n/backend/simple"
+  require "rails"
   RAILS_PRESENT = true
 
   # We are unable to run Activerecord with rails edge on jruby as the sqlite
@@ -11,13 +11,13 @@ begin
   # that runtime and Rails version
   SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha")
 
-  require FIXTURES_PATH.join('rails', 'config', 'application.rb')
-  require 'honeybadger/init/rails'
-  require 'rspec/rails'
+  require FIXTURES_PATH.join("rails", "config", "application.rb")
+  require "honeybadger/init/rails"
+  require "rspec/rails"
 rescue LoadError
   RAILS_PRESENT = false
   SKIP_ACTIVE_RECORD = true
-  puts 'Skipping Rails integration specs.'
+  puts "Skipping Rails integration specs."
 end
 
 # Defining this as a method as we only want to include these hooks in rails
@@ -37,8 +37,8 @@ def load_rails_hooks(spec)
 
   spec.before(:each) do
     Honeybadger.configure do |config|
-      config.api_key = 'gem testing'
-      config.backend = 'test'
+      config.api_key = "gem testing"
+      config.backend = "test"
     end
   end
 

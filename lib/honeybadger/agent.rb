@@ -1,18 +1,18 @@
-require 'forwardable'
+require "forwardable"
 
-require 'honeybadger/version'
-require 'honeybadger/config'
-require 'honeybadger/context_manager'
-require 'honeybadger/notice'
-require 'honeybadger/event'
-require 'honeybadger/plugin'
-require 'honeybadger/logging'
-require 'honeybadger/worker'
-require 'honeybadger/events_worker'
-require 'honeybadger/metrics_worker'
-require 'honeybadger/breadcrumbs'
-require 'honeybadger/registry'
-require 'honeybadger/registry_execution'
+require "honeybadger/version"
+require "honeybadger/config"
+require "honeybadger/context_manager"
+require "honeybadger/notice"
+require "honeybadger/event"
+require "honeybadger/plugin"
+require "honeybadger/logging"
+require "honeybadger/worker"
+require "honeybadger/events_worker"
+require "honeybadger/metrics_worker"
+require "honeybadger/breadcrumbs"
+require "honeybadger/registry"
+require "honeybadger/registry_execution"
 
 module Honeybadger
   # The Honeybadger agent contains all the methods for interacting with the
@@ -62,7 +62,7 @@ module Honeybadger
     end
 
     def initialize(opts = {})
-      if opts.kind_of?(Config)
+      if opts.is_a?(Config)
         @config = opts
         opts = {}
       end
@@ -125,8 +125,8 @@ module Honeybadger
     # @return [String] UUID reference to the notice within Honeybadger.
     # @return [false] when ignored.
     def notify(exception_or_opts = nil, opts = {}, **kwargs)
-      if !config[:'exceptions.enabled']
-        debug { 'disabled feature=notices' }
+      if !config[:"exceptions.enabled"]
+        debug { "disabled feature=notices" }
         return false
       end
 
@@ -145,11 +145,13 @@ module Honeybadger
 
       validate_notify_opts!(opts)
 
-      add_breadcrumb(
-        "Honeybadger Notice",
-        metadata: opts,
-        category: "notice"
-      ) if config[:'breadcrumbs.enabled']
+      if config[:"breadcrumbs.enabled"]
+        add_breadcrumb(
+          "Honeybadger Notice",
+          metadata: opts,
+          category: "notice"
+        )
+      end
 
       opts[:rack_env] ||= context_manager.get_rack_env
       opts[:global_context] ||= context_manager.get_context
@@ -164,21 +166,21 @@ module Honeybadger
       end
 
       unless notice.api_key =~ NOT_BLANK
-        error { sprintf('Unable to send error report: API key is missing. id=%s', notice.id) }
+        error { sprintf("Unable to send error report: API key is missing. id=%s", notice.id) }
         return false
       end
 
       if !opts[:force] && notice.ignore?
-        debug { sprintf('ignore notice feature=notices id=%s', notice.id) }
+        debug { sprintf("ignore notice feature=notices id=%s", notice.id) }
         return false
       end
 
       if notice.halted?
-        debug { 'halted notice feature=notices' }
+        debug { "halted notice feature=notices" }
         return false
       end
 
-      info { sprintf('Reporting error id=%s', notice.id) }
+      info { sprintf("Reporting error id=%s", notice.id) }
 
       if opts[:sync] || config[:sync]
         send_now(notice)
@@ -204,7 +206,7 @@ module Honeybadger
     #   otherwise.
     def check_in(id)
       # this is to allow check ins even if a url is passed
-      check_in_id = id.to_s.strip.gsub(/\/$/, '').split('/').last
+      check_in_id = id.to_s.strip.gsub(/\/$/, "").split("/").last
       response = backend.check_in(check_in_id)
       response.success?
     end
@@ -411,7 +413,7 @@ module Honeybadger
 
       extra_payload = {}.tap do |p|
         p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
-        p[:hostname] = config[:hostname].to_s if config[:'events.attach_hostname']
+        p[:hostname] = config[:hostname].to_s if config[:"events.attach_hostname"]
       end
 
       event = Event.new(event_type, extra_payload.merge(payload))
@@ -573,7 +575,7 @@ module Honeybadger
     def validate_notify_opts!(opts)
       return if opts.has_key?(:exception)
       return if opts.has_key?(:error_message)
-      msg = sprintf('`Honeybadger.notify` was called with invalid arguments. You must pass either an Exception or options Hash containing the `:error_message` key. location=%s', caller[caller.size-1])
+      msg = sprintf("`Honeybadger.notify` was called with invalid arguments. You must pass either an Exception or options Hash containing the `:error_message` key. location=%s", caller[caller.size - 1])
       raise ArgumentError.new(msg) if config.dev?
       warn(msg)
     end

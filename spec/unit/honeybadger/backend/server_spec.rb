@@ -1,11 +1,11 @@
-require 'logger'
-require 'honeybadger/backend/server'
-require 'honeybadger/config'
+require "logger"
+require "honeybadger/backend/server"
+require "honeybadger/config"
 
 describe Honeybadger::Backend::Server do
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, api_key: 'abc123') }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, api_key: "abc123") }
   let(:logger) { config.logger }
-  let(:payload) { double('Notice', to_json: '{}') }
+  let(:payload) { double("Notice", to_json: "{}") }
 
   subject { described_class.new(config) }
 
@@ -16,7 +16,7 @@ describe Honeybadger::Backend::Server do
   describe "#check_in" do
     it "returns a response" do
       stub_http
-      expect(subject.check_in('foobar')).to be_a Honeybadger::Backend::Response
+      expect(subject.check_in("foobar")).to be_a Honeybadger::Backend::Response
     end
   end
 
@@ -28,12 +28,12 @@ describe Honeybadger::Backend::Server do
 
     context "when payload has an api key" do
       before do
-        allow(payload).to receive(:api_key).and_return('badgers')
+        allow(payload).to receive(:api_key).and_return("badgers")
       end
 
       it "passes the payload api key in extra headers" do
         http = stub_http
-        expect(http).to receive(:post).with(anything, anything, hash_including({ 'X-API-Key' => 'badgers'}))
+        expect(http).to receive(:post).with(anything, anything, hash_including({"X-API-Key" => "badgers"}))
         notify_backend
       end
     end
@@ -41,7 +41,7 @@ describe Honeybadger::Backend::Server do
     context "when payload doesn't have an api key" do
       it "doesn't pass extra headers" do
         http = stub_http
-        expect(http).to receive(:post).with(anything, anything, hash_including({ 'X-API-Key' => 'abc123'}))
+        expect(http).to receive(:post).with(anything, anything, hash_including({"X-API-Key" => "abc123"}))
         notify_backend
       end
     end
@@ -49,7 +49,7 @@ describe Honeybadger::Backend::Server do
     context "when encountering exceptions" do
       context "HTTP connection setup problems" do
         it "should not be rescued" do
-          proxy = double()
+          proxy = double
           allow(proxy).to receive(:new).and_raise(NoMemoryError)
           allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
           expect { notify_backend }.to raise_error(NoMemoryError)
@@ -90,7 +90,7 @@ describe Honeybadger::Backend::Server do
 
     it "adds auth headers" do
       http = stub_http
-      expect(http).to receive(:post).with(anything, anything, hash_including({ 'X-API-Key' => 'abc123'}))
+      expect(http).to receive(:post).with(anything, anything, hash_including({"X-API-Key" => "abc123"}))
       send_event
     end
 
@@ -123,9 +123,9 @@ describe Honeybadger::Backend::Server do
       send_event(2)
     end
 
-    def send_event(count=1)
+    def send_event(count = 1)
       payload = []
-      count.times {|i| payload << {ts: DateTime.now.new_offset(0).rfc3339, event_type: "checkout", sum: "123.23", increment: i} }
+      count.times { |i| payload << {ts: DateTime.now.new_offset(0).rfc3339, event_type: "checkout", sum: "123.23", increment: i} }
       subject.event(payload)
     end
   end

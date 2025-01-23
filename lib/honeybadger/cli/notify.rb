@@ -1,9 +1,9 @@
-require 'digest'
-require 'forwardable'
-require 'honeybadger/cli/main'
-require 'honeybadger/cli/helpers'
-require 'honeybadger/util/http'
-require 'honeybadger/util/stats'
+require "digest"
+require "forwardable"
+require "honeybadger/cli/main"
+require "honeybadger/cli/helpers"
+require "honeybadger/util/http"
+require "honeybadger/util/stats"
 
 module Honeybadger
   module CLI
@@ -23,8 +23,8 @@ module Honeybadger
           api_key: config.get(:api_key),
           notifier: NOTIFIER,
           error: {
-            class: options['class'],
-            message: options['message']
+            class: options["class"],
+            message: options["message"]
           },
           request: {},
           server: {
@@ -35,12 +35,12 @@ module Honeybadger
           }
         }
 
-        payload[:error][:fingerprint] = Digest::SHA1.hexdigest(options['fingerprint']) if option?('fingerprint')
-        payload[:error][:tags] = options['tags'].to_s.strip.split(',').map(&:strip) if option?('tags')
+        payload[:error][:fingerprint] = Digest::SHA1.hexdigest(options["fingerprint"]) if option?("fingerprint")
+        payload[:error][:tags] = options["tags"].to_s.strip.split(",").map(&:strip) if option?("tags")
 
-        payload[:request][:component] = options['component'] if option?('component')
-        payload[:request][:action] = options['action'] if option?('action')
-        payload[:request][:url] = options['url'] if option?('url')
+        payload[:request][:component] = options["component"] if option?("component")
+        payload[:request][:action] = options["action"] if option?("action")
+        payload[:request][:url] = options["url"] if option?("url")
 
         payload.delete(:request) if payload[:request].empty?
 

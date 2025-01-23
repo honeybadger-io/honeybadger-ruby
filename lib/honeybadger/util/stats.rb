@@ -6,14 +6,17 @@ module Honeybadger
 
       class << self
         def all
-          { :mem => memory, :load => load }
+          {mem: memory, load: load}
         end
 
         # From https://github.com/bloopletech/webstats/blob/master/server/data_providers/mem_info.rb
         def memory
           out = {}
           if HAS_MEM && (meminfo = run_meminfo)
-            out[:total], out[:free], out[:buffers], out[:cached] = meminfo[0..4].map { |l| l =~ /^.*?\: +(.*?) kB$/; ($1.to_i / 1024.0).to_f }
+            out[:total], out[:free], out[:buffers], out[:cached] = meminfo[0..4].map { |l|
+              l =~ /^.*?: +(.*?) kB$/
+              ($1.to_i / 1024.0).to_f
+            }
             out[:free_total] = out[:free] + out[:buffers] + out[:cached]
           end
           out
@@ -23,7 +26,7 @@ module Honeybadger
         def load
           out = {}
           if HAS_LOAD && (loadavg = run_loadavg)
-            out[:one], out[:five], out[:fifteen] = loadavg.split(' ', 4).map(&:to_f)
+            out[:one], out[:five], out[:fifteen] = loadavg.split(" ", 4).map(&:to_f)
           end
           out
         end

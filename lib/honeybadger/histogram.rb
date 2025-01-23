@@ -1,4 +1,4 @@
-require 'honeybadger/metric'
+require "honeybadger/metric"
 
 module Honeybadger
   class Histogram < Metric
@@ -11,7 +11,7 @@ module Honeybadger
       @samples += 1
 
       @total ||= 0
-      @total = @total + value
+      @total += value
 
       @min = value if @min.nil? || @min > value
       @max = value if @max.nil? || @max < value
@@ -23,7 +23,7 @@ module Honeybadger
     end
 
     def find_bin(value)
-      bin = bins.find {|b| b >= value  }
+      bin = bins.find { |b| b >= value }
       bin = INFINITY if bin.nil?
       bin
     end

@@ -1,10 +1,10 @@
-require 'forwardable'
+require "forwardable"
 
-require 'honeybadger/backend/base'
-require 'honeybadger/backend/server'
-require 'honeybadger/backend/test'
-require 'honeybadger/backend/null'
-require 'honeybadger/backend/debug'
+require "honeybadger/backend/base"
+require "honeybadger/backend/server"
+require "honeybadger/backend/test"
+require "honeybadger/backend/null"
+require "honeybadger/backend/debug"
 
 module Honeybadger
   # @api private

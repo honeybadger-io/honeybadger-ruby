@@ -1,5 +1,5 @@
-require 'honeybadger/instrumentation_helper'
-require 'honeybadger/plugin'
+require "honeybadger/instrumentation_helper"
+require "honeybadger/plugin"
 
 module Honeybadger
   module Plugins
@@ -16,13 +16,13 @@ module Honeybadger
 
           ::Autotuner.metrics_reporter = proc do |metrics|
             if config.load_plugin_insights_events?(:autotuner)
-              Honeybadger.event('stats.autotuner', metrics)
+              Honeybadger.event("stats.autotuner", metrics)
             end
 
             if config.load_plugin_insights_metrics?(:autotuner)
-              metric_source 'autotuner'
+              metric_source "autotuner"
               metrics.each do |key, val|
-                gauge key, ->{ val }
+                gauge key, -> { val }
               end
             end
           end

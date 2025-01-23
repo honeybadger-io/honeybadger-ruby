@@ -1,8 +1,7 @@
-require 'honeybadger'
-
+require "honeybadger"
 
 feature "Running the exec cli command" do
-  before { set_environment_variable('HONEYBADGER_BACKEND', 'debug') }
+  before { set_environment_variable("HONEYBADGER_BACKEND", "debug") }
 
   it "quietly executes the requested command" do
     output = capture(:stdout) { Honeybadger::CLI.start(%w[exec --api-key=test-api-key ls]) }
@@ -12,7 +11,7 @@ feature "Running the exec cli command" do
   context "when the options are invalid" do
     it "notifies the user" do
       output = capture(:stdout) do
-        expect{ Honeybadger::CLI.start(%w[exec --api-key= ls]) }.to raise_error(SystemExit)
+        expect { Honeybadger::CLI.start(%w[exec --api-key= ls]) }.to raise_error(SystemExit)
       end
       expect(output).to match(/required.+api-key/i)
     end
@@ -21,7 +20,7 @@ feature "Running the exec cli command" do
   context "when the command fails due to a non-zero exit code" do
     it "notifies Honeybadger of the failure" do
       output = capture(:stdout) do
-        expect{Honeybadger::CLI.start(%w[exec --api-key=test-api-key this-command-should-not-exist])}.to raise_error(SystemExit)
+        expect { Honeybadger::CLI.start(%w[exec --api-key=test-api-key this-command-should-not-exist]) }.to raise_error(SystemExit)
       end
       expect(output).to match(/failed.+this-command-should-not-exist/im)
       expect(output).to match(/Successfully notified Honeybadger/i)
@@ -37,7 +36,7 @@ feature "Running the exec cli command" do
     end
   end
 
-context "when Rails is not detected due to a missing environment.rb" do
+  context "when Rails is not detected due to a missing environment.rb" do
     it "skips rails initialization without logging" do
       output = capture(:stdout) { Honeybadger::CLI.start(%w[exec --api-key=test-api-key --skip-rails-load ls]) }
       expect(output).to_not match(/Skipping Rails initialization/i)
@@ -46,9 +45,9 @@ context "when Rails is not detected due to a missing environment.rb" do
 
   context "when Rails is detected via the presence of environment.rb" do
     before(:each) do
-      @config_path = File.join(Dir.pwd, 'config')
+      @config_path = File.join(Dir.pwd, "config")
       FileUtils.mkdir_p(@config_path) unless File.exist?(@config_path)
-      File.open(File.join(@config_path, 'environment.rb'), 'w')
+      File.open(File.join(@config_path, "environment.rb"), "w")
     end
 
     after(:each) { FileUtils.rm_rf(@config_path) }
