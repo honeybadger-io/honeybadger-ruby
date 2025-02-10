@@ -28,8 +28,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # read from .tool-versions
-          # ruby-version: '3.2'
+          ruby-version: head
           bundler-cache: true
 
       - name: Publish gem
