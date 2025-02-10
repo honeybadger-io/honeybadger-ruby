@@ -133,6 +133,19 @@ module Honeybadger
   end
 
   class ActionMailerSubscriber < NotificationSubscriber
+    def format_payload(payload)
+      # Don't include the mail object in the payload...
+      mail = payload.delete(:mail)
+
+      # ... but do include any attachment filenames
+      attachment_info = if mail&.attachments&.any?
+        { attachments: mail.attachments.map { |a| { filename: a.filename } } }
+      else
+        {}
+      end
+
+      payload.merge(attachment_info)
+    end
   end
 
   class ActiveStorageSubscriber < NotificationSubscriber
