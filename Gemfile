@@ -19,14 +19,10 @@ gem 'capistrano'
 gem 'rake'
 
 # mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
-platforms :ruby_25 do
-  gem "mathn"
-end
+gem "mathn"
 
 # rdoc has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/rdoc
-platforms :ruby_35 do
-  gem "rdoc"
-end
+gem "rdoc"
 
 gem "bump", "~> 0.10.0"
 

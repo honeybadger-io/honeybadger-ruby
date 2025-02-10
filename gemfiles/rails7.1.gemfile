@@ -15,6 +15,8 @@ gem "base64"
 gem "mutex_m"
 gem "capistrano"
 gem "rake"
+gem "mathn"
+gem "rdoc"
 gem "bump", "~> 0.10.0"
 gem "activesupport", "< 7.2"
 gem "activemodel", "< 7.2"
@@ -34,11 +36,6 @@ group :development do
   gem "guard-rspec"
   gem "pry"
   gem "pry-byebug", platforms: :mri
-  gem "rdoc"
-end
-
-platforms :ruby_25 do
-  gem "mathn"
 end
 
 gemspec path: "../"
