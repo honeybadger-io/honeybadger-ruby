@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.26.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.2...v5.26.3) (2025-02-10)
+
+
+### Bug Fixes
+
+* remove mail objects from ActionMailer events ([#664](https://github.com/honeybadger-io/honeybadger-ruby/issues/664)) ([07e0520](https://github.com/honeybadger-io/honeybadger-ruby/commit/07e0520ae1cd27beb16a96e075e64eb6463c97a8)), closes [#663](https://github.com/honeybadger-io/honeybadger-ruby/issues/663)
+
 ## [5.26.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.1...v5.26.2) (2025-01-10)
 
 
