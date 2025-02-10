@@ -19,9 +19,10 @@ gem 'capistrano'
 gem 'rake'
 
 # mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
-platforms :ruby_25 do
-  gem "mathn"
-end
+gem "mathn"
+
+# rdoc has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/rdoc
+gem "rdoc"
 
 gem "bump", "~> 0.10.0"
 
@@ -30,5 +31,4 @@ group :development do
   gem 'guard-rspec'
   gem 'pry'
   gem 'pry-byebug', platforms: :mri
-  gem 'rdoc'
 end

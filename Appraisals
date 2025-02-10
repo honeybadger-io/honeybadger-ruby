@@ -3,6 +3,7 @@
 RAILS_GEMS = %w[activesupport activemodel activerecord activejob railties actionpack]
 
 appraise "standalone" do
+  gem "rdoc"
 end
 
 if !RUBY_PLATFORM.match?(/java/)

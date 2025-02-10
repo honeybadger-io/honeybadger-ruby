@@ -18,6 +18,7 @@ jobs:
           - '3.1'
           - '3.2'
           - '3.3'
+          - '3.4'
           - 'ruby-head'
         gemfile:
           - binding_of_caller.gemfile
@@ -42,7 +43,14 @@ jobs:
             gemfile: rails8.gemfile
           - ruby: '3.1'
             gemfile: rails8.gemfile
-
+          - ruby: '3.4'
+            gemfile: rails6.1.gemfile
+          - ruby: 'ruby-head'
+            gemfile: rails6.1.gemfile
+          - ruby: '3.4'
+            gemfile: rails7.0.gemfile
+          - ruby: 'ruby-head'
+            gemfile: rails7.0.gemfile
     # Has to be top level to cache properly
     env:
       BUNDLE_GEMFILE: "gemfiles/${{ matrix.gemfile }}"
