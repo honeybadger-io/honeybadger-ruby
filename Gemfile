@@ -18,9 +18,10 @@ gem 'mutex_m'
 gem 'capistrano'
 gem 'rake'
 
-# mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
+# mathn and rdoc have moved to rubygems in Ruby 2.5.0
 platforms :ruby_25 do
   gem "mathn"
+  gem "rdoc"
 end
 
 gem "bump", "~> 0.10.0"
@@ -30,5 +31,4 @@ group :development do
   gem 'guard-rspec'
   gem 'pry'
   gem 'pry-byebug', platforms: :mri
-  gem 'rdoc'
 end
