@@ -27,7 +27,7 @@ module Honeybadger
             exclude_when: lambda do |data|
               # Ignore schema, begin, and commit transaction queries
               data[:name] == "SCHEMA" ||
-                (data[:sql] && (Util::SQL.force_utf_8(data[:sql].dup) =~ /^(begin|commit)( transaction)?$/i))
+                (data[:sql] && (Util::SQL.force_utf_8(data[:sql].dup) =~ /^(begin|commit)( immediate)?( transaction)?$/i))
             end
           },
 
