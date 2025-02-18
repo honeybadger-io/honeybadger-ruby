@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.26.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.3...v5.26.4) (2025-02-18)
+
+
+### Bug Fixes
+
+* ignore transactions with the immediate keyword ([#668](https://github.com/honeybadger-io/honeybadger-ruby/issues/668)) ([43e9ccb](https://github.com/honeybadger-io/honeybadger-ruby/commit/43e9ccb8afb86b6be340dba064af14c5cfd4929f))
+
 ## [5.26.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.2...v5.26.3) (2025-02-10)
 
 
