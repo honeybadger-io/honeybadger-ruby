@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.27.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.4...v5.27.0) (2025-03-13)
+
+
+### Features
+
+* set action and component from context ([#672](https://github.com/honeybadger-io/honeybadger-ruby/issues/672)) ([1704486](https://github.com/honeybadger-io/honeybadger-ruby/commit/17044868f28c78f76752e1464c3eea30cc75d74b))
+
 ## [5.26.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.3...v5.26.4) (2025-02-18)
 
 
