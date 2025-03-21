@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [5.27.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.0...v5.27.1) (2025-03-21)
+
+
+### Bug Fixes
+
+* add specs for ignored events ([#677](https://github.com/honeybadger-io/honeybadger-ruby/issues/677)) ([3907ecf](https://github.com/honeybadger-io/honeybadger-ruby/commit/3907ecf7ace995b2771b07f51a42388ce82c6aed))
+* prepend callback in Active Job plugin ([a46a668](https://github.com/honeybadger-io/honeybadger-ruby/commit/a46a6685358ffdb25d1c6446585a3e65847ac34b))
+
 ## [5.27.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.26.4...v5.27.0) (2025-03-13)
 
 
