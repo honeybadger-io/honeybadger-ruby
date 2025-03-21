@@ -418,6 +418,16 @@ describe Honeybadger::Agent do
         end
       end
 
+      context "when configured with a hash and regex with a nested payload" do
+        let(:ignored_events) { [{ "nested" => { "data"  => /test.*/ }}] }
+        let(:event_type) { "report.system" }
+        let(:payload) { { nested: { data: "test-report" }} }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
       context "when configured with a hash with string keys" do
         let(:ignored_events) { [{ "nested" => { "data"  => "test" }}] }
         let(:event_type) { "report.system" }
