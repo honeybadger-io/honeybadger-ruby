@@ -297,4 +297,33 @@ describe Honeybadger::Config do
       expect(unknown_key_response).to eq(false)
     end
   end
+
+  describe "#ignored_events" do
+    let(:config) { Honeybadger::Config.new(:'events.ignore_only' => ignored_events) }
+
+    context "empty array" do
+      let(:ignored_events) { [] }
+      it { expect(config.ignored_events).to eq([]) }
+    end
+
+    context "a string" do
+      let(:ignored_events) { ['foo'] }
+      it { expect(config.ignored_events).to eq([{[:event_type] => "foo"}]) }
+    end
+
+    context "a regex" do
+      let(:ignored_events) { [/foo/] }
+      it { expect(config.ignored_events).to eq([{[:event_type] => /foo/}]) }
+    end
+
+    context "a simple hash" do
+      let(:ignored_events) { [{foo: 'bar'}] }
+      it { expect(config.ignored_events).to eq([{[:foo] => "bar"}]) }
+    end
+
+    context "a simple hash with a regex value" do
+      let(:ignored_events) { [{foo: /bar/}] }
+      it { expect(config.ignored_events).to eq([{[:foo] => /bar/}]) }
+    end
+  end
 end
