@@ -10,7 +10,7 @@ module Honeybadger
           "sql.active_record" => {
             message: lambda do |data|
               # Disregard empty string names
-              name = data[:name] if data[:name] && !data[:name].strip.empty?
+              name = data[:name] if data[:name] && !data[:name].to_s.strip.empty?
 
               ["Active Record", name].compact.join(" - ")
             end,
