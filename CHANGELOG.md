@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.27.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.1...v5.27.2) (2025-04-24)
+
+
+### Bug Fixes
+
+* ensure value is a string before trying to strip it ([#683](https://github.com/honeybadger-io/honeybadger-ruby/issues/683)) ([4834cf9](https://github.com/honeybadger-io/honeybadger-ruby/commit/4834cf957be8b9afc3ef6fcb6cc0e02fef3c7ce3)), closes [#682](https://github.com/honeybadger-io/honeybadger-ruby/issues/682)
+
 ## [5.27.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.0...v5.27.1) (2025-03-21)
 
 
