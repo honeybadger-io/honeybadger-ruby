@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.27.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.2...v5.27.3) (2025-04-30)
+
+
+### Documentation Updates
+
+* update RubyGems copy ([5e7609a](https://github.com/honeybadger-io/honeybadger-ruby/commit/5e7609aa74f021ac748154c57b2f8fe530762484))
+
 ## [5.27.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.1...v5.27.2) (2025-04-24)
 
 
