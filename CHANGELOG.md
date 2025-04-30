@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.27.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.2...v5.27.3) (2025-04-30)
+
+
+### Miscellaneous Chores
+
+* release 5.27.3 ([1051186](https://github.com/honeybadger-io/honeybadger-ruby/commit/105118639be3de0c7558406d9f75661efaf8b340))
+
 ## [5.27.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.1...v5.27.2) (2025-04-24)
 
 
