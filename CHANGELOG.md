@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.27.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.3...v5.27.4) (2025-04-30)
+
+
+### Documentation Updates
+
+* shorten the gem summary ([3caacd1](https://github.com/honeybadger-io/honeybadger-ruby/commit/3caacd10fd4b605ce357a0c7eff0be37e64fcc64))
+
 ## [5.27.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.2...v5.27.3) (2025-04-30)
 
 
