@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.name        = 'honeybadger'
   s.version     = Honeybadger::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.summary     = 'Error reports you can be happy about.'
-  s.description = 'Make managing application errors a more pleasant experience.'
+  s.summary     = 'The official honeybadger.io gem for full-stack error tracking, performance and uptime monitoring, and logging.'
+  s.description = 'Honeybadger.io unifies error tracking, performance and uptime monitoring, and logging in one powerfully simple platform. Detect, diagnose, and resolve production issues faster—so you can focus on building, not debugging.'
   s.authors     = ['Honeybadger Industries LLC']
   s.email       = ['support@honeybadger.io']
   s.homepage    = 'https://www.honeybadger.io/for/ruby/'
