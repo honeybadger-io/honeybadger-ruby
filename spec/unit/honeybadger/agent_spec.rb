@@ -131,7 +131,7 @@ describe Honeybadger::Agent do
       opts = {error_message: 'test'}
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
       instance = described_class.new(config)
-     
+
       expect(instance.worker).to receive(:push) do |notice|
         expect(notice.error_message).to match('test')
       end
@@ -142,7 +142,7 @@ describe Honeybadger::Agent do
       opts = {tags: 'testing, kwargs'}
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
       instance = described_class.new(config)
-      
+
       expect(instance.worker).to receive(:push) do |notice|
         expect(notice.error_message).to match('test')
         expect(notice.tags).to eq(['testing', 'kwargs'])
@@ -154,7 +154,7 @@ describe Honeybadger::Agent do
       opts = {tags: 'testing, hash'}
       config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
       instance = described_class.new(config)
-      
+
       expect(instance.worker).to receive(:push) do |notice|
         expect(notice.error_message).to match('test')
         expect(notice.tags).to eq(['testing', 'hash'])
@@ -345,6 +345,98 @@ describe Honeybadger::Agent do
 
       it "does not push an event" do
         expect(events_worker).not_to receive(:push)
+      end
+    end
+
+    describe "sampling events using insights.sample_rate config" do
+      let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'insights.sample_rate' => sample_rate) }
+      let(:payload) { { some_data: "is here" } }
+      let(:event_type) { "test_event" }
+
+      context "when sample rate is 100" do
+        let(:sample_rate) { 100 }
+
+        it "pushes all events" do
+          expect(events_worker).to receive(:push) do |msg|
+            expect(msg[:event_type]).to eq("test_event")
+            expect(msg[:some_data]).to eq("is here")
+          end
+          subject.event(payload.merge(event_type: event_type))
+        end
+      end
+
+      context "when sample rate is 0" do
+        let(:sample_rate) { 0 }
+
+        it "does not push any events" do
+          expect(events_worker).not_to receive(:push)
+          subject.event(payload.merge(event_type: event_type))
+        end
+      end
+
+      context "with request_id in payload" do
+        let(:sample_rate) { 50 }
+        let(:payload) { { some_data: "is here", request_id: "test-request-id" } }
+
+        it "uses consistent sampling based on request_id" do
+          expect(Zlib).to receive(:crc32).with("test-request-id").and_return(49) # 49 % 100 < 50, so it should be included
+          expect(events_worker).to receive(:push)
+          subject.event(payload.merge(event_type: event_type))
+        end
+
+        it "consistently samples events with the same request_id" do
+          expect(Zlib).to receive(:crc32).with("test-request-id").and_return(75) # 75 % 100 > 50, so it should be excluded
+          expect(events_worker).not_to receive(:push)
+          subject.event(payload.merge(event_type: event_type))
+        end
+      end
+
+      context "without request_id in payload" do
+        let(:sample_rate) { 50 }
+
+        it "uses random sampling" do
+          # Mock rand to return a value that would include the event
+          expect(subject).to receive(:rand).with(100).and_return(25) # 25 < 50, so it should be included
+          expect(events_worker).to receive(:push)
+          subject.event(payload.merge(event_type: event_type))
+        end
+
+        it "randomly excludes events based on sample rate" do
+          # Mock rand to return a value that would exclude the event
+          expect(subject).to receive(:rand).with(100).and_return(75) # 75 > 50, so it should be excluded
+          expect(events_worker).not_to receive(:push)
+          subject.event(payload.merge(event_type: event_type))
+        end
+      end
+
+      context "with sample rate override in event metadata" do
+        let(:sample_rate) { 0 } # Global sample rate is 0 (no events)
+        let(:payload) { { some_data: "is here", _hb: { sample_rate: 100 } } } # But this event has override to 100%
+
+        it "uses the override sample rate from event metadata" do
+          expect(events_worker).to receive(:push) do |msg|
+            # Verify that _hb metadata is removed
+            expect(msg).not_to have_key(:_hb)
+            expect(msg[:event_type]).to eq("test_event")
+            expect(msg[:some_data]).to eq("is here")
+          end
+          subject.event(payload.merge(event_type: event_type))
+        end
+      end
+
+      context "with invalid sample rate override in event metadata" do
+        let(:sample_rate) { 100 } # Global sample rate is 100% (all events)
+        let(:payload) { { some_data: "is here", _hb: { sample_rate: "invalid" } } } # Invalid override
+
+        it "falls back to global sample rate" do
+          expect(events_worker).to receive(:push) do |msg|
+            # Verify that _hb metadata is removed
+            expect(msg).not_to have_key(:_hb)
+            expect(msg[:event_type]).to eq("test_event")
+            expect(msg[:some_data]).to eq("is here")
+          end
+          subject.event(payload.merge(event_type: event_type))
+        end
       end
     end
 
