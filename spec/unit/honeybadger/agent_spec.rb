@@ -438,6 +438,21 @@ describe Honeybadger::Agent do
           subject.event(payload.merge(event_type: event_type))
         end
       end
+
+      context "with metric events" do
+        let(:sample_rate) { 0 } # Global sample rate is 0 (no events)
+        let(:event_type) { "metric.hb" }
+        let(:payload) { { metric_name: "test.metric", value: 42 } }
+
+        it "always sends metric events regardless of sample rate" do
+          expect(events_worker).to receive(:push) do |msg|
+            expect(msg[:event_type]).to eq("metric.hb")
+            expect(msg[:metric_name]).to eq("test.metric")
+            expect(msg[:value]).to eq(42)
+          end
+          subject.event(payload.merge(event_type: event_type))
+        end
+      end
     end
 
     describe "ignoring events using events.ignore config" do
