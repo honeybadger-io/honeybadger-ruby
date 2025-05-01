@@ -18,9 +18,6 @@ gem 'mutex_m'
 gem 'capistrano'
 gem 'rake'
 
-# mathn has moved to a rubygem in Ruby 2.5.0: https://github.com/ruby/mathn
-gem "mathn"
-
 # rdoc has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/rdoc
 gem "rdoc"
 
