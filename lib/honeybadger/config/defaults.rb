@@ -129,6 +129,11 @@ module Honeybadger
         default: nil,
         type: Array
       },
+      :'events.sample_rate' => {
+        description: 'Percentage of events to send to the API (0-100). A value of 0 means no events are sent, 100 means all events are sent.',
+        default: 100,
+        type: Integer
+      },
       plugins: {
         description: 'An optional list of plugins to load. Default is to load all plugins.',
         default: nil,
@@ -481,11 +486,6 @@ module Honeybadger
         description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
         default: false,
         type: Boolean
-      },
-      :'insights.sample_rate' => {
-        description: 'Percentage of events to send to the API (0-100). A value of 0 means no events are sent, 100 means all events are sent.',
-        default: 100,
-        type: Integer
       },
       :'insights.console.enabled' => {
         description: "Enable/Disable Honeybadger Insights built-in instrumentation in a Rails console.",

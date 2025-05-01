@@ -582,8 +582,8 @@ module Honeybadger
     def sample_event?(event)
       # Always send metrics events
       return true if event[:event_type] == "metric.hb"
-      
-      sample_rate = config[:'insights.sample_rate']
+
+      sample_rate = config[:'events.sample_rate']
       sample_rate = event.dig(:_hb, :sample_rate) if event.dig(:_hb, :sample_rate).is_a?(Numeric)
 
       return true if sample_rate >= 100
