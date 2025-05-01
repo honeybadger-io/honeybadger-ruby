@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'zlib'
 
 require 'honeybadger/version'
 require 'honeybadger/config'
@@ -434,6 +435,10 @@ module Honeybadger
 
       return if event.halted?
 
+      return unless sample_event?(event)
+
+      strip_metadata(event)
+
       events_worker.push(event.as_json)
     end
 
@@ -569,6 +574,26 @@ module Honeybadger
     end
 
     private
+
+    def strip_metadata(event)
+      event.delete(:_hb)
+    end
+
+    def sample_event?(event)
+      # Always send metrics events
+      return true if event[:event_type] == "metric.hb"
+      
+      sample_rate = config[:'insights.sample_rate']
+      sample_rate = event.dig(:_hb, :sample_rate) if event.dig(:_hb, :sample_rate).is_a?(Numeric)
+
+      return true if sample_rate >= 100
+
+      if event[:request_id] # Send all events for a given request
+        Zlib.crc32(event[:request_id].to_s) % 100 < sample_rate
+      else # Otherwise just take a random sample
+        rand(100) < sample_rate
+      end
+    end
 
     def validate_notify_opts!(opts)
       return if opts.has_key?(:exception)
