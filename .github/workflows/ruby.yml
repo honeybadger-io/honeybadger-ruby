@@ -83,7 +83,7 @@ jobs:
           - rails.gemfile
         exclude:
           - ruby: 'jruby-9.4.12.0'
-            gemfile: rails8.gemfile
+            gemfile: rails.gemfile
           - ruby: 'jruby-10.0.0.0'
             gemfile: rails6.1.gemfile
 
