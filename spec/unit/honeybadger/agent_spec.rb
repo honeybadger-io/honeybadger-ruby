@@ -348,8 +348,8 @@ describe Honeybadger::Agent do
       end
     end
 
-    describe "sampling events using insights.sample_rate config" do
-      let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'insights.sample_rate' => sample_rate) }
+    describe "sampling events using events.sample_rate config" do
+      let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER, backend: :debug, :'events.sample_rate' => sample_rate) }
       let(:payload) { { some_data: "is here" } }
       let(:event_type) { "test_event" }
 
