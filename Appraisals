@@ -40,6 +40,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -51,6 +52,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -61,6 +63,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.2" }
     gem "sqlite3", "~> 1.4", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -71,6 +74,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.3" }
     gem "sqlite3", "~> 2", platforms: :mri
     gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"

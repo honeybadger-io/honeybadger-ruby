@@ -25,6 +25,7 @@ gem "railties", "< 7.1"
 gem "actionpack", "< 7.1"
 gem "sqlite3", "~> 1.4", platforms: :mri
 gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+gem "psych", "< 5.2.4", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"
