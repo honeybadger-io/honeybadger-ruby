@@ -26,6 +26,7 @@ gem "actionpack", github: "rails"
 gem "rack", github: "rack/rack", branch: "2-2-stable"
 gem "arel", github: "rails/arel"
 gem "sqlite3", "~> 2", platforms: :mri
+gem "psych", "< 5.2.4", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rspec-rails"
 gem "listen"
