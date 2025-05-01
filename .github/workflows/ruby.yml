@@ -79,7 +79,13 @@ jobs:
           - 'jruby-9.4.12.0'
           - 'jruby-10.0.0.0'
         gemfile:
+          - rails6.1.gemfile
           - rails.gemfile
+        exclude:
+          - ruby: 'jruby-9.4.12.0'
+            gemfile: rails8.gemfile
+          - ruby: 'jruby-10.0.0.0'
+            gemfile: rails6.1.gemfile
 
     # Has to be top level to cache properly
     env:
