@@ -39,7 +39,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails6.1" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 61", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", "~> 71", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -50,7 +50,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails7.0" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", "~> 71", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -60,7 +60,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails7.1" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.2" }
     gem "sqlite3", "~> 1.4", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", "~> 71", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -70,7 +70,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails7.2" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.3" }
     gem "sqlite3", "~> 2", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", "~> 71", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -80,7 +80,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails8" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 8.0.0.rc1" }
     gem "sqlite3", "~> 2", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", "~> 71", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
