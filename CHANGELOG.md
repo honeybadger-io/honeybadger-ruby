@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [5.28.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.4...v5.28.0) (2025-05-02)
+
+
+### Features
+
+* add sampling ([#689](https://github.com/honeybadger-io/honeybadger-ruby/issues/689)) ([0692ab0](https://github.com/honeybadger-io/honeybadger-ruby/commit/0692ab07d33843dc2612c36713b0f126ecba6b35))
+
+
 ## [5.27.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.3...v5.27.4) (2025-04-30)
 
 
