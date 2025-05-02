@@ -15,7 +15,6 @@ gem "base64"
 gem "mutex_m"
 gem "capistrano"
 gem "rake"
-gem "mathn"
 gem "rdoc"
 gem "bump", "~> 0.10.0"
 gem "activesupport", "< 7.2"
@@ -25,7 +24,8 @@ gem "activejob", "< 7.2"
 gem "railties", "< 7.2"
 gem "actionpack", "< 7.2"
 gem "sqlite3", "~> 1.4", platforms: :mri
-gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+gem "psych", "< 5.2.4", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rack-mini-profiler", require: false
 gem "rspec-rails"

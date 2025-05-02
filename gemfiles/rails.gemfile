@@ -15,7 +15,6 @@ gem "base64"
 gem "mutex_m"
 gem "capistrano", "~> 3.0"
 gem "rake"
-gem "mathn"
 gem "rdoc"
 gem "bump", "~> 0.10.0"
 gem "activesupport", github: "rails"
@@ -27,6 +26,7 @@ gem "actionpack", github: "rails"
 gem "rack", github: "rack/rack", branch: "2-2-stable"
 gem "arel", github: "rails/arel"
 gem "sqlite3", "~> 2", platforms: :mri
+gem "psych", "< 5.2.4", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rspec-rails"
 gem "listen"

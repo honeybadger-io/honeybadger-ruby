@@ -39,7 +39,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails6.1" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 6.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 61", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -50,7 +51,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails7.0" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.1" }
     gem "sqlite3", "~> 1.4", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -60,7 +62,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails7.1" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.2" }
     gem "sqlite3", "~> 1.4", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 60", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -70,7 +73,8 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   appraise "rails7.2" do
     RAILS_GEMS.each { |rails_gem| gem rails_gem, "< 7.3" }
     gem "sqlite3", "~> 2", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -78,9 +82,10 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
   end
 
   appraise "rails8" do
-    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 8.0.0.rc1" }
+    RAILS_GEMS.each { |rails_gem| gem rails_gem, "~> 8.0.2" }
     gem "sqlite3", "~> 2", platforms: :mri
-    gem "activerecord-jdbcsqlite3-adapter", "~> 70", platforms: :jruby
+    gem "activerecord-jdbcsqlite3-adapter", platforms: :jruby
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "better_errors", require: false, platforms: :mri
     gem "rack-mini-profiler", require: false
     gem "rspec-rails"
@@ -93,6 +98,7 @@ if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5.0")
     gem "rack", github: "rack/rack", branch: "2-2-stable" # Rack"s main branch is Rack 3, but ActionPack currently requires Rack 2
     gem "arel", github: "rails/arel"
     gem "sqlite3", "~> 2", platforms: :mri
+    gem "psych", "< 5.2.4", platforms: :jruby
     gem "capistrano", "~> 3.0"
     gem "better_errors", require: false, platforms: :mri
     gem "rspec-rails"
