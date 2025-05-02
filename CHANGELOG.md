@@ -9,10 +9,6 @@
 * add sampling ([#689](https://github.com/honeybadger-io/honeybadger-ruby/issues/689)) ([0692ab0](https://github.com/honeybadger-io/honeybadger-ruby/commit/0692ab07d33843dc2612c36713b0f126ecba6b35))
 
 
-### Bug Fixes
-
-* rename sample rate config option ([#690](https://github.com/honeybadger-io/honeybadger-ruby/issues/690)) ([34ad3c9](https://github.com/honeybadger-io/honeybadger-ruby/commit/34ad3c91517aeb5f8814808041fa8ba931982d53))
-
 ## [5.27.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.3...v5.27.4) (2025-04-30)
 
 
