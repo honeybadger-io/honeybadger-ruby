@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
     "source_code_uri" => "https://github.com/honeybadger-io/honeybadger-ruby"
   }
 
-  s.required_ruby_version = ">= 2.3.0"
+  s.required_ruby_version = ">= 3.0.0"
 
   s.rdoc_options << "--markup=tomdoc"
   s.rdoc_options << "--main=README.md"
