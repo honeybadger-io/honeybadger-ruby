@@ -1,4 +1,4 @@
-require 'honeybadger/util/sql'
+require "honeybadger/util/sql"
 
 module Honeybadger
   module Breadcrumbs
@@ -49,7 +49,7 @@ module Honeybadger
           "perform_start.active_job" => {
             message: "Active Job Perform Start",
             select_keys: [],
-            category: "job",
+            category: "job"
           },
 
           # ActiveSupport Actions
@@ -67,32 +67,32 @@ module Honeybadger
           #
           "halted_callback.action_controller" => {
             message: "Action Controller Callback Halted",
-            category: "request",
+            category: "request"
           },
           "process_action.action_controller" => {
             message: "Action Controller Action Process",
             select_keys: [:controller, :action, :format, :method, :path, :status, :view_runtime, :db_runtime],
-            category: "request",
+            category: "request"
           },
           "start_processing.action_controller" => {
             message: "Action Controller Start Process",
             select_keys: [:controller, :action, :format, :method, :path],
-            category: "request",
+            category: "request"
           },
           "redirect_to.action_controller" => {
             message: "Action Controller Redirect",
-            category: "request",
+            category: "request"
           },
 
           # View Actions
           #
           "render_template.action_view" => {
             message: "Action View Template Render",
-            category: "render",
+            category: "render"
           },
           "render_partial.action_view" => {
             message: "Action View Partial Render",
-            category: "render",
+            category: "render"
           },
 
           # Mailer actions

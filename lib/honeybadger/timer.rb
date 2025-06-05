@@ -1,4 +1,4 @@
-require 'honeybadger/gauge'
+require "honeybadger/gauge"
 
 module Honeybadger
   class Timer < Gauge

@@ -1,16 +1,16 @@
 begin
-  require 'resque'
-  require 'mock_redis'
+  require "resque"
+  require "mock_redis"
   RESQUE_PRESENT = true
 rescue LoadError
   RESQUE_PRESENT = false
-  puts 'Skipping Resque integration specs.'
+  puts "Skipping Resque integration specs."
 end
 
 if RESQUE_PRESENT
-  require 'honeybadger'
+  require "honeybadger"
 
-  ERROR = StandardError.new('This is a failure inside Honeybadger integration test suite')
+  ERROR = StandardError.new("This is a failure inside Honeybadger integration test suite")
 
   class TestWorker
     @queue = :test
@@ -28,7 +28,7 @@ if RESQUE_PRESENT
     end
   end
 
-  describe 'Resque integration' do
+  describe "Resque integration" do
     let(:worker) { Resque::Worker.new(:test) }
 
     before(:all) do
@@ -36,7 +36,7 @@ if RESQUE_PRESENT
     end
 
     it "reports failed jobs to Honeybadger" do
-      job = Resque::Job.new(:jobs, {'class' => 'TestWorker', 'args' => nil})
+      job = Resque::Job.new(:jobs, {"class" => "TestWorker", "args" => nil})
 
       expect(Honeybadger).to receive(:notify).once.with(ERROR, anything)
 
@@ -44,7 +44,7 @@ if RESQUE_PRESENT
     end
 
     it "reports DirtyExit to Honeybadger" do
-      job = Resque::Job.new(:jobs, {'class' => 'TestWorker', 'args' => nil})
+      job = Resque::Job.new(:jobs, {"class" => "TestWorker", "args" => nil})
 
       expect(Honeybadger).to receive(:notify).once.with(kind_of(Resque::DirtyExit), anything)
 

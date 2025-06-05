@@ -1,4 +1,4 @@
-require 'honeybadger/logging'
+require "honeybadger/logging"
 
 module Honeybadger
   # A concurrent queue to execute plugin collect blocks and registry.
@@ -40,7 +40,7 @@ module Honeybadger
     end
 
     def shutdown(force = false)
-      d { 'shutting down worker' }
+      d { "shutting down worker" }
 
       mutex.synchronize do
         @shutdown = true
@@ -101,7 +101,7 @@ module Honeybadger
     end
 
     def kill!
-      d { 'killing worker thread' }
+      d { "killing worker thread" }
 
       if thread
         Thread.kill(thread)
@@ -123,7 +123,7 @@ module Honeybadger
 
     def run
       begin
-        d { 'worker started' }
+        d { "worker started" }
         loop do
           case msg = queue.pop
           when SHUTDOWN then break
@@ -132,7 +132,7 @@ module Honeybadger
           end
         end
       ensure
-        d { 'stopping worker' }
+        d { "stopping worker" }
       end
     rescue Exception => e
       error {
@@ -148,9 +148,9 @@ module Honeybadger
 
       if shutdown?
         kill!
-        return
+        nil
       end
-    rescue StandardError => e
+    rescue => e
       error {
         err = "Error in worker thread class=%s message=%s\n\t%s"
         sprintf(err, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))

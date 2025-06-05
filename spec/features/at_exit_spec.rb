@@ -1,18 +1,18 @@
 feature "Rescuing exceptions at exit" do
-  let(:crash_cmd) { "ruby #{ FIXTURES_PATH.join('ruby_crash.rb') }" }
+  let(:crash_cmd) { "ruby #{FIXTURES_PATH.join("ruby_crash.rb")}" }
 
   def custom_crash_cmd(crash_type)
-    "ruby #{ FIXTURES_PATH.join('ruby_custom_crash.rb') } #{ crash_type }"
+    "ruby #{FIXTURES_PATH.join("ruby_custom_crash.rb")} #{crash_type}"
   end
 
   before do
-    set_environment_variable('HONEYBADGER_API_KEY', 'asdf')
-    set_environment_variable('HONEYBADGER_LOGGING_LEVEL', 'DEBUG')
+    set_environment_variable("HONEYBADGER_API_KEY", "asdf")
+    set_environment_variable("HONEYBADGER_LOGGING_LEVEL", "DEBUG")
   end
 
   it "reports the exception to Honeybadger" do
     expect(run_command(crash_cmd)).not_to be_successfully_executed
-    assert_notification('error' => {'class' => 'RuntimeError', 'message' => 'RuntimeError: badgers!'})
+    assert_notification("error" => {"class" => "RuntimeError", "message" => "RuntimeError: badgers!"})
   end
 
   it "ignores SystemExit" do
@@ -27,12 +27,12 @@ feature "Rescuing exceptions at exit" do
 
   it "reports SignalException of type other than SIGTERM" do
     expect(run_command(custom_crash_cmd("hup"))).not_to be_successfully_executed
-    assert_notification('error' => {'class' => 'SignalException', 'message' => 'SignalException: SIGHUP'})
+    assert_notification("error" => {"class" => "SignalException", "message" => "SignalException: SIGHUP"})
   end
 
   context "at_exit is disabled" do
     before do
-      set_environment_variable('HONEYBADGER_EXCEPTIONS_NOTIFY_AT_EXIT', 'false')
+      set_environment_variable("HONEYBADGER_EXCEPTIONS_NOTIFY_AT_EXIT", "false")
     end
 
     it "doesn't report the exception to Honeybadger" do

@@ -1,7 +1,7 @@
-require 'ruby-prof'
-require 'honeybadger'
+require "ruby-prof"
+require "honeybadger"
 
-if Honeybadger.start({:api_key => 'badgers', :debug => true, :backend => 'null'})
+if Honeybadger.start({api_key: "badgers", debug: true, backend: "null"})
   RubyProf.start and Honeybadger::Agent.at_exit do
     result = RubyProf.stop
     printer = RubyProf::FlatPrinter.new(result)
@@ -9,6 +9,6 @@ if Honeybadger.start({:api_key => 'badgers', :debug => true, :backend => 'null'}
   end
 
   1000.times do
-    Honeybadger.notify(error_class: 'RubyProf', error_message: 'Profiling Honeybadger -- this should never actually be reported.')
+    Honeybadger.notify(error_class: "RubyProf", error_message: "Profiling Honeybadger -- this should never actually be reported.")
   end
 end

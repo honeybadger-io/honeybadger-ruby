@@ -12,7 +12,7 @@ module Honeybadger
       def to_hash
         hash.to_hash
       end
-      alias to_h to_hash
+      alias_method :to_h, :to_hash
 
       private
 
@@ -41,25 +41,25 @@ module Honeybadger
       end
 
       def mash?(method)
-        key = [prefix, method.to_s + '.'].compact.join('.')
-        KEYS.any? {|k| k.start_with?(key) }
+        key = [prefix, method.to_s + "."].compact.join(".")
+        KEYS.any? { |k| k.start_with?(key) }
       end
 
       def setter?(method_name)
-        return false unless method_name.to_s =~ /=\z/
+        return false unless /=\z/.match?(method_name.to_s)
         key = key(method_name)
-        KEYS.any? {|k| k == key }
+        KEYS.any? { |k| k == key }
       end
 
       def getter?(method_name)
         key = key(method_name)
-        KEYS.any? {|k| k == key }
+        KEYS.any? { |k| k == key }
       end
 
       def key(method_name)
-        parts = [prefix, method_name.to_s.chomp('=')]
+        parts = [prefix, method_name.to_s.chomp("=")]
         parts.compact!
-        parts.join('.')
+        parts.join(".")
       end
 
       def get(key)
@@ -89,9 +89,9 @@ module Honeybadger
       def before_notify(action = nil, &block)
         hooks = Array(get(:before_notify)).dup
 
-        if action && validate_before_action(action, 'notify')
+        if action && validate_before_action(action, "notify")
           hooks << action
-        elsif block_given? && validate_before_action(block, 'notify')
+        elsif block_given? && validate_before_action(block, "notify")
           hooks << block
         end
 
@@ -101,9 +101,9 @@ module Honeybadger
       def before_event(action = nil, &block)
         hooks = Array(get(:before_event)).dup
 
-        if action && validate_before_action(action, 'event')
+        if action && validate_before_action(action, "event")
           hooks << action
-        elsif block_given? && validate_before_action(block, 'event')
+        elsif block_given? && validate_before_action(block, "event")
           hooks << block
         end
 
@@ -112,7 +112,7 @@ module Honeybadger
 
       def backtrace_filter(&block)
         if block_given?
-          logger.warn('DEPRECATED: backtrace_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#backtrace_filter')
+          logger.warn("DEPRECATED: backtrace_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#backtrace_filter")
           hash[:backtrace_filter] = block if block_given?
         end
 
@@ -121,7 +121,7 @@ module Honeybadger
 
       def exception_filter(&block)
         if block_given?
-          logger.warn('DEPRECATED: exception_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_filter')
+          logger.warn("DEPRECATED: exception_filter is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_filter")
           hash[:exception_filter] = block
         end
 
@@ -130,7 +130,7 @@ module Honeybadger
 
       def exception_fingerprint(&block)
         if block_given?
-          logger.warn('DEPRECATED: exception_fingerprint is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_fingerprint')
+          logger.warn("DEPRECATED: exception_fingerprint is deprecated. Please use before_notify instead. See https://docs.honeybadger.io/ruby/support/v4-upgrade#exception_fingerprint")
           hash[:exception_fingerprint] = block
         end
 
@@ -143,15 +143,15 @@ module Honeybadger
         if !action.respond_to?(:call)
           logger.warn(
             "You attempted to add a before #{type} hook that does not respond " \
-            'to #call. We are discarding this hook so your intended behavior ' \
-            'will not occur.'
+            "to #call. We are discarding this hook so your intended behavior " \
+            "will not occur."
           )
           false
         elsif action.arity != 1
           logger.warn(
             "You attempted to add a before #{type} hook that has an arity " \
-            'other than one. We are discarding this hook so your intended ' \
-            'behavior will not occur.'
+            "other than one. We are discarding this hook so your intended " \
+            "behavior will not occur."
           )
           false
         else

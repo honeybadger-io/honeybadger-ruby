@@ -8,7 +8,7 @@ module HanamiApp
 
   class Routes < Hanami::Routes
     get "/runtime_error" do
-      raise 'exception raised from test Hanami app in honeybadger gem test suite'
+      raise "exception raised from test Hanami app in honeybadger gem test suite"
     end
   end
 end

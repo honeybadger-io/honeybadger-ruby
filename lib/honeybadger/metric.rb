@@ -3,11 +3,11 @@ module Honeybadger
     attr_reader :name, :attributes, :samples
 
     def self.metric_type
-      name.split('::').last.downcase
+      name.split("::").last.downcase
     end
 
     def self.signature(metric_type, name, attributes)
-      Digest::SHA1.hexdigest("#{metric_type}-#{name}-#{attributes.keys.join('-')}-#{attributes.values.join('-')}").to_sym
+      Digest::SHA1.hexdigest("#{metric_type}-#{name}-#{attributes.keys.join("-")}-#{attributes.values.join("-")}").to_sym
     end
 
     def self.register(registry, metric_name, attributes)
