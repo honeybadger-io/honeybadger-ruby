@@ -289,7 +289,14 @@ module Honeybadger
     end
 
     def insights_enabled?
-      public? && !!self[:'insights.enabled']
+      return false unless public?
+      return false if insights_exclude_for_rake_tasks?
+      !!self[:'insights.enabled']
+    end
+
+    def insights_exclude_for_rake_tasks?
+      return unless defined?(Rake)
+      (Rake.application.top_level_tasks & self[:'insights.exclude_rake_tasks']).any?
     end
 
     def cluster_collection?(name)
