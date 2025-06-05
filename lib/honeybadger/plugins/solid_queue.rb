@@ -3,6 +3,8 @@ module Honeybadger
     module SolidQueue
       Plugin.register :solid_queue do
         requirement { config.load_plugin_insights?(:solid_queue) && defined?(::SolidQueue) }
+        requirement { !defined?(Rake) || !Rake.application.top_level_tasks.include?('assets:precompile') }
+        requirement { defined?(ActiveRecord::Base) && ActiveRecord::Base.connected? }
 
         collect_solid_queue_stats = -> do
           data = {}
