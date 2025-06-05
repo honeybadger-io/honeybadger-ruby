@@ -149,7 +149,7 @@ module Honeybadger
       begin
         d { "worker started" }
         loop do
-          case (msg = queue.pop)
+          case msg = queue.pop
           when SHUTDOWN then break
           when ConditionVariable then signal_marker(msg)
           else work(msg)
@@ -158,7 +158,7 @@ module Honeybadger
       ensure
         d { "stopping worker" }
       end
-    rescue => e
+    rescue Exception => e
       error {
         msg = "Error in worker thread (shutting down) class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))

@@ -8,7 +8,7 @@ module Honeybadger
     class Line
       # Backtrace line regexp (optionally allowing leading X: for windows support).
       # Capture quoted strings either with leading backtick (pre Ruby 3.4) or single quote.
-      INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in (?:`|')([^']+)')?$}
+      INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in (?:`|')([^']+)')?$}.freeze
 
       # The file portion of the line (such as app/models/user.rb).
       attr_reader :file
@@ -168,16 +168,16 @@ module Honeybadger
       end
     end
 
-    private_class_method def self.split_multiline_backtrace(backtrace)
+    private
+
+    attr_writer :lines, :application_lines
+
+    def self.split_multiline_backtrace(backtrace)
       if backtrace.size == 1
         backtrace.first.to_s.split(/\n\s*/)
       else
         backtrace
       end
     end
-
-    private
-
-    attr_writer :lines, :application_lines
   end
 end

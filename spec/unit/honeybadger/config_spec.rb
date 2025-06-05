@@ -2,9 +2,6 @@ require "honeybadger/config"
 require "honeybadger/backend/base"
 require "net/http"
 
-INIT_LOGGER = Logger.new(File::NULL)
-CONFIGURE_LOGGER = Logger.new(File::NULL)
-
 describe Honeybadger::Config do
   specify { expect(subject[:env]).to eq nil }
   specify { expect(subject[:"delayed_job.attempt_threshold"]).to eq 0 }
@@ -260,6 +257,9 @@ describe Honeybadger::Config do
   describe "#configure" do
     context "when the app has already been initialized" do
       it "overrides the logger with the configured logger" do
+        INIT_LOGGER = Logger.new(File::NULL)
+        CONFIGURE_LOGGER = Logger.new(File::NULL)
+
         honeybadger = Honeybadger::Config.new.init!(logger: INIT_LOGGER)
 
         honeybadger.configure do |config|

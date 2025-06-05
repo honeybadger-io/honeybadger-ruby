@@ -33,7 +33,7 @@ module Honeybadger
 
   # @api private
   # A Regexp which matches non-blank characters.
-  NOT_BLANK = /\S/
+  NOT_BLANK = /\S/.freeze
 
   # @api private
   # Matches lines beginning with ./
@@ -53,11 +53,11 @@ module Honeybadger
 
     # @api private
     # The String character used to split tag strings.
-    TAG_SEPERATOR = /,|\s/
+    TAG_SEPERATOR = /,|\s/.freeze
 
     # @api private
     # The Regexp used to strip invalid characters from individual tags.
-    TAG_SANITIZER = /\s/
+    TAG_SANITIZER = /\s/.freeze
 
     # @api private
     class Cause

@@ -33,7 +33,7 @@ module Honeybadger
           begin
             duration = Honeybadger.instrumentation.monotonic_timer { block.call }[0]
             status = "success"
-          rescue
+          rescue Exception
             status = "failure"
             raise
           ensure

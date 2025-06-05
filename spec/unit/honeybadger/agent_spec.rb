@@ -2,9 +2,9 @@ require "honeybadger/agent"
 require "honeybadger/events_worker"
 require "timecop"
 
-NULL_BLOCK = proc {}.freeze
-
 describe Honeybadger::Agent do
+  NULL_BLOCK = proc {}.freeze
+
   describe "class methods" do
     subject { described_class }
 

@@ -137,10 +137,7 @@ module Honeybadger
           return false
         end
 
-        # rubocop:disable Security/Eval
-        # The following eval is used to dynamically define a controller for test purposes only.
-        # It is safe in this context because it is only used in a CLI test command, not in production code.
-        eval(<<-CONTROLLER, binding, __FILE__, __LINE__ + 1)
+        eval(<<-CONTROLLER)
         class Honeybadger::TestController < ApplicationController
           # This is to bypass any filters that may prevent access to the action.
           if respond_to?(:prepend_before_action)
@@ -156,7 +153,6 @@ module Honeybadger
           def verify; end
         end
         CONTROLLER
-        # rubocop:enable Security/Eval
 
         ::Rails.application.try(:reload_routes_unless_loaded)
         ::Rails.application.routes.tap do |r|

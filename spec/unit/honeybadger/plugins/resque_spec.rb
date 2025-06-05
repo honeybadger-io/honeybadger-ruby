@@ -4,8 +4,6 @@ require "honeybadger/agent"
 
 class TestWorker
   extend Honeybadger::Plugins::Resque::Extension
-  def self.retry_criteria_valid?(e)
-  end
 end
 
 describe TestWorker do
@@ -55,6 +53,10 @@ describe TestWorker do
       let(:retry_criteria_valid) { false }
 
       before do
+        class TestWorker
+          def self.retry_criteria_valid?(e)
+          end
+        end
         allow(described_class).to receive(:retry_criteria_valid?)
           .and_return(retry_criteria_valid)
       end

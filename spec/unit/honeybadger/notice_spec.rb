@@ -3,25 +3,6 @@ require "honeybadger/config"
 require "honeybadger/plugins/local_variables"
 require "timecop"
 
-class FooError < ArgumentError; end
-
-class TheCause < RuntimeError; end
-
-class CauseError < StandardError; end
-
-class OriginalExceptionError < StandardError; end
-
-class ContinuedExceptionError < StandardError; end
-
-IGNORED_ERROR_CLASSES = %w[
-  ActiveRecord::RecordNotFound
-  AbstractController::ActionNotFound
-  ActionController::RoutingError
-  ActionController::InvalidAuthenticityToken
-  CGI::Session::CookieStore::TamperedWithCookie
-  ActionController::UnknownAction
-].freeze
-
 describe Honeybadger::Notice do
   let(:config) { build_config }
 
@@ -136,7 +117,7 @@ describe Honeybadger::Notice do
     def exception.detailed_message(**kwargs)
       <<~MSG
         test.rb:1:in `<main>': undefined method `time' for 1:Integer (#{self.class.name})
-
+        
         1.time {}
          ^^^^^
         Did you mean?  times
@@ -146,7 +127,7 @@ describe Honeybadger::Notice do
     notice_from_exception = build_notice({exception: exception})
     expect(notice_from_exception.send(:error_message)).to eq <<~EXPECTED
       NoMethodError: test.rb:1:in `<main>': undefined method `time' for 1:Integer
-
+      
       1.time {}
        ^^^^^
       Did you mean?  times
@@ -285,6 +266,7 @@ describe Honeybadger::Notice do
     end
 
     it "ignores an exception that inherits from ignored error class" do
+      class ::FooError < ArgumentError; end
       notice = build_notice(exception: FooError.new("Oh noes!"),
         config: build_config("exceptions.ignore": [ArgumentError]))
       expect(notice.ignore?).to eq true # Expected ArgumentError to ignore FooError
@@ -309,7 +291,16 @@ describe Honeybadger::Notice do
       expect { notice.ignore? }.not_to raise_error
     end
 
-    IGNORED_ERROR_CLASSES.each do |ignored_error_class|
+    ignored_error_classes = %w[
+      ActiveRecord::RecordNotFound
+      AbstractController::ActionNotFound
+      ActionController::RoutingError
+      ActionController::InvalidAuthenticityToken
+      CGI::Session::CookieStore::TamperedWithCookie
+      ActionController::UnknownAction
+    ]
+
+    ignored_error_classes.each do |ignored_error_class|
       it "ignores #{ignored_error_class} error by default" do
         notice = build_notice(error_class: ignored_error_class)
         expect(notice.ignore?).to eq true
@@ -542,6 +533,8 @@ describe Honeybadger::Notice do
   end
 
   describe "config[:'exceptions.unwrap']" do
+    class TheCause < RuntimeError; end
+
     let(:notice) { build_notice(exception: exception, config: config) }
     let(:exception) { RuntimeError.new("foo") }
 
@@ -965,6 +958,25 @@ describe Honeybadger::Notice do
   end
 
   context "exception cause" do
+    class CauseError < StandardError
+      attr_reader :cause
+      attr_writer :cause
+    end
+
+    class OriginalExceptionError < StandardError
+      attr_reader :original_exception
+      def cause=(e)
+        @original_exception = e
+      end
+    end
+
+    class ContinuedExceptionError < StandardError
+      attr_reader :continued_exception
+      def cause=(e)
+        @continued_exception = e
+      end
+    end
+
     def build_cause(message: "expected cause", backtrace: caller)
       StandardError.new(message).tap do |cause|
         cause.set_backtrace(backtrace)
