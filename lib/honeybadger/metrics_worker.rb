@@ -134,7 +134,7 @@ module Honeybadger
       ensure
         d { "stopping worker" }
       end
-    rescue Exception => e
+    rescue => e
       error {
         msg = "Error in worker thread (shutting down) class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))

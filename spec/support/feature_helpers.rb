@@ -3,15 +3,32 @@ require "json"
 module FeatureHelpers
   # https://github.com/erikhuda/thor/blob/011dc48b5ea92767445b062f971664235973c8b4/spec/helper.rb#L49
   def capture(stream)
+    stream = stream.to_s
     begin
-      stream = stream.to_s
-      eval "$#{stream} = StringIO.new"
-      yield
-      result = eval("$#{stream}").string
-    ensure
-      eval("$#{stream} = #{stream.upcase}")
+      Kernel.const_get(stream.upcase)
+    rescue
+      nil
     end
-
+    captured = StringIO.new
+    begin
+      case stream
+      when "stdout"
+        $stdout = captured
+      when "stderr"
+        $stderr = captured
+      else
+        raise ArgumentError, "Unsupported stream: #{stream}"
+      end
+      yield
+      result = captured.string
+    ensure
+      case stream
+      when "stdout"
+        $stdout = STDOUT
+      when "stderr"
+        $stderr = STDERR
+      end
+    end
     result
   end
 

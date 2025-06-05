@@ -169,7 +169,7 @@ module Honeybadger
       end
 
       def caller_location
-        if caller&.find { |l| l !~ LOCATE_CALLER_LOCATION && l =~ CALLER_LOCATION }
+        if caller&.find { |l| l !~ LOCATE_CALLER_LOCATION && (l =~ CALLER_LOCATION) }
           Regexp.last_match(1)
         end
       end

@@ -29,19 +29,17 @@ module Honeybadger
       #
       # Provide standard exception handling for the given block.
       def standard_exception_handling
-        begin
-          yield
-        rescue SystemExit
-          # Exit silently with current status
-          raise
-        rescue OptionParser::InvalidOption => ex
-          warn ex.message
-          exit(false)
-        rescue Exception => ex
-          # Exit with error message
-          display_error_message(ex)
-          exit(false)
-        end
+        yield
+      rescue SystemExit
+        # Exit silently with current status
+        raise
+      rescue OptionParser::InvalidOption => ex
+        warn ex.message
+        exit(false)
+      rescue => ex
+        # Exit with error message
+        display_error_message(ex)
+        exit(false)
       end
 
       # Method extracted from Rake 0.8.7 source
