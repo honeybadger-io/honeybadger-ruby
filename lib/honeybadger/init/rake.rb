@@ -36,7 +36,7 @@ module Honeybadger
       rescue OptionParser::InvalidOption => ex
         warn ex.message
         exit(false)
-      rescue StandardError => ex
+      rescue => ex
         # Exit with error message
         display_error_message(ex)
         exit(false)

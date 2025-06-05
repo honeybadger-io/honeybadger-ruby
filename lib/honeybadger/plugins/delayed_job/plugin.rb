@@ -33,7 +33,7 @@ module Honeybadger
             )
 
             block.call(job)
-          rescue StandardError => error
+          rescue => error
             if job.attempts.to_i >= ::Honeybadger.config[:"delayed_job.attempt_threshold"].to_i
               ::Honeybadger.notify(
                 component: component,
