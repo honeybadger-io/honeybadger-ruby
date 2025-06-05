@@ -295,8 +295,12 @@ module Honeybadger
     end
 
     def insights_exclude_for_rake_tasks?
-      return unless defined?(Rake)
-      (Rake.application.top_level_tasks & self[:'insights.exclude_rake_tasks']).any?
+      return false unless defined?(Rake) && Rake.application&.top_level_tasks
+
+      current_tasks = Array(Rake.application.top_level_tasks)
+      excluded_tasks = Array(self[:'insights.exclude_rake_tasks'])
+
+      (current_tasks & excluded_tasks).any?
     end
 
     def cluster_collection?(name)
