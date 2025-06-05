@@ -5,11 +5,20 @@ module FeatureHelpers
   def capture(stream)
     begin
       stream = stream.to_s
-      eval "$#{stream} = StringIO.new"
+      old_stream = eval("$#{stream}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
+      eval("$#{stream} = StringIO.new", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
       yield
-      result = eval("$#{stream}").string
+      result = eval("$#{stream}", binding, __FILE__, __LINE__).string # rubocop:disable Security/Eval
     ensure
-      eval("$#{stream} = #{stream.upcase}")
+      # Restore the original stream
+      case stream
+      when "stdout"
+        $stdout = old_stream
+      when "stderr"
+        $stderr = old_stream
+      else
+        eval("$#{stream} = old_stream", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
+      end
     end
 
     result

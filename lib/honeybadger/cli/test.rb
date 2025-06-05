@@ -137,22 +137,25 @@ module Honeybadger
           return false
         end
 
-        eval(<<-CONTROLLER)
-        class Honeybadger::TestController < ApplicationController
-          # This is to bypass any filters that may prevent access to the action.
-          if respond_to?(:prepend_before_action)
-            prepend_before_action :test_honeybadger
-          else
-            prepend_before_filter :test_honeybadger
+        # Define the test controller class
+        controller_code = <<~RUBY
+          class Honeybadger::TestController < ApplicationController
+            # This is to bypass any filters that may prevent access to the action.
+            if respond_to?(:prepend_before_action)
+              prepend_before_action :test_honeybadger
+            else
+              prepend_before_filter :test_honeybadger
+            end
+            def test_honeybadger
+              puts "Raising '\#{Honeybadger::CLI::Test::TEST_EXCEPTION.class.name}' to simulate application failure."
+              raise Honeybadger::CLI::Test::TEST_EXCEPTION
+            end
+            # Ensure we actually have an action to go to.
+            def verify; end
           end
-          def test_honeybadger
-            puts "Raising '#{Honeybadger::CLI::Test::TEST_EXCEPTION.class.name}' to simulate application failure."
-            raise Honeybadger::CLI::Test::TEST_EXCEPTION
-          end
-          # Ensure we actually have an action to go to.
-          def verify; end
-        end
-        CONTROLLER
+        RUBY
+
+        Honeybadger.module_eval(controller_code, __FILE__, __LINE__)
 
         ::Rails.application.try(:reload_routes_unless_loaded)
         ::Rails.application.routes.tap do |r|
