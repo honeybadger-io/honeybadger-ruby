@@ -12,7 +12,7 @@ module Honeybadger
         exception_name = ENV["EXCEPTION"] || "HoneybadgerTestingException"
         Object.const_get(exception_name)
       rescue
-        Object.const_set(exception_name, Class.new(Exception))
+        Object.const_set(exception_name, Class.new(RuntimeError))
       end.new('Testing honeybadger via "honeybadger test". If you can see this, it works.')
 
       class TestBackend
@@ -90,7 +90,7 @@ module Honeybadger
         exception_name = ENV["EXCEPTION"] || "HoneybadgerTestingException"
         Object.const_get(exception_name)
       rescue
-        Object.const_set(exception_name, Class.new(Exception))
+        Object.const_set(exception_name, Class.new(RuntimeError))
       end
 
       def run_standalone_test

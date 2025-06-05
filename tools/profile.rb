@@ -5,7 +5,7 @@ if Honeybadger.start({api_key: "badgers", debug: true, backend: "null"})
   RubyProf.start and Honeybadger::Agent.at_exit do
     result = RubyProf.stop
     printer = RubyProf::FlatPrinter.new(result)
-    printer.print(STDOUT, {})
+    printer.print($stdout, {})
   end
 
   1000.times do

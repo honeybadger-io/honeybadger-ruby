@@ -9,7 +9,7 @@ module Honeybadger
           lifecycle.around(:invoke_job) do |job, &block|
             begin
               begin
-                if job.payload_object.class.name == "ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper"
+                if job.payload_object.instance_of?(::ActiveJob::QueueAdapters::DelayedJobAdapter::JobWrapper)
                   # buildin support for Rails 4.2 ActiveJob
                   component = job.payload_object.job_data["job_class"]
                   action = "perform"

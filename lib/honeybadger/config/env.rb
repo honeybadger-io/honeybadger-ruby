@@ -4,7 +4,7 @@ module Honeybadger
   class Config
     module Env
       CONFIG_KEY = /\AHONEYBADGER_(.+)\Z/.freeze
-      CONFIG_MAPPING = Hash[DEFAULTS.keys.map { |k| [k.to_s.upcase.gsub(KEY_REPLACEMENT, "_"), k] }].freeze
+      CONFIG_MAPPING = DEFAULTS.keys.map { |k| [k.to_s.upcase.gsub(KEY_REPLACEMENT, "_"), k] }.to_h.freeze
       ARRAY_VALUES = Regexp.new('\s*,\s*').freeze
       IGNORED_TYPES = Set[Hash]
 

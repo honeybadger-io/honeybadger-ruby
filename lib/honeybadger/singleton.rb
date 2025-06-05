@@ -68,7 +68,7 @@ module Honeybadger
 
   # @api private
   def load_plugins!
-    Dir[File.expand_path("../plugins/*.rb", __FILE__)].each do |plugin|
+    Dir[File.expand_path("../plugins/*.rb", __FILE__)].sort.each do |plugin|
       require plugin
     end
     Plugin.load!(config)

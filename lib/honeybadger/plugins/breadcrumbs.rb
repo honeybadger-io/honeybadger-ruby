@@ -73,7 +73,7 @@ module Honeybadger
       # @option notification_config [Proc] :transform A proc that accepts the data payload. The return value will replace the current data hash (optional)
       #
       def self.send_breadcrumb_notification(name, duration, notification_config, data = {})
-        return if notification_config[:exclude_when] && notification_config[:exclude_when].call(data)
+        return if notification_config[:exclude_when]&.call(data)
 
         message =
           case (m = notification_config[:message])

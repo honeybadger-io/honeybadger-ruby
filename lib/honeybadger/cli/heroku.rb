@@ -78,7 +78,7 @@ module Honeybadger
               apps.values.first
             else
               say "We detected a Heroku app named #{apps.values.first}. Do you want to load the config? (y/yes or n/no)"
-              if /(y|yes)/i.match?(STDIN.gets.chomp)
+              if /(y|yes)/i.match?($stdin.gets.chomp)
                 apps.values.first
               end
             end
@@ -87,7 +87,7 @@ module Honeybadger
             apps.each_with_index { |a, i| say "\s\s#{i + 1}. #{a[1]}" }
             say "\s\s#{apps.size + 1}. Use default"
             say "Please select an option (1-#{apps.size + 1}):"
-            apps.values[STDIN.gets.chomp.to_i - 1]
+            apps.values[$stdin.gets.chomp.to_i - 1]
           end
         end
       end
@@ -107,7 +107,7 @@ module Honeybadger
         cmd << "--app #{app}" if app
         output = run(cmd.join("\s"))
         return false unless $?.to_i == 0
-        Hash[output.scan(/(HONEYBADGER_[^:]+):\s*(\S.*)\s*$/)]
+        output.scan(/(HONEYBADGER_[^:]+):\s*(\S.*)\s*$/).to_h
       end
 
       def set_env_from_heroku(app = nil)

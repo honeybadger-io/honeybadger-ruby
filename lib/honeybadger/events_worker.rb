@@ -84,7 +84,7 @@ module Honeybadger
     # Blocks until queue is processed up to this point in time.
     def flush
       mutex.synchronize do
-        if thread && thread.alive?
+        if thread&.alive?
           queue.push(FLUSH)
           queue.push(marker)
           marker.wait(mutex)
@@ -300,7 +300,7 @@ module Honeybadger
           debug { sprintf("Success ⚡ Event sent code=%s", response.code) }
         end
       when :stubbed
-        info { sprintf("Success ⚡ Development mode is enabled; This event will be sent after app is deployed.") }
+        info { "Success ⚡ Development mode is enabled; This event will be sent after app is deployed." }
       when :error
         warn { sprintf("Event send failed: an unknown error occurred. code=%s error=%s", response.code, response.message.to_s.dump) }
       else

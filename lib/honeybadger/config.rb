@@ -10,7 +10,6 @@ require "honeybadger/backend"
 require "honeybadger/config/defaults"
 require "honeybadger/util/http"
 require "honeybadger/util/revision"
-require "honeybadger/logging"
 
 module Honeybadger
   # @api private

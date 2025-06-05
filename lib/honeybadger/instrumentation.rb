@@ -143,12 +143,12 @@ module Honeybadger
 
     # @api private
     def extract_attributes(args)
-      args.select { |a| a.is_a?(Hash) }.first || {}
+      args.find { |a| a.is_a?(Hash) } || {}
     end
 
     # @api private
     def extract_callable(args)
-      args.select { |a| a.respond_to?(:call) }.first
+      args.find { |a| a.respond_to?(:call) }
     end
   end
 end

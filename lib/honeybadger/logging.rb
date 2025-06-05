@@ -116,7 +116,7 @@ module Honeybadger
     end
 
     class ConfigLogger < StandardLogger
-      LOCATE_CALLER_LOCATION = Regexp.new("#{Regexp.escape(__FILE__)}").freeze
+      LOCATE_CALLER_LOCATION = Regexp.new(Regexp.escape(__FILE__).to_s).freeze
       CALLER_LOCATION = Regexp.new("#{Regexp.escape(File.expand_path("../../../", __FILE__))}/(.*)").freeze
 
       INFO_SUPPLEMENT = " level=%s pid=%s".freeze
@@ -124,7 +124,7 @@ module Honeybadger
 
       def initialize(config, logger = Logger.new(nil))
         @config = config
-        @tty = STDOUT.tty?
+        @tty = $stdout.tty?
         @tty_level = @config.log_level(:"logging.tty_level")
         super(logger)
       end
@@ -169,7 +169,7 @@ module Honeybadger
       end
 
       def caller_location
-        if caller && caller.find { |l| l !~ LOCATE_CALLER_LOCATION && l =~ CALLER_LOCATION }
+        if caller&.find { |l| l !~ LOCATE_CALLER_LOCATION && l =~ CALLER_LOCATION }
           Regexp.last_match(1)
         end
       end

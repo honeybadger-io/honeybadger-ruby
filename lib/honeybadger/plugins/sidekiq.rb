@@ -37,7 +37,8 @@ module Honeybadger
             status = "failure"
             raise
           ensure
-            context.merge!(duration: duration, status: status)
+            context[:duration] = duration
+            context[:status] = status
             if Honeybadger.config.load_plugin_insights_events?(:sidekiq)
               Honeybadger.event("perform.sidekiq", context)
             end
