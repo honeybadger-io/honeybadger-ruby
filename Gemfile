@@ -28,4 +28,5 @@ group :development do
   gem 'guard-rspec'
   gem 'pry'
   gem 'pry-byebug', platforms: :mri
+  gem 'standard'
 end
