@@ -135,11 +135,9 @@ describe Honeybadger::Config::Yaml do
     end
 
     it "raises an exception with a helpful backtrace", if: RUBY_PLATFORM !~ /java/ do
-      begin
-        described_class.new(config_path)
-      rescue => e
-        expect(e.backtrace[0]).to start_with(config_path.to_s)
-      end
+      described_class.new(config_path)
+    rescue => e
+      expect(e.backtrace[0]).to start_with(config_path.to_s)
     end
   end
 end

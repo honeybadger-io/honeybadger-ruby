@@ -31,8 +31,8 @@ module Honeybadger
           begin
             env["honeybadger.config"] = config
             response = @app.call(env)
-          rescue Exception => raised
-            env["honeybadger.error_id"] = notify_honeybadger(raised, env)
+          rescue StandardError => error
+            env["honeybadger.error_id"] = notify_honeybadger(error, env)
             raise
           end
 

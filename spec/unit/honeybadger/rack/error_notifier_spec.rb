@@ -47,7 +47,7 @@ describe Honeybadger::Rack::ErrorNotifier do
     begin
       stack = Honeybadger::Rack::ErrorNotifier.new(app, agent)
       stack.call(environment)
-    rescue Exception => raised
+    rescue StandardError => raised
       expect(raised).to eq exception
     else
       fail "Didn't raise an exception"
