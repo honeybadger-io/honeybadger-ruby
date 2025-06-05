@@ -3,7 +3,6 @@ module Honeybadger
     module SolidQueue
       Plugin.register :solid_queue do
         requirement { config.load_plugin_insights?(:solid_queue) && defined?(::SolidQueue) }
-        requirement { !defined?(Rake) || !Rake.application.top_level_tasks.include?('assets:precompile') }
         requirement { defined?(ActiveRecord::Base) && ActiveRecord::Base.connected? }
 
         collect_solid_queue_stats = -> do
@@ -28,9 +27,9 @@ module Honeybadger
         end
 
         collect do
-          stats = collect_solid_queue_stats.call
-
           if config.cluster_collection?(:solid_queue)
+            stats = collect_solid_queue_stats.call
+
             if Honeybadger.config.load_plugin_insights_events?(:solid_queue)
               Honeybadger.event('stats.solid_queue', stats.except(:stats).merge(stats[:stats]))
             end
