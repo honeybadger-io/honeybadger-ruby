@@ -1,10 +1,10 @@
 require "honeybadger/notification_subscriber"
 
-describe Honeybadger::ActiveSupportCacheMultiSubscriber do
-  module ActiveSupport
-    module Cache; end
-  end
+module ActiveSupport
+  module Cache; end
+end
 
+describe Honeybadger::ActiveSupportCacheMultiSubscriber do
   context "with a cache_write_multi.active_support payload" do
     let(:payload) do
       obj = Object.new

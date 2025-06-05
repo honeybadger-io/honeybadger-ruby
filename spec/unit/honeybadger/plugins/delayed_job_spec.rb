@@ -1,6 +1,15 @@
 require "honeybadger/config"
 require "honeybadger/agent"
 
+class ExceptionTester
+  def null_method
+  end
+
+  def will_raise
+    raise "raised from will_raise"
+  end
+end
+
 begin
   require "delayed_job"
   require "honeybadger/plugins/delayed_job/plugin"
@@ -11,15 +20,6 @@ begin
     # https://github.com/collectiveidea/delayed_job/blob/master/spec/delayed/backend/test.rb
     $:.unshift(File.join(Gem::Specification.find_by_name("delayed_job").full_gem_path, "spec"))
     Delayed::Worker.backend = :test
-
-    class ExceptionTester
-      def null_method
-      end
-
-      def will_raise
-        raise "raised from will_raise"
-      end
-    end
 
     context "when it's installed" do
       let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
