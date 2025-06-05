@@ -26,7 +26,7 @@ module Honeybadger
             faktory.error_handlers << lambda do |ex, params|
               opts = {parameters: params}
 
-              if job = params[:job]
+              if (job = params[:job])
                 if (threshold = config[:"faktory.attempt_threshold"].to_i) > 0
                   # If job.failure is nil, it is the first attempt. The first
                   # retry has a job.failure.retry_count of 0, which would be

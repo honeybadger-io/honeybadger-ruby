@@ -185,7 +185,7 @@ module Honeybadger
     def ignored_classes
       ignore_only = get(:"exceptions.ignore_only")
       return ignore_only if ignore_only
-      return DEFAULTS[:"exceptions.ignore"] unless ignore = get(:"exceptions.ignore")
+      return DEFAULTS[:"exceptions.ignore"] unless (ignore = get(:"exceptions.ignore"))
 
       DEFAULTS[:"exceptions.ignore"] | Array(ignore)
     end
@@ -193,7 +193,7 @@ module Honeybadger
     def raw_ignored_events
       ignore_only = get(:"events.ignore_only")
       return ignore_only if ignore_only
-      return DEFAULTS[:"events.ignore"] unless ignore = get(:"events.ignore")
+      return DEFAULTS[:"events.ignore"] unless (ignore = get(:"events.ignore"))
 
       DEFAULTS[:"events.ignore"] | Array(ignore)
     end
@@ -429,7 +429,7 @@ module Honeybadger
 
       return build_stdout_logger if log_stdout?
 
-      if path = log_path
+      if (path = log_path)
         FileUtils.mkdir_p(path.dirname) unless path.dirname.writable?
         return build_file_logger(path)
       end

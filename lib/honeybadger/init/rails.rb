@@ -36,7 +36,7 @@ module Honeybadger
         end
 
         console do
-          unless Honeybadger::Agent.instance.config[:"insights.enabled"] = Honeybadger::Agent.instance.config[:"insights.console.enabled"]
+          unless (Honeybadger::Agent.instance.config[:"insights.enabled"] = Honeybadger::Agent.instance.config[:"insights.console.enabled"])
             Honeybadger::Agent.instance.config.logger.debug("Rails console detected, shutting down Honeybadger Insights workers.")
             Honeybadger::Agent.instance.stop_insights
           end

@@ -13,7 +13,7 @@ module Honeybadger
 
         env.each_pair do |k, v|
           next unless k.match(CONFIG_KEY)
-          next unless config_key = CONFIG_MAPPING[$1]
+          next unless (config_key = CONFIG_MAPPING[$1])
           type = OPTIONS[config_key][:type]
           next if IGNORED_TYPES.include?(type)
           hash[config_key] = cast_value(v, type)

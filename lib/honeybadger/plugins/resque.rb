@@ -54,7 +54,7 @@ module Honeybadger
         requirement { defined?(::Resque::Job) }
 
         requirement do
-          if resque_honeybadger = defined?(::Resque::Failure::Honeybadger)
+          if (resque_honeybadger = defined?(::Resque::Failure::Honeybadger))
             logger.warn("Support for Resque has been moved " \
                         "to the honeybadger gem. Please remove " \
                         "resque-honeybadger from your " \

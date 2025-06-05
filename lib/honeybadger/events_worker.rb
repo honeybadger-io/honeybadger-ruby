@@ -294,7 +294,7 @@ module Honeybadger
       when 413
         warn { sprintf("Event send failed: Payload is too large. code=%s", response.code) }
       when 201
-        if throttle = dec_throttle
+        if (throttle = dec_throttle)
           debug { sprintf("Success ⚡ Event sent code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
         else
           debug { sprintf("Success ⚡ Event sent code=%s", response.code) }

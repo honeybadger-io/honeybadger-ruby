@@ -40,7 +40,7 @@ module Honeybadger
           exit(1)
         end
 
-        if env = heroku_var("RAILS_ENV", app, heroku_var("RACK_ENV", app))
+        if (env = heroku_var("RAILS_ENV", app, heroku_var("RACK_ENV", app)))
           say("Installing deploy notification addon", :magenta)
           invoke :install_deploy_notification, [], {app: app, api_key: api_key, environment: env}
         else
@@ -65,9 +65,9 @@ module Honeybadger
           require "inifile"
           ini = IniFile.load(git_config)
           ini.each_section do |section|
-            if match = section.match(/remote "(?<remote>.+)"/)
+            if (match = section.match(/remote "(?<remote>.+)"/))
               url = ini[section]["url"]
-              if url_match = url.match(/heroku\.com:(?<app>.+)\.git$/)
+              if (url_match = url.match(/heroku\.com:(?<app>.+)\.git$/))
                 apps[match[:remote]] = url_match[:app]
               end
             end
@@ -111,7 +111,7 @@ module Honeybadger
       end
 
       def set_env_from_heroku(app = nil)
-        return false unless env = read_heroku_env(app)
+        return false unless (env = read_heroku_env(app))
         env.each_pair do |k, v|
           ENV[k] ||= v
         end

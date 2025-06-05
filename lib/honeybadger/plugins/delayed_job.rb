@@ -5,7 +5,7 @@ module Honeybadger
     requirement { defined?(::Delayed::Plugin) }
     requirement { defined?(::Delayed::Worker.plugins) }
     requirement do
-      if delayed_job_honeybadger = defined?(::Delayed::Plugins::Honeybadger)
+      if (delayed_job_honeybadger = defined?(::Delayed::Plugins::Honeybadger))
         logger.warn("Support for Delayed Job has been moved " \
                     "to the honeybadger gem. Please remove " \
                     "delayed_job_honeybadger from your " \

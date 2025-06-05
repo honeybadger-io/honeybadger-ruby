@@ -182,26 +182,26 @@ module Honeybadger
       def verify_test
         Honeybadger.flush
 
-        if calling = TestBackend.callings[:notices].find { |c| c[0].exception.eql?(TEST_EXCEPTION) }
+        if (calling = TestBackend.callings[:notices].find { |c| c[0].exception.eql?(TEST_EXCEPTION) })
           _, response = *calling
 
           if !response.success?
             host = Honeybadger.config.get(:"connection.host")
             say(<<~MSG, :red)
               !! --- Honeybadger test failed ------------------------------------------------ !!
-              
+
               The error notifier is installed, but we encountered an error:
-              
+
                 #{response.error_message}
-              
+
               To fix this issue, please try the following:
-              
+
                 - Make sure the gem is configured properly.
                 - Retry executing this command a few times.
                 - Make sure you can connect to #{host} (`curl https://#{host}/v1/notices`).
                 - Email support@honeybadger.io for help. Include as much debug info as you
                   can for a faster resolution!
-              
+
               !! --- End -------------------------------------------------------------------- !!
             MSG
             exit(1)
@@ -214,12 +214,12 @@ module Honeybadger
 
         say(<<~MSG, :red)
           !! --- Honeybadger test failed ------------------------------------------------ !!
-          
+
           Error: The test exception was not reported; the application may not be
           configured properly.
-          
+
           This is usually caused by one of the following issues:
-          
+
             - There was a problem loading your application. Check your logs to see if a
               different exception is being raised.
             - The exception is being rescued before it reaches our Rack middleware. If
@@ -251,37 +251,37 @@ module Honeybadger
 
         <<~MSG
           ⚡ --- Honeybadger is installed! -----------------------------------------------
-          
+
           Good news: You're one deploy away from seeing all of your exceptions in
           Honeybadger. For now, we've generated a test exception for you:
-          
+
             #{notice_url}
-          
+
           Optional steps:
-          
+
             - Show a feedback form on your error page:
               https://docs.honeybadger.io/gem-feedback
             - Show a UUID or link to Honeybadger on your error page:
               https://docs.honeybadger.io/gem-informer
             - Track deployments (if you're using Capistrano, we already did this):
               https://docs.honeybadger.io/gem-deploys
-          
+
           If you ever need help:
-          
+
             - Read the gem troubleshooting guide: https://docs.honeybadger.io/gem-troubleshooting
             - Check out our documentation: https://docs.honeybadger.io/
             - Email the founders: support@honeybadger.io
-          
+
           Most people don't realize that Honeybadger is a small, bootstrapped company. We
           really couldn't do this without you. Thank you for allowing us to do what we
           love: making developers awesome.
-          
+
           Happy 'badgering!
-          
+
           Sincerely,
           The Honeybadger Crew
           https://www.honeybadger.io/about/
-          
+
           ⚡ --- End --------------------------------------------------------------------
         MSG
       end

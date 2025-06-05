@@ -161,7 +161,7 @@ module Honeybadger
 
         r = msg.dup
         r << sprintf(INFO_SUPPLEMENT, severity, Process.pid)
-        if severity == Logger::Severity::DEBUG && l = caller_location
+        if severity == Logger::Severity::DEBUG && (l = caller_location)
           r << sprintf(DEBUG_SUPPLEMENT, l.dump)
         end
 

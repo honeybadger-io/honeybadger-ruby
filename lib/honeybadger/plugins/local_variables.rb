@@ -27,7 +27,7 @@ module Honeybadger
         requirement { config[:"exceptions.local_variables"] }
         requirement { defined?(::BindingOfCaller) }
         requirement do
-          if res = defined?(::BetterErrors)
+          if (res = defined?(::BetterErrors))
             logger.warn("The local variables feature is incompatible with the " \
                         "better_errors gem; to remove this warning, set " \
                         "exceptions.local_variables to false for environments " \
