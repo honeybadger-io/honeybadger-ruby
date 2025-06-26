@@ -64,7 +64,8 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+        bundler-cache: ${{ matrix.ruby != 'ruby-head' }}
+      continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
 
     - name: Build and test regular ruby
       run: |
