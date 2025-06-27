@@ -27,8 +27,10 @@ module Honeybadger
   #     @see Agent#$2
   def_delegator :'Honeybadger::Agent.instance', :check_in
   def_delegator :'Honeybadger::Agent.instance', :context
+  def_delegator :'Honeybadger::Agent.instance', :event_context
   def_delegator :'Honeybadger::Agent.instance', :configure
   def_delegator :'Honeybadger::Agent.instance', :get_context
+  def_delegator :'Honeybadger::Agent.instance', :get_event_context
   def_delegator :'Honeybadger::Agent.instance', :flush
   def_delegator :'Honeybadger::Agent.instance', :stop
   def_delegator :'Honeybadger::Agent.instance', :exception_filter

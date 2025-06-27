@@ -64,7 +64,14 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+        bundler-cache: ${{ matrix.ruby != 'ruby-head' }} # Try to avoid problems with ruby-head breaking bundler
+      continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
+
+    # Deal with a lack of bundler cache for ruby-head
+    - name: Install gems for ruby-head
+      if: matrix.ruby == 'ruby-head'
+      run: bundle install
+      continue-on-error: true
 
     - name: Build and test regular ruby
       run: |

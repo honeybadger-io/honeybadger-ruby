@@ -708,4 +708,169 @@ describe Honeybadger::Agent do
       end
     end
   end
+
+  context "#event_context" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    subject { instance }
+
+    it "sets event context" do
+      subject.event_context(user_id: 123)
+      expect(subject.get_event_context).to eq({user_id: 123})
+    end
+
+    it "merges event context" do
+      subject.event_context(user_id: 123)
+      subject.event_context(email: "test@example.com")
+      expect(subject.get_event_context).to eq({user_id: 123, email: "test@example.com"})
+    end
+
+    it "returns self when no block given" do
+      expect(subject.event_context(user_id: 123)).to eq(subject)
+    end
+
+    it "executes block with local context" do
+      result = subject.event_context(user_id: 123) do
+        # Inside the block, we should have the local context
+        expect(subject.get_event_context).to eq({user_id: 123})
+        "block result"
+      end
+      expect(result).to eq("block result")
+      # After the block, the context should be cleared (local context only)
+      expect(subject.get_event_context).to eq({})
+    end
+
+    it "clears local context after block execution" do
+      subject.event_context(user_id: 123)
+      subject.event_context(email: "test@example.com") do
+        # Local context should be merged
+        expect(subject.get_event_context).to eq({user_id: 123, email: "test@example.com"})
+      end
+      # Only global context should remain
+      expect(subject.get_event_context).to eq({user_id: 123})
+    end
+
+    it "handles objects with to_honeybadger_context method" do
+      user = double("User")
+      allow(user).to receive(:to_honeybadger_context).and_return({user_id: 456, name: "John"})
+
+      subject.event_context(user)
+      expect(subject.get_event_context).to eq({user_id: 456, name: "John"})
+    end
+
+    it "handles nested context objects" do
+      inner_object = double("InnerObject")
+      allow(inner_object).to receive(:to_honeybadger_context).and_return({inner: "value"})
+
+      outer_object = double("OuterObject")
+      allow(outer_object).to receive(:to_honeybadger_context).and_return({outer: "value", nested: inner_object})
+
+      subject.event_context(outer_object)
+      expect(subject.get_event_context).to eq({outer: "value", nested: {inner: "value"}})
+    end
+  end
+
+  context "#get_event_context" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    subject { instance }
+
+    it "returns nil when no event context is set" do
+      expect(subject.get_event_context).to be_nil
+    end
+
+    it "returns event context when set" do
+      subject.event_context(user_id: 123)
+      expect(subject.get_event_context).to eq({user_id: 123})
+    end
+  end
+
+  context "#event with context" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, "events.attach_hostname": false) }
+    let(:events_worker) { double(Honeybadger::EventsWorker.new(config)) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    subject { instance }
+
+    before do
+      allow(instance).to receive(:events_worker).and_return(events_worker)
+    end
+
+    it "does not include global context in events" do
+      subject.context(user_id: 123)
+
+      expect(events_worker).to receive(:push) do |msg|
+        expect(msg).not_to have_key(:user_id)
+      end
+
+      subject.event("test_event", some_data: "is here")
+    end
+
+    it "includes event-specific context in events at the root" do
+      subject.event_context(user_id: 456)
+
+      expect(events_worker).to receive(:push) do |msg|
+        expect(msg[:user_id]).to eq(456)
+      end
+
+      subject.event("test_event", some_data: "is here")
+    end
+
+    it "does not merge global and event-specific context (only event context at root)" do
+      subject.context(user_id: 123, global_data: "global")
+      subject.event_context(user_id: 456, event_data: "event")
+
+      expect(events_worker).to receive(:push) do |msg|
+        expect(msg[:user_id]).to eq(456)
+        expect(msg[:event_data]).to eq("event")
+        expect(msg).not_to have_key(:global_data)
+      end
+
+      subject.event("test_event", some_data: "is here")
+    end
+
+    it "does not include event context keys when empty" do
+      expect(events_worker).to receive(:push) do |msg|
+        expect(msg).not_to have_key(:user_id)
+        expect(msg).not_to have_key(:event_data)
+      end
+
+      subject.event("test_event", some_data: "is here")
+    end
+
+    it "clears event context when clear! is called" do
+      subject.event_context(user_id: 123)
+      subject.clear!
+
+      expect(events_worker).to receive(:push) do |msg|
+        expect(msg).not_to have_key(:user_id)
+      end
+
+      subject.event("test_event", some_data: "is here")
+    end
+  end
+
+  context "#collect" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
+    let(:metrics_worker) { double(Honeybadger::MetricsWorker.new(config)) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+    let(:collection_execution) { double(Honeybadger::Plugin::CollectorExecution) }
+
+    subject { instance }
+
+    before do
+      allow(instance).to receive(:metrics_worker).and_return(metrics_worker)
+    end
+
+    context "with a collection execution instance" do
+      it "adds to the worker" do
+        expect(metrics_worker).to receive(:push) do |msg|
+          expect(msg).to eq(collection_execution)
+        end
+        subject.collect(collection_execution)
+      end
+    end
+  end
 end
