@@ -53,6 +53,13 @@ module Honeybadger
       end
     end
 
+    def clear_context
+      @mutex.synchronize do
+        @global_context = nil
+        @local_context = nil
+      end
+    end
+
     def set_event_context(hash, &block)
       local = block_given?
       @mutex.synchronize do
@@ -82,6 +89,13 @@ module Honeybadger
         return @global_event_context unless @local_event_context
 
         @global_event_context.merge(@local_event_context.inject({}, :merge))
+      end
+    end
+
+    def clear_event_context
+      @mutex.synchronize do
+        @global_event_context = nil
+        @local_event_context = nil
       end
     end
 

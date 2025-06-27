@@ -464,7 +464,7 @@ module Honeybadger
     #   Honeybadger.event_context(user)
     #
     #   # Clearing event context:
-    #   Honeybadger.event_context.clear!
+    #   Honeybadger.clear_event_context
     #
     # @param [Hash] context A Hash of data which will be sent to Honeybadger
     #   when an event occurs. If the object responds to +#to_honeybadger_context+,
