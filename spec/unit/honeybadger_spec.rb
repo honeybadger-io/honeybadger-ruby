@@ -47,7 +47,7 @@ describe Honeybadger do
   end
 
   it "delegates ::event_context to agent instance" do
-    expect(Honeybadger::Agent.instance).to receive(:event_context)
+    expect(Honeybadger::Agent.instance).to receive(:event_context).with({user_id: 123})
     Honeybadger.event_context({user_id: 123})
   end
 
