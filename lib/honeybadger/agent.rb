@@ -413,8 +413,7 @@ module Honeybadger
       extra_payload = {}.tap do |p|
         p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
         p[:hostname] = config[:hostname].to_s if config[:'events.attach_hostname']
-        event_context = context_manager.get_event_context
-        p[:context] = event_context if event_context && !event_context.empty?
+        p.update(context_manager.get_event_context || {})
       end
 
       event = Event.new(event_type, extra_payload.merge(payload))
