@@ -802,40 +802,39 @@ describe Honeybadger::Agent do
       subject.context(user_id: 123)
 
       expect(events_worker).to receive(:push) do |msg|
-        expect(msg).not_to have_key(:context)
+        expect(msg).not_to have_key(:user_id)
       end
 
       subject.event("test_event", some_data: "is here")
     end
 
-    it "includes event-specific context in events" do
+    it "includes event-specific context in events at the root" do
       subject.event_context(user_id: 456)
 
       expect(events_worker).to receive(:push) do |msg|
-        expect(msg[:context]).to eq({user_id: 456})
+        expect(msg[:user_id]).to eq(456)
       end
 
       subject.event("test_event", some_data: "is here")
     end
 
-    it "does not merge global and event-specific context" do
+    it "does not merge global and event-specific context (only event context at root)" do
       subject.context(user_id: 123, global_data: "global")
       subject.event_context(user_id: 456, event_data: "event")
 
       expect(events_worker).to receive(:push) do |msg|
-        # Only event context should be included, not global context
-        expect(msg[:context]).to eq({
-          user_id: 456,
-          event_data: "event"
-        })
+        expect(msg[:user_id]).to eq(456)
+        expect(msg[:event_data]).to eq("event")
+        expect(msg).not_to have_key(:global_data)
       end
 
       subject.event("test_event", some_data: "is here")
     end
 
-    it "does not include context when empty" do
+    it "does not include event context keys when empty" do
       expect(events_worker).to receive(:push) do |msg|
-        expect(msg).not_to have_key(:context)
+        expect(msg).not_to have_key(:user_id)
+        expect(msg).not_to have_key(:event_data)
       end
 
       subject.event("test_event", some_data: "is here")
@@ -846,7 +845,7 @@ describe Honeybadger::Agent do
       subject.clear!
 
       expect(events_worker).to receive(:push) do |msg|
-        expect(msg).not_to have_key(:context)
+        expect(msg).not_to have_key(:user_id)
       end
 
       subject.event("test_event", some_data: "is here")
