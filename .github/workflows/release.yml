@@ -29,7 +29,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: head
-          bundler-cache: true
+          bundler-cache: false
 
       - name: Publish gem
         if: ${{ steps.release.outputs.release_created }}
