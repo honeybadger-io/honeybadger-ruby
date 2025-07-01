@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [5.29.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.29.0...v5.29.1) (2025-07-01)
+
+
+### Bug Fixes
+
+* Revert "feat: exclude insights from rake tasks config ([#697](https://github.com/honeybadger-io/honeybadger-ruby/issues/697))" ([381566c](https://github.com/honeybadger-io/honeybadger-ruby/commit/381566cf976e110ff5b55770038aac25f51ee4ea)), closes [#702](https://github.com/honeybadger-io/honeybadger-ruby/issues/702)
+
 ## [5.29.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.28.0...v5.29.0) (2025-06-27)
 
 
