@@ -497,11 +497,6 @@ module Honeybadger
         default: 60,
         type: Integer
       },
-      :'insights.exclude_rake_tasks' => {
-        description: "List of Rake tasks to exclude from Insights instrumentation.",
-        default: ['assets:precompile'],
-        type: Array
-      },
       :'puma.insights.events' => {
         description: 'Enable automatic event capturing for Puma stats.',
         default: true,
