@@ -1,40 +1,40 @@
-require 'honeybadger/config'
+require "honeybadger/config"
 
 describe Honeybadger::Config::Yaml do
   subject { described_class.new(path, env) }
-  let(:path) { FIXTURES_PATH.join('honeybadger.yml') }
-  let(:env) { 'production' }
+  let(:path) { FIXTURES_PATH.join("honeybadger.yml") }
+  let(:env) { "production" }
 
   it { should be_a Hash }
 
   context "when options are nested" do
     it "converts deeply nested options to dotted hash syntax" do
-      expect(subject[:'a.really.deeply.nested']).to eq 'option'
+      expect(subject[:"a.really.deeply.nested"]).to eq "option"
     end
   end
 
   context "when an environment namespace is present" do
     it "prioritizes the namespace" do
-      expect(subject[:api_key]).to eq 'asdf'
+      expect(subject[:api_key]).to eq "asdf"
     end
 
     context "and the environment collides with an option name" do
-      let(:env) { 'api_key' }
+      let(:env) { "api_key" }
 
       it "prioritizes the option name" do
-        expect(subject[:api_key]).to eq 'zxcv'
+        expect(subject[:api_key]).to eq "zxcv"
       end
     end
 
     context "and the environment collides with an option namespace" do
-      let(:env) { 'logging' }
-      let(:yaml) { <<-YAML }
-api_key: "cobras"
-top: true
-logging:
-  api_key: "badgers"
-  path: "log/my.log"
-  level: "DEBUG"
+      let(:env) { "logging" }
+      let(:yaml) { <<~YAML }
+        api_key: "cobras"
+        top: true
+        logging:
+          api_key: "badgers"
+          path: "log/my.log"
+          level: "DEBUG"
       YAML
 
       before do
@@ -42,32 +42,32 @@ logging:
       end
 
       it "merges all the options" do
-        expect(subject[:'logging.path']).to eq 'log/my.log'
-        expect(subject[:'logging.level']).to eq 'DEBUG'
-        expect(subject[:'logging.api_key']).to eq 'badgers'
-        expect(subject[:api_key]).to eq 'badgers'
+        expect(subject[:"logging.path"]).to eq "log/my.log"
+        expect(subject[:"logging.level"]).to eq "DEBUG"
+        expect(subject[:"logging.api_key"]).to eq "badgers"
+        expect(subject[:api_key]).to eq "badgers"
         expect(subject[:top]).to eq true
       end
     end
   end
 
   context "when an environment namespace is not present" do
-    subject { described_class.new(FIXTURES_PATH.join('honeybadger.yml'), 'foo') }
+    subject { described_class.new(FIXTURES_PATH.join("honeybadger.yml"), "foo") }
 
     it "falls back to the top level namespace" do
-      expect(subject[:api_key]).to eq 'zxcv'
+      expect(subject[:api_key]).to eq "zxcv"
     end
   end
 
   context "when ERB is used" do
     it "evaluates ERB" do
-      expect(subject[:erb]).to eq 'erb!'
+      expect(subject[:erb]).to eq "erb!"
     end
   end
 
   context "when file is not found" do
     it "raises a ConfigError" do
-      expect { described_class.new('foo.yml') }.to raise_error(Honeybadger::Config::ConfigError)
+      expect { described_class.new("foo.yml") }.to raise_error(Honeybadger::Config::ConfigError)
     end
   end
 
@@ -81,23 +81,23 @@ logging:
     before { allow(path).to receive(:read).and_return(yaml) }
 
     context "nil" do
-      let(:yaml) { '---' }
+      let(:yaml) { "---" }
       it { should eq({}) }
     end
 
     context "empty" do
-      let(:yaml) { '' }
+      let(:yaml) { "" }
       it { should eq({}) }
     end
 
     context "invalid" do
-      let(:yaml) { 'foo' }
+      let(:yaml) { "foo" }
       specify { expect { subject }.to raise_error(Honeybadger::Config::ConfigError) }
     end
 
     context "valid" do
-      let(:yaml) { 'foo: bar' }
-      it { should eq({ foo: 'bar' }) }
+      let(:yaml) { "foo: bar" }
+      it { should eq({foo: "bar"}) }
     end
   end
 
@@ -105,7 +105,7 @@ logging:
     before { allow(path).to receive(:read).and_return(yaml) }
     let(:yaml) { "foo: !ruby/regexp '/credit_card/i'" }
 
-    it { should eq({ foo: /credit_card/i }) }
+    it { should eq({foo: /credit_card/i}) }
   end
 
   context "when an unknown error occurs" do
@@ -120,11 +120,11 @@ logging:
   end
 
   context "when an error occurs in ERB" do
-    let(:config_path) { FIXTURES_PATH.join('honeybadger.yml') }
-    let(:yaml) { <<-YAML }
----
-api_key: "<%= MyApp.config.nonexistant_var %>"
-YAML
+    let(:config_path) { FIXTURES_PATH.join("honeybadger.yml") }
+    let(:yaml) { <<~YAML }
+      ---
+      api_key: "<%= MyApp.config.nonexistant_var %>"
+    YAML
 
     before do
       allow(config_path).to receive(:read).and_return(yaml)
@@ -135,11 +135,9 @@ YAML
     end
 
     it "raises an exception with a helpful backtrace", if: RUBY_PLATFORM !~ /java/ do
-      begin
-        described_class.new(config_path)
-      rescue => e
-        expect(e.backtrace[0]).to start_with(config_path.to_s)
-      end
+      described_class.new(config_path)
+    rescue => e
+      expect(e.backtrace[0]).to start_with(config_path.to_s)
     end
   end
 end

@@ -1,7 +1,7 @@
-require 'forwardable'
-require 'rack/request'
+require "forwardable"
+require "rack/request"
 
-require 'honeybadger/ruby'
+require "honeybadger/ruby"
 
 module Honeybadger
   module Rack
@@ -23,22 +23,22 @@ module Honeybadger
 
       def initialize(app, agent = nil)
         @app = app
-        @agent = agent.kind_of?(Agent) && agent
+        @agent = agent.is_a?(Agent) && agent
       end
 
       def call(env)
         agent.with_rack_env(env) do
           begin
-            env['honeybadger.config'] = config
+            env["honeybadger.config"] = config
             response = @app.call(env)
-          rescue Exception => raised
-            env['honeybadger.error_id'] = notify_honeybadger(raised, env)
+          rescue => error
+            env["honeybadger.error_id"] = notify_honeybadger(error, env)
             raise
           end
 
           framework_exception = framework_exception(env)
           if framework_exception
-            env['honeybadger.error_id'] = notify_honeybadger(framework_exception, env)
+            env["honeybadger.error_id"] = notify_honeybadger(framework_exception, env)
           end
 
           response
@@ -57,15 +57,15 @@ module Honeybadger
       end
 
       def ignored_user_agent?(env)
-        true if config[:'exceptions.ignored_user_agents'].
-          flatten.
-          any? { |ua| ua === env['HTTP_USER_AGENT'] }
+        true if config[:"exceptions.ignored_user_agents"]
+          .flatten
+          .any? { |ua| ua === env["HTTP_USER_AGENT"] }
       end
 
       def notify_honeybadger(exception, env)
         return if ignored_user_agent?(env)
 
-        if config[:'breadcrumbs.enabled']
+        if config[:"breadcrumbs.enabled"]
           # Drop the last breadcrumb only if the message contains the error class name
           agent.breadcrumbs.drop_previous_breadcrumb_if do |bc|
             bc.category == "log" && bc.message.include?(exception.class.to_s)
@@ -84,8 +84,8 @@ module Honeybadger
       end
 
       def framework_exception(env)
-        env['action_dispatch.exception'] || env['rack.exception'] ||
-          env['sinatra.error'] || env['honeybadger.exception']
+        env["action_dispatch.exception"] || env["rack.exception"] ||
+          env["sinatra.error"] || env["honeybadger.exception"]
       end
     end
   end

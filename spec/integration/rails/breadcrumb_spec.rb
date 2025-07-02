@@ -1,6 +1,6 @@
-require_relative '../rails_helper'
+require_relative "../rails_helper"
 
-describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
+describe "Rails Breadcrumbs integration", if: RAILS_PRESENT, type: :request do
   # The plugin is defaulted to off, we need to make sure we re-load plugins
   # after config as plugins only check requirement only at load time
   before(:all) do
@@ -46,7 +46,7 @@ describe 'Rails Breadcrumbs integration', if: RAILS_PRESENT, type: :request do
     expect(notices.first).to contain_breadcrumb_including({
       category: "log",
       message: "test log event",
-      metadata: include({ severity: "INFO" })
+      metadata: include({severity: "INFO"})
     })
   end
 

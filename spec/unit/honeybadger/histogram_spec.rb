@@ -1,10 +1,8 @@
-# encoding: utf-8
-
 describe Honeybadger::Histogram do
   describe "#payloads" do
     let(:metric) { described_class.new(name, attributes) }
     let(:name) { "perform" }
-    let(:attributes) { { foo: "bar" } }
+    let(:attributes) { {foo: "bar"} }
 
     subject { metric.payloads }
 

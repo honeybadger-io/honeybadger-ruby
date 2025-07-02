@@ -1,25 +1,24 @@
-require 'timecop'
-require 'thread'
+require "timecop"
 
-require 'honeybadger/metrics_worker'
-require 'honeybadger/config'
+require "honeybadger/metrics_worker"
+require "honeybadger/config"
 
 describe Honeybadger::MetricsWorker do
   let!(:instance) { described_class.new(config) }
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
-  let(:obj) { double('CollectionExecution', tick: 1) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
+  let(:obj) { double("CollectionExecution", tick: 1) }
 
   subject { instance }
 
   after do
     Thread.list.each do |thread|
-      next unless thread.kind_of?(Honeybadger::MetricsWorker::Thread)
+      next unless thread.is_a?(Honeybadger::MetricsWorker::Thread)
       Thread.kill(thread)
     end
   end
 
   describe "work depends on tick" do
-    let(:obj) { double('CollectionExecution', tick: tick) }
+    let(:obj) { double("CollectionExecution", tick: tick) }
 
     before do
       allow(instance).to receive(:sleep)
@@ -53,7 +52,7 @@ describe Honeybadger::MetricsWorker do
 
   context "when an exception happens in the worker loop" do
     before do
-      allow(instance.send(:queue)).to receive(:pop).and_raise('fail')
+      allow(instance.send(:queue)).to receive(:pop).and_raise("fail")
     end
 
     it "does not raise when shutting down" do
@@ -80,11 +79,11 @@ describe Honeybadger::MetricsWorker do
   end
 
   context "when an exception happens during processing" do
-    let(:obj) { double('CollectionExecution', tick: 0, call: nil, reset: nil) }
+    let(:obj) { double("CollectionExecution", tick: 0, call: nil, reset: nil) }
 
     before do
       allow(instance).to receive(:sleep)
-      allow(obj).to receive(:call).and_raise('fail')
+      allow(obj).to receive(:call).and_raise("fail")
     end
 
     def flush

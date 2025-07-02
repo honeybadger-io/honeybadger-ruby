@@ -1,5 +1,5 @@
-require 'honeybadger/plugins/shoryuken'
-require 'honeybadger/config'
+require "honeybadger/plugins/shoryuken"
+require "honeybadger/config"
 
 RSpec.describe "Shoryuken Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
@@ -17,7 +17,8 @@ RSpec.describe "Shoryuken Dependency" do
   context "when shoryuken is installed" do
     let(:shim) do
       Class.new do
-        def self.configure_server; end
+        def self.configure_server
+        end
       end
     end
 
@@ -44,16 +45,16 @@ class TestShoryukenWorker < Honeybadger::Plugins::Shoryuken::Middleware; end
 RSpec.describe TestShoryukenWorker do
   let(:sqs_msg) do
     double("SqsMsg",
-           queue_name: "queue",
-           attributes: { "ApproximateReceiveCount" => receive_count },
-           data: double("SqsMsgData", message_id: rand.to_s))
+      queue_name: "queue",
+      attributes: {"ApproximateReceiveCount" => receive_count},
+      data: double("SqsMsgData", message_id: rand.to_s))
   end
-  let(:body) { { "key" => "value" } }
+  let(:body) { {"key" => "value"} }
 
   shared_examples_for "notifies Honeybadger" do
     it do
       expect(Honeybadger).to receive(:notify).with(kind_of(RuntimeError),
-                                                   hash_including(parameters: { body: { "key" => "value" } }))
+        hash_including(parameters: {body: {"key" => "value"}}))
 
       expect { job_execution }.to raise_error(RuntimeError)
     end
@@ -62,13 +63,11 @@ RSpec.describe TestShoryukenWorker do
   shared_examples_for "batch notifies Honeybadger" do
     it do
       expect(Honeybadger).to receive(:notify).with(kind_of(RuntimeError),
-                                                   hash_including(parameters:
-                                                                    { batch: [
-                                                                        { "key" => "value" },
-                                                                        { "key" => "value" }
-                                                                      ]
-                                                                    }
-                                                                 ))
+        hash_including(parameters:
+                         {batch: [
+                           {"key" => "value"},
+                           {"key" => "value"}
+                         ]}))
 
       expect { job_execution }.to raise_error(RuntimeError)
     end
@@ -95,8 +94,8 @@ RSpec.describe TestShoryukenWorker do
     end
 
     context "when an attempt threshold is configured" do
-      before { ::Honeybadger.config[:'shoryuken.attempt_threshold'] = 2 }
-      after { ::Honeybadger.config[:'shoryuken.attempt_threshold'] = 0 }
+      before { ::Honeybadger.config[:"shoryuken.attempt_threshold"] = 2 }
+      after { ::Honeybadger.config[:"shoryuken.attempt_threshold"] = 0 }
 
       include_examples "doesn't notify Honeybadger"
 

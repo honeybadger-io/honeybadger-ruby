@@ -1,4 +1,4 @@
-require 'honeybadger/ruby'
+require "honeybadger/ruby"
 
 module Honeybadger
   # @api private
@@ -6,7 +6,7 @@ module Honeybadger
   module RakeHandler
     def self.included(klass)
       klass.class_eval do
-        include Rake087Methods unless defined?(Rake::VERSION) && Rake::VERSION >= '0.9.0'
+        include Rake087Methods unless defined?(Rake::VERSION) && Rake::VERSION >= "0.9.0"
         alias_method :display_error_message_without_honeybadger, :display_error_message
         alias_method :display_error_message, :display_error_message_with_honeybadger
       end
@@ -20,7 +20,7 @@ module Honeybadger
     end
 
     def reconstruct_command_line
-      "rake #{ARGV.join( ' ' )}"
+      "rake #{ARGV.join(" ")}"
     end
 
     # This module brings Rake 0.8.7 error handling to 0.9.0 standards
@@ -29,30 +29,28 @@ module Honeybadger
       #
       # Provide standard exception handling for the given block.
       def standard_exception_handling
-        begin
-          yield
-        rescue SystemExit => ex
-          # Exit silently with current status
-          raise
-        rescue OptionParser::InvalidOption => ex
-          $stderr.puts ex.message
-          exit(false)
-        rescue Exception => ex
-          # Exit with error message
-          display_error_message(ex)
-          exit(false)
-        end
+        yield
+      rescue SystemExit
+        # Exit silently with current status
+        raise
+      rescue OptionParser::InvalidOption => ex
+        warn ex.message
+        exit(false)
+      rescue => ex
+        # Exit with error message
+        display_error_message(ex)
+        exit(false)
       end
 
       # Method extracted from Rake 0.8.7 source
       def display_error_message(ex)
-        $stderr.puts "#{name} aborted!"
-        $stderr.puts ex.message
+        warn "#{name} aborted!"
+        warn ex.message
         if options.trace
-          $stderr.puts ex.backtrace.join("\n")
+          warn ex.backtrace.join("\n")
         else
-          $stderr.puts ex.backtrace.find {|str| str =~ /#{@rakefile}/ } || ""
-          $stderr.puts "(See full trace by running task with --trace)"
+          warn ex.backtrace.find { |str| str =~ /#{@rakefile}/ } || ""
+          warn "(See full trace by running task with --trace)"
         end
       end
     end

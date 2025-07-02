@@ -1,4 +1,4 @@
-require 'json'
+require "json"
 
 module Honeybadger
   # @api private
@@ -8,7 +8,7 @@ module Honeybadger
     class Line
       # Backtrace line regexp (optionally allowing leading X: for windows support).
       # Capture quoted strings either with leading backtick (pre Ruby 3.4) or single quote.
-      INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in (?:`|')([^']+)')?$}.freeze
+      INPUT_FORMAT = %r{^((?:[a-zA-Z]:)?[^:]+):(\d+)(?::in (?:`|')([^']+)')?$}
 
       # The file portion of the line (such as app/models/user.rb).
       attr_reader :file
@@ -45,21 +45,19 @@ module Honeybadger
           file, number, method = match[1], match[2], match[3]
           filtered_args = [fmatch[1], fmatch[2], fmatch[3]]
           new(file, number, method, *filtered_args, opts.fetch(:source_radius, 2))
-        else
-          nil
         end
       end
 
       def initialize(file, number, method, filtered_file = file,
-                     filtered_number = number, filtered_method = method,
-                     source_radius = 2)
-        self.filtered_file   = filtered_file
+        filtered_number = number, filtered_method = method,
+        source_radius = 2)
+        self.filtered_file = filtered_file
         self.filtered_number = filtered_number
         self.filtered_method = filtered_method
-        self.file            = file
-        self.number          = number
-        self.method          = method
-        self.source_radius   = source_radius
+        self.file = file
+        self.number = number
+        self.method = method
+        self.source_radius = source_radius
       end
 
       # Reconstructs the line in a readable fashion.
@@ -72,7 +70,7 @@ module Honeybadger
       end
 
       def inspect
-        "<Line:#{to_s}>"
+        "<Line:#{self}>"
       end
 
       # Determines if this line is part of the application trace or not.
@@ -102,8 +100,11 @@ module Honeybadger
 
           l = 0
           File.open(file) do |f|
-            start.times { f.gets ; l += 1 }
-            return Hash[duration.times.map { (line = f.gets) ? [(l += 1), line] : nil }.compact]
+            start.times {
+              f.gets
+              l += 1
+            }
+            return duration.times.map { (line = f.gets) ? [(l += 1), line] : nil }.compact.to_h
           end
         else
           {}
@@ -121,7 +122,7 @@ module Honeybadger
         Line.parse(unparsed_line.to_s, opts)
       end.compact
 
-      instance = new(lines)
+      new(lines)
     end
 
     def initialize(lines)
@@ -133,9 +134,9 @@ module Honeybadger
     #
     # Returns array containing backtrace lines.
     def to_ary
-      lines.take(1000).map { |l| { :number => l.filtered_number, :file => l.filtered_file, :method => l.filtered_method, :source => l.source } }
+      lines.take(1000).map { |l| {number: l.filtered_number, file: l.filtered_file, method: l.filtered_method, source: l.source} }
     end
-    alias :to_a :to_ary
+    alias_method :to_a, :to_ary
 
     # JSON support.
     #
@@ -171,11 +172,15 @@ module Honeybadger
 
     attr_writer :lines, :application_lines
 
-    def self.split_multiline_backtrace(backtrace)
-      if backtrace.size == 1
-        backtrace.first.to_s.split(/\n\s*/)
-      else
-        backtrace
+    class << self
+      private
+
+      def split_multiline_backtrace(backtrace)
+        if backtrace.size == 1
+          backtrace.first.to_s.split(/\n\s*/)
+        else
+          backtrace
+        end
       end
     end
   end

@@ -1,6 +1,6 @@
-require 'set'
+require "set"
 
-require 'honeybadger/conversions'
+require "honeybadger/conversions"
 
 module Honeybadger
   module Util
@@ -8,17 +8,17 @@ module Honeybadger
     # are based on Rails' HTTP parameter filter.
     class Sanitizer
       COOKIE_PAIRS = /[;,]\s?/
-      COOKIE_SEP = '='.freeze
-      COOKIE_PAIR_SEP = '; '.freeze
+      COOKIE_SEP = "=".freeze
+      COOKIE_PAIR_SEP = "; ".freeze
 
-      ENCODE_OPTS = { invalid: :replace, undef: :replace, replace: '?'.freeze }.freeze
+      ENCODE_OPTS = {invalid: :replace, undef: :replace, replace: "?".freeze}.freeze
 
-      BASIC_OBJECT = '#<BasicObject>'.freeze
-      DEPTH = '[DEPTH]'.freeze
-      FILTERED = '[FILTERED]'.freeze
-      RAISED = '[RAISED]'.freeze
-      RECURSION = '[RECURSION]'.freeze
-      TRUNCATED = '[TRUNCATED]'.freeze
+      BASIC_OBJECT = "#<BasicObject>".freeze
+      DEPTH = "[DEPTH]".freeze
+      FILTERED = "[FILTERED]".freeze
+      RAISED = "[RAISED]".freeze
+      RECURSION = "[RECURSION]".freeze
+      TRUNCATED = "[TRUNCATED]".freeze
 
       IMMUTABLE = [NilClass, FalseClass, TrueClass, Symbol, Numeric, Method].freeze
 
@@ -51,15 +51,15 @@ module Honeybadger
         @deep_regexps, @regexps = @regexps.partition { |r| r.to_s.include?('\\.'.freeze) }
         deep_strings, @strings = strings.partition { |s| s.include?('\\.'.freeze) }
 
-        @regexps << Regexp.new(strings.join('|'.freeze), true) unless strings.empty?
-        @deep_regexps << Regexp.new(deep_strings.join('|'.freeze), true) unless deep_strings.empty?
+        @regexps << Regexp.new(strings.join("|".freeze), true) unless strings.empty?
+        @deep_regexps << Regexp.new(deep_strings.join("|".freeze), true) unless deep_strings.empty?
       end
 
       def sanitize(data, depth = 0, stack = nil, parents = [])
         return BASIC_OBJECT if basic_object?(data)
 
         if recursive?(data)
-          return RECURSION if stack && stack.include?(data.object_id)
+          return RECURSION if stack&.include?(data.object_id)
 
           stack = stack ? stack.dup : Set.new
           stack << data.object_id
@@ -74,12 +74,12 @@ module Honeybadger
 
           hash.each_pair do |key, value|
             parents.push(key) if deep_regexps
-            key = key.kind_of?(Symbol) ? key : sanitize(key, depth+1, stack, parents)
+            key = key.is_a?(Symbol) ? key : sanitize(key, depth + 1, stack, parents)
 
             if filter_key?(key, parents)
               new_hash[key] = FILTERED
             else
-              value = sanitize(value, depth+1, stack, parents)
+              value = sanitize(value, depth + 1, stack, parents)
 
               if blocks.any? && !recursive?(value)
                 key = key.dup if can_dup?(key)
@@ -98,13 +98,13 @@ module Honeybadger
           return DEPTH if depth >= max_depth
 
           data.to_a.map do |value|
-            sanitize(value, depth+1, stack, parents)
+            sanitize(value, depth + 1, stack, parents)
           end
         when Numeric, TrueClass, FalseClass, NilClass
           data
         when String
           sanitize_string(data)
-        when -> (d) { d.respond_to?(:to_honeybadger) }
+        when ->(d) { d.respond_to?(:to_honeybadger) }
           return DEPTH if depth >= max_depth
 
           begin
@@ -113,7 +113,7 @@ module Honeybadger
             return RAISED
           end
 
-          sanitize(data, depth+1, stack, parents)
+          sanitize(data, depth + 1, stack, parents)
         else # all other objects
           klass = data.class
 
@@ -156,7 +156,7 @@ module Honeybadger
         filtered_url
       end
 
-    private
+      private
 
       attr_reader :max_depth, :regexps, :deep_regexps, :blocks
 
@@ -180,7 +180,7 @@ module Honeybadger
       def valid_encoding?(string)
         string.valid_encoding? && (
           VALID_ENCODINGS.include?(string.encoding) ||
-          VALID_ENCODINGS.include?(Encoding.compatible?(''.freeze, string))
+          VALID_ENCODINGS.include?(Encoding.compatible?("".freeze, string))
         )
       end
 
@@ -202,7 +202,7 @@ module Honeybadger
       end
 
       def can_dup?(obj)
-        !IMMUTABLE.any? {|k| obj.kind_of?(k) }
+        !IMMUTABLE.any? { |k| obj.is_a?(k) }
       end
 
       def inspected?(string)

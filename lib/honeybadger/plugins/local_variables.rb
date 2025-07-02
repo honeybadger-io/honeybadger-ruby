@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/backtrace'
+require "honeybadger/plugin"
+require "honeybadger/backtrace"
 
 module Honeybadger
   module Plugins
@@ -24,10 +24,10 @@ module Honeybadger
       end
 
       Plugin.register do
-        requirement { config[:'exceptions.local_variables'] }
+        requirement { config[:"exceptions.local_variables"] }
         requirement { defined?(::BindingOfCaller) }
         requirement do
-          if res = defined?(::BetterErrors)
+          if (res = defined?(::BetterErrors))
             logger.warn("The local variables feature is incompatible with the " \
                         "better_errors gem; to remove this warning, set " \
                         "exceptions.local_variables to false for environments " \

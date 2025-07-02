@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/ruby'
+require "honeybadger/plugin"
+require "honeybadger/ruby"
 
 module Honeybadger
   module Plugins
@@ -18,18 +18,18 @@ module Honeybadger
         # Error notifications must be synchronous as the +on_failure+ hook is
         # executed after +around_perform+.
         def on_failure_with_honeybadger(e, *args)
-          Honeybadger.notify(e, parameters: { job_arguments: args }, sync: true) if send_exception_to_honeybadger?(e, args)
+          Honeybadger.notify(e, parameters: {job_arguments: args}, sync: true) if send_exception_to_honeybadger?(e, args)
         ensure
           Honeybadger.clear!
         end
 
         def send_exception_to_honeybadger?(e, args)
           return true unless respond_to?(:retry_criteria_valid?)
-          return true if ::Honeybadger.config[:'resque.resque_retry.send_exceptions_when_retrying']
+          return true if ::Honeybadger.config[:"resque.resque_retry.send_exceptions_when_retrying"]
 
           !retry_criteria_valid?(e)
         rescue => e
-          Honeybadger.notify(e, parameters: { job_arguments: args }, sync: true)
+          Honeybadger.notify(e, parameters: {job_arguments: args}, sync: true)
         end
       end
 
@@ -54,7 +54,7 @@ module Honeybadger
         requirement { defined?(::Resque::Job) }
 
         requirement do
-          if resque_honeybadger = defined?(::Resque::Failure::Honeybadger)
+          if (resque_honeybadger = defined?(::Resque::Failure::Honeybadger))
             logger.warn("Support for Resque has been moved " \
                         "to the honeybadger gem. Please remove " \
                         "resque-honeybadger from your " \
@@ -64,7 +64,7 @@ module Honeybadger
         end
 
         execution do
-          return unless Honeybadger.config[:'exceptions.enabled']
+          return unless Honeybadger.config[:"exceptions.enabled"]
           ::Resque::Job.send(:include, Installer)
         end
       end

@@ -1,4 +1,4 @@
-require 'honeybadger/notification_subscriber'
+require "honeybadger/notification_subscriber"
 
 module Honeybadger
   module Plugins
@@ -11,19 +11,21 @@ module Honeybadger
           Honeybadger.clear!
           context = context(job)
           block.call
-        rescue StandardError => e
-          Honeybadger.notify(
-            e,
-            context: context,
-            parameters: { arguments: job.arguments }
-          ) if job.executions >= Honeybadger.config[:'active_job.attempt_threshold'].to_i
+        rescue => e
+          if job.executions >= Honeybadger.config[:"active_job.attempt_threshold"].to_i
+            Honeybadger.notify(
+              e,
+              context: context,
+              parameters: {arguments: job.arguments}
+            )
+          end
           raise e
         end
 
         def context(job) # rubocop:disable Metrics/MethodLength
           {
             component: job.class,
-            action: 'perform',
+            action: "perform",
             enqueued_at: job.try(:enqueued_at),
             executions: job.executions,
             job_class: job.class,
@@ -51,7 +53,7 @@ module Honeybadger
         end
 
         execution do
-          ::ActiveJob::Base.set_callback(:perform, :around, prepend: true, &ActiveJob.method(:perform_around)) if Honeybadger.config[:'exceptions.enabled']
+          ::ActiveJob::Base.set_callback(:perform, :around, prepend: true, &ActiveJob.method(:perform_around)) if Honeybadger.config[:"exceptions.enabled"]
 
           if config.load_plugin_insights?(:active_job)
             ::ActiveSupport::Notifications.subscribe(/(enqueue_at|enqueue|enqueue_retry|enqueue_all|perform|retry_stopped|discard)\.active_job/, Honeybadger::ActiveJobSubscriber.new)

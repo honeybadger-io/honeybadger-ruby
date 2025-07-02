@@ -1,7 +1,7 @@
-require 'forwardable'
-require 'net/http'
+require "forwardable"
+require "net/http"
 
-require 'honeybadger/logging'
+require "honeybadger/logging"
 
 module Honeybadger
   # A concurrent queue to notify the backend.
@@ -38,7 +38,7 @@ module Honeybadger
       return false unless start
 
       if queue.size >= config.max_queue_size
-        warn { sprintf('Unable to report error; reached max queue size of %s. id=%s', queue.size, msg.id) }
+        warn { sprintf("Unable to report error; reached max queue size of %s. id=%s", queue.size, msg.id) }
         return false
       end
 
@@ -50,7 +50,7 @@ module Honeybadger
     end
 
     def shutdown(force = false)
-      d { 'shutting down worker' }
+      d { "shutting down worker" }
 
       mutex.synchronize do
         @shutdown = true
@@ -60,11 +60,11 @@ module Honeybadger
       return true unless thread&.alive?
 
       if throttled?
-        warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } unless queue.empty?
+        warn { sprintf("Unable to report %s error(s) to Honeybadger (currently throttled)", queue.size) } unless queue.empty?
         return true
       end
 
-      info { sprintf('Waiting to report %s error(s) to Honeybadger', queue.size) } unless queue.empty?
+      info { sprintf("Waiting to report %s error(s) to Honeybadger", queue.size) } unless queue.empty?
 
       queue.push(SHUTDOWN)
       !!thread.join
@@ -76,7 +76,7 @@ module Honeybadger
     # Blocks until queue is processed up to this point in time.
     def flush
       mutex.synchronize do
-        if thread && thread.alive?
+        if thread&.alive?
           queue.push(marker)
           marker.wait(mutex)
         end
@@ -125,7 +125,7 @@ module Honeybadger
     end
 
     def kill!
-      d { 'killing worker thread' }
+      d { "killing worker thread" }
 
       if thread
         Thread.kill(thread)
@@ -147,7 +147,7 @@ module Honeybadger
 
     def run
       begin
-        d { 'worker started' }
+        d { "worker started" }
         loop do
           case msg = queue.pop
           when SHUTDOWN then break
@@ -156,9 +156,9 @@ module Honeybadger
           end
         end
       ensure
-        d { 'stopping worker' }
+        d { "stopping worker" }
       end
-    rescue Exception => e
+    rescue => e
       error {
         msg = "Error in worker thread (shutting down) class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
@@ -171,13 +171,13 @@ module Honeybadger
       send_now(msg)
 
       if shutdown? && throttled?
-        warn { sprintf('Unable to report %s error(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
+        warn { sprintf("Unable to report %s error(s) to Honeybadger (currently throttled)", queue.size) } if queue.size > 1
         kill!
         return
       end
 
       sleep(throttle_interval)
-    rescue StandardError => e
+    rescue => e
       error {
         msg = "Error in worker thread class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
@@ -185,12 +185,12 @@ module Honeybadger
     end
 
     def notify_backend(payload)
-      d { sprintf('worker notifying backend id=%s', payload.id) }
+      d { sprintf("worker notifying backend id=%s", payload.id) }
       backend.notify(:notices, payload)
     end
 
     def calc_throttle_interval
-      ((BASE_THROTTLE ** throttle) - 1).round(3)
+      ((BASE_THROTTLE**throttle) - 1).round(3)
     end
 
     def inc_throttle
@@ -211,33 +211,33 @@ module Honeybadger
     end
 
     def handle_response(msg, response)
-      d { sprintf('worker response id=%s code=%s message=%s', msg.id, response.code, response.message.to_s.dump) }
+      d { sprintf("worker response id=%s code=%s message=%s", msg.id, response.code, response.message.to_s.dump) }
 
       case response.code
       when 429, 503
         throttle = inc_throttle
-        warn { sprintf('Error report failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s', msg.id, response.code, throttle, throttle_interval) }
+        warn { sprintf("Error report failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s", msg.id, response.code, throttle, throttle_interval) }
       when 402
-        warn { sprintf('Error report failed: payment is required. id=%s code=%s', msg.id, response.code) }
+        warn { sprintf("Error report failed: payment is required. id=%s code=%s", msg.id, response.code) }
         suspend(3600)
       when 403
-        warn { sprintf('Error report failed: API key is invalid. id=%s code=%s', msg.id, response.code) }
+        warn { sprintf("Error report failed: API key is invalid. id=%s code=%s", msg.id, response.code) }
         suspend(3600)
       when 413
-        warn { sprintf('Error report failed: Payload is too large. id=%s code=%s', msg.id, response.code) }
+        warn { sprintf("Error report failed: Payload is too large. id=%s code=%s", msg.id, response.code) }
       when 201
-        host = config.get(:'connection.ui_host')
-        if throttle = dec_throttle
-          info { sprintf('Success ⚡ https://%s/notice/%s id=%s code=%s throttle=%s interval=%s', host, msg.id, msg.id, response.code, throttle, throttle_interval) }
+        host = config.get(:"connection.ui_host")
+        if (throttle = dec_throttle)
+          info { sprintf("Success ⚡ https://%s/notice/%s id=%s code=%s throttle=%s interval=%s", host, msg.id, msg.id, response.code, throttle, throttle_interval) }
         else
-          info { sprintf('Success ⚡ https://%s/notice/%s id=%s code=%s', host, msg.id, msg.id, response.code) }
+          info { sprintf("Success ⚡ https://%s/notice/%s id=%s code=%s", host, msg.id, msg.id, response.code) }
         end
       when :stubbed
-        info { sprintf('Success ⚡ Development mode is enabled; this error will be reported if it occurs after you deploy your app. id=%s', msg.id) }
+        info { sprintf("Success ⚡ Development mode is enabled; this error will be reported if it occurs after you deploy your app. id=%s", msg.id) }
       when :error
-        warn { sprintf('Error report failed: an unknown error occurred. code=%s error=%s', response.code, response.message.to_s.dump) }
+        warn { sprintf("Error report failed: an unknown error occurred. code=%s error=%s", response.code, response.message.to_s.dump) }
       else
-        warn { sprintf('Error report failed: unknown response from server. code=%s', response.code) }
+        warn { sprintf("Error report failed: unknown response from server. code=%s", response.code) }
       end
     end
 

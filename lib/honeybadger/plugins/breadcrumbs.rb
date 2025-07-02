@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/breadcrumbs/logging'
+require "honeybadger/plugin"
+require "honeybadger/breadcrumbs/logging"
 
 module Honeybadger
   module Plugins
@@ -41,19 +41,19 @@ module Honeybadger
     # See RailsBreadcrumbs.send_breadcrumb_notification for specifics on the
     # options for customization
     Plugin.register :breadcrumbs do
-      requirement { config[:'breadcrumbs.enabled'] }
+      requirement { config[:"breadcrumbs.enabled"] }
 
       execution do
         # Rails specific breadcrumb events
         #
         if defined?(::Rails.application) && ::Rails.application
-          config[:'breadcrumbs.active_support_notifications'].each do |name, config|
+          config[:"breadcrumbs.active_support_notifications"].each do |name, config|
             RailsBreadcrumbs.subscribe_to_notification(name, config)
           end
-          ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector) if config[:'breadcrumbs.logging.enabled']
+          ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector) if config[:"breadcrumbs.logging.enabled"]
         end
 
-        ::Logger.prepend(Honeybadger::Breadcrumbs::LogWrapper) if config[:'breadcrumbs.logging.enabled']
+        ::Logger.prepend(Honeybadger::Breadcrumbs::LogWrapper) if config[:"breadcrumbs.logging.enabled"]
       end
     end
 
@@ -73,7 +73,7 @@ module Honeybadger
       # @option notification_config [Proc] :transform A proc that accepts the data payload. The return value will replace the current data hash (optional)
       #
       def self.send_breadcrumb_notification(name, duration, notification_config, data = {})
-        return if notification_config[:exclude_when] && notification_config[:exclude_when].call(data)
+        return if notification_config[:exclude_when]&.call(data)
 
         message =
           case (m = notification_config[:message])
