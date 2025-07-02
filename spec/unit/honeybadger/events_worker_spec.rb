@@ -232,7 +232,7 @@ describe Honeybadger::EventsWorker do
 
       it "warns the logger when the queue has additional items" do
         allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/throttled/i)
+        expect(config.logger).to receive(:warn).with(/throttled/i).at_least(:once)
         100.times { subject.send(:inc_throttle) }
         10.times do
           subject.push(event)

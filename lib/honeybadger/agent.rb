@@ -415,6 +415,7 @@ module Honeybadger
       extra_payload = {}.tap do |p|
         p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
         p[:hostname] = config[:hostname].to_s if config[:"events.attach_hostname"]
+        p.update(context_manager.get_event_context || {})
       end
 
       event = Event.new(event_type, extra_payload.merge(payload))
@@ -442,6 +443,54 @@ module Honeybadger
       strip_metadata(event)
 
       events_worker.push(event.as_json)
+    end
+
+    # Save event-specific context for the current request.
+    #
+    # @example
+    #   Honeybadger.event_context({user_id: current_user.id})
+    #
+    #   # Inside a Rails controller:
+    #   before_action do
+    #     Honeybadger.event_context({user_id: current_user.id})
+    #   end
+    #
+    #   # Explicit conversion
+    #   class User < ActiveRecord::Base
+    #     def to_honeybadger_context
+    #       { user_id: id, user_email: email }
+    #     end
+    #   end
+    #
+    #   user = User.first
+    #   Honeybadger.event_context(user)
+    #
+    #   # Clearing event context:
+    #   Honeybadger.clear_event_context
+    #
+    # @param [Hash] context A Hash of data which will be sent to Honeybadger
+    #   when an event occurs. If the object responds to +#to_honeybadger_context+,
+    #   the return value of that method will be used (explicit conversion). Can
+    #   include any key/value, but a few keys have a special meaning in
+    #   Honeybadger.
+    #
+    # @return [Object, self] value of the block if passed, otherwise self
+    def event_context(context = nil, &block)
+      block_result = context_manager.set_event_context(context, &block) unless context.nil?
+      return block_result if block_given?
+
+      self
+    end
+
+    # Get event-specific context for the current request.
+    #
+    # @example
+    #   Honeybadger.event_context({my_data: 'my value'})
+    #   Honeybadger.get_event_context # => {my_data: 'my value'}
+    #
+    # @return [Hash, nil]
+    def get_event_context
+      context_manager.get_event_context
     end
 
     # @api private

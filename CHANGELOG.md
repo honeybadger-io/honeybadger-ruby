@@ -1,6 +1,26 @@
 # Change Log
 
 
+## [5.29.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.29.0...v5.29.1) (2025-07-01)
+
+
+### Bug Fixes
+
+* Revert "feat: exclude insights from rake tasks config ([#697](https://github.com/honeybadger-io/honeybadger-ruby/issues/697))" ([381566c](https://github.com/honeybadger-io/honeybadger-ruby/commit/381566cf976e110ff5b55770038aac25f51ee4ea)), closes [#702](https://github.com/honeybadger-io/honeybadger-ruby/issues/702)
+
+## [5.29.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.28.0...v5.29.0) (2025-06-27)
+
+
+### Features
+
+* add event context ([#700](https://github.com/honeybadger-io/honeybadger-ruby/issues/700)) ([36abc18](https://github.com/honeybadger-io/honeybadger-ruby/commit/36abc1826a62954b83b11b10d7e91d41f3052524))
+* exclude insights from rake tasks config ([#697](https://github.com/honeybadger-io/honeybadger-ruby/issues/697)) ([118034c](https://github.com/honeybadger-io/honeybadger-ruby/commit/118034c8395dd79fada9979f9f519ded8e81234a))
+
+
+### Bug Fixes
+
+* avoid database connections during asset precompilation ([#695](https://github.com/honeybadger-io/honeybadger-ruby/issues/695)) ([14ae485](https://github.com/honeybadger-io/honeybadger-ruby/commit/14ae4858da865cb6f95d16e1a12faf3ecc2caedd))
+
 ## [5.28.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.27.4...v5.28.0) (2025-05-02)
 
 
