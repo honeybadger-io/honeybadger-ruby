@@ -65,7 +65,7 @@ module Honeybadger
               - cucumber
               
               # By default, Honeybadger won't report errors in the development_environments.
-              # You can override this by explicitly setting report_data to true or false.
+              # You can override this by explicitly setting report_data to true.
               # report_data: true
               
               # The current Git revision of your project. Defaults to the last commit hash.
