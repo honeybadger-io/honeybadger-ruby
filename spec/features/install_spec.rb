@@ -50,11 +50,6 @@ feature "Installing honeybadger via the cli" do
         run_command_and_stop("honeybadger install asdf --no-insights", fail_on_error: true)
         expect(YAML.load_file(config_file).dig("insights", "enabled")).to eq(false)
       end
-
-      it "defaults to enabled" do
-        run_command_and_stop("honeybadger install asdf", fail_on_error: true)
-        expect(YAML.load_file(config_file).dig("insights", "enabled")).to eq(true)
-      end
     end
 
     context "with host and/or UI host flags" do

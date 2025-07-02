@@ -484,7 +484,7 @@ module Honeybadger
       },
       "insights.enabled": {
         description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
-        default: true,
+        default: false,
         type: Boolean
       },
       "insights.console.enabled": {
