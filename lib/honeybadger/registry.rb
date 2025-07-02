@@ -2,7 +2,7 @@ module Honeybadger
   class Registry
     def initialize
       @mutex = Mutex.new
-      @metrics = Hash.new
+      @metrics = {}
     end
 
     def register(metric)
@@ -19,7 +19,7 @@ module Honeybadger
 
     def flush
       @mutex.synchronize do
-        @metrics = Hash.new
+        @metrics = {}
       end
     end
 

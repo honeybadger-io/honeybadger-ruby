@@ -1,6 +1,6 @@
-require 'honeybadger/plugins/karafka'
-require 'honeybadger/karafka'
-require 'honeybadger/config'
+require "honeybadger/plugins/karafka"
+require "honeybadger/karafka"
+require "honeybadger/config"
 
 describe "Karafka Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
@@ -22,9 +22,9 @@ describe "Karafka Dependency" do
         end
       end
     end
-    let(:monitor) { double('monitor') }
-    let(:event) { double('event') }
-    let(:errors_listener) { double('errors listener') }
+    let(:monitor) { double("monitor") }
+    let(:event) { double("event") }
+    let(:errors_listener) { double("errors listener") }
 
     before do
       Object.const_set(:Karafka, shim)
@@ -39,8 +39,8 @@ describe "Karafka Dependency" do
     end
 
     context "when Insights instrumentation is enabled" do
-      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, :'insights.enabled' => true) }
-      let(:insights_listener) { double('insights listener') }
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
+      let(:insights_listener) { double("insights listener") }
 
       before do
         allow(::Honeybadger::Karafka::InsightsListener).to receive(:new).and_return(insights_listener)

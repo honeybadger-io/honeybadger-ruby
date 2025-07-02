@@ -1,12 +1,12 @@
-require 'honeybadger/rack/user_feedback'
-require 'honeybadger/config'
+require "honeybadger/rack/user_feedback"
+require "honeybadger/config"
 
 describe Honeybadger::Rack::UserFeedback do
   let(:agent) { Honeybadger::Agent.new }
   let(:config) { agent.config }
   let(:main_app) do
     lambda do |env|
-      env['honeybadger.error_id'] = honeybadger_id if defined?(honeybadger_id)
+      env["honeybadger.error_id"] = honeybadger_id if defined?(honeybadger_id)
       [200, {}, ["<!-- HONEYBADGER FEEDBACK -->"]]
     end
   end
@@ -24,8 +24,8 @@ describe Honeybadger::Rack::UserFeedback do
 
     context "a project root is configured" do
       let(:tmp_dir) { TMP_DIR }
-      let(:template_dir) { File.join(tmp_dir, 'lib', 'honeybadger', 'templates') }
-      let(:template_file) { File.join(template_dir, 'feedback_form.erb') }
+      let(:template_dir) { File.join(tmp_dir, "lib", "honeybadger", "templates") }
+      let(:template_file) { File.join(template_dir, "feedback_form.erb") }
 
       before do
         FileUtils.mkdir_p(template_dir)
@@ -35,7 +35,7 @@ describe Honeybadger::Rack::UserFeedback do
 
       context "custom template is implemented" do
         before do
-          File.open(template_file, 'w') { |f| f.write 'custom feedback form' }
+          File.write(template_file, "custom feedback form")
         end
 
         it "renders with custom template" do
@@ -47,7 +47,7 @@ describe Honeybadger::Rack::UserFeedback do
 
   context "there is no honeybadger id" do
     it "does not modify the output" do
-      expect(result[2][0]).to eq '<!-- HONEYBADGER FEEDBACK -->'
+      expect(result[2][0]).to eq "<!-- HONEYBADGER FEEDBACK -->"
     end
   end
 end

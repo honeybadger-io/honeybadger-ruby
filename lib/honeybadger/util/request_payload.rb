@@ -1,4 +1,4 @@
-require 'honeybadger/util/sanitizer'
+require "honeybadger/util/sanitizer"
 
 module Honeybadger
   module Util
@@ -18,7 +18,7 @@ module Honeybadger
       KEYS = DEFAULTS.keys.freeze
 
       # The cgi_data key where the raw Cookie header is stored.
-      HTTP_COOKIE_KEY = 'HTTP_COOKIE'.freeze
+      HTTP_COOKIE_KEY = "HTTP_COOKIE".freeze
 
       def self.build(opts = {})
         sanitizer = opts.fetch(:sanitizer) { Sanitizer.new }

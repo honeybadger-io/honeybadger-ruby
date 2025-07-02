@@ -1,5 +1,5 @@
-require 'honeybadger/event'
-require 'timecop'
+require "honeybadger/event"
+require "timecop"
 
 describe Honeybadger::Event do
   let(:event_type) { "event_type" }
@@ -19,10 +19,10 @@ describe Honeybadger::Event do
     context "event_type is passed as part of payload" do
       subject { described_class.new(event_type) }
 
-      let(:event_type) { { event_type: "action" } }
+      let(:event_type) { {event_type: "action"} }
 
       its(:event_type) { should eq "action" }
-      its(:payload) { should eq({ event_type: "action" }) }
+      its(:payload) { should eq({event_type: "action"}) }
     end
   end
 
@@ -46,11 +46,11 @@ describe Honeybadger::Event do
 
   describe "as_json" do
     let(:event_type) { "action" }
-    let(:payload) { { data1: 1 } }
+    let(:payload) { {data1: 1} }
 
     before { Timecop.freeze }
     after { Timecop.unfreeze }
 
-    its(:as_json) { should eq({ event_type: "action", ts: Time.now.utc.strftime("%FT%T.%LZ"), data1: 1 }) }
+    its(:as_json) { should eq({event_type: "action", ts: Time.now.utc.strftime("%FT%T.%LZ"), data1: 1}) }
   end
 end

@@ -1,8 +1,8 @@
-require 'honeybadger/breadcrumbs/logging'
+require "honeybadger/breadcrumbs/logging"
+
+LOGGING_LEVELS = %w[info debug warn error fatal unknown]
 
 describe Honeybadger::Breadcrumbs::LogSubscriberInjector do
-  LOGGING_LEVELS = %w(info debug warn error fatal unknown)
-
   let(:logger) do
     Class.new do
       prepend Honeybadger::Breadcrumbs::LogSubscriberInjector

@@ -1,5 +1,5 @@
-require 'honeybadger/plugins/passenger'
-require 'honeybadger/config'
+require "honeybadger/plugins/passenger"
+require "honeybadger/config"
 
 describe "Passenger integration" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
@@ -16,7 +16,7 @@ describe "Passenger integration" do
   end
 
   context "when passenger is installed" do
-    let(:shim) { double('PhusionPassenger') }
+    let(:shim) { double("PhusionPassenger") }
 
     before do
       Object.const_set(:PhusionPassenger, shim)

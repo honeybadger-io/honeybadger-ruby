@@ -1,0 +1,25 @@
+name: Standard
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: head
+        bundler-cache: true
+
+    - name: Run standard
+      run: |
+        bundle exec standardrb .
+

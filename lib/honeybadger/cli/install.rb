@@ -1,7 +1,7 @@
-require 'forwardable'
-require 'honeybadger/cli/main'
-require 'honeybadger/cli/test'
-require 'pathname'
+require "forwardable"
+require "honeybadger/cli/main"
+require "honeybadger/cli/test"
+require "pathname"
 
 module Honeybadger
   module CLI
@@ -18,15 +18,15 @@ module Honeybadger
         say("Installing Honeybadger #{VERSION}")
 
         begin
-          require File.join(Dir.pwd, 'config', 'application.rb')
+          require File.join(Dir.pwd, "config", "application.rb")
           raise LoadError unless defined?(::Rails.application)
           root = Rails.root
-          config_root = root.join('config')
+          config_root = root.join("config")
         rescue LoadError
           root = config_root = Pathname.new(Dir.pwd)
         end
 
-        config_path = config_root.join('honeybadger.yml')
+        config_path = config_root.join("honeybadger.yml")
 
         if config_path.exist?
           say("You're already on Honeybadger, so you're all set.", :yellow)
@@ -45,52 +45,52 @@ module Honeybadger
 
           default_env = defined?(::Rails.application) ? "Rails.env" : "ENV['RUBY_ENV'] || ENV['RACK_ENV']"
           default_root = defined?(::Rails.application) ? "Rails.root.to_s" : "Dir.pwd"
-          File.open(path, 'w+') do |file|
-            file.write(<<-CONFIG)
----
-# For more options, see https://docs.honeybadger.io/lib/ruby/gem-reference/configuration
-
-api_key: '#{api_key}'
-
-# The environment your app is running in.
-env: "<%= #{default_env} %>"
-
-# The absolute path to your project folder.
-root: "<%= #{default_root} %>"
-
-# Honeybadger won't report errors in these environments.
-development_environments:
-- test
-- development
-- cucumber
-
-# By default, Honeybadger won't report errors in the development_environments.
-# You can override this by explicitly setting report_data to true or false.
-# report_data: true
-
-# The current Git revision of your project. Defaults to the last commit hash.
-# revision: null
-
-# Enable verbose debug logging (useful for troubleshooting).
-debug: false
-
-# Enable Honeybadger Insights
-insights:
-  enabled: #{options["insights"]}
-CONFIG
+          File.open(path, "w+") do |file|
+            file.write(<<~CONFIG)
+              ---
+              # For more options, see https://docs.honeybadger.io/lib/ruby/gem-reference/configuration
+              
+              api_key: '#{api_key}'
+              
+              # The environment your app is running in.
+              env: "<%= #{default_env} %>"
+              
+              # The absolute path to your project folder.
+              root: "<%= #{default_root} %>"
+              
+              # Honeybadger won't report errors in these environments.
+              development_environments:
+              - test
+              - development
+              - cucumber
+              
+              # By default, Honeybadger won't report errors in the development_environments.
+              # You can override this by explicitly setting report_data to true or false.
+              # report_data: true
+              
+              # The current Git revision of your project. Defaults to the last commit hash.
+              # revision: null
+              
+              # Enable verbose debug logging (useful for troubleshooting).
+              debug: false
+              
+              # Enable Honeybadger Insights
+              insights:
+                enabled: #{options["insights"]}
+            CONFIG
             if (connection = options.slice("host", "ui_host")).any?
               file.puts("\n# Override hosts\nconnection:")
-              connection.each {|k,v| file.puts("  #{k}: '#{v}'") }
+              connection.each { |k, v| file.puts("  #{k}: '#{v}'") }
             end
           end
         end
 
-        if (capfile = root.join('Capfile')).exist?
-          if capfile.read.match(/honeybadger/)
+        if (capfile = root.join("Capfile")).exist?
+          if /honeybadger/.match?(capfile.read)
             say("Detected Honeybadger in Capfile; skipping Capistrano installation.", :yellow)
           else
             say("Appending Capistrano tasks to: #{capfile}", :yellow)
-            File.open(capfile, 'a') do |f|
+            File.open(capfile, "a") do |f|
               f.puts("\nrequire 'capistrano/honeybadger'")
             end
           end
