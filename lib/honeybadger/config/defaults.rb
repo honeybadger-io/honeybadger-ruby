@@ -484,7 +484,7 @@ module Honeybadger
       },
       "insights.enabled": {
         description: "Enable/Disable Honeybadger Insights built-in instrumentation.",
-        default: false,
+        default: true,
         type: Boolean
       },
       "insights.console.enabled": {
@@ -497,8 +497,8 @@ module Honeybadger
         default: 60,
         type: Integer
       },
-      :'puma.insights.events' => {
-        description: 'Enable automatic event capturing for Puma stats.',
+      "puma.insights.events": {
+        description: "Enable automatic event capturing for Puma stats.",
         default: true,
         type: Boolean
       },
