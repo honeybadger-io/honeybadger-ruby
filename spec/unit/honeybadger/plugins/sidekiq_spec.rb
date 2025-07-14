@@ -214,7 +214,17 @@ describe "Sidekiq Dependency" do
           end
 
           def as_json
-            {}
+            {
+              "stats" => {
+                "processed" => 0,
+                "failed" => 0,
+                "scheduled_size" => 0,
+                "retry_size" => 0,
+                "dead_size" => 0,
+                "processes_size" => 0,
+                "default_queue_latency" => 0
+              }
+            }
           end
         end
       end

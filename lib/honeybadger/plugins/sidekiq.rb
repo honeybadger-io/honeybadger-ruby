@@ -133,38 +133,42 @@ module Honeybadger
           end
 
           if config.load_plugin_insights?(:sidekiq)
-            require "sidekiq"
-            require "sidekiq/api"
+            begin
+              require "sidekiq"
+              require "sidekiq/api"
 
-            if Gem::Version.new(::Sidekiq::VERSION) >= Gem::Version.new("6.5")
-              require "sidekiq/component"
+              if Gem::Version.new(::Sidekiq::VERSION) >= Gem::Version.new("6.5")
+                require "sidekiq/component"
 
-              class SidekiqClusterCollectionChecker
-                include ::Sidekiq::Component
-                def initialize(config)
-                  @config = config
-                end
+                class SidekiqClusterCollectionChecker
+                  include ::Sidekiq::Component
+                  def initialize(config)
+                    @config = config
+                  end
 
-                def collect?
-                  return true unless defined?(::Sidekiq::Enterprise)
-                  leader?
-                end
-              end
-            end
-
-            ::Sidekiq.configure_server do |config|
-              config.server_middleware { |chain| chain.add(ServerMiddlewareInstrumentation) }
-              config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
-
-              if defined?(SidekiqClusterCollectionChecker)
-                config.on(:startup) do
-                  leader_checker = SidekiqClusterCollectionChecker.new(config)
+                  def collect?
+                    return true unless defined?(::Sidekiq::Enterprise)
+                    leader?
+                  end
                 end
               end
-            end
 
-            ::Sidekiq.configure_client do |config|
-              config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
+              ::Sidekiq.configure_server do |config|
+                config.server_middleware { |chain| chain.add(ServerMiddlewareInstrumentation) }
+                config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
+
+                if defined?(SidekiqClusterCollectionChecker)
+                  config.on(:startup) do
+                    leader_checker = SidekiqClusterCollectionChecker.new(config)
+                  end
+                end
+              end
+
+              ::Sidekiq.configure_client do |config|
+                config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
+              end
+            rescue LoadError
+              # Sidekiq is not loaded, so we don't need to do anything
             end
           end
         end
