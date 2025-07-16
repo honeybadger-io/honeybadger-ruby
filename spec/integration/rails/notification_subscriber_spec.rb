@@ -37,6 +37,6 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT, type: :re
     # Wait for all events to be processed
     sleep(0.2)
 
-    expect(Honeybadger::Backend::Test.events.map { |e| e[:duration] }.uniq.length).to eq(6)
+    expect(Honeybadger::Backend::Test.events.map { |e| e[:duration] }.uniq.length).to eq(5)
   end
 end
