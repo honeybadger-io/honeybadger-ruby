@@ -91,4 +91,9 @@ RSpec.configure do |config|
   else
     config.filter_run_excluding framework: ->(v) { !v || v != :ruby }
   end
+
+  config.before(:each) do
+    stub_request(:post, "https://api.honeybadger.io/v1/notices")
+      .to_return(status: 200)
+  end
 end
