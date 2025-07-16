@@ -7,7 +7,6 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT, type: :re
   load_rails_hooks(self)
 
   before do
-    Honeybadger.config[:"insights.enabled"] = true
     Honeybadger.config[:"events.batch_size"] = 0
 
     Honeybadger::Backend::Test.events.clear
@@ -38,6 +37,7 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT, type: :re
     # Wait for all events to be processed
     sleep(0.2)
 
-    expect(Honeybadger::Backend::Test.events.map { |e| e[:duration] }.uniq.length).to eq(5)
+    test_timing_events = Honeybadger::Backend::Test.events.select { |e| e[:event_type] == "test.timing" }
+    expect(test_timing_events.map { |e| e[:duration] }.uniq.length).to eq(5)
   end
 end
