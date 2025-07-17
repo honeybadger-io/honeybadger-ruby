@@ -8,7 +8,7 @@ module Honeybadger
             from_git
 
           revision = revision.to_s.strip
-          return unless revision =~ /\S/
+          return unless /\S/.match?(revision)
 
           revision
         end
@@ -20,18 +20,26 @@ module Honeybadger
         #
         # See https://devcenter.heroku.com/articles/dyno-metadata
         def from_heroku
-          ENV['HEROKU_SLUG_COMMIT']
+          ENV["HEROKU_SLUG_COMMIT"]
         end
 
         def from_capistrano(root)
-          file = File.join(root, 'REVISION')
+          file = File.join(root, "REVISION")
           return nil unless File.file?(file)
-          File.read(file) rescue nil
+          begin
+            File.read(file)
+          rescue
+            nil
+          end
         end
 
         def from_git
-          return nil unless File.directory?('.git')
-          `git rev-parse HEAD 2> #{File::NULL}` rescue nil
+          return nil unless File.directory?(".git")
+          begin
+            `git rev-parse HEAD 2> #{File::NULL}`
+          rescue
+            nil
+          end
         end
       end
     end

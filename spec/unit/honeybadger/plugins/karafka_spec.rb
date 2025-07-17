@@ -1,8 +1,9 @@
-require 'honeybadger/plugins/karafka'
-require 'honeybadger/config'
+require "honeybadger/plugins/karafka"
+require "honeybadger/karafka"
+require "honeybadger/config"
 
 describe "Karafka Dependency" do
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": false) }
 
   before do
     Honeybadger::Plugin.instances[:karafka].reset!
@@ -21,17 +22,35 @@ describe "Karafka Dependency" do
         end
       end
     end
-    let(:event) { double('event') }
+    let(:monitor) { double("monitor") }
+    let(:event) { double("event") }
+    let(:errors_listener) { double("errors listener") }
 
     before do
       Object.const_set(:Karafka, shim)
+      allow(::Karafka).to receive(:monitor).and_return(monitor)
+      allow(::Honeybadger::Karafka::ErrorsListener).to receive(:new).and_return(errors_listener)
     end
     after { Object.send(:remove_const, :Karafka) }
 
     it "includes integration module into Karafka" do
-      expect(::Karafka).to receive_message_chain(:monitor, :subscribe).with('error.occurred').and_yield(event)
-      expect(event).to receive(:[]).with(:error).and_return(RuntimeError.new)
+      expect(monitor).to receive(:subscribe).with(errors_listener)
       Honeybadger::Plugin.instances[:karafka].load!(config)
+    end
+
+    context "when Insights instrumentation is enabled" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
+      let(:insights_listener) { double("insights listener") }
+
+      before do
+        allow(::Honeybadger::Karafka::InsightsListener).to receive(:new).and_return(insights_listener)
+      end
+
+      it "includes integration module into Karafka" do
+        expect(monitor).to receive(:subscribe).with(errors_listener)
+        expect(monitor).to receive(:subscribe).with(insights_listener)
+        Honeybadger::Plugin.instances[:karafka].load!(config)
+      end
     end
   end
 end

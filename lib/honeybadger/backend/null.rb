@@ -1,11 +1,11 @@
-require 'honeybadger/backend/base'
+require "honeybadger/backend/base"
 
 module Honeybadger
   module Backend
     class Null < Base
       class StubbedResponse < Response
         def initialize
-          super(:stubbed, '{}'.freeze)
+          super(:stubbed, "{}".freeze)
         end
 
         def success?
@@ -22,6 +22,10 @@ module Honeybadger
       end
 
       def check_in(id)
+        StubbedResponse.new
+      end
+
+      def event(payload)
         StubbedResponse.new
       end
     end

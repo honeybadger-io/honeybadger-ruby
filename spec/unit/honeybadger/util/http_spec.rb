@@ -1,52 +1,53 @@
-require 'net/http'
-require 'logger'
-require 'honeybadger/util/http'
-require 'honeybadger/config'
+require "net/http"
+require "logger"
+require "honeybadger/util/http"
+require "honeybadger/config"
 
 describe Honeybadger::Util::HTTP do
-  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, api_key: 'abc123') }
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, api_key: "abc123") }
   let(:logger) { config.logger }
 
   subject { described_class.new(config) }
 
   it { should respond_to :post }
+  it { should respond_to :post_newline_delimited }
   it { should respond_to :get }
 
   it "sends a user agent with version number" do
-    http  = stub_http
-    expect(http).to receive(:post).with(kind_of(String), kind_of(String), hash_including({'User-Agent' => "HB-Ruby #{Honeybadger::VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"}))
+    http = stub_http
+    expect(http).to receive(:post).with(kind_of(String), kind_of(String), hash_including({"User-Agent" => "HB-Ruby #{Honeybadger::VERSION}; #{RUBY_VERSION}; #{RUBY_PLATFORM}"}))
     http_post
   end
 
   context "when proxy settings are configured" do
     let(:config) {
       Honeybadger::Config.new({
-        :api_key => 'abc123',
-        :'connection.proxy_host' => 'some.host',
-        :'connection.proxy_port' => 88,
-        :'connection.proxy_user' => 'login',
-        :'connection.proxy_pass' => 'passwd'
+        api_key: "abc123",
+        "connection.proxy_host": "some.host",
+        "connection.proxy_port": 88,
+        "connection.proxy_user": "login",
+        "connection.proxy_pass": "passwd"
       })
     }
 
     it "gets from Honeybadger when using an HTTP proxy" do
-      http  = stub_http
+      http = stub_http
       proxy = double(new: http)
       allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
 
-      expect(http).to receive(:get).with('/v1/foo')
-      expect(Net::HTTP).to receive(:Proxy).with('some.host', 88, 'login', 'passwd')
+      expect(http).to receive(:get).with("/v1/foo")
+      expect(Net::HTTP).to receive(:Proxy).with("some.host", 88, "login", "passwd")
 
       http_get
     end
 
     it "posts to Honeybadger when using an HTTP proxy" do
-      http  = stub_http
+      http = stub_http
       proxy = double(new: http)
       allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
 
-      expect(http).to receive(:post).with('/v1/foo', kind_of(String), Honeybadger::Util::HTTP::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
-      expect(Net::HTTP).to receive(:Proxy).with('some.host', 88, 'login', 'passwd')
+      expect(http).to receive(:post).with("/v1/foo", kind_of(String), Honeybadger::Util::HTTP::HEADERS.merge({"X-API-Key" => "abc123"}))
+      expect(Net::HTTP).to receive(:Proxy).with("some.host", 88, "login", "passwd")
 
       http_post
     end
@@ -55,6 +56,11 @@ describe Honeybadger::Util::HTTP do
   it "returns the response" do
     stub_http
     expect(http_post).to be_a Net::HTTPResponse
+  end
+
+  it "returns the response for post_newline_delimited" do
+    stub_http
+    expect(http_post_newline_delimited).to be_a Net::HTTPResponse
   end
 
   it "returns the response for #get" do
@@ -84,7 +90,7 @@ describe Honeybadger::Util::HTTP do
 
   context "non-success response from server" do
     it "logs failure" do
-      stub_http(response: Net::HTTPClientError.new('1.2', '429', 'Too Many Requests'))
+      stub_http(response: Net::HTTPClientError.new("1.2", "429", "Too Many Requests"))
       expect(logger).to receive(:debug).with(/code=429/)
       http_post
     end
@@ -92,7 +98,7 @@ describe Honeybadger::Util::HTTP do
 
   context "non-success response from server on #get" do
     it "logs failure" do
-      stub_http(response: Net::HTTPClientError.new('1.2', '429', 'Too Many Requests'))
+      stub_http(response: Net::HTTPClientError.new("1.2", "429", "Too Many Requests"))
       expect(logger).to receive(:debug).with(/code=429/)
       http_get
     end
@@ -100,7 +106,7 @@ describe Honeybadger::Util::HTTP do
 
   context "failure response from server" do
     it "logs failure" do
-      stub_http(response: Net::HTTPServerError.new('1.2', '500', 'Internal Error'))
+      stub_http(response: Net::HTTPServerError.new("1.2", "500", "Internal Error"))
       expect(logger).to receive(:debug).with(/code=500/)
       http_post
     end
@@ -109,7 +115,7 @@ describe Honeybadger::Util::HTTP do
   context "when encountering exceptions" do
     context "HTTP connection setup problems" do
       it "should not be rescued" do
-        proxy = double()
+        proxy = double
         allow(proxy).to receive(:new).and_raise(NoMemoryError)
         allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
         expect { http_post }.to raise_error(NoMemoryError)
@@ -138,17 +144,17 @@ describe Honeybadger::Util::HTTP do
 
   context "SSL" do
     it "posts to the right url for non-ssl" do
-      config[:'connection.secure'] = false
+      config[:"connection.secure"] = false
       http = stub_http
       url = "http://api.honeybadger.io:80/v1/foo"
       uri = URI.parse(url)
-      expect(http).to receive(:post).with(uri.path, anything, Honeybadger::Util::HTTP::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
+      expect(http).to receive(:post).with(uri.path, anything, Honeybadger::Util::HTTP::HEADERS.merge({"X-API-Key" => "abc123"}))
       http_post
     end
 
     it "post to the right path for ssl" do
       http = stub_http
-      expect(http).to receive(:post).with('/v1/foo', anything, Honeybadger::Util::HTTP::HEADERS.merge({ 'X-API-Key' => 'abc123'}))
+      expect(http).to receive(:post).with("/v1/foo", anything, Honeybadger::Util::HTTP::HEADERS.merge({"X-API-Key" => "abc123"}))
       http_post
     end
 
@@ -157,7 +163,7 @@ describe Honeybadger::Util::HTTP do
       uri = URI.parse(url)
 
       real_http = Net::HTTP.new(uri.host, uri.port)
-      allow(real_http).to receive(:post).and_return(double(code: '200'))
+      allow(real_http).to receive(:post).and_return(double(code: "200"))
       proxy = double(new: real_http)
       allow(Net::HTTP).to receive(:Proxy).and_return(proxy)
 
@@ -172,7 +178,7 @@ describe Honeybadger::Util::HTTP do
 
     it "uses the default DEFAULT_CERT_FILE if asked to" do
       expect(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(true)
-      config[:'connection.system_ssl_cert_chain'] = true
+      config[:"connection.system_ssl_cert_chain"] = true
 
       http = subject.send(:setup_http_connection)
       expect(http.ca_file).not_to eq config.local_cert_path
@@ -180,11 +186,11 @@ describe Honeybadger::Util::HTTP do
     end
 
     it "uses a custom ca bundle if asked to" do
-      config[:'connection.ssl_ca_bundle_path'] = '/test/blargh.crt'
+      config[:"connection.ssl_ca_bundle_path"] = "/test/blargh.crt"
 
       http = subject.send(:setup_http_connection)
       expect(http.ca_file).not_to eq config.local_cert_path
-      expect(http.ca_file).to eq '/test/blargh.crt'
+      expect(http.ca_file).to eq "/test/blargh.crt"
     end
 
     it "uses the default cert (OpenSSL::X509::DEFAULT_CERT_FILE) only if explicitly told to" do
@@ -206,7 +212,7 @@ describe Honeybadger::Util::HTTP do
     end
 
     it "does not use ssl if not secure" do
-      config[:'connection.secure'] = false
+      config[:"connection.secure"] = false
       http = subject.send(:setup_http_connection)
       expect(http.port).to eq 80
     end
@@ -226,25 +232,45 @@ describe Honeybadger::Util::HTTP do
     end
 
     it "allow override of the open timeout" do
-      config[:'connection.http_open_timeout'] = 4
+      config[:"connection.http_open_timeout"] = 4
       http = stub_http
       expect(http).to receive(:open_timeout=).with(4)
       http_post
     end
 
     it "allow override of the read timeout" do
-      config[:'connection.http_read_timeout'] = 10
+      config[:"connection.http_read_timeout"] = 10
       http = stub_http
       expect(http).to receive(:read_timeout=).with(10)
       http_post
     end
   end
 
+  describe "#post_newline_delimited" do
+    it "should properly serialize NDJSON and compress" do
+      http = stub_http
+      expect(http).to receive(:post) do |path, body, headers|
+        expect(path).to eq("/v1/foo")
+        decompressed = Zlib::Inflate.inflate(body)
+        parts = decompressed.split("\n").map { |part| JSON.parse(part) }
+        expect(parts.length).to be(2)
+
+        Net::HTTPSuccess.new("1.2", "200", "OK")
+      end
+      http_post_newline_delimited
+    end
+  end
+
   def http_post
-    subject.post('/v1/foo', double('Notice', to_json: '{}'))
+    subject.post("/v1/foo", double("Notice", to_json: "{}"))
+  end
+
+  def http_post_newline_delimited
+    ts = DateTime.now.new_offset(0).rfc3339
+    subject.post_newline_delimited("/v1/foo", [{ts: ts, event_type: "test"}, {ts: ts, event_type: "test2"}])
   end
 
   def http_get
-    subject.get('/v1/foo')
+    subject.get("/v1/foo")
   end
 end

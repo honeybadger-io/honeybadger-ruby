@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/agent'
+require "honeybadger/plugin"
+require "honeybadger/agent"
 
 module Honeybadger
   module Plugins
@@ -9,11 +9,11 @@ module Honeybadger
 
         execution do
           ::PhusionPassenger.on_event(:starting_worker_process) do |forked|
-            logger.debug('Starting passenger worker process')
+            logger.debug("Starting passenger worker process")
           end
 
           ::PhusionPassenger.on_event(:stopping_worker_process) do
-            logger.debug('Stopping passenger worker process')
+            logger.debug("Stopping passenger worker process")
             Honeybadger.stop
           end
         end

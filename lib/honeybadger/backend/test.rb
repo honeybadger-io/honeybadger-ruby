@@ -1,4 +1,4 @@
-require 'honeybadger/backend/null'
+require "honeybadger/backend/null"
 
 module Honeybadger
   module Backend
@@ -10,7 +10,17 @@ module Honeybadger
       #
       # @return [Hash] Notifications hash.
       def self.notifications
-        @notifications ||= Hash.new {|h,k| h[k] = [] }
+        @notifications ||= Hash.new { |h, k| h[k] = [] }
+      end
+
+      # The event list.
+      #
+      # @example
+      #   Test.events # => [{}, {}, ...]
+      #
+      # @return [Array<Hash>] List of event payloads.
+      def self.events
+        @events ||= []
       end
 
       # @api public
@@ -32,8 +42,17 @@ module Honeybadger
         self.class.check_ins
       end
 
+      def events
+        self.class.events
+      end
+
       def notify(feature, payload)
         notifications[feature] << payload
+        super
+      end
+
+      def event(payload)
+        events.concat(payload.dup)
         super
       end
 

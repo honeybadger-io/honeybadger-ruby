@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/ruby'
+require "honeybadger/plugin"
+require "honeybadger/ruby"
 
 module Honeybadger
   module Plugins
@@ -15,8 +15,8 @@ module Honeybadger
 
       def invoke_command_with_honeybadger(*args)
         invoke_command_without_honeybadger(*args)
-      rescue Exception => e
-        Honeybadger.notify(e)
+      rescue => error
+        Honeybadger.notify(error)
         raise
       end
     end
@@ -25,6 +25,7 @@ module Honeybadger
       requirement { defined?(::Thor.no_commands) }
 
       execution do
+        return unless Honeybadger.config[:"exceptions.enabled"]
         ::Thor.send(:include, Thor)
       end
     end

@@ -1,8 +1,8 @@
-require 'forwardable'
-require 'net/http'
-require 'json'
+require "forwardable"
+require "net/http"
+require "json"
 
-require 'honeybadger/logging'
+require "honeybadger/logging"
 
 module Honeybadger
   module Backend
@@ -34,7 +34,7 @@ module Honeybadger
       #   @param [String] message The String message returned by the server (or
       #     set by the backend in the case of an :error code).
       def initialize(*args)
-        if (response = args.first).kind_of?(Net::HTTPResponse)
+        if (response = args.first).is_a?(Net::HTTPResponse)
           @code, @body, @message = response.code.to_i, response.body.to_s, response.message
         else
           @code, @body, @message = args
@@ -51,18 +51,18 @@ module Honeybadger
       def error_message
         return message if code == :error
         return FRIENDLY_ERRORS[code] if FRIENDLY_ERRORS[code]
-        return error if error =~ NOT_BLANK
+        return error if NOT_BLANK.match?(error)
         msg = "The server responded with #{code}"
-        msg << ": #{message}" if message =~ NOT_BLANK
+        msg << ": #{message}" if NOT_BLANK.match?(message)
         msg
       end
 
       private
 
       def parse_error(body)
-        return unless body =~ NOT_BLANK
+        return unless NOT_BLANK.match?(body)
         obj = JSON.parse(body)
-        return obj['error'] if obj.kind_of?(Hash)
+        obj["error"] if obj.is_a?(Hash)
       rescue JSON::ParserError
         nil
       end
@@ -88,7 +88,7 @@ module Honeybadger
       #
       # @raise NotImplementedError
       def notify(feature, payload)
-        raise NotImplementedError, 'must define #notify on subclass.'
+        raise NotImplementedError, "must define #notify on subclass."
       end
 
       # Does a check in using the input id.
@@ -97,7 +97,7 @@ module Honeybadger
       #
       # @raise NotImplementedError
       def check_in(id)
-        raise NotImplementedError, 'must define #check_in on subclass.'
+        raise NotImplementedError, "must define #check_in on subclass."
       end
 
       # Track a deployment
@@ -107,6 +107,16 @@ module Honeybadger
       # @param [#to_json] payload The JSON payload containing all deployment data.
       def track_deployment(payload)
         notify(:deploys, payload)
+      end
+
+      # Send event
+      # @example
+      #   backend.event([{event_type: "email_received", ts: "2023-03-04T12:12:00+1:00", subject: 'Re: Aquisition' }})
+      #
+      # @param [Array] payload array of event hashes to send
+      # @raise NotImplementedError
+      def event(payload)
+        raise NotImplementedError, "must define #event on subclass"
       end
 
       private

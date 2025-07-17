@@ -1,5 +1,5 @@
-require 'honeybadger/plugins/lambda'
-require 'honeybadger/config'
+require "honeybadger/plugins/lambda"
+require "honeybadger/config"
 
 describe "Lambda Plugin" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: :test, api_key: "noop") }
@@ -13,14 +13,14 @@ describe "Lambda Plugin" do
     Honeybadger::Backend::Test.notifications[:notices].clear
   end
 
-  it 'forces sync mode' do
+  it "forces sync mode" do
     expect(config[:sync]).to eq false
     Honeybadger::Plugin.instances[:lambda].load!(config)
     expect(config[:sync]).to eq true
   end
 
   describe "hb_wrap_handler decorator" do
-    it 'auto-captures errors from class methods when decorator is used' do
+    it "auto-captures errors from class methods when decorator is used" do
       expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
       Honeybadger::Plugin.instances[:lambda].load!(config)
 
@@ -36,7 +36,7 @@ describe "Lambda Plugin" do
       expect { klass.test_handler(event: {}, context: {}) }.to raise_error(RuntimeError, "An exception")
     end
 
-    it 'auto-captures errors from main methods when decorator is used' do
+    it "auto-captures errors from main methods when decorator is used" do
       expect(Honeybadger).to receive(:notify).with kind_of(RuntimeError)
       Honeybadger::Plugin.instances[:lambda].load!(config)
 
@@ -53,18 +53,20 @@ describe "Lambda Plugin" do
   end
 
   describe "notice injection" do
-    let(:lambda_data) { {
-      "function" => "lambda_fn",
-      "handler" => "the.handler",
-      "memory" => 128
-    } }
+    let(:lambda_data) {
+      {
+        "function" => "lambda_fn",
+        "handler" => "the.handler",
+        "memory" => 128
+      }
+    }
 
     before do
       expect(Honeybadger::Util::Lambda).to receive(:trace_id).and_return("abc123")
       expect(Honeybadger::Util::Lambda).to receive(:normalized_data).and_return(lambda_data)
     end
 
-    it 'adds details to notice data and includes trace_id into context' do
+    it "adds details to notice data and includes trace_id into context" do
       agent = Honeybadger::Agent.new(config)
       Honeybadger::Plugin.instances[:lambda].load!(config)
       agent.notify("test")
@@ -72,7 +74,7 @@ describe "Lambda Plugin" do
       expect(notice.component).to eq "lambda_fn"
       expect(notice.action).to eq "the.handler"
       expect(notice.context[:lambda_trace_id]).to eq "abc123"
-      expect(notice.details).to eq({ "Lambda Details" => lambda_data })
+      expect(notice.details).to eq({"Lambda Details" => lambda_data})
     end
   end
 end

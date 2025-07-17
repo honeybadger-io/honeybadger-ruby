@@ -1,5 +1,5 @@
-require 'honeybadger/plugin'
-require 'honeybadger/util/lambda'
+require "honeybadger/plugin"
+require "honeybadger/util/lambda"
 
 module Honeybadger
   module Plugins
@@ -26,19 +26,17 @@ module Honeybadger
         mod = Module.new do
           handler_names.each do |handler|
             define_method(handler) do |event:, context:|
-              begin
-                Honeybadger.context(aws_request_id: context.aws_request_id) if context.respond_to?(:aws_request_id)
+              Honeybadger.context(aws_request_id: context.aws_request_id) if context.respond_to?(:aws_request_id)
 
-                super(event: event, context: context)
-              rescue => e
-                Honeybadger.notify(e)
-                raise
-              end
+              super(event: event, context: context)
+            rescue => e
+              Honeybadger.notify(e)
+              raise
             end
           end
         end
 
-        self.singleton_class.prepend(mod)
+        singleton_class.prepend(mod)
         Kernel.singleton_class.prepend(mod) if self == TOPLEVEL_BINDING.eval("self")
       end
     end
@@ -49,7 +47,7 @@ module Honeybadger
 
       execution do
         config[:sync] = true
-        config[:'exceptions.notify_at_exit'] = false
+        config[:"exceptions.notify_at_exit"] = false
 
         main = TOPLEVEL_BINDING.eval("self")
         main.extend(LambdaExtension)

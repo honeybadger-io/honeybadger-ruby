@@ -1,5 +1,5 @@
-require 'honeybadger/backend/base'
-require 'honeybadger/config'
+require "honeybadger/backend/base"
+require "honeybadger/config"
 
 describe Honeybadger::Backend::Response do
   context "when successful" do
@@ -43,10 +43,11 @@ describe Honeybadger::Backend::Base do
   subject { described_class.new(config) }
 
   it { should respond_to :notify }
+  it { should respond_to :event }
 
   describe "#notify" do
     it "raises NotImplementedError" do
-      expect { subject.notify(:notices, double('Notice')) }.to raise_error NotImplementedError
+      expect { subject.notify(:notices, double("Notice")) }.to raise_error NotImplementedError
     end
   end
 

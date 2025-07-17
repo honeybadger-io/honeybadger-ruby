@@ -1,5 +1,5 @@
-require 'honeybadger/backend/debug'
-require 'honeybadger/config'
+require "honeybadger/backend/debug"
+require "honeybadger/config"
 
 describe Honeybadger::Backend::Debug do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
@@ -17,7 +17,7 @@ describe Honeybadger::Backend::Debug do
   it { should respond_to :notify }
 
   describe "#notify" do
-    let(:notice) { double('Notice', to_json: '{}') }
+    let(:notice) { double("Notice", to_json: "{}") }
 
     subject { instance.notify(:notices, notice) }
 
@@ -32,8 +32,20 @@ describe Honeybadger::Backend::Debug do
   describe "#check_in" do
     it "logs the check_in" do
       expect(logger).to receive(:unknown).with("checking in debug backend with id=10")
-      
+
       instance.check_in(10)
+    end
+  end
+
+  describe "#event" do
+    it "logs the event" do
+      expect(logger).to receive(:unknown) do |msg|
+        expect(msg).to match(/"some_data":"is here"/)
+        expect(msg).to match(/"event_type":"test_event"/)
+        expect(msg).to match(/"ts":"test_timestamp"/)
+      end
+
+      instance.event({event_type: "test_event", ts: "test_timestamp", some_data: "is here"})
     end
   end
 end

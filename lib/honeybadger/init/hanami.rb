@@ -1,14 +1,14 @@
-require 'honeybadger/ruby'
+require "honeybadger/ruby"
 
 Honeybadger.init!({
-  :framework => :hanami,
-  :env => ENV['HANAMI_ENV'] || ENV['RACK_ENV'],
-  :'logging.path' => 'STDOUT'
+  framework: :hanami,
+  env: ENV["HANAMI_ENV"] || ENV["RACK_ENV"],
+  "logging.path": "STDOUT"
 })
 
 Honeybadger.load_plugins!
 
-if Hanami::VERSION >= '2.0'
+if Hanami::VERSION >= "2.0" && Honeybadger.config[:"exceptions.enabled"]
   Hanami.app.instance_eval do
     config.middleware.use Honeybadger::Rack::UserFeedback
     config.middleware.use Honeybadger::Rack::UserInformer

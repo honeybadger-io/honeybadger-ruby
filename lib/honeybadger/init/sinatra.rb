@@ -1,5 +1,5 @@
-require 'sinatra/base'
-require 'honeybadger/ruby'
+require "sinatra/base"
+require "honeybadger/ruby"
 
 module Honeybadger
   module Init
@@ -15,8 +15,8 @@ module Honeybadger
             Honeybadger.install_at_exit_callback
             build_without_honeybadger(*args, &block)
           end
-          alias :build_without_honeybadger :build
-          alias :build :build_with_honeybadger
+          alias_method :build_without_honeybadger, :build
+          alias_method :build, :build_with_honeybadger
 
           def configure_honeybadger
             return unless defined?(honeybadger_api_key)
@@ -27,21 +27,20 @@ module Honeybadger
 
           def install_honeybadger
             config = Honeybadger.config
-            return unless config[:'sinatra.enabled']
-            if config[:'exceptions.enabled']
+            return unless config[:"sinatra.enabled"]
+            if config[:"exceptions.enabled"]
               # These two must come before the ErrorNotifier, since an error/response
               # passes through middleware from inner to outer (bottom to top)
-              install_honeybadger_middleware(Honeybadger::Rack::UserFeedback)
-              install_honeybadger_middleware(Honeybadger::Rack::UserInformer)
+              install_honeybadger_middleware(Honeybadger::Rack::UserFeedback) if config[:"feedback.enabled"]
+              install_honeybadger_middleware(Honeybadger::Rack::UserInformer) if config[:"user_informer.enabled"]
               install_honeybadger_middleware(Honeybadger::Rack::ErrorNotifier)
             end
           end
 
           def install_honeybadger_middleware(klass)
-            return if middleware.any? {|m| m[0] == klass }
+            return if middleware.any? { |m| m[0] == klass }
             use(klass)
           end
-
         end
       end
     end
@@ -49,9 +48,9 @@ module Honeybadger
 end
 
 Honeybadger.init!({
-  env: ENV['APP_ENV'] || ENV['RACK_ENV'],
+  env: ENV["APP_ENV"] || ENV["RACK_ENV"],
   framework: :sinatra,
-  :'logging.path' => 'STDOUT'
+  "logging.path": "STDOUT"
 })
 
 Honeybadger.load_plugins!

@@ -1,7 +1,7 @@
-require 'forwardable'
-require 'honeybadger/cli/main'
-require 'honeybadger/cli/helpers'
-require 'honeybadger/util/http'
+require "forwardable"
+require "honeybadger/cli/main"
+require "honeybadger/cli/helpers"
+require "honeybadger/util/http"
 
 module Honeybadger
   module CLI
@@ -19,9 +19,9 @@ module Honeybadger
       def run
         payload = {
           environment: config.get(:env),
-          revision: options['revision'],
-          repository: options['repository'],
-          local_username: options['user']
+          revision: options["revision"],
+          repository: options["repository"],
+          local_username: options["user"]
         }
 
         response = config.backend.notify(:deploys, payload)
