@@ -128,8 +128,8 @@ describe Honeybadger::Agent do
     end
 
     it "accepts keyword arguments as second argument" do
-      opts = {tags: 'testing, kwargs'}
-      config = Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER)
+      opts = {tags: "testing, kwargs"}
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
 
       expect(instance.worker).to receive(:push) do |notice|
