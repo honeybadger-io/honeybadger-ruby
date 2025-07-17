@@ -1,4 +1,4 @@
-require 'honeybadger/ruby'
+require "honeybadger/ruby"
 
 RSpec::Matchers.define :define do |expected|
   match do |actual|
@@ -39,17 +39,28 @@ describe Honeybadger do
   it "delegates ::flush to agent instance" do
     expect(Honeybadger::Agent.instance).to receive(:flush)
     Honeybadger.flush
-  end 
+  end
 
   it "delegates ::event to agent instance" do
     expect(Honeybadger::Agent.instance).to receive(:event)
     Honeybadger.event("just an event")
   end
 
+  it "delegates ::event_context to agent instance" do
+    expect(Honeybadger::Agent.instance).to receive(:event_context).with({user_id: 123})
+    Honeybadger.event_context({user_id: 123})
+  end
+
+  it "delegates ::get_event_context to agent instance" do
+    expect(Honeybadger::Agent.instance).to receive(:get_event_context)
+    Honeybadger.get_event_context
+  end
+
   describe "#context" do
     let(:c) { {foo: :bar} }
 
     before { described_class.context(c) }
+    after { described_class.context.clear! }
 
     it "sets the context" do
       described_class.context(c)
@@ -67,12 +78,54 @@ describe Honeybadger do
     it "clears the context" do
       expect { described_class.context.clear! }.to change { described_class.get_context }.from(c).to(nil)
     end
+
+    context "with local context" do
+      it "merges local context" do
+        allow(described_class).to receive(:get_context).and_call_original
+
+        described_class.context({bar: :baz}) do
+          described_class.context({bar: :qux}) do
+            expect(described_class.get_context).to eq({foo: :bar, bar: :qux})
+          end
+          expect(described_class.get_context).to eq({foo: :bar, bar: :baz})
+        end
+
+        expect(described_class).to have_received(:get_context).at_least(:twice)
+      end
+
+      it "clears local context" do
+        allow(described_class).to receive(:get_context).and_call_original
+
+        described_class.context({bar: :baz}) do
+          expect(described_class.get_context).to eq({foo: :bar, bar: :baz})
+        end
+        expect(described_class.get_context).to eq({foo: :bar})
+
+        expect(described_class).to have_received(:get_context).at_least(:twice)
+      end
+
+      it "tracks local context correctly" do
+        allow(described_class).to receive(:get_context).and_call_original
+
+        begin
+          described_class.context({bar: :qux}) do
+            described_class.context({baz: :qux})
+
+            raise "exception"
+          end
+        rescue
+          # noop
+        end
+
+        expect(described_class.get_context).to eq({foo: :bar, baz: :qux})
+      end
+    end
   end
 
   describe "#notify" do
-    let(:config) { Honeybadger::Config.new(api_key:'fake api key', logger: NULL_LOGGER) }
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
     let(:instance) { Honeybadger::Agent.new(config) }
-    let(:worker) { double('Honeybadger::Worker') }
+    let(:worker) { double("Honeybadger::Worker") }
 
     before do
       allow(Honeybadger::Agent).to receive(:instance).and_return(instance)
@@ -90,13 +143,13 @@ describe Honeybadger do
     end
 
     it "creates and send a notice for a hash" do
-      exception = build_exception
+      build_exception
       notice = stub_notice!(config)
 
-      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: 'uh oh')).and_return(notice)
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: "uh oh")).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
-      Honeybadger.notify(error_message: 'uh oh')
+      Honeybadger.notify(error_message: "uh oh")
     end
 
     it "does not pass the hash as an exception when sending a notice for it" do
@@ -105,13 +158,13 @@ describe Honeybadger do
       expect(Honeybadger::Notice).to receive(:new).with(anything, hash_excluding(:exception))
       expect(worker).to receive(:push).with(notice)
 
-      Honeybadger.notify(error_message: 'uh oh')
+      Honeybadger.notify(error_message: "uh oh")
     end
 
     it "creates and sends a notice for an exception and hash" do
       exception = build_exception
       notice = stub_notice!(config)
-      notice_args = { error_message: 'uh oh' }
+      notice_args = {error_message: "uh oh"}
 
       expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(notice_args.merge(exception: exception))).and_return(notice)
       expect(worker).to receive(:push).with(notice)
@@ -122,27 +175,27 @@ describe Honeybadger do
     it "sends a notice with a string" do
       notice = stub_notice!(config)
 
-      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: 'the test message')).and_return(notice)
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: "the test message")).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
-      Honeybadger.notify('the test message')
+      Honeybadger.notify("the test message")
     end
 
     it "sends a notice with any arbitrary object" do
       notice = stub_notice!(config)
 
-      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: 'the test message')).and_return(notice)
+      expect(Honeybadger::Notice).to receive(:new).with(config, hash_including(error_message: "the test message")).and_return(notice)
       expect(worker).to receive(:push).with(notice)
 
-      Honeybadger.notify(double(to_s: 'the test message'))
+      Honeybadger.notify(double(to_s: "the test message"))
     end
 
     it "generates a backtrace excluding the singleton" do
       expect(instance.worker).to receive(:push) do |notice|
-        expect(notice.backtrace.to_a[0]).to match('lib/honeybadger/agent.rb')
+        expect(notice.backtrace.to_a[0]).to match("lib/honeybadger/agent.rb")
       end
 
-      Honeybadger.notify(error_message: 'testing backtrace generation')
+      Honeybadger.notify(error_message: "testing backtrace generation")
     end
 
     it "does not deliver an ignored exception when notifying implicitly" do
@@ -187,7 +240,6 @@ describe Honeybadger do
 
     it "passes config to created notices" do
       exception = build_exception
-      config_opts = { 'one' => 'two', 'three' => 'four' }
 
       notice = stub_notice(config)
 
@@ -220,15 +272,15 @@ describe Honeybadger do
   describe "#configure" do
     before do
       Honeybadger.config.set(:api_key, nil)
-      Honeybadger.config.set(:'user_informer.enabled', true)
+      Honeybadger.config.set(:"user_informer.enabled", true)
     end
 
     it "configures the singleton" do
       expect {
         Honeybadger.configure do |config|
-          config.api_key = 'test api key'
+          config.api_key = "test api key"
         end
-      }.to change { Honeybadger.config.get(:api_key) }.from(nil).to('test api key')
+      }.to change { Honeybadger.config.get(:api_key) }.from(nil).to("test api key")
     end
 
     it "yields a Ruby config object" do

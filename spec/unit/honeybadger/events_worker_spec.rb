@@ -1,17 +1,16 @@
-require 'timecop'
-require 'thread'
+require "timecop"
 
-require 'honeybadger/events_worker'
-require 'honeybadger/config'
-require 'honeybadger/backend'
+require "honeybadger/events_worker"
+require "honeybadger/config"
+require "honeybadger/backend"
 
 describe Honeybadger::EventsWorker do
   let!(:instance) { described_class.new(config) }
   let(:config) {
     Honeybadger::Config.new(
-      logger: NULL_LOGGER, debug: true, backend: 'null',
-      :'events.batch_size' => 5,
-      :'events.timeout' => 10_000
+      logger: NULL_LOGGER, debug: true, backend: "null",
+      "events.batch_size": 5,
+      "events.timeout": 10_000
     )
   }
   let(:event) { {event_type: "test", ts: "not-important"} }
@@ -20,14 +19,14 @@ describe Honeybadger::EventsWorker do
 
   after do
     Thread.list.each do |thread|
-      next unless thread.kind_of?(Honeybadger::EventsWorker::Thread)
+      next unless thread.is_a?(Honeybadger::EventsWorker::Thread)
       Thread.kill(thread)
     end
   end
 
   context "when an exception happens in the worker loop" do
     before do
-      allow(instance.send(:queue)).to receive(:pop).and_raise('fail')
+      allow(instance.send(:queue)).to receive(:pop).and_raise("fail")
     end
 
     it "does not raise when shutting down" do
@@ -56,7 +55,7 @@ describe Honeybadger::EventsWorker do
   context "when an exception happens during processing" do
     before do
       allow(instance).to receive(:sleep)
-      allow(instance).to receive(:handle_response).and_raise('fail')
+      allow(instance).to receive(:handle_response).and_raise("fail")
     end
 
     def flush
@@ -117,19 +116,13 @@ describe Honeybadger::EventsWorker do
 
     context "when queue is full" do
       before do
-        allow(config).to receive(:max_queue_size).and_return(5)
+        allow(config).to receive(:events_max_queue_size).and_return(5)
         allow(instance).to receive(:queue).and_return(double(size: 5))
       end
 
       it "rejects the push" do
         expect(instance.send(:queue)).not_to receive(:push)
         expect(instance.push(event)).to eq false
-      end
-
-      it "warns the logger" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/reached max/i)
-        instance.push(event)
       end
     end
   end
@@ -220,7 +213,7 @@ describe Honeybadger::EventsWorker do
 
     context "when throttled during shutdown" do
       before do
-        allow(subject.send(:backend)).to receive(:event).with(anything).and_return(Honeybadger::Backend::Response.new(429) )
+        allow(subject.send(:backend)).to receive(:event).with(anything).and_return(Honeybadger::Backend::Response.new(429))
       end
 
       it "shuts down immediately" do
@@ -239,7 +232,7 @@ describe Honeybadger::EventsWorker do
 
       it "warns the logger when the queue has additional items" do
         allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/throttled/i)
+        expect(config.logger).to receive(:warn).with(/throttled/i).at_least(:once)
         100.times { subject.send(:inc_throttle) }
         10.times do
           subject.push(event)
@@ -345,7 +338,7 @@ describe Honeybadger::EventsWorker do
     end
 
     context "when error" do
-      let(:response) { Honeybadger::Backend::Response.new(:error, nil, 'test error message') }
+      let(:response) { Honeybadger::Backend::Response.new(:error, nil, "test error message") }
 
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/test error message/)
@@ -365,14 +358,14 @@ describe Honeybadger::EventsWorker do
     context "timeout" do
       let(:config) {
         Honeybadger::Config.new(
-          logger: NULL_LOGGER, debug: true, backend: 'null',
-          :'events.batch_size' => 5,
-          :'events.timeout' => 100
+          logger: NULL_LOGGER, debug: true, backend: "null",
+          "events.batch_size": 5,
+          "events.timeout": 100
         )
       }
 
       it "should send after timeout when sending another" do
-        expect(subject.send(:backend)).to receive(:event).with([event]).twice().and_return(Honeybadger::Backend::Null::StubbedResponse.new)
+        expect(subject.send(:backend)).to receive(:event).with([event]).twice.and_return(Honeybadger::Backend::Null::StubbedResponse.new)
         subject.push(event)
         sleep(0.25)
         subject.push(event)

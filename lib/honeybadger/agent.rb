@@ -1,14 +1,19 @@
-require 'forwardable'
+require "forwardable"
+require "zlib"
 
-require 'honeybadger/version'
-require 'honeybadger/config'
-require 'honeybadger/context_manager'
-require 'honeybadger/notice'
-require 'honeybadger/plugin'
-require 'honeybadger/logging'
-require 'honeybadger/worker'
-require 'honeybadger/events_worker'
-require 'honeybadger/breadcrumbs'
+require "honeybadger/version"
+require "honeybadger/config"
+require "honeybadger/context_manager"
+require "honeybadger/notice"
+require "honeybadger/event"
+require "honeybadger/plugin"
+require "honeybadger/logging"
+require "honeybadger/worker"
+require "honeybadger/events_worker"
+require "honeybadger/metrics_worker"
+require "honeybadger/breadcrumbs"
+require "honeybadger/registry"
+require "honeybadger/registry_execution"
 
 module Honeybadger
   # The Honeybadger agent contains all the methods for interacting with the
@@ -58,7 +63,7 @@ module Honeybadger
     end
 
     def initialize(opts = {})
-      if opts.kind_of?(Config)
+      if opts.is_a?(Config)
         @config = opts
         opts = {}
       end
@@ -121,6 +126,11 @@ module Honeybadger
     # @return [String] UUID reference to the notice within Honeybadger.
     # @return [false] when ignored.
     def notify(exception_or_opts = nil, opts = {}, **kwargs)
+      if !config[:"exceptions.enabled"]
+        debug { "disabled feature=notices" }
+        return false
+      end
+
       opts = opts.dup
       opts.merge!(kwargs)
 
@@ -136,15 +146,18 @@ module Honeybadger
 
       validate_notify_opts!(opts)
 
-      add_breadcrumb(
-        "Honeybadger Notice",
-        metadata: opts,
-        category: "notice"
-      ) if config[:'breadcrumbs.enabled']
+      if config[:"breadcrumbs.enabled"]
+        add_breadcrumb(
+          "Honeybadger Notice",
+          metadata: opts,
+          category: "notice"
+        )
+      end
 
       opts[:rack_env] ||= context_manager.get_rack_env
       opts[:global_context] ||= context_manager.get_context
       opts[:breadcrumbs] ||= breadcrumbs.dup
+      opts[:request_id] ||= context_manager.get_request_id
 
       notice = Notice.new(config, opts)
 
@@ -153,22 +166,22 @@ module Honeybadger
         with_error_handling { hook.call(notice) }
       end
 
-      unless notice.api_key =~ NOT_BLANK
-        error { sprintf('Unable to send error report: API key is missing. id=%s', notice.id) }
+      unless NOT_BLANK.match?(notice.api_key)
+        error { sprintf("Unable to send error report: API key is missing. id=%s", notice.id) }
         return false
       end
 
       if !opts[:force] && notice.ignore?
-        debug { sprintf('ignore notice feature=notices id=%s', notice.id) }
+        debug { sprintf("ignore notice feature=notices id=%s", notice.id) }
         return false
       end
 
       if notice.halted?
-        debug { 'halted notice feature=notices' }
+        debug { "halted notice feature=notices" }
         return false
       end
 
-      info { sprintf('Reporting error id=%s', notice.id) }
+      info { sprintf("Reporting error id=%s", notice.id) }
 
       if opts[:sync] || config[:sync]
         send_now(notice)
@@ -194,7 +207,7 @@ module Honeybadger
     #   otherwise.
     def check_in(id)
       # this is to allow check ins even if a url is passed
-      check_in_id = id.to_s.strip.gsub(/\/$/, '').split('/').last
+      check_in_id = id.to_s.strip.gsub(/\/$/, "").split("/").last
       response = backend.check_in(check_in_id)
       response.success?
     end
@@ -258,9 +271,11 @@ module Honeybadger
     #   When present, tags will be applied to errors with this context
     #   (optional).
     #
-    # @return [self] so that method calls can be chained.
-    def context(context = nil)
-      context_manager.set_context(context) unless context.nil?
+    # @return [Object, self] value of the block if passed, otherwise self
+    def context(context = nil, &block)
+      block_result = context_manager.set_context(context, &block) unless context.nil?
+      return block_result if block_given?
+
       self
     end
 
@@ -356,6 +371,7 @@ module Honeybadger
     ensure
       worker.flush
       events_worker&.flush
+      metrics_worker&.flush
     end
 
     # Stops the Honeybadger service.
@@ -365,6 +381,17 @@ module Honeybadger
     def stop(force = false)
       worker.shutdown(force)
       events_worker&.shutdown(force)
+      metrics_worker&.shutdown(force)
+      true
+    end
+
+    # Stops the Honeybadger Insights related services.
+    #
+    # @example
+    #   Honeybadger.stop_insights # => nil
+    def stop_insights(force = false)
+      events_worker&.shutdown(force)
+      metrics_worker&.shutdown(force)
       true
     end
 
@@ -385,18 +412,101 @@ module Honeybadger
     def event(event_type, payload = {})
       init_events_worker
 
-      ts = DateTime.now.new_offset(0).rfc3339
-      merged = {ts: ts}
-
-      if event_type.is_a?(String)
-        merged.merge!(event_type: event_type)
-      else
-        merged.merge!(Hash(event_type))
+      extra_payload = {}.tap do |p|
+        p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
+        p[:hostname] = config[:hostname].to_s if config[:"events.attach_hostname"]
+        p.update(context_manager.get_event_context || {})
       end
 
-      merged.merge!(Hash(payload))
+      event = Event.new(event_type, extra_payload.merge(payload))
 
-      events_worker.push(merged)
+      config.before_event_hooks.each do |hook|
+        with_error_handling { hook.call(event) }
+      end
+
+      return if config.ignored_events.any? do |check|
+        with_error_handling do
+          check.all? do |keys, value|
+            if keys == [:event_type]
+              event.event_type&.match?(value)
+            elsif event.dig(*keys)
+              event.dig(*keys).to_s.match?(value)
+            end
+          end
+        end
+      end
+
+      return if event.halted?
+
+      return unless sample_event?(event)
+
+      strip_metadata(event)
+
+      events_worker.push(event.as_json)
+    end
+
+    # Save event-specific context for the current request.
+    #
+    # @example
+    #   Honeybadger.event_context({user_id: current_user.id})
+    #
+    #   # Inside a Rails controller:
+    #   before_action do
+    #     Honeybadger.event_context({user_id: current_user.id})
+    #   end
+    #
+    #   # Explicit conversion
+    #   class User < ActiveRecord::Base
+    #     def to_honeybadger_context
+    #       { user_id: id, user_email: email }
+    #     end
+    #   end
+    #
+    #   user = User.first
+    #   Honeybadger.event_context(user)
+    #
+    #   # Clearing event context:
+    #   Honeybadger.clear_event_context
+    #
+    # @param [Hash] context A Hash of data which will be sent to Honeybadger
+    #   when an event occurs. If the object responds to +#to_honeybadger_context+,
+    #   the return value of that method will be used (explicit conversion). Can
+    #   include any key/value, but a few keys have a special meaning in
+    #   Honeybadger.
+    #
+    # @return [Object, self] value of the block if passed, otherwise self
+    def event_context(context = nil, &block)
+      block_result = context_manager.set_event_context(context, &block) unless context.nil?
+      return block_result if block_given?
+
+      self
+    end
+
+    # Get event-specific context for the current request.
+    #
+    # @example
+    #   Honeybadger.event_context({my_data: 'my value'})
+    #   Honeybadger.get_event_context # => {my_data: 'my value'}
+    #
+    # @return [Hash, nil]
+    def get_event_context
+      context_manager.get_event_context
+    end
+
+    # @api private
+    def collect(collector)
+      return unless config.insights_enabled?
+
+      init_metrics_worker
+      metrics_worker.push(collector)
+    end
+
+    # @api private
+    def registry
+      return @registry if defined?(@registry)
+      @registry = Honeybadger::Registry.new.tap do |r|
+        collect(Honeybadger::RegistryExecution.new(r, config, {}))
+      end
     end
 
     # @api private
@@ -465,13 +575,15 @@ module Honeybadger
     # @api private
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
+      context_manager.set_request_id(rack_env["action_dispatch.request_id"] || SecureRandom.uuid)
       yield
     ensure
       context_manager.set_rack_env(nil)
+      context_manager.set_request_id(nil)
     end
 
     # @api private
-    attr_reader :worker, :events_worker
+    attr_reader :worker, :events_worker, :metrics_worker
 
     # @api private
     # @!method init!(...)
@@ -483,12 +595,61 @@ module Honeybadger
     # @see Config#backend
     def_delegators :config, :backend
 
+    # @api private
+    # @!method time
+    # @see Honeybadger::Instrumentation#time
+    def_delegator :instrumentation, :time
+
+    # @api private
+    # @!method histogram
+    # @see Honeybadger::Instrumentation#histogram
+    def_delegator :instrumentation, :histogram
+
+    # @api private
+    # @!method gauge
+    # @see Honeybadger::Instrumentation#gauge
+    def_delegator :instrumentation, :gauge
+
+    # @api private
+    # @!method increment_counter
+    # @see Honeybadger::Instrumentation#increment_counter
+    def_delegator :instrumentation, :increment_counter
+
+    # @api private
+    # @!method decrement_counter
+    # @see Honeybadger::Instrumentation#decrement_counter
+    def_delegator :instrumentation, :decrement_counter
+
+    def instrumentation
+      @instrumentation ||= Honeybadger::Instrumentation.new(self)
+    end
+
     private
+
+    def strip_metadata(event)
+      event.delete(:_hb)
+    end
+
+    def sample_event?(event)
+      # Always send metrics events
+      return true if event[:event_type] == "metric.hb"
+
+      sample_rate = config[:"events.sample_rate"]
+      sample_rate = event.dig(:_hb, :sample_rate) if event.dig(:_hb, :sample_rate).is_a?(Numeric)
+
+      return true if sample_rate >= 100
+
+      if event[:request_id] # Send all events for a given request
+        Zlib.crc32(event[:request_id].to_s) % 100 < sample_rate
+      else # Otherwise just take a random sample
+        rand(100) < sample_rate
+      end
+    end
 
     def validate_notify_opts!(opts)
       return if opts.has_key?(:exception)
       return if opts.has_key?(:error_message)
-      msg = sprintf('`Honeybadger.notify` was called with invalid arguments. You must pass either an Exception or options Hash containing the `:error_message` key. location=%s', caller[caller.size-1])
+      msg = sprintf("`Honeybadger.notify` was called with invalid arguments. You must pass either an Exception or options Hash containing the `:error_message` key. location=%s", caller[caller.size - 1])
       raise ArgumentError.new(msg) if config.dev?
       warn(msg)
     end
@@ -518,10 +679,15 @@ module Honeybadger
       @events_worker = EventsWorker.new(config)
     end
 
+    def init_metrics_worker
+      return if @metrics_worker
+      @metrics_worker = MetricsWorker.new(config)
+    end
+
     def with_error_handling
       yield
     rescue => ex
-      error { "Rescued an error in a before notify hook: #{ex.message}" }
+      error { "Rescued an error in a before hook: #{ex.message}" }
     end
 
     @instance = new(Config.new)

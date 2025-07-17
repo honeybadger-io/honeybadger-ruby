@@ -3,7 +3,7 @@
 [![Ruby](https://github.com/honeybadger-io/honeybadger-ruby/actions/workflows/ruby.yml/badge.svg)](https://github.com/honeybadger-io/honeybadger-ruby/actions/workflows/ruby.yml)
 [![Gem Version](https://badge.fury.io/rb/honeybadger.svg)](http://badge.fury.io/rb/honeybadger)
 
-This is the notifier gem for integrating apps with the :zap: [Honeybadger Exception Notifier for Ruby and Rails](http://honeybadger.io).
+This is the notifier gem for integrating apps with the :zap: [Honeybadger Exception Notifier for Ruby and Rails](https://www.honeybadger.io).
 
 When an uncaught exception occurs, Honeybadger will POST the relevant data to the Honeybadger server specified in your environment.
 

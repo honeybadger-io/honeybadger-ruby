@@ -1,7 +1,7 @@
-require 'forwardable'
-require 'net/http'
+require "forwardable"
+require "net/http"
 
-require 'honeybadger/logging'
+require "honeybadger/logging"
 
 module Honeybadger
   # A concurrent queue to notify the backend.
@@ -39,13 +39,14 @@ module Honeybadger
       @pid = Process.pid
       @send_queue = []
       @last_sent = nil
+      @dropped_events = 0
     end
 
     def push(msg)
       return false unless start
 
-      if queue.size >= config.max_queue_size
-        warn { sprintf('Unable to send event; reached max queue size of %s.', queue.size) }
+      if queue.size >= config.events_max_queue_size
+        @dropped_events += 1
         return false
       end
 
@@ -57,7 +58,7 @@ module Honeybadger
     end
 
     def shutdown(force = false)
-      d { 'shutting down events worker' }
+      d { "shutting down events worker" }
 
       mutex.synchronize do
         @shutdown = true
@@ -67,11 +68,11 @@ module Honeybadger
       return true unless thread&.alive?
 
       if throttled?
-        warn { sprintf('Unable to send %s event(s) to Honeybadger (currently throttled)', queue.size) } unless queue.empty?
+        warn { sprintf("Unable to send %s event(s) to Honeybadger (currently throttled)", queue.size) } unless queue.empty?
         return true
       end
 
-      info { sprintf('Waiting to send %s events(s) to Honeybadger', queue.size) } unless queue.empty?
+      info { sprintf("Waiting to send %s events(s) to Honeybadger", queue.size) } unless queue.empty?
       queue.push(FLUSH)
       queue.push(SHUTDOWN)
       !!thread.join
@@ -83,7 +84,7 @@ module Honeybadger
     # Blocks until queue is processed up to this point in time.
     def flush
       mutex.synchronize do
-        if thread && thread.alive?
+        if thread&.alive?
           queue.push(FLUSH)
           queue.push(marker)
           marker.wait(mutex)
@@ -134,7 +135,7 @@ module Honeybadger
     end
 
     def kill!
-      d { 'killing worker thread' }
+      d { "killing worker thread" }
 
       if thread
         Thread.kill(thread)
@@ -164,7 +165,7 @@ module Honeybadger
 
     def run
       begin
-        d { 'worker started' }
+        d { "worker started" }
         mutex.synchronize do
           @last_sent = Time.now
         end
@@ -178,9 +179,9 @@ module Honeybadger
           end
         end
       ensure
-        d { 'stopping worker' }
+        d { "stopping worker" }
       end
-    rescue Exception => e
+    rescue => e
       error {
         msg = "Error in worker thread (shutting down) class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
@@ -207,7 +208,12 @@ module Honeybadger
       send_now(mutex.synchronize { send_queue })
       mutex.synchronize do
         @last_sent = Time.now
+        debug { sprintf("Sending %s events", send_queue.length) }
         send_queue.clear
+        if @dropped_events > 0
+          warn { sprintf("Dropped %s messages due to exceeding max queue size of %s", @dropped_events, config.events_max_queue_size) }
+        end
+        @dropped_events = 0
       end
     end
 
@@ -221,7 +227,7 @@ module Honeybadger
     def flush_send_queue
       return if mutex.synchronize { send_queue.empty? }
       send_batch
-    rescue StandardError => e
+    rescue => e
       error {
         msg = "Error in worker thread class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
@@ -233,28 +239,26 @@ module Honeybadger
       check_and_send
 
       if shutdown? && throttled?
-        warn { sprintf('Unable to send %s events(s) to Honeybadger (currently throttled)', queue.size) } if queue.size > 1
+        warn { sprintf("Unable to send %s events(s) to Honeybadger (currently throttled)", queue.size) } if queue.size > 1
         kill!
         return
       end
 
       sleep(throttle_interval)
-    rescue StandardError => e
+    rescue => e
       error {
         msg = "Error in worker thread class=%s message=%s\n\t%s"
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
     end
 
-
     def send_to_backend(msg)
-      d { 'events_worker sending to backend' }
-      response = backend.event(msg)
-      response
+      d { "events_worker sending to backend" }
+      backend.event(msg)
     end
 
     def calc_throttle_interval
-      ((BASE_THROTTLE ** throttle) - 1).round(3)
+      ((BASE_THROTTLE**throttle) - 1).round(3)
     end
 
     def inc_throttle
@@ -275,32 +279,32 @@ module Honeybadger
     end
 
     def handle_response(response)
-      d { sprintf('events_worker response code=%s message=%s', response.code, response.message.to_s.dump) }
+      d { sprintf("events_worker response code=%s message=%s", response.code, response.message.to_s.dump) }
 
       case response.code
       when 429, 503
         throttle = inc_throttle
-        warn { sprintf('Event send failed: project is sending too many events. code=%s throttle=%s interval=%s', response.code, throttle, throttle_interval) }
+        warn { sprintf("Event send failed: project is sending too many events. code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
       when 402
-        warn { sprintf('Event send failed: payment is required. code=%s', response.code) }
+        warn { sprintf("Event send failed: payment is required. code=%s", response.code) }
         suspend(3600)
       when 403
-        warn { sprintf('Event send failed: API key is invalid. code=%s', response.code) }
+        warn { sprintf("Event send failed: API key is invalid. code=%s", response.code) }
         suspend(3600)
       when 413
-        warn { sprintf('Event send failed: Payload is too large. code=%s', response.code) }
+        warn { sprintf("Event send failed: Payload is too large. code=%s", response.code) }
       when 201
-        if throttle = dec_throttle
-          debug { sprintf('Success ⚡ Event sent code=%s throttle=%s interval=%s', response.code, throttle, throttle_interval) }
+        if (throttle = dec_throttle)
+          debug { sprintf("Success ⚡ Event sent code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
         else
-          debug { sprintf('Success ⚡ Event sent code=%s', response.code) }
+          debug { sprintf("Success ⚡ Event sent code=%s", response.code) }
         end
       when :stubbed
-        info { sprintf('Success ⚡ Development mode is enabled; This event will be sent after app is deployed.') }
+        info { "Success ⚡ Development mode is enabled; This event will be sent after app is deployed." }
       when :error
-        warn { sprintf('Event send failed: an unknown error occurred. code=%s error=%s', response.code, response.message.to_s.dump) }
+        warn { sprintf("Event send failed: an unknown error occurred. code=%s error=%s", response.code, response.message.to_s.dump) }
       else
-        warn { sprintf('Event send failed: unknown response from server. code=%s', response.code) }
+        warn { sprintf("Event send failed: unknown response from server. code=%s", response.code) }
       end
     end
 

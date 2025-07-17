@@ -1,5 +1,5 @@
-require 'honeybadger/backend/null'
-require 'honeybadger/config'
+require "honeybadger/backend/null"
+require "honeybadger/config"
 
 describe Honeybadger::Backend::Null do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
@@ -12,8 +12,8 @@ describe Honeybadger::Backend::Null do
   it { should respond_to :notify }
 
   describe "#notify" do
-    subject { instance.notify(:notices, double('Notice')) }
-    
+    subject { instance.notify(:notices, double("Notice")) }
+
     it { should be_a Honeybadger::Backend::Response }
   end
 
@@ -23,4 +23,3 @@ describe Honeybadger::Backend::Null do
     it { should be_a Honeybadger::Backend::Response }
   end
 end
-

@@ -28,9 +28,8 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # read from .tool-versions
-          # ruby-version: '3.2'
-          bundler-cache: true
+          ruby-version: head
+          bundler-cache: false
 
       - name: Publish gem
         if: ${{ steps.release.outputs.release_created }}
