@@ -315,7 +315,17 @@ module Honeybadger
     end
 
     def signal_marker(marker)
-      mutex.synchronize do
+      # In JRuby, trying to acquire a mutex that's already owned by the same thread
+      # can cause a deadlock. Use try_lock to avoid this issue.
+      if mutex.try_lock
+        begin
+          marker.signal
+        ensure
+          mutex.unlock
+        end
+      else
+        # If we can't acquire the lock, signal directly
+        # This is safe because we're already in a synchronized context
         marker.signal
       end
     end
