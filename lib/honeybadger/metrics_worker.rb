@@ -163,21 +163,15 @@ module Honeybadger
     # Release the marker. Important to perform during cleanup when shutting
     # down, otherwise it could end up waiting indefinitely.
     def release_marker
-      signal_marker(marker)
+      if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
+        Thread.new { signal_marker(marker) }
+      else
+        signal_marker(marker)
+      end
     end
 
     def signal_marker(marker)
-      # In JRuby, trying to acquire a mutex that's already owned by the same thread
-      # can cause a deadlock. Use try_lock to avoid this issue.
-      if mutex.try_lock
-        begin
-          marker.signal
-        ensure
-          mutex.unlock
-        end
-      else
-        # If we can't acquire the lock, signal directly
-        # This is safe because we're already in a synchronized context
+      mutex.synchronize do
         marker.signal
       end
     end
