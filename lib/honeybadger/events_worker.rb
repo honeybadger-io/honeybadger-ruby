@@ -311,11 +311,7 @@ module Honeybadger
     # Release the marker. Important to perform during cleanup when shutting
     # down, otherwise it could end up waiting indefinitely.
     def release_marker
-      if defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
-        Thread.new { signal_marker(marker) }
-      else
-        signal_marker(marker)
-      end
+      signal_marker(marker)
     end
 
     def signal_marker(marker)
