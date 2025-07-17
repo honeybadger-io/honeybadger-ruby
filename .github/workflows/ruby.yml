@@ -85,6 +85,7 @@ jobs:
         ruby:
           - 'jruby-9.4.12.0'
           - 'jruby-10.0.0.0'
+          - 'jruby-10.0.1.0'
         gemfile:
           - rails7.1.gemfile
           - rails6.1.gemfile
