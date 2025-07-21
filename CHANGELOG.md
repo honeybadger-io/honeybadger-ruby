@@ -11,7 +11,6 @@
 
 ### Features
 
-* enable Insights by default ([#706](https://github.com/honeybadger-io/honeybadger-ruby/issues/706)) ([e7e02c5](https://github.com/honeybadger-io/honeybadger-ruby/commit/e7e02c558669c37e18313d8b2c1bd8d9c553048a))
 * enable Insights by default ([#707](https://github.com/honeybadger-io/honeybadger-ruby/issues/707)) ([ab0f35e](https://github.com/honeybadger-io/honeybadger-ruby/commit/ab0f35e648b00d40ac27b2375c85d6e0a37ad546))
 
 
