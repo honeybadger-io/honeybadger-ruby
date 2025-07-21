@@ -248,8 +248,10 @@ module Honeybadger
     end
 
     def signal_marker(marker)
-      mutex.synchronize do
+      if mutex.owned?
         marker.signal
+      else
+        mutex.synchronize { marker.signal }
       end
     end
   end
