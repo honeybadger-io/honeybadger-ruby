@@ -78,7 +78,7 @@ describe "Sidekiq Dependency" do
           let(:job_context) { {context: "Job raised exception", job: job} }
 
           it "notifies Honeybadger" do
-            expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+            expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
             sidekiq.error_handlers[0].call(exception, job_context)
           end
 
@@ -96,7 +96,7 @@ describe "Sidekiq Dependency" do
               let(:attempt) { 2 }
 
               it "notifies Honeybadger" do
-                expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
                 sidekiq.error_handlers[0].call(exception, job_context)
               end
             end
@@ -106,7 +106,7 @@ describe "Sidekiq Dependency" do
               let(:attempt) { 2 }
 
               it "notifies Honeybadger" do
-                expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
                 sidekiq.error_handlers[0].call(exception, job_context)
               end
             end
@@ -115,7 +115,7 @@ describe "Sidekiq Dependency" do
               let(:attempt) { 3 }
 
               it "notifies Honeybadger" do
-                expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
                 sidekiq.error_handlers[0].call(exception, job_context)
               end
             end
@@ -125,7 +125,7 @@ describe "Sidekiq Dependency" do
             let(:job) { {"class" => "HardWorker"} }
 
             it "includes the class as a component" do
-              expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: "HardWorker", action: "perform"}).once
+              expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: "HardWorker", action: "perform").once
               sidekiq.error_handlers[0].call(exception, job_context)
             end
           end
@@ -134,7 +134,7 @@ describe "Sidekiq Dependency" do
             let(:job) { {"class" => "HardWorker", "wrapped" => "WrappedWorker"} }
 
             it "includes the class as a component" do
-              expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: "WrappedWorker", action: "perform"}).once
+              expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: "WrappedWorker", action: "perform").once
               sidekiq.error_handlers[0].call(exception, job_context)
             end
           end
@@ -145,7 +145,7 @@ describe "Sidekiq Dependency" do
           let(:job_context) { job }
 
           it "notifies Honeybadger" do
-            expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+            expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
             sidekiq.error_handlers[0].call(exception, job_context)
           end
 
@@ -163,7 +163,7 @@ describe "Sidekiq Dependency" do
               let(:retry_config) { 1 }
 
               it "notifies Honeybadger" do
-                expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
                 sidekiq.error_handlers[0].call(exception, job_context)
               end
             end
@@ -172,7 +172,7 @@ describe "Sidekiq Dependency" do
               let(:attempt) { 3 }
 
               it "notifies Honeybadger" do
-                expect(Honeybadger).to receive(:notify).with(exception, {parameters: job_context, component: nil}).once
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
                 sidekiq.error_handlers[0].call(exception, job_context)
               end
             end

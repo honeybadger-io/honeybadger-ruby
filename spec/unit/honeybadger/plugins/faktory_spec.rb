@@ -49,7 +49,7 @@ describe "Faktory Dependency" do
         let(:handler_context) { {context: "Failed Hard", event: {}} }
 
         it "notifies Honeybadger" do
-          expect(Honeybadger).to receive(:notify).with(exception, {parameters: handler_context}).once
+          expect(Honeybadger).to receive(:notify).with(exception, parameters: handler_context).once
           faktory_config.error_handlers[0].call(exception, handler_context)
         end
       end
@@ -72,7 +72,7 @@ describe "Faktory Dependency" do
         }
 
         it "notifies Honeybadger" do
-          expect(Honeybadger).to receive(:notify).with(exception, error_payload).once
+          expect(Honeybadger).to receive(:notify).with(exception, **error_payload).once
           faktory_config.error_handlers[0].call(exception, handler_context)
         end
 
@@ -92,7 +92,7 @@ describe "Faktory Dependency" do
             let(:retry_limit) { 0 }
 
             it "notifies Honeybadger" do
-              expect(Honeybadger).to receive(:notify).with(exception, error_payload).once
+              expect(Honeybadger).to receive(:notify).with(exception, **error_payload).once
               faktory_config.error_handlers[0].call(exception, handler_context)
             end
           end
@@ -102,7 +102,7 @@ describe "Faktory Dependency" do
             let(:retry_limit) { 3 }
 
             it "notifies Honeybadger" do
-              expect(Honeybadger).to receive(:notify).with(exception, error_payload).once
+              expect(Honeybadger).to receive(:notify).with(exception, **error_payload).once
               faktory_config.error_handlers[0].call(exception, handler_context)
             end
           end
@@ -112,7 +112,7 @@ describe "Faktory Dependency" do
             let(:retry_limit) { 10 }
 
             it "notifies Honeybadger" do
-              expect(Honeybadger).to receive(:notify).with(exception, error_payload).once
+              expect(Honeybadger).to receive(:notify).with(exception, **error_payload).once
               faktory_config.error_handlers[0].call(exception, handler_context)
             end
           end
