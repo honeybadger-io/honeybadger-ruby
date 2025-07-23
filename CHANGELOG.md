@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.0.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.0...v6.0.1) (2025-07-23)
+
+
+### Bug Fixes
+
+* Use kwargs for .notify in plugins ([#709](https://github.com/honeybadger-io/honeybadger-ruby/issues/709)) ([9007f16](https://github.com/honeybadger-io/honeybadger-ruby/commit/9007f169b26522c4f4e293527e7cb56fdea6a0f3))
+
 ## [6.0.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.29.1...v6.0.0) (2025-07-21)
 
 
