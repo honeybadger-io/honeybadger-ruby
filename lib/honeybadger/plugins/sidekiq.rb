@@ -126,7 +126,7 @@ module Honeybadger
                     opts[:action] = "perform" if opts[:component]
                   end
 
-                  Honeybadger.notify(ex, opts)
+                  Honeybadger.notify(ex, **opts)
                 }
               end
             end

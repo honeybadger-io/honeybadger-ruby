@@ -8,7 +8,7 @@ module Honeybadger
     execution do
       return unless Honeybadger.config[:"exceptions.enabled"]
       if SuckerPunch.respond_to?(:exception_handler=) # >= v2
-        SuckerPunch.exception_handler = ->(ex, klass, args) { Honeybadger.notify(ex, {component: klass, parameters: args}) }
+        SuckerPunch.exception_handler = ->(ex, klass, args) { Honeybadger.notify(ex, component: klass, parameters: args) }
       else
         SuckerPunch.exception_handler do |ex, klass, args|
           Honeybadger.notify(ex, {component: klass, parameters: args})

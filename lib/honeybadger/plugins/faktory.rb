@@ -43,7 +43,7 @@ module Honeybadger
                 opts[:action] = "perform"
               end
 
-              Honeybadger.notify(ex, opts)
+              Honeybadger.notify(ex, **opts)
             end
           end
         end
