@@ -122,13 +122,26 @@ module Honeybadger
   class ActiveJobSubscriber < NotificationSubscriber
     def format_payload(payload)
       job = payload[:job]
+      jobs = payload[:jobs]
       adapter = payload[:adapter]
-      payload.except(:job, :adapter).merge({
-        adapter_class: adapter.class.to_s,
-        job_class: job.class.to_s,
-        job_id: job.job_id,
-        queue_name: job.queue_name
+
+      base_payload = payload.except(:job, :jobs, :adapter).merge({
+        adapter_class: adapter&.class&.to_s
       })
+
+      if jobs
+        base_payload.merge({
+          jobs: jobs.map { |j| {job_class: j.class.to_s, job_id: j.job_id, queue_name: j.queue_name} }
+        })
+      elsif job
+        base_payload.merge({
+          job_class: job.class.to_s,
+          job_id: job.job_id,
+          queue_name: job.queue_name
+        })
+      else
+        base_payload
+      end
     end
   end
 

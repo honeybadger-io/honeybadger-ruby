@@ -55,3 +55,115 @@ describe Honeybadger::ActiveSupportCacheMultiSubscriber do
     end
   end
 end
+
+describe Honeybadger::ActiveJobSubscriber do
+  let(:adapter) { double("adapter", class: Class) }
+
+  context "with a single job payload" do
+    let(:job) { double("job", class: String, job_id: "123", queue_name: "default") }
+    let(:payload) do
+      {
+        job: job,
+        adapter: adapter,
+        extra_data: "test"
+      }
+    end
+
+    subject { described_class.new.format_payload(payload) }
+
+    it "returns a payload with job data" do
+      expect(subject).to eq({
+        adapter_class: "Class",
+        job_class: "String",
+        job_id: "123",
+        queue_name: "default",
+        extra_data: "test"
+      })
+    end
+  end
+
+  context "with a jobs payload (enqueue_all)" do
+    let(:job1) { double("job1", class: String, job_id: "123", queue_name: "default") }
+    let(:job2) { double("job2", class: Integer, job_id: "456", queue_name: "priority") }
+    let(:payload) do
+      {
+        jobs: [job1, job2],
+        adapter: adapter,
+        extra_data: "test"
+      }
+    end
+
+    subject { described_class.new.format_payload(payload) }
+
+    it "returns a payload with jobs array" do
+      expect(subject).to eq({
+        adapter_class: "Class",
+        jobs: [
+          {job_class: "String", job_id: "123", queue_name: "default"},
+          {job_class: "Integer", job_id: "456", queue_name: "priority"}
+        ],
+        extra_data: "test"
+      })
+    end
+  end
+
+  context "with nil job payload" do
+    let(:payload) do
+      {
+        job: nil,
+        adapter: adapter,
+        extra_data: "test"
+      }
+    end
+
+    subject { described_class.new.format_payload(payload) }
+
+    it "returns payload without job data" do
+      expect(subject).to eq({
+        adapter_class: "Class",
+        extra_data: "test"
+      })
+    end
+  end
+
+  context "with no job or jobs payload" do
+    let(:payload) do
+      {
+        adapter: adapter,
+        extra_data: "test"
+      }
+    end
+
+    subject { described_class.new.format_payload(payload) }
+
+    it "returns payload without job data" do
+      expect(subject).to eq({
+        adapter_class: "Class",
+        extra_data: "test"
+      })
+    end
+  end
+
+  context "with nil adapter" do
+    let(:job) { double("job", class: String, job_id: "123", queue_name: "default") }
+    let(:payload) do
+      {
+        job: job,
+        adapter: nil,
+        extra_data: "test"
+      }
+    end
+
+    subject { described_class.new.format_payload(payload) }
+
+    it "handles nil adapter gracefully" do
+      expect(subject).to eq({
+        adapter_class: nil,
+        job_class: "String",
+        job_id: "123",
+        queue_name: "default",
+        extra_data: "test"
+      })
+    end
+  end
+end
