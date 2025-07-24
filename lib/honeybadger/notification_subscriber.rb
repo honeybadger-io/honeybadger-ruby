@@ -131,7 +131,7 @@ module Honeybadger
 
       if jobs
         base_payload.merge({
-          jobs: jobs.map { |j| {job_class: j.class.to_s, job_id: j.job_id, queue_name: j.queue_name} }
+          jobs: jobs.compact.map { |j| {job_class: j.class.to_s, job_id: j.job_id, queue_name: j.queue_name} }
         })
       elsif job
         base_payload.merge({
