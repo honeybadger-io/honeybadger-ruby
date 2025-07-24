@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.0.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.1...v6.0.2) (2025-07-24)
+
+
+### Bug Fixes
+
+* allow jobs in active job subscriber payloads ([#710](https://github.com/honeybadger-io/honeybadger-ruby/issues/710)) ([cc22434](https://github.com/honeybadger-io/honeybadger-ruby/commit/cc224346f5a40e49fdaae75ca8206501fd8da330))
+
 ## [6.0.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.0...v6.0.1) (2025-07-23)
 
 
