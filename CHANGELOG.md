@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.0.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.2...v6.0.3) (2025-08-04)
+
+
+### Bug Fixes
+
+* log fewer 429 responses in events worker ([#714](https://github.com/honeybadger-io/honeybadger-ruby/issues/714)) ([91c7fc2](https://github.com/honeybadger-io/honeybadger-ruby/commit/91c7fc2a0f38d16e076f03c45578afec4a536a2a)), closes [#713](https://github.com/honeybadger-io/honeybadger-ruby/issues/713)
+
 ## [6.0.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.1...v6.0.2) (2025-07-24)
 
 
