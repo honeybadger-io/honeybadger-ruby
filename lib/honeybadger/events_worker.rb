@@ -285,7 +285,7 @@ module Honeybadger
       when 429, 503
         throttle = inc_throttle
         warn { sprintf("Event send failed: project is sending too many events. code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
-        suspend(3600)
+        suspend(response.retry_after_seconds || 3600)
       when 402
         warn { sprintf("Event send failed: payment is required. code=%s", response.code) }
         suspend(3600)

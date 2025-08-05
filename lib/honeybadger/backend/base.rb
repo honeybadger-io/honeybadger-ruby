@@ -1,6 +1,7 @@
 require "forwardable"
 require "net/http"
 require "json"
+require "time"
 
 require "honeybadger/logging"
 
@@ -36,8 +37,10 @@ module Honeybadger
       def initialize(*args)
         if (response = args.first).is_a?(Net::HTTPResponse)
           @code, @body, @message = response.code.to_i, response.body.to_s, response.message
+          @original_response = response
         else
           @code, @body, @message = args
+          @original_response = nil
         end
 
         @success = (200..299).cover?(@code)
@@ -46,6 +49,28 @@ module Honeybadger
 
       def success?
         @success
+      end
+
+      # Parse the Retry-After header value and return the number of seconds to wait.
+      # Returns nil if the header is not present or cannot be parsed.
+      #
+      # @return [Integer, nil] The number of seconds to wait, or nil if not present
+      def retry_after_seconds
+        return nil unless @original_response
+        return nil unless (retry_after = @original_response["Retry-After"])
+
+        # Try to parse as an integer (seconds)
+        if /^\d+$/.match?(retry_after)
+          return retry_after.to_i
+        end
+
+        # Try to parse as an HTTP date
+        begin
+          (Time.httpdate(retry_after) - Time.now).to_i.clamp(0..)
+        rescue ArgumentError
+          # Invalid date format
+          nil
+        end
       end
 
       def error_message

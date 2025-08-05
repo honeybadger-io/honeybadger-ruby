@@ -266,6 +266,47 @@ describe Honeybadger::EventsWorker do
       it "adds throttle" do
         expect { handle_response }.to change(instance, :throttle_interval).by(0.05)
       end
+
+      context "with Retry-After header" do
+        let(:mock_response) do
+          double("Net::HTTPResponse",
+            code: "429",
+            body: "",
+            message: "Too Many Requests")
+        end
+        let(:response) { Honeybadger::Backend::Response.new(mock_response) }
+
+        before do
+          allow(mock_response).to receive(:is_a?).with(Net::HTTPResponse).and_return(true)
+        end
+
+        context "when Retry-After is present" do
+          before do
+            allow(mock_response).to receive(:[]).with("Retry-After").and_return("120")
+          end
+
+          it "suspends for the specified time" do
+            expect(instance).to receive(:suspend).with(120)
+            handle_response
+          end
+
+          it "logs the suspension" do
+            expect(config.logger).to receive(:warn).with(/Event send failed: project is sending too many events/)
+            handle_response
+          end
+        end
+
+        context "when Retry-After is not present" do
+          before do
+            allow(mock_response).to receive(:[]).with("Retry-After").and_return(nil)
+          end
+
+          it "suspends for the default time" do
+            expect(instance).to receive(:suspend).with(3600)
+            handle_response
+          end
+        end
+      end
     end
 
     context "when 402" do
