@@ -57,7 +57,7 @@ module Honeybadger
       # @return [Integer, nil] The number of seconds to wait, or nil if not present
       def retry_after_seconds
         return nil unless @original_response
-        return nil unless (retry_after = @original_response["Retry-After"])
+        return nil unless (retry_after = @original_response["Retry-After"]&.strip)
 
         # Try to parse as an integer (seconds)
         if /^\d+$/.match?(retry_after)
