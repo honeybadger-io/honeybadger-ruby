@@ -1,4 +1,5 @@
 require "honeybadger/conversions"
+require "monitor"
 
 module Honeybadger
   # @api private
@@ -10,7 +11,7 @@ module Honeybadger
     end
 
     def initialize
-      @mutex = Mutex.new
+      @monitor = Monitor.new
       _initialize
     end
 
@@ -22,7 +23,7 @@ module Honeybadger
 
     def set_context(hash, &block)
       local = block_given?
-      @mutex.synchronize do
+      @monitor.synchronize do
         @global_context ||= {}
         @local_context ||= []
 
@@ -39,13 +40,13 @@ module Honeybadger
         begin
           yield
         ensure
-          @mutex.synchronize { @local_context&.pop }
+          @monitor.synchronize { @local_context&.pop }
         end
       end
     end
 
     def get_context
-      @mutex.synchronize do
+      @monitor.synchronize do
         return @global_context unless @local_context
 
         @global_context.merge(@local_context.inject({}, :merge))
@@ -53,7 +54,7 @@ module Honeybadger
     end
 
     def clear_context
-      @mutex.synchronize do
+      @monitor.synchronize do
         @global_context = nil
         @local_context = nil
       end
@@ -61,7 +62,7 @@ module Honeybadger
 
     def set_event_context(hash, &block)
       local = block_given?
-      @mutex.synchronize do
+      @monitor.synchronize do
         @global_event_context ||= {}
         @local_event_context ||= []
 
@@ -78,13 +79,13 @@ module Honeybadger
         begin
           yield
         ensure
-          @mutex.synchronize { @local_event_context&.pop }
+          @monitor.synchronize { @local_event_context&.pop }
         end
       end
     end
 
     def get_event_context
-      @mutex.synchronize do
+      @monitor.synchronize do
         return @global_event_context unless @local_event_context
 
         @global_event_context.merge(@local_event_context.inject({}, :merge))
@@ -92,26 +93,26 @@ module Honeybadger
     end
 
     def clear_event_context
-      @mutex.synchronize do
+      @monitor.synchronize do
         @global_event_context = nil
         @local_event_context = nil
       end
     end
 
     def set_rack_env(env)
-      @mutex.synchronize { @rack_env = env }
+      @monitor.synchronize { @rack_env = env }
     end
 
     def get_rack_env
-      @mutex.synchronize { @rack_env }
+      @monitor.synchronize { @rack_env }
     end
 
     def set_request_id(request_id)
-      @mutex.synchronize { @request_id = request_id }
+      @monitor.synchronize { @request_id = request_id }
     end
 
     def get_request_id
-      @mutex.synchronize { @request_id }
+      @monitor.synchronize { @request_id }
     end
 
     private
@@ -119,7 +120,7 @@ module Honeybadger
     attr_accessor :custom, :rack_env, :request_id
 
     def _initialize
-      @mutex.synchronize do
+      @monitor.synchronize do
         @global_context = nil
         @local_context = nil
         @global_event_context = nil

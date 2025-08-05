@@ -91,6 +91,25 @@ describe Honeybadger::Agent do
         expect(instance.context({bar: :baz}) { :return_value }).to eq(:return_value)
       end
     end
+
+    it "does not deadlock when getting context within to_honeybadger_context" do
+      thing = Class.new do
+        def initialize(agent)
+          @agent = agent
+        end
+
+        def to_honeybadger_context
+          @agent.get_context
+          {foo: "bar"}
+        end
+      end
+
+      object = thing.new(instance)
+
+      expect {
+        instance.context(object)
+      }.not_to raise_error
+    end
   end
 
   describe "#clear!" do
