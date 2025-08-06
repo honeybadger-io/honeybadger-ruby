@@ -127,7 +127,7 @@ module Honeybadger
 
     def can_start?
       return false if shutdown?
-      return false if suspended? && !config.events_queue_when_suspended?
+      return false if suspended?
       true
     end
 
