@@ -134,6 +134,11 @@ module Honeybadger
         default: 100,
         type: Integer
       },
+      "events.queue_when_suspended": {
+        description: "Whether to allow events to be queued when the worker is suspended due to rate limiting. Defaults to false to prevent memory issues.",
+        default: false,
+        type: Boolean
+      },
       plugins: {
         description: "An optional list of plugins to load. Default is to load all plugins.",
         default: nil,

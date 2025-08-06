@@ -256,6 +256,10 @@ module Honeybadger
       self[:"events.timeout"]
     end
 
+    def events_queue_when_suspended?
+      self[:"events.queue_when_suspended"]
+    end
+
     def params_filters
       Array(self[:"request.filter_keys"])
     end

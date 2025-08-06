@@ -125,6 +125,34 @@ describe Honeybadger::EventsWorker do
         expect(instance.push(event)).to eq false
       end
     end
+
+    context "when suspended" do
+      before do
+        instance.send(:suspend, 300)
+      end
+
+      context "and queue_when_suspended is false (default)" do
+        before do
+          allow(config).to receive(:events_queue_when_suspended?).and_return(false)
+        end
+
+        it "rejects the push" do
+          expect(instance.send(:queue)).not_to receive(:push)
+          expect(instance.push(event)).to eq false
+        end
+      end
+
+      context "and queue_when_suspended is true" do
+        before do
+          allow(config).to receive(:events_queue_when_suspended?).and_return(true)
+        end
+
+        it "allows the push" do
+          expect(instance.send(:queue)).to receive(:push).with(event)
+          expect(instance.push(event)).not_to eq false
+        end
+      end
+    end
   end
 
   describe "#start" do

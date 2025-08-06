@@ -10,6 +10,19 @@ describe Honeybadger::Config do
   specify { expect(subject[:"delayed_job.attempt_threshold"]).to eq 0 }
   specify { expect(subject[:debug]).to eq false }
 
+  describe "#events_queue_when_suspended?" do
+    it "returns the configured value" do
+      config = Honeybadger::Config.new
+      config[:"events.queue_when_suspended"] = true
+      expect(config.events_queue_when_suspended?).to eq true
+    end
+
+    it "defaults to false" do
+      config = Honeybadger::Config.new
+      expect(config.events_queue_when_suspended?).to eq false
+    end
+  end
+
   describe "#init!" do
     let(:env) { {} }
     let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }

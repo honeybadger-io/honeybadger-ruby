@@ -44,6 +44,7 @@ module Honeybadger
 
     def push(msg)
       return false unless start
+      return false if suspended? && !config.events_queue_when_suspended?
 
       if queue.size >= config.events_max_queue_size
         @dropped_events += 1
@@ -126,7 +127,7 @@ module Honeybadger
 
     def can_start?
       return false if shutdown?
-      return false if suspended?
+      return false if suspended? && !config.events_queue_when_suspended?
       true
     end
 
