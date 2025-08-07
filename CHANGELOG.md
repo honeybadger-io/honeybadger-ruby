@@ -1,6 +1,18 @@
 # Change Log
 
 
+## [6.0.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.3...v6.0.4) (2025-08-07)
+
+
+### Bug Fixes
+
+* replace context_manager mutex with a monitor ([#718](https://github.com/honeybadger-io/honeybadger-ruby/issues/718)) ([936f3eb](https://github.com/honeybadger-io/honeybadger-ruby/commit/936f3eb4e55024b55e6a1a7f3552000e5dd69eee))
+
+
+### Performance Improvements
+
+* ignore more events by default ([#720](https://github.com/honeybadger-io/honeybadger-ruby/issues/720)) ([1f7c757](https://github.com/honeybadger-io/honeybadger-ruby/commit/1f7c757beac6f443fae88aa17141bc9806480b15))
+
 ## [6.0.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.2...v6.0.3) (2025-08-04)
 
 
