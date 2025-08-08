@@ -175,8 +175,18 @@ module Honeybadger
 
         collect_sidekiq_stats = -> do
           stats = ::Sidekiq::Stats.new
-          data = stats.as_json
-          data[:queues] = {}
+          data = {
+            stats: {
+              processed: stats.processed,
+              failed: stats.failed,
+              scheduled_size: stats.scheduled_size,
+              retry_size: stats.retry_size,
+              dead_size: stats.dead_size,
+              processes_size: stats.processes_size,
+              default_queue_latency: stats.default_queue_latency
+            },
+            queues: {}
+          }
 
           ::Sidekiq::Queue.all.each do |queue|
             data[:queues][queue.name] ||= {}
@@ -216,13 +226,13 @@ module Honeybadger
             stats = collect_sidekiq_stats.call
 
             if Honeybadger.config.load_plugin_insights_events?(:sidekiq)
-              Honeybadger.event("stats.sidekiq", stats.except("stats").merge(stats["stats"]))
+              Honeybadger.event("stats.sidekiq", stats.except(:stats).merge(stats[:stats]))
             end
 
             if Honeybadger.config.load_plugin_insights_metrics?(:sidekiq)
               metric_source "sidekiq"
 
-              stats["stats"].each do |name, value|
+              stats[:stats].each do |name, value|
                 gauge name, value: value
               end
 
