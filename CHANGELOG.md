@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.0.5](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.4...v6.0.5) (2025-08-11)
+
+
+### Bug Fixes
+
+* don't use as_json to collect Sidekiq stats ([#723](https://github.com/honeybadger-io/honeybadger-ruby/issues/723)) ([d389b2b](https://github.com/honeybadger-io/honeybadger-ruby/commit/d389b2bc2f8b5b7bcc5590946e5b0fa1a551719d)), closes [#722](https://github.com/honeybadger-io/honeybadger-ruby/issues/722)
+
 ## [6.0.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.3...v6.0.4) (2025-08-07)
 
 
