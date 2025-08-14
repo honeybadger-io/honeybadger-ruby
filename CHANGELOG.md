@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.0.6](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.5...v6.0.6) (2025-08-14)
+
+
+### Bug Fixes
+
+* reduce Insights logging ([#725](https://github.com/honeybadger-io/honeybadger-ruby/issues/725)) ([cc4756d](https://github.com/honeybadger-io/honeybadger-ruby/commit/cc4756dc86a77856588057668774fce2e1dd408e))
+
 ## [6.0.5](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.4...v6.0.5) (2025-08-11)
 
 
