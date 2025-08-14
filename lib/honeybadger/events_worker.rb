@@ -284,28 +284,28 @@ module Honeybadger
       case response.code
       when 429, 503
         throttle = inc_throttle
-        warn { sprintf("Event send failed: project is sending too many events. code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
+        debug { sprintf("Insights Event send failed: project is sending too many events. code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
         suspend(3600)
       when 402
-        warn { sprintf("Event send failed: payment is required. code=%s", response.code) }
+        warn { sprintf("Insights Event send failed: payment is required. code=%s", response.code) }
         suspend(3600)
       when 403
-        warn { sprintf("Event send failed: API key is invalid. code=%s", response.code) }
+        warn { sprintf("Insights Event send failed: API key is invalid. code=%s", response.code) }
         suspend(3600)
       when 413
-        warn { sprintf("Event send failed: Payload is too large. code=%s", response.code) }
+        warn { sprintf("Insights Event send failed: Payload is too large. code=%s", response.code) }
       when 201
         if (throttle = dec_throttle)
-          debug { sprintf("Success ⚡ Event sent code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
+          debug { sprintf("Success ⚡ Insights Event sent code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
         else
-          debug { sprintf("Success ⚡ Event sent code=%s", response.code) }
+          debug { sprintf("Success ⚡ Insights Event sent code=%s", response.code) }
         end
       when :stubbed
         info { "Success ⚡ Development mode is enabled; This event will be sent after app is deployed." }
       when :error
-        warn { sprintf("Event send failed: an unknown error occurred. code=%s error=%s", response.code, response.message.to_s.dump) }
+        warn { sprintf("Insights Event send failed: an unknown error occurred. code=%s error=%s", response.code, response.message.to_s.dump) }
       else
-        warn { sprintf("Event send failed: unknown response from server. code=%s", response.code) }
+        warn { sprintf("Insights Event send failed: unknown response from server. code=%s", response.code) }
       end
     end
 
