@@ -7,12 +7,9 @@ module Honeybadger
 
     execution do
       ::Warden::Manager.after_set_user do |user, auth, opts|
-        if user.respond_to?(:id)
-          ::Honeybadger.context({
-            user_scope: opts[:scope].to_s,
-            user_id: user.id.to_s
-          })
-        end
+        Honeybadger.context(user_scope: opts[:scope].to_s)
+        Honeybadger.context(user_id: user.id.to_s) if user.respond_to?(:id)
+        Honeybadger.context(user) if user.respond_to?(:to_honeybadger_context)
       end
     end
   end
