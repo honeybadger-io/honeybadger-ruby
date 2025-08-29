@@ -109,6 +109,7 @@ module Honeybadger
     def format_payload(payload)
       {
         query: Util::SQL.obfuscate(payload[:sql], payload[:connection]&.adapter_name),
+        cached: payload[:cached],
         async: payload[:async]
       }
     end
