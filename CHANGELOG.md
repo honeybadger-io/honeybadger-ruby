@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [6.1.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.6...v6.1.0) (2025-08-29)
+
+
+### Features
+
+* add cached attribute to ActiveRecordSubscriber ([#730](https://github.com/honeybadger-io/honeybadger-ruby/issues/730)) ([09d7cd6](https://github.com/honeybadger-io/honeybadger-ruby/commit/09d7cd67557d871c8930322ed0dd70e9863c19d5))
+* add warden user to Honeybadger context ([#729](https://github.com/honeybadger-io/honeybadger-ruby/issues/729)) ([b1e5c9f](https://github.com/honeybadger-io/honeybadger-ruby/commit/b1e5c9f3ab3fef895233ae4429b96b68afc7d4d0)), closes [#728](https://github.com/honeybadger-io/honeybadger-ruby/issues/728)
+
 ## [6.0.6](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.5...v6.0.6) (2025-08-14)
 
 
