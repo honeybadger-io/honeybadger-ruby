@@ -164,4 +164,13 @@ module Honeybadger
 
   class ActiveStorageSubscriber < NotificationSubscriber
   end
+
+  class RailsEventSubscriber
+    def emit(event)
+      return unless Honeybadger.config.load_plugin_insights_events?(:rails)
+
+      event_name = event.delete(:name)
+      Honeybadger.event(event_name, event.except(:timestamp))
+    end
+  end
 end
