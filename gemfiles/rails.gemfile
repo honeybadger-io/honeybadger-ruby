@@ -17,14 +17,7 @@ gem "capistrano", "~> 3.0"
 gem "rake"
 gem "rdoc"
 gem "bump", "~> 0.10.0"
-gem "activesupport", github: "rails"
-gem "activemodel", github: "rails"
-gem "activerecord", github: "rails"
-gem "activejob", github: "rails"
-gem "railties", github: "rails"
-gem "actionpack", github: "rails"
-gem "rack", github: "rack/rack", branch: "2-2-stable"
-gem "arel", github: "rails/arel"
+gem "rails", github: "rails/rails", branch: "main"
 gem "sqlite3", "~> 2", platforms: :mri
 gem "psych", "< 5.2.4", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
