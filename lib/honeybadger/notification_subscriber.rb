@@ -169,8 +169,7 @@ module Honeybadger
     def emit(event)
       return unless Honeybadger.config.load_plugin_insights_events?(:rails)
 
-      event_name = event.delete(:name)
-      Honeybadger.event(event_name, event.except(:timestamp))
+      Honeybadger.event(event[:name], event.except(:name, :timestamp))
     end
   end
 end

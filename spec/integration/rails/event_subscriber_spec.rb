@@ -18,6 +18,7 @@ describe "Rails Insights Event Subscriber", if: RAILS_PRESENT, type: :request do
     rails_events = Honeybadger::Backend::Test.events.select { |e| e[:event_type] == "test.rails_event" }
     expect(rails_events).not_to be_empty
     expect(rails_events.first[:payload][:rails_key]).to eq("rails_value")
+    expect(rails_events.first[:name]).to be_blank
   end
 
   it "gracefully handles Rails.event when not available", unless: defined?(Rails.event) do
