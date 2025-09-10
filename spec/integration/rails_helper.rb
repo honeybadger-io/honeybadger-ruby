@@ -9,7 +9,7 @@ begin
   # We are unable to run Activerecord with rails edge on jruby as the sqlite
   # adapter is not supported, so we are skipping activrecord specs just for
   # that runtime and Rails version
-  SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha")
+  SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && (Rails::VERSION::PRE == "alpha" || Rails::VERSION::MAJOR >= 8))
 
   require FIXTURES_PATH.join("rails", "config", "application.rb")
   require "honeybadger/init/rails"

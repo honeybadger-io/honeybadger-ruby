@@ -2,7 +2,7 @@ require "rails"
 require "action_controller/railtie"
 
 # Duplicating here as some specs don't use the rails helper
-SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && Rails::VERSION::PRE == "alpha")
+SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && (Rails::VERSION::PRE == "alpha" || Rails::VERSION::MAJOR >= 8))
 
 if SKIP_ACTIVE_RECORD
   module ActiveRecord
