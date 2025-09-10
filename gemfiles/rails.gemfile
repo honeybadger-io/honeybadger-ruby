@@ -10,7 +10,6 @@ gem "rspec-its", "~> 1.3.1"
 gem "ruby-prof", platforms: :mri, require: false
 gem "timecop"
 gem "webmock"
-gem "bigdecimal"
 gem "base64"
 gem "mutex_m"
 gem "capistrano", "~> 3.0"
@@ -26,11 +25,29 @@ gem "actionpack", github: "rails", branch: "main"
 gem "rack", github: "rack/rack"
 gem "arel", github: "rails/arel"
 gem "sqlite3", "~> 2", platforms: :mri
-gem "psych", "< 5.2.4", platforms: :jruby
 gem "better_errors", require: false, platforms: :mri
 gem "rspec-rails"
 gem "listen"
 gem "tzinfo-data"
+
+
+platform :jruby do
+  gem "activerecord-jdbcsqlite3-adapter"
+  
+  # Let Bundler pick the JRuby build of psych (>= 5.2.4 on java doesn’t pull the C-ext `date` gem)
+  gem "psych", "~> 5.2", require: false
+
+  # Keep IRB usable without dragging in `io-console` (MRI-only C ext)
+  gem "reline", "~> 0.5.10", require: false
+
+  gem "nokogiri"
+  gem "racc", ">= 1.7.3"
+
+  # Ensure MRI-only bits never try to build on JRuby
+  gem "io-console", platforms: [:ruby]
+  gem "date", platforms: [:ruby]
+  gem "bigdecimal", platforms: [:ruby]
+end
 
 group :development do
   gem "guard"
