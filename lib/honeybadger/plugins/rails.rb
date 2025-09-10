@@ -93,10 +93,10 @@ module Honeybadger
             ::ActiveSupport::Notifications.subscribe("sql.active_record", Honeybadger::ActiveRecordSubscriber.new)
             ::ActiveSupport::Notifications.subscribe("process.action_mailer", Honeybadger::ActionMailerSubscriber.new)
             ::ActiveSupport::Notifications.subscribe(/(service_upload|service_download)\.active_storage/, Honeybadger::ActiveStorageSubscriber.new)
-            
+
             # Subscribe to Rails.event for structured event logging (Rails 8.1+)
             if defined?(::Rails.event) && config.load_plugin_insights_events?(:rails)
-              ::Rails.event.subscribe(Honeybadger::RailsEventSubscriber.new) 
+              ::Rails.event.subscribe(Honeybadger::RailsEventSubscriber.new)
             end
           end
         end
