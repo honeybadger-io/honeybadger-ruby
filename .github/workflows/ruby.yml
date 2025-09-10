@@ -83,16 +83,17 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - 'jruby-9.4.12.0'
-          - 'jruby-10.0.0.0'
+          - 'jruby-9.4.14.0'
+          - 'jruby-10.0.2.0'
         gemfile:
-          - rails7.1.gemfile
           - rails6.1.gemfile
+          - rails7.1.gemfile
+          - rails8.gemfile
           - rails.gemfile
         exclude:
-          - ruby: 'jruby-9.4.12.0'
+          - ruby: 'jruby-9.4.14.0'
             gemfile: rails.gemfile
-          - ruby: 'jruby-10.0.0.0'
+          - ruby: 'jruby-10.0.2.0'
             gemfile: rails6.1.gemfile
 
     # Has to be top level to cache properly
