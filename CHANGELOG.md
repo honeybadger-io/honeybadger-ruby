@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.1.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.0...v6.1.1) (2025-10-10)
+
+
+### Bug Fixes
+
+* handle invalid strings when sanitizing ([#739](https://github.com/honeybadger-io/honeybadger-ruby/issues/739)) ([e707cc8](https://github.com/honeybadger-io/honeybadger-ruby/commit/e707cc84ae6503e8a2f20d362f78442d243bcdca)), closes [#733](https://github.com/honeybadger-io/honeybadger-ruby/issues/733)
+
 ## [6.1.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.6...v6.1.0) (2025-08-29)
 
 
