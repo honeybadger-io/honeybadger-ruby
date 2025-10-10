@@ -206,7 +206,13 @@ module Honeybadger
       end
 
       def inspected?(string)
-        String(string) =~ /#<.*>/
+        # Ensure string has valid encoding before pattern matching
+        # to avoid ArgumentError with invalid byte sequences
+        string = valid_encoding(string) unless valid_encoding?(string)
+        string =~ /#<.*>/
+      rescue
+        # If any encoding error occurs, assume it's not inspected
+        false
       end
     end
   end
