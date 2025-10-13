@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.1.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.1...v6.1.2) (2025-10-13)
+
+
+### Bug Fixes
+
+* handle invalid byte sequence in breadcrumbs ([#742](https://github.com/honeybadger-io/honeybadger-ruby/issues/742)) ([87fd97b](https://github.com/honeybadger-io/honeybadger-ruby/commit/87fd97b944d5bfcc51296bb021eed5a2db30ccf7)), closes [#741](https://github.com/honeybadger-io/honeybadger-ruby/issues/741)
+
 ## [6.1.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.0...v6.1.1) (2025-10-10)
 
 
