@@ -415,6 +415,11 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      "rails.insights.custom_events": {
+        description: "Enable capturing of custom Rails.event events in Rails 8.1 and later.",
+        default: true,
+        type: Boolean
+      },
       "rails.insights.metrics": {
         description: "Enable automatic metric data collection for Ruby on Rails.",
         default: false,

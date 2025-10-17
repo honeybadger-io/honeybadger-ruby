@@ -167,7 +167,7 @@ module Honeybadger
 
   class RailsEventSubscriber
     def emit(event)
-      return unless Honeybadger.config.load_plugin_insights_events?(:rails)
+      return unless Honeybadger.config.load_plugin_insights_custom_events?(:rails)
 
       Honeybadger.event(event[:name], event.except(:name, :timestamp))
     end

@@ -21,6 +21,20 @@ describe "Rails Insights Event Subscriber", if: RAILS_PRESENT, type: :request do
     expect(rails_events.first[:name]).to be_blank
   end
 
+  it "does not capture Rails.event events when custom_events is disabled", if: defined?(Rails.event) do
+    Honeybadger.config[:"rails.insights.custom_events"] = false
+
+    # Reload the plugin to apply the new config
+    Honeybadger::Plugin.instances[:rails].load!(Honeybadger.config)
+
+    Rails.event.notify("test.disabled_event", {rails_key: "rails_value"})
+
+    sleep(0.1)
+
+    rails_events = Honeybadger::Backend::Test.events.select { |e| e[:event_type] == "test.disabled_event" }
+    expect(rails_events).to be_empty
+  end
+
   it "gracefully handles Rails.event when not available", unless: defined?(Rails.event) do
     expect { Honeybadger::Plugin.instances[:rails].load!(Honeybadger.config) }.not_to raise_error
   end
