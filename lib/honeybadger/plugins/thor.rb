@@ -25,7 +25,7 @@ module Honeybadger
       requirement { defined?(::Thor.no_commands) }
 
       execution do
-        return unless Honeybadger.config[:"exceptions.enabled"]
+        next unless Honeybadger.config[:"exceptions.enabled"]
         ::Thor.send(:include, Thor)
       end
     end
