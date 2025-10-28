@@ -321,6 +321,13 @@ module Honeybadger
       !!self[:"#{name}.insights.metrics"]
     end
 
+    def load_plugin_insights_custom_events?(name)
+      return false unless insights_enabled?
+      return false unless load_plugin_insights?(name)
+      return true if self[:"#{name}.insights.custom_events"].nil?
+      !!self[:"#{name}.insights.custom_events"]
+    end
+
     def root_regexp
       return @root_regexp if @root_regexp
       return nil if @no_root
