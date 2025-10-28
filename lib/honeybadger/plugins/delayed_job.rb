@@ -15,7 +15,7 @@ module Honeybadger
     end
 
     execution do
-      return unless Honeybadger.config[:"exceptions.enabled"]
+      next unless Honeybadger.config[:"exceptions.enabled"]
       require "honeybadger/plugins/delayed_job/plugin"
       ::Delayed::Worker.plugins << Plugins::DelayedJob::Plugin
     end
