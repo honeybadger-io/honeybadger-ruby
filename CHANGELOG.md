@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.1.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.2...v6.1.3) (2025-10-28)
+
+
+### Bug Fixes
+
+* replace return with next in execution blocks to prevent LocalJumpError ([#745](https://github.com/honeybadger-io/honeybadger-ruby/issues/745)) ([f49977a](https://github.com/honeybadger-io/honeybadger-ruby/commit/f49977a174c15d37c46ff6d0492790ee040778d2))
+
 ## [6.1.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.1...v6.1.2) (2025-10-13)
 
 
