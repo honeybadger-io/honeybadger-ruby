@@ -22,11 +22,11 @@ module Honeybadger
     end
 
     def record(name, payload)
-      if Honeybadger.config.load_plugin_insights_events?(:rails)
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: :events)
         Honeybadger.event(name, payload)
       end
 
-      if Honeybadger.config.load_plugin_insights_metrics?(:rails)
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: :metrics)
         metric_source "rails"
         record_metrics(name, payload)
       end
@@ -167,7 +167,7 @@ module Honeybadger
 
   class RailsEventSubscriber
     def emit(event)
-      return unless Honeybadger.config.load_plugin_insights_structured_events?(:rails)
+      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :structured_events)
 
       Honeybadger.event(event[:name], event.except(:name, :timestamp))
     end

@@ -30,11 +30,11 @@ module Honeybadger
           if config.cluster_collection?(:solid_queue)
             stats = collect_solid_queue_stats.call
 
-            if Honeybadger.config.load_plugin_insights_events?(:solid_queue)
+            if Honeybadger.config.load_plugin_insights?(:solid_queue, feature: :events)
               Honeybadger.event("stats.solid_queue", stats.except(:stats).merge(stats[:stats]))
             end
 
-            if Honeybadger.config.load_plugin_insights_metrics?(:solid_queue)
+            if Honeybadger.config.load_plugin_insights?(:solid_queue, feature: :metrics)
               metric_source "solid_queue"
               stats[:stats].each do |stat_name, value|
                 gauge stat_name, value: value

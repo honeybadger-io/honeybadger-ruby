@@ -335,38 +335,17 @@ module Honeybadger
       self[:"#{name}.insights.collection_interval"]
     end
 
-    def load_plugin_insights?(name)
+    def load_plugin_insights?(name, feature: nil)
       return false unless insights_enabled?
-      return true if self[:"#{name}.insights.enabled"].nil?
-      !!self[:"#{name}.insights.enabled"]
-    end
 
-    def load_plugin_insights_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.events"].nil?
-      !!self[:"#{name}.insights.events"]
-    end
-
-    def load_plugin_insights_metrics?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.metrics"].nil?
-      !!self[:"#{name}.insights.metrics"]
-    end
-
-    def load_plugin_insights_structured_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.structured_events"].nil?
-      !!self[:"#{name}.insights.structured_events"]
-    end
-
-    def load_plugin_insights_active_support_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.active_support_events"].nil?
-      !!self[:"#{name}.insights.active_support_events"]
+      if feature
+        return false unless load_plugin_insights?(name)
+        return true if self[:"#{name}.insights.#{feature}"].nil?
+        !!self[:"#{name}.insights.#{feature}"]
+      else
+        return true if self[:"#{name}.insights.enabled"].nil?
+        !!self[:"#{name}.insights.enabled"]
+      end
     end
 
     def root_regexp

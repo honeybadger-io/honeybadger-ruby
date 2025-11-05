@@ -24,11 +24,11 @@ module Honeybadger
               status: response_data.code.to_i
             }.merge(parsed_uri_data(request_data))
 
-            if @@hb_config.load_plugin_insights_events?(:net_http)
+            if @@hb_config.load_plugin_insights?(:net_http, feature: :events)
               Honeybadger.event("request.net_http", context)
             end
 
-            if @@hb_config.load_plugin_insights_metrics?(:net_http)
+            if @@hb_config.load_plugin_insights?(:net_http, feature: :metrics)
               context.delete(:url)
               Honeybadger.gauge("duration.request", context.merge(metric_source: "net_http"))
             end

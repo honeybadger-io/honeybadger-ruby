@@ -15,11 +15,11 @@ module Honeybadger
           end
 
           ::Autotuner.metrics_reporter = proc do |metrics|
-            if config.load_plugin_insights_events?(:autotuner)
+            if config.load_plugin_insights?(:autotuner, feature: :events)
               Honeybadger.event("stats.autotuner", metrics)
             end
 
-            if config.load_plugin_insights_metrics?(:autotuner)
+            if config.load_plugin_insights?(:autotuner, feature: :metrics)
               metric_source "autotuner"
               metrics.each do |key, val|
                 gauge key, -> { val }
