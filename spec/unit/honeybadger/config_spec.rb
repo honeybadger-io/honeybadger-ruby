@@ -117,6 +117,78 @@ describe Honeybadger::Config do
     end
   end
 
+  describe "rails insights configuration" do
+    let(:config) { Honeybadger::Config.new }
+
+    it "returns true for the new ActiveSupport events option by default" do
+      expect(config[:"rails.insights.active_support_events"]).to eq true
+      expect(config[:"rails.insights.events"]).to eq true
+    end
+
+    it "allows configuring the new option via the Ruby configuration block" do
+      config.configure do |c|
+        c.rails.insights.active_support_events = false
+      end
+
+      expect(config[:"rails.insights.active_support_events"]).to eq false
+      expect(config.load_plugin_insights_events?(:rails)).to eq false
+    end
+
+    it "warns and maps when using the deprecated option in the Ruby configuration block" do
+      logger = instance_spy(Logger)
+      config.instance_variable_set(:@logger, logger)
+
+      config.configure do |c|
+        c.rails.insights.events = false
+      end
+
+      expect(config[:"rails.insights.active_support_events"]).to eq false
+      expect(config.load_plugin_insights_events?(:rails)).to eq false
+      expect(logger).to have_received(:warn).with(a_string_including(
+        "rails.insights.events",
+        "Ruby configuration block"
+      ))
+    end
+
+    it "warns and maps when the deprecated option is provided via environment variables" do
+      logger = instance_spy(Logger)
+      config.instance_variable_set(:@logger, logger)
+
+      config.load!(framework: {}, env: {"HONEYBADGER_RAILS_INSIGHTS_EVENTS" => "false"})
+
+      expect(config[:"rails.insights.active_support_events"]).to eq false
+      expect(config.load_plugin_insights_events?(:rails)).to eq false
+      expect(logger).to have_received(:warn).with(a_string_including(
+        "rails.insights.events",
+        "environment variable HONEYBADGER_RAILS_INSIGHTS_EVENTS"
+      ))
+    end
+
+    it "warns and maps when the deprecated option is provided via YAML configuration" do
+      config_file = TMP_DIR.join("deprecated_honeybadger.yml")
+      File.write(config_file, <<~YAML)
+        rails:
+          insights:
+            events: false
+      YAML
+
+      logger = instance_spy(Logger)
+      yaml_config = Honeybadger::Config.new("config.path": config_file)
+      yaml_config.instance_variable_set(:@logger, logger)
+
+      yaml_config.load!(framework: {}, env: {})
+
+      expect(yaml_config[:"rails.insights.active_support_events"]).to eq false
+      expect(yaml_config.load_plugin_insights_events?(:rails)).to eq false
+      expect(logger).to have_received(:warn).with(a_string_including(
+        "rails.insights.events",
+        "YAML configuration"
+      ))
+    ensure
+      config_file&.delete if config_file&.exist?
+    end
+  end
+
   describe "#ignored_classes" do
     let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, debug: true}.merge!(opts)) }
     let(:opts) { {"exceptions.ignore": ["foo"]} }

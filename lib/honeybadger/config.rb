@@ -36,11 +36,23 @@ module Honeybadger
 
     IVARS = [:@ruby, :@env, :@yaml, :@framework].freeze
 
+    DEPRECATED_OPTION_ALIASES = {
+      :"rails.insights.events" => :"rails.insights.active_support_events"
+    }.freeze
+
     def initialize(opts = {})
-      @ruby = opts.freeze
+      @deprecated_option_warnings = {}
+      @ruby = {}.freeze
       @env = {}.freeze
       @yaml = {}.freeze
       @framework = {}.freeze
+
+      processed_opts = opts.is_a?(Hash) ? opts.dup : opts
+      if processed_opts.is_a?(Hash)
+        apply_deprecated_options!(processed_opts, source_label: "Ruby options")
+      end
+
+      @ruby = processed_opts.freeze
     end
 
     attr_accessor :ruby, :env, :yaml, :framework
@@ -62,9 +74,24 @@ module Honeybadger
 
     def load!(framework: {}, env: ENV)
       return self if @loaded
-      self.framework = framework.freeze
-      self.env = Env.new(env).freeze
-      load_config_from_disk { |yaml| self.yaml = yaml.freeze }
+      framework_opts = framework.is_a?(Hash) ? framework.dup : framework
+      if framework_opts.is_a?(Hash)
+        apply_deprecated_options!(framework_opts, source_label: "framework configuration")
+        self.framework = framework_opts.freeze
+      else
+        self.framework = framework.freeze
+      end
+
+      env_opts = Env.new(env)
+      apply_deprecated_options!(env_opts, source_label: lambda { |old_key, _new_key|
+        "environment variable #{env_var_name_for(old_key)}"
+      })
+      self.env = env_opts.freeze
+
+      load_config_from_disk do |yaml|
+        apply_deprecated_options!(yaml, source_label: "YAML configuration")
+        self.yaml = yaml.freeze
+      end
       detect_revision!
       @loaded = true
       self
@@ -73,6 +100,7 @@ module Honeybadger
     def configure
       new_ruby = Ruby.new(self)
       yield(new_ruby)
+      apply_deprecated_options!(new_ruby.to_hash, source_label: "Ruby configuration block")
       self.ruby = ruby.merge(new_ruby).freeze
       @logger = @backend = nil
       self
@@ -114,6 +142,7 @@ module Honeybadger
     end
 
     def get(key)
+      key = canonical_option(key)
       IVARS.each do |var|
         source = instance_variable_get(var)
         if source.has_key?(key)
@@ -126,7 +155,12 @@ module Honeybadger
     alias_method :[], :get
 
     def set(key, value)
-      self.ruby = ruby.merge(key => value).freeze
+      normalized_key = normalize_option_key(key)
+      canonical_key = canonical_option(normalized_key)
+      if canonical_key != normalized_key
+        warn_deprecated_option(normalized_key, canonical_key, "Ruby runtime configuration")
+      end
+      self.ruby = ruby.merge(canonical_key => value).freeze
       @logger = @backend = nil
     end
     alias_method :[]=, :set
@@ -464,6 +498,54 @@ module Honeybadger
       else
         Pathname.new(root.to_s).join(path.to_s)
       end
+    end
+
+    def apply_deprecated_options!(hash, source_label:)
+      return hash unless hash.is_a?(Hash)
+
+      DEPRECATED_OPTION_ALIASES.each do |old_key, new_key|
+        key_variant = if hash.has_key?(old_key)
+          old_key
+        elsif hash.has_key?(old_key.to_s)
+          old_key.to_s
+        end
+        next unless key_variant
+
+        value = hash.delete(key_variant)
+        label = source_label.respond_to?(:call) ? source_label.call(old_key, new_key) : source_label
+        warn_deprecated_option(old_key, new_key, label)
+        hash[new_key] = value unless hash.has_key?(new_key)
+      end
+
+      hash
+    end
+
+    def normalize_option_key(key)
+      return key if key.is_a?(Symbol)
+      return key.to_sym if key.respond_to?(:to_sym)
+
+      key
+    end
+
+    def canonical_option(key)
+      normalized = normalize_option_key(key)
+      DEPRECATED_OPTION_ALIASES.fetch(normalized, normalized)
+    end
+
+    def warn_deprecated_option(old_key, new_key, source_label = nil)
+      @deprecated_option_warnings ||= {}
+      cache_key = [old_key, source_label]
+      return if @deprecated_option_warnings[cache_key]
+
+      @deprecated_option_warnings[cache_key] = true
+
+      message = "DEPRECATED: The `#{old_key}` configuration option is deprecated; use `#{new_key}` instead."
+      message = "#{message} (configured via #{source_label})" if source_label
+      logger.warn(message)
+    end
+
+    def env_var_name_for(option_key)
+      "HONEYBADGER_" + option_key.to_s.upcase.gsub(KEY_REPLACEMENT, "_")
     end
 
     def load_config_from_disk
