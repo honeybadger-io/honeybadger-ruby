@@ -362,6 +362,13 @@ module Honeybadger
       !!self[:"#{name}.insights.structured_events"]
     end
 
+    def load_plugin_insights_active_support_events?(name)
+      return false unless insights_enabled?
+      return false unless load_plugin_insights?(name)
+      return true if self[:"#{name}.insights.active_support_events"].nil?
+      !!self[:"#{name}.insights.active_support_events"]
+    end
+
     def root_regexp
       return @root_regexp if @root_regexp
       return nil if @no_root

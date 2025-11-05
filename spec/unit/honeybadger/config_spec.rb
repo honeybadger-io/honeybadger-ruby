@@ -131,7 +131,7 @@ describe Honeybadger::Config do
       end
 
       expect(config[:"rails.insights.active_support_events"]).to eq false
-      expect(config.load_plugin_insights_events?(:rails)).to eq false
+      expect(config.load_plugin_insights_active_support_events?(:rails)).to eq false
     end
 
     it "warns and maps when using the deprecated option in the Ruby configuration block" do
@@ -143,7 +143,7 @@ describe Honeybadger::Config do
       end
 
       expect(config[:"rails.insights.active_support_events"]).to eq false
-      expect(config.load_plugin_insights_events?(:rails)).to eq false
+      expect(config.load_plugin_insights_active_support_events?(:rails)).to eq false
       expect(logger).to have_received(:warn).with(a_string_including(
         "rails.insights.events",
         "Ruby configuration block"
@@ -157,7 +157,7 @@ describe Honeybadger::Config do
       config.load!(framework: {}, env: {"HONEYBADGER_RAILS_INSIGHTS_EVENTS" => "false"})
 
       expect(config[:"rails.insights.active_support_events"]).to eq false
-      expect(config.load_plugin_insights_events?(:rails)).to eq false
+      expect(config.load_plugin_insights_active_support_events?(:rails)).to eq false
       expect(logger).to have_received(:warn).with(a_string_including(
         "rails.insights.events",
         "environment variable HONEYBADGER_RAILS_INSIGHTS_EVENTS"
@@ -179,7 +179,7 @@ describe Honeybadger::Config do
       yaml_config.load!(framework: {}, env: {})
 
       expect(yaml_config[:"rails.insights.active_support_events"]).to eq false
-      expect(yaml_config.load_plugin_insights_events?(:rails)).to eq false
+      expect(yaml_config.load_plugin_insights_active_support_events?(:rails)).to eq false
       expect(logger).to have_received(:warn).with(a_string_including(
         "rails.insights.events",
         "YAML configuration"

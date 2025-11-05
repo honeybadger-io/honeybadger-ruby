@@ -84,7 +84,7 @@ module Honeybadger
         requirement { defined?(::Rails.application) && ::Rails.application }
 
         execution do
-          if config.load_plugin_insights?(:rails)
+          if config.load_plugin_insights?(:rails) && config.load_plugin_insights_active_support_events?(:rails)
             ::ActiveSupport::Notifications.subscribe(/(process_action|send_file|redirect_to|halted_callback|unpermitted_parameters)\.action_controller/, Honeybadger::ActionControllerSubscriber.new)
             ::ActiveSupport::Notifications.subscribe(/(write_fragment|read_fragment|expire_fragment|exist_fragment\?)\.action_controller/, Honeybadger::ActionControllerCacheSubscriber.new)
             ::ActiveSupport::Notifications.subscribe(/cache_(read|generate|fetch_hit|write|increment|decrement|delete|cleanup|prune|exist\?)\.active_support/, Honeybadger::ActiveSupportCacheSubscriber.new)
@@ -93,11 +93,11 @@ module Honeybadger
             ::ActiveSupport::Notifications.subscribe("sql.active_record", Honeybadger::ActiveRecordSubscriber.new)
             ::ActiveSupport::Notifications.subscribe("process.action_mailer", Honeybadger::ActionMailerSubscriber.new)
             ::ActiveSupport::Notifications.subscribe(/(service_upload|service_download)\.active_storage/, Honeybadger::ActiveStorageSubscriber.new)
+          end
 
-            # Subscribe to Rails.event for structured event logging (Rails 8.1+)
-            if defined?(::Rails.event) && config.load_plugin_insights_structured_events?(:rails)
-              ::Rails.event.subscribe(Honeybadger::RailsEventSubscriber.new)
-            end
+          # Subscribe to Rails.event for structured event logging (Rails 8.1+)
+          if config.load_plugin_insights?(:rails) && defined?(::Rails.event) && config.load_plugin_insights_structured_events?(:rails)
+            ::Rails.event.subscribe(Honeybadger::RailsEventSubscriber.new)
           end
         end
       end
