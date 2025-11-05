@@ -321,11 +321,11 @@ module Honeybadger
       !!self[:"#{name}.insights.metrics"]
     end
 
-    def load_plugin_insights_custom_events?(name)
+    def load_plugin_insights_structured_events?(name)
       return false unless insights_enabled?
       return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.custom_events"].nil?
-      !!self[:"#{name}.insights.custom_events"]
+      return true if self[:"#{name}.insights.structured_events"].nil?
+      !!self[:"#{name}.insights.structured_events"]
     end
 
     def root_regexp
