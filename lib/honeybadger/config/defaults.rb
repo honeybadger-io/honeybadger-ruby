@@ -410,11 +410,6 @@ module Honeybadger
         default: true,
         type: Boolean
       },
-      "rails.insights.events": {
-        description: "DEPRECATED: Use rails.insights.active_support_events.",
-        default: nil,
-        type: Boolean
-      },
       "rails.insights.active_support_events": {
         description: "Enable automatic ActiveSupport::Notifications event capturing for Ruby on Rails.",
         default: true,
