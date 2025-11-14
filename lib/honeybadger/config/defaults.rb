@@ -414,7 +414,7 @@ module Honeybadger
         description: "Enable automatic event capturing for Ruby on Rails.",
         default: true,
         type: Boolean,
-        deprecated: "The config option `rails.insights.events` has been deprecated. Use `rails.insights.active_support_events` instead."
+        deprecated: "The config option `rails.insights.events` is deprecated. Use `rails.insights.active_support_events` instead."
       },
       "rails.insights.active_support_events": {
         description: "Enable automatic ActiveSupport::Notifications event capturing for Ruby on Rails.",
