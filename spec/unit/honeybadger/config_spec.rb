@@ -96,6 +96,45 @@ describe Honeybadger::Config do
         end
       end
     end
+
+    context "when options are deprecated" do
+      before do
+        # Unfreeze the constant to allow proxying for method expectations
+        stub_const("Honeybadger::Config::OPTIONS", Honeybadger::Config::OPTIONS.dup)
+        allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(anything, :deprecated).and_return(nil)
+        allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(:env, :deprecated).and_return(
+          deprecated_value
+        )
+      end
+
+      context "with a deprecation message" do
+        let(:deprecated_value) { "The option `env` is deprecated. Use `environment_name` instead." }
+
+        it "logs a deprecation warning with the message" do
+          expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
+            "`env`",
+            "`environment_name`",
+            "config_source=framework"
+          ), "honeybadger")
+          config.init!(api_key: "foo", env: "staging")
+          expect(config[:env]).to eq "staging"
+        end
+      end
+
+      context "without a deprecation message" do
+        let(:deprecated_value) { true }
+
+        it "logs a deprecation warning with the default message" do
+          expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
+            "`env`",
+            "no effect",
+            "config_source=framework"
+          ), "honeybadger")
+          config.init!(api_key: "foo", env: "staging")
+          expect(config[:env]).to eq "staging"
+        end
+      end
+    end
   end
 
   describe "#get" do

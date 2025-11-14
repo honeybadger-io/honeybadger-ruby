@@ -66,6 +66,7 @@ module Honeybadger
       self.env = Env.new(env).freeze
       load_config_from_disk { |yaml| self.yaml = yaml.freeze }
       detect_revision!
+      warn_deprecations!
       @loaded = true
       self
     end
@@ -301,31 +302,10 @@ module Honeybadger
       self[:"#{name}.insights.collection_interval"]
     end
 
-    def load_plugin_insights?(name)
+    def load_plugin_insights?(name, feature: nil)
       return false unless insights_enabled?
-      return true if self[:"#{name}.insights.enabled"].nil?
-      !!self[:"#{name}.insights.enabled"]
-    end
-
-    def load_plugin_insights_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.events"].nil?
-      !!self[:"#{name}.insights.events"]
-    end
-
-    def load_plugin_insights_metrics?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.metrics"].nil?
-      !!self[:"#{name}.insights.metrics"]
-    end
-
-    def load_plugin_insights_structured_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.structured_events"].nil?
-      !!self[:"#{name}.insights.structured_events"]
+      return false unless self[:"#{name}.insights.enabled"]
+      feature.nil? || self[:"#{name}.insights.#{feature}"]
     end
 
     def root_regexp
@@ -370,6 +350,21 @@ module Honeybadger
     def detect_revision!
       return if self[:revision]
       set(:revision, Util::Revision.detect(self[:root]))
+    end
+
+    def warn_deprecations!
+      IVARS.each do |var|
+        source = instance_variable_get(var)
+        source.each_pair do |key, value|
+          next unless (deprecated = OPTIONS.dig(key, :deprecated))
+          msg = if deprecated.is_a?(String)
+            deprecated
+          else
+            "The `#{key}` option is deprecated and has no effect."
+          end
+          warn("DEPRECATED: #{msg} config_source=#{var.to_s.delete_prefix("@")}")
+        end
+      end
     end
 
     def log_path

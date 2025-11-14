@@ -39,11 +39,11 @@ module Honeybadger
           ensure
             context[:duration] = duration
             context[:status] = status
-            if Honeybadger.config.load_plugin_insights_events?(:sidekiq)
+            if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :events)
               Honeybadger.event("perform.sidekiq", context)
             end
 
-            if Honeybadger.config.load_plugin_insights_metrics?(:sidekiq)
+            if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :metrics)
               metric_source "sidekiq"
               gauge "perform", context.slice(:worker, :queue, :duration)
             end
@@ -60,7 +60,7 @@ module Honeybadger
             queue: queue
           }
 
-          if Honeybadger.config.load_plugin_insights_events?(:sidekiq)
+          if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :events)
             Honeybadger.event("enqueue.sidekiq", context)
           end
 
@@ -225,11 +225,11 @@ module Honeybadger
           if config.cluster_collection?(:sidekiq) && (leader_checker.nil? || leader_checker.collect?)
             stats = collect_sidekiq_stats.call
 
-            if Honeybadger.config.load_plugin_insights_events?(:sidekiq)
+            if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :events)
               Honeybadger.event("stats.sidekiq", stats.except(:stats).merge(stats[:stats]))
             end
 
-            if Honeybadger.config.load_plugin_insights_metrics?(:sidekiq)
+            if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :metrics)
               metric_source "sidekiq"
 
               stats[:stats].each do |name, value|

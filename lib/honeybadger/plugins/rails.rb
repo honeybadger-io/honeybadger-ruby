@@ -95,7 +95,7 @@ module Honeybadger
             ::ActiveSupport::Notifications.subscribe(/(service_upload|service_download)\.active_storage/, Honeybadger::ActiveStorageSubscriber.new)
 
             # Subscribe to Rails.event for structured event logging (Rails 8.1+)
-            if defined?(::Rails.event) && config.load_plugin_insights_structured_events?(:rails)
+            if defined?(::Rails.event) && config.load_plugin_insights?(:rails, feature: :structured_events)
               ::Rails.event.subscribe(Honeybadger::RailsEventSubscriber.new)
             end
           end
