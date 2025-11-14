@@ -375,13 +375,13 @@ module Honeybadger
             "The `#{deprecated_key}` option is deprecated and has no effect."
           end
 
+          warn("DEPRECATED: #{msg} config_source=#{var.to_s.delete_prefix("@")}")
+
           if deprecated_by
             updated_source ||= source.dup
-            updated_source[deprecated_by] = value unless updated_source.has_key?(deprecated_by)
+            updated_source[deprecated_by] = value unless updated_source.key?(deprecated_by)
             updated_source.delete(deprecated_key)
           end
-
-          warn("DEPRECATED: #{msg} config_source=#{var.to_s.delete_prefix("@")}")
         end
 
         instance_variable_set(var, updated_source.freeze) if updated_source
