@@ -359,6 +359,10 @@ module Honeybadger
     def process_deprecations!
       IVARS.each do |var|
         source = instance_variable_get(var)
+
+        # We don't need to update the source unless there are deprecated_by options.
+        updated_source = nil
+
         source.each_pair do |deprecated_key, value|
           next unless (deprecated = OPTIONS.dig(deprecated_key, :deprecated))
           deprecated_by = OPTIONS.dig(deprecated_key, :deprecated_by)
@@ -372,13 +376,15 @@ module Honeybadger
           end
 
           if deprecated_by
-            new_source = source.has_key?(deprecated_by) ? source.dup : source.merge(deprecated_by => value)
-            new_source.delete(deprecated_key)
-            instance_variable_set(var, new_source.freeze)
+            updated_source ||= source.dup
+            updated_source[deprecated_by] = value unless updated_source.has_key?(deprecated_by)
+            updated_source.delete(deprecated_key)
           end
 
           warn("DEPRECATED: #{msg} config_source=#{var.to_s.delete_prefix("@")}")
         end
+
+        instance_variable_set(var, updated_source.freeze) if updated_source
       end
     end
 
