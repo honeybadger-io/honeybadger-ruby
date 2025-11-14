@@ -308,27 +308,6 @@ module Honeybadger
       feature.nil? || self[:"#{name}.insights.#{feature}"]
     end
 
-    def load_plugin_insights_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.events"].nil?
-      !!self[:"#{name}.insights.events"]
-    end
-
-    def load_plugin_insights_metrics?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.metrics"].nil?
-      !!self[:"#{name}.insights.metrics"]
-    end
-
-    def load_plugin_insights_structured_events?(name)
-      return false unless insights_enabled?
-      return false unless load_plugin_insights?(name)
-      return true if self[:"#{name}.insights.structured_events"].nil?
-      !!self[:"#{name}.insights.structured_events"]
-    end
-
     def root_regexp
       return @root_regexp if @root_regexp
       return nil if @no_root

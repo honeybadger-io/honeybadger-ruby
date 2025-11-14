@@ -39,11 +39,11 @@ module Honeybadger
     end
 
     def record_puma_stats(stats, context = {})
-      if Honeybadger.config.load_plugin_insights_events?(:puma)
+      if Honeybadger.config.load_plugin_insights?(:puma, feature: :events)
         Honeybadger.event("stats.puma", context.merge(stats))
       end
 
-      if Honeybadger.config.load_plugin_insights_metrics?(:puma)
+      if Honeybadger.config.load_plugin_insights?(:puma, feature: :metrics)
         STATS_KEYS.each do |stat|
           gauge stat, context, -> { stats[stat] } if stats[stat]
         end

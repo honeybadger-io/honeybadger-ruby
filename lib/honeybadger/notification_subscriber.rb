@@ -23,11 +23,11 @@ module Honeybadger
 
     def record(name, payload)
       # DEPRECATED: `rails.insights.events` will be removed in future versions.
-      if Honeybadger.config.load_plugin_insights?(:rails, feature: "active_support_events") || Honeybadger.config.load_plugin_insights?(:rails, feature: "events")
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events) || Honeybadger.config.load_plugin_insights?(:rails, feature: :events)
         Honeybadger.event(name, payload)
       end
 
-      if Honeybadger.config.load_plugin_insights_metrics?(:rails)
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: :metrics)
         metric_source "rails"
         record_metrics(name, payload)
       end
@@ -168,7 +168,7 @@ module Honeybadger
 
   class RailsEventSubscriber
     def emit(event)
-      return unless Honeybadger.config.load_plugin_insights_structured_events?(:rails)
+      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :structured_events)
 
       Honeybadger.event(event[:name], event.except(:name, :timestamp))
     end
