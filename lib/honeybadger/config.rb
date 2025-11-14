@@ -66,7 +66,7 @@ module Honeybadger
       self.env = Env.new(env).freeze
       load_config_from_disk { |yaml| self.yaml = yaml.freeze }
       detect_revision!
-      warn_deprecations!
+      process_deprecations!
       @loaded = true
       self
     end
@@ -352,18 +352,39 @@ module Honeybadger
       set(:revision, Util::Revision.detect(self[:root]))
     end
 
-    def warn_deprecations!
+    # When an option includes the `deprecated` property, warn the logger with
+    # the provided message (or a default message if `true`). If the
+    # `deprecated_by` property is present, automatically rename the option,
+    # removing the old key from the source.
+    def process_deprecations!
       IVARS.each do |var|
         source = instance_variable_get(var)
-        source.each_pair do |key, value|
-          next unless (deprecated = OPTIONS.dig(key, :deprecated))
+
+        # We don't need to update the source unless there are deprecated_by options.
+        updated_source = nil
+
+        source.each_pair do |deprecated_key, value|
+          next unless (deprecated = OPTIONS.dig(deprecated_key, :deprecated))
+          deprecated_by = OPTIONS.dig(deprecated_key, :deprecated_by)
+
           msg = if deprecated.is_a?(String)
             deprecated
+          elsif deprecated_by
+            "The `#{deprecated_key}` option is deprecated. Use `#{deprecated_by}` instead."
           else
-            "The `#{key}` option is deprecated and has no effect."
+            "The `#{deprecated_key}` option is deprecated and has no effect."
           end
+
           warn("DEPRECATED: #{msg} config_source=#{var.to_s.delete_prefix("@")}")
+
+          if deprecated_by
+            updated_source ||= source.dup
+            updated_source[deprecated_by] = value unless updated_source.key?(deprecated_by)
+            updated_source.delete(deprecated_key)
+          end
         end
+
+        instance_variable_set(var, updated_source.freeze) if updated_source
       end
     end
 

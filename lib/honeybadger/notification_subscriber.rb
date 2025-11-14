@@ -22,8 +22,7 @@ module Honeybadger
     end
 
     def record(name, payload)
-      # DEPRECATED: The config option `rails.insights.events` is deprecated. Use `rails.insights.active_support_events` instead.
-      if Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events) || Honeybadger.config.load_plugin_insights?(:rails, feature: :events)
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events)
         Honeybadger.event(name, payload)
       end
 
