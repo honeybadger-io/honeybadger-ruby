@@ -103,12 +103,12 @@ describe Honeybadger::Config do
         stub_const("Honeybadger::Config::OPTIONS", Honeybadger::Config::OPTIONS.dup)
         allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(anything, :deprecated).and_return(nil)
         allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(:env, :deprecated).and_return(
-          deprecation_value
+          deprecated_value
         )
       end
 
       context "with a deprecation message" do
-        let(:deprecation_value) { "The option `env` is deprecated. Use `environment_name` instead." }
+        let(:deprecated_value) { "The option `env` is deprecated. Use `environment_name` instead." }
 
         it "logs a deprecation warning with the message" do
           expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
@@ -122,7 +122,7 @@ describe Honeybadger::Config do
       end
 
       context "without a deprecation message" do
-        let(:deprecation_value) { true }
+        let(:deprecated_value) { true }
 
         it "logs a deprecation warning with the default message" do
           expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
