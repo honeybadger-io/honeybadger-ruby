@@ -330,6 +330,11 @@ module Honeybadger
         default: 0,
         type: Integer
       },
+      "active_job.insights.enabled": {
+        description: "Enable automatic data collection for Active Job.",
+        default: true,
+        type: Boolean
+      },
       "delayed_job.attempt_threshold": {
         description: "The number of attempts before notifications will be sent.",
         default: 0,
@@ -514,6 +519,11 @@ module Honeybadger
         default: 60,
         type: Integer
       },
+      "puma.insights.enabled": {
+        description: "Enable automatic data collection for Puma.",
+        default: true,
+        type: Boolean
+      },
       "puma.insights.events": {
         description: "Enable automatic event capturing for Puma stats.",
         default: true,
@@ -528,6 +538,11 @@ module Honeybadger
         description: "The frequency in which the Honeybadger gem will collect Puma stats.",
         default: 1,
         type: Integer
+      },
+      "autotuner.insights.enabled": {
+        description: "Enable automatic data collection for Autotuner.",
+        default: true,
+        type: Boolean
       },
       "autotuner.insights.events": {
         description: "Enable automatic event capturing for Autotuner stats.",
