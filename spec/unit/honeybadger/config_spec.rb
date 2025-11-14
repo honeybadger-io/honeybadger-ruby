@@ -149,7 +149,7 @@ describe Honeybadger::Config do
           it "logs a deprecation warning and configures the deprecated_by key" do
             expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
               "`env`",
-              "`deprecated_by_env",
+              "`deprecated_by_env`",
               "config_source=framework"
             ), "honeybadger")
             config.init!(api_key: "expected_api_key", env: "expected_env")
@@ -163,7 +163,7 @@ describe Honeybadger::Config do
           it "logs a deprecation warning without overriding the deprecated_by key" do
             expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
               "`env`",
-              "`deprecated_by_env",
+              "`deprecated_by_env`",
               "config_source=framework"
             ), "honeybadger")
             config.init!(api_key: "expected_api_key", env: "noop_env", deprecated_by_env: "expected_env")
