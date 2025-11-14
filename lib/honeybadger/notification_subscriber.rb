@@ -22,7 +22,8 @@ module Honeybadger
     end
 
     def record(name, payload)
-      if Honeybadger.config.load_plugin_insights_events?(:rails)
+      # DEPRECATED: `rails.insights.events` will be removed in future versions.
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: "active_support_events") || Honeybadger.config.load_plugin_insights?(:rails, feature: "events")
         Honeybadger.event(name, payload)
       end
 
