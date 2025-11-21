@@ -325,6 +325,11 @@ module Honeybadger
         default: false,
         type: Boolean
       },
+      "active_agent.insights.enabled": {
+        description: "Enable automatic data collection for Active Agent.",
+        default: true,
+        type: Boolean
+      },
       "active_job.attempt_threshold": {
         description: "The number of attempts before notifications will be sent.",
         default: 0,

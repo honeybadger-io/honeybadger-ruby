@@ -17,7 +17,6 @@ module Honeybadger
         instrumenter_id: id,
         duration: ((finish_time - payload.delete(:_start_time)) * 1000).round(2)
       }.merge(format_payload(payload).compact)
-
       record(name, payload)
     end
 
