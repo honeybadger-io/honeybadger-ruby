@@ -19,7 +19,7 @@ module Honeybadger
     execution do
       if config.load_plugin_insights?(:active_agent)
         # TODO: do we want to subscribe to .provider.active_agent events for
-        # individual API calls in multi-turn conversions? If so, we may want to
+        # individual API calls in multi-turn conversations? If so, we may want to
         # unsubscribe from prompt.active_agent and embed.active_agent events to
         # avoid duplicates. I'm not sure if that would prevent us from showing
         # the total duration for prompts, though.
