@@ -16,7 +16,6 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: head
         bundler-cache: true
 
     - name: Run standard
