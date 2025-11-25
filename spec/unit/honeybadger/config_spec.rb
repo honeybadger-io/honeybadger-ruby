@@ -96,6 +96,84 @@ describe Honeybadger::Config do
         end
       end
     end
+
+    context "when options are deprecated" do
+      before do
+        # Unfreeze the constant to allow proxying for method expectations
+        stub_const("Honeybadger::Config::OPTIONS", Honeybadger::Config::OPTIONS.dup)
+        allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(anything, :deprecated).and_return(nil)
+        allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(anything, :deprecated_by).and_call_original
+        allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(:env, :deprecated).and_return(
+          deprecated_value
+        )
+      end
+
+      context "with a deprecation message" do
+        let(:deprecated_value) { "The option `env` is deprecated. Use `environment_name` instead." }
+
+        it "logs a deprecation warning with the message" do
+          expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
+            "`env`",
+            "`environment_name`",
+            "config_source=framework"
+          ), "honeybadger")
+          config.init!(api_key: "expected_api_key", env: "expected_env")
+          expect(config[:api_key]).to eq "expected_api_key"
+          expect(config[:env]).to eq "expected_env"
+        end
+      end
+
+      context "without a deprecation message" do
+        let(:deprecated_value) { true }
+
+        it "logs a deprecation warning with the default message" do
+          expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
+            "`env`",
+            "no effect",
+            "config_source=framework"
+          ), "honeybadger")
+          config.init!(api_key: "expected_api_key", env: "expected_env")
+          expect(config[:api_key]).to eq "expected_api_key"
+          expect(config[:env]).to eq "expected_env"
+        end
+      end
+
+      context "with deprecated_by option" do
+        let(:deprecated_value) { true }
+
+        before do
+          allow(Honeybadger::Config::OPTIONS).to receive(:dig).with(:env, :deprecated_by).and_return(:deprecated_by_env)
+        end
+
+        context "when the deprecated_by key is not configured" do
+          it "logs a deprecation warning and configures the deprecated_by key" do
+            expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
+              "`env`",
+              "`deprecated_by_env`",
+              "config_source=framework"
+            ), "honeybadger")
+            config.init!(api_key: "expected_api_key", env: "expected_env")
+            expect(config[:api_key]).to eq "expected_api_key"
+            expect(config[:env]).to be_nil
+            expect(config[:deprecated_by_env]).to eq "expected_env"
+          end
+        end
+
+        context "when the deprecated_by key is configured" do
+          it "logs a deprecation warning without overriding the deprecated_by key" do
+            expect(NULL_LOGGER).to receive(:add).with(Logger::Severity::WARN, a_string_including(
+              "`env`",
+              "`deprecated_by_env`",
+              "config_source=framework"
+            ), "honeybadger")
+            config.init!(api_key: "expected_api_key", env: "noop_env", deprecated_by_env: "expected_env")
+            expect(config[:api_key]).to eq "expected_api_key"
+            expect(config[:env]).to be_nil
+            expect(config[:deprecated_by_env]).to eq "expected_env"
+          end
+        end
+      end
+    end
   end
 
   describe "#get" do

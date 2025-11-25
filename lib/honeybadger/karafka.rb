@@ -69,11 +69,11 @@ module Honeybadger
       #
       # @param event [Karafka::Core::Monitoring::Event]
       def on_statistics_emitted(event)
-        if Honeybadger.config.load_plugin_insights_events?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :events)
           Honeybadger.event("statistics_emitted.karafka", event.payload)
         end
 
-        return unless Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+        return unless Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
 
         statistics = event[:statistics]
         consumer_group_id = event[:consumer_group_id]
@@ -126,11 +126,11 @@ module Honeybadger
           extra_tags.merge!(consumer_tags(event.payload[:caller]))
         end
 
-        if Honeybadger.config.load_plugin_insights_events?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :events)
           Honeybadger.event("error.occurred.karafka", error: event[:error], **extra_tags)
         end
 
-        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
           increment_counter("error_occurred", value: 1, **extra_tags)
         end
       end
@@ -144,7 +144,7 @@ module Honeybadger
         consumer_group_id = event[:subscription_group].consumer_group.id
         extra_tags = {consumer_group: consumer_group_id}
 
-        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
           histogram("listener_polling_time_taken", value: time_taken, **extra_tags)
           histogram("listener_polling_messages", value: messages_count, **extra_tags)
         end
@@ -160,7 +160,7 @@ module Honeybadger
 
         tags = consumer_tags(consumer)
 
-        if Honeybadger.config.load_plugin_insights_events?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :events)
           event_context = tags.merge({
             consumer: consumer.class.name,
             duration: event[:time],
@@ -171,7 +171,7 @@ module Honeybadger
           Honeybadger.event("consumer.consumed.karafka", event_context)
         end
 
-        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
           increment_counter("consumer_messages", value: messages.count, **tags)
           increment_counter("consumer_batches", value: 1, **tags)
           gauge("consumer_offset", value: metadata.last_offset, **tags)
@@ -192,7 +192,7 @@ module Honeybadger
           #
           # @param event [Karafka::Core::Monitoring::Event]
           def on_consumer_#{after}(event)
-            if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+            if Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
               tags = consumer_tags(event.payload[:caller])
               increment_counter('consumer_#{name}', value: 1, **tags)
             end
@@ -205,7 +205,7 @@ module Honeybadger
       def on_worker_process(event)
         jq_stats = event[:jobs_queue].statistics
 
-        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
           gauge("worker_total_threads", value: ::Karafka::App.config.concurrency)
           histogram("worker_processing", value: jq_stats[:busy])
           histogram("worker_enqueued_jobs", value: jq_stats[:enqueued])
@@ -218,7 +218,7 @@ module Honeybadger
       def on_worker_processed(event)
         jq_stats = event[:jobs_queue].statistics
 
-        if Honeybadger.config.load_plugin_insights_metrics?(:karafka)
+        if Honeybadger.config.load_plugin_insights?(:karafka, feature: :metrics)
           histogram("worker_processing", value: jq_stats[:busy])
         end
       end
