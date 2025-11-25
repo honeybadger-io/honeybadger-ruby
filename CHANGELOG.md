@@ -1,6 +1,27 @@
 # Change Log
 
 
+## [6.1.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.2...v6.1.3) (2025-10-28)
+
+
+### Bug Fixes
+
+* replace return with next in execution blocks to prevent LocalJumpError ([#745](https://github.com/honeybadger-io/honeybadger-ruby/issues/745)) ([f49977a](https://github.com/honeybadger-io/honeybadger-ruby/commit/f49977a174c15d37c46ff6d0492790ee040778d2))
+
+## [6.1.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.1...v6.1.2) (2025-10-13)
+
+
+### Bug Fixes
+
+* handle invalid byte sequence in breadcrumbs ([#742](https://github.com/honeybadger-io/honeybadger-ruby/issues/742)) ([87fd97b](https://github.com/honeybadger-io/honeybadger-ruby/commit/87fd97b944d5bfcc51296bb021eed5a2db30ccf7)), closes [#741](https://github.com/honeybadger-io/honeybadger-ruby/issues/741)
+
+## [6.1.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.0...v6.1.1) (2025-10-10)
+
+
+### Bug Fixes
+
+* handle invalid strings when sanitizing ([#739](https://github.com/honeybadger-io/honeybadger-ruby/issues/739)) ([e707cc8](https://github.com/honeybadger-io/honeybadger-ruby/commit/e707cc84ae6503e8a2f20d362f78442d243bcdca)), closes [#733](https://github.com/honeybadger-io/honeybadger-ruby/issues/733)
+
 ## [6.1.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.0.6...v6.1.0) (2025-08-29)
 
 

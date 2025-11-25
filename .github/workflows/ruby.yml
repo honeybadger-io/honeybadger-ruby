@@ -76,6 +76,7 @@ jobs:
     - name: Build and test regular ruby
       run: |
         bundle exec rake
+      continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
 
   jruby:
     runs-on: ubuntu-22.04

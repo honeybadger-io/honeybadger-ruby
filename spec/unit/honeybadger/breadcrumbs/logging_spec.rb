@@ -33,6 +33,12 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
     subject.add("DEBUG", {})
   end
 
+  it "handles invalid UTF-8 byte sequences" do
+    invalid_string = "\xE9s"
+    expect(Honeybadger).to receive(:add_breadcrumb).with("?s", anything)
+    subject.add("DEBUG", invalid_string)
+  end
+
   it "does not mutate the message" do
     subject.add("DEBUG", {}, "Honeybadger")
     expect(subject.severity).to eq("DEBUG")

@@ -97,6 +97,34 @@ describe Honeybadger::Util::Sanitizer do
       expect(described_class.new.sanitize(object)).to eq(object)
     end
 
+    it "handles objects with invalid byte sequences in their string representation" do
+      # Create a string with invalid UTF-8 byte sequences
+      invalid_string = (100..1000).to_a.pack("c*").force_encoding("utf-8")
+      object = double(to_s: invalid_string)
+      
+      # Should not raise an error
+      expect { described_class.new.sanitize(object) }.not_to raise_error
+      
+      # Should return sanitized string
+      result = described_class.new.sanitize(object)
+      expect(result).to be_a(String)
+      expect(result.encoding).to eq(Encoding::UTF_8)
+      expect(result.valid_encoding?).to be true
+    end
+
+    it "handles objects with invalid byte sequences that look like inspect output" do
+      # Create a string with invalid UTF-8 that starts with #<
+      invalid_string = "#<Object \xFF\xFE>".force_encoding("utf-8")
+      object = double(to_s: invalid_string)
+      
+      # Should not raise an error
+      expect { described_class.new.sanitize(object) }.not_to raise_error
+      
+      # Should return sanitized class name since it looks like inspect output
+      result = described_class.new.sanitize(object)
+      expect(result).to eq("#<RSpec::Mocks::Double>")
+    end
+
     context "with bad encodings" do
       let(:string) { "hello ümlaut" }
       let(:binary) { string.dup.force_encoding(Encoding::BINARY) }
