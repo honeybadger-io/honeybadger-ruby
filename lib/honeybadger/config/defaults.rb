@@ -554,6 +554,11 @@ module Honeybadger
         description: "Enable automatic metric data aggregation for Autotuner stats.",
         default: false,
         type: Boolean
+      },
+      "flipper.insights.enabled": {
+        description: "Enable automatic data collection for Flipper.",
+        default: true,
+        type: Boolean
       }
     }.freeze
 
