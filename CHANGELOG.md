@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.2.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.3...v6.2.0) (2025-11-25)
+
+
+### Features
+
+* add Rails.event subscriber ([#734](https://github.com/honeybadger-io/honeybadger-ruby/issues/734)) ([1762fc4](https://github.com/honeybadger-io/honeybadger-ruby/commit/1762fc43bcd70219659b7340fb2c19158eb18099))
+
 ## [6.1.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.2...v6.1.3) (2025-10-28)
 
 
