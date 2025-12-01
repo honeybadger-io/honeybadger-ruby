@@ -12,7 +12,8 @@ module Honeybadger
         elsif message.nil?
           message, progname = [progname, nil]
         end
-        message &&= Util::Sanitizer.sanitize(message.to_s).strip
+        message &&= Util::Sanitizer.sanitize(message.to_s)
+        message = message.strip if message
         unless should_ignore_log?(message, progname)
           Honeybadger.add_breadcrumb(message, category: :log, metadata: {
             severity: format_severity(severity),
