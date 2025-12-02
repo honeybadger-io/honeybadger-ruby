@@ -32,7 +32,7 @@ describe "Flipper Dependency" do
 
     before do
       Object.const_set(:Flipper, flipper_shim)
-      unless defined?(::ActiveSupport)
+      unless defined?(::ActiveSupport::Notifications)
         Object.const_set(:ActiveSupport, active_support_shim)
         active_support_shim.const_set(:Notifications, notifications_shim)
       end
