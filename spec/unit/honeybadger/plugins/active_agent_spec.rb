@@ -14,36 +14,16 @@ describe "Active Agent Dependency" do
     end
   end
 
-  context "when Active Agent is installed" do
+  context "when Active Agent is installed", if: defined?(::ActiveSupport::Notifications) do
     let(:active_agent_shim) do
-      Module.new
-    end
-
-    let(:notifications_shim) do
-      Module.new do
-        def self.subscribe(*args)
-        end
-      end
-    end
-
-    let(:active_support_shim) do
       Module.new
     end
 
     before do
       Object.const_set(:ActiveAgent, active_agent_shim)
-      unless defined?(::ActiveSupport)
-        Object.const_set(:ActiveSupport, active_support_shim)
-        active_support_shim.const_set(:Notifications, notifications_shim)
-      end
     end
 
-    after do
-      Object.send(:remove_const, :ActiveAgent)
-      if defined?(::ActiveSupport) && active_support_shim == ::ActiveSupport
-        Object.send(:remove_const, :ActiveSupport)
-      end
-    end
+    after { Object.send(:remove_const, :ActiveAgent) }
 
     context "when insights are enabled" do
       let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "active_agent.insights.enabled": true) }
