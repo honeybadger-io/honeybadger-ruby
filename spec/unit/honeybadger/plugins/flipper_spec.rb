@@ -1,6 +1,13 @@
 require "honeybadger/plugins/flipper"
 require "honeybadger/config"
 
+module ActiveSupport
+  module Notifications
+    def self.subscribe(*args)
+    end
+  end
+end
+
 describe "Flipper Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
@@ -19,30 +26,12 @@ describe "Flipper Dependency" do
       Module.new
     end
 
-    let(:notifications_shim) do
-      Module.new do
-        def self.subscribe(*args)
-        end
-      end
-    end
-
-    let(:active_support_shim) do
-      Module.new
-    end
-
     before do
       Object.const_set(:Flipper, flipper_shim)
-      unless defined?(::ActiveSupport::Notifications)
-        Object.const_set(:ActiveSupport, active_support_shim)
-        active_support_shim.const_set(:Notifications, notifications_shim)
-      end
     end
 
     after do
       Object.send(:remove_const, :Flipper)
-      if defined?(::ActiveSupport) && active_support_shim == ::ActiveSupport
-        Object.send(:remove_const, :ActiveSupport)
-      end
     end
 
     context "when insights are enabled" do
