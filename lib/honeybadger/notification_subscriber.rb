@@ -17,21 +17,39 @@ module Honeybadger
         instrumenter_id: id,
         duration: ((finish_time - payload.delete(:_start_time)) * 1000).round(2)
       }.merge(format_payload(payload).compact)
+
       record(name, payload)
+      record_metrics(name, payload)
     end
 
     def record(name, payload)
-      if Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events)
-        Honeybadger.event(name, payload)
-      end
-
-      if Honeybadger.config.load_plugin_insights?(:rails, feature: :metrics)
-        metric_source "rails"
-        record_metrics(name, payload)
-      end
+      Honeybadger.event(name, payload)
     end
 
     def record_metrics(name, payload)
+      # noop
+    end
+
+    def process?(name, payload)
+      true
+    end
+
+    def format_payload(payload)
+      payload
+    end
+  end
+
+  class RailsSubscriber < NotificationSubscriber
+    def record(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events)
+      Honeybadger.event(name, payload)
+    end
+
+    def record_metrics(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :metrics)
+
+      metric_source "rails"
+
       case name
       when "sql.active_record"
         gauge("duration.sql.active_record", value: payload[:duration], **payload.slice(:query))
@@ -45,37 +63,29 @@ module Honeybadger
         gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
       end
     end
-
-    def process?(event, payload)
-      true
-    end
-
-    def format_payload(payload)
-      payload
-    end
   end
 
-  class ActionControllerSubscriber < NotificationSubscriber
+  class ActionControllerSubscriber < RailsSubscriber
     def format_payload(payload)
       payload.except(:headers, :request, :response)
     end
   end
 
-  class ActionControllerCacheSubscriber < NotificationSubscriber
+  class ActionControllerCacheSubscriber < RailsSubscriber
     def format_payload(payload)
       payload[:key] = ::ActiveSupport::Cache.expand_cache_key(payload[:key]) if payload[:key]
       payload
     end
   end
 
-  class ActiveSupportCacheSubscriber < NotificationSubscriber
+  class ActiveSupportCacheSubscriber < RailsSubscriber
     def format_payload(payload)
       payload[:key] = ::ActiveSupport::Cache.expand_cache_key(payload[:key]) if payload[:key]
       payload
     end
   end
 
-  class ActiveSupportCacheMultiSubscriber < NotificationSubscriber
+  class ActiveSupportCacheMultiSubscriber < RailsSubscriber
     def format_payload(payload)
       payload[:key] = expand_cache_keys_from_payload(payload[:key])
       payload[:hits] = expand_cache_keys_from_payload(payload[:hits])
@@ -93,7 +103,7 @@ module Honeybadger
     end
   end
 
-  class ActionViewSubscriber < NotificationSubscriber
+  class ActionViewSubscriber < RailsSubscriber
     PROJECT_ROOT = defined?(::Rails) ? ::Rails.root.to_s : ""
 
     def format_payload(payload)
@@ -104,7 +114,7 @@ module Honeybadger
     end
   end
 
-  class ActiveRecordSubscriber < NotificationSubscriber
+  class ActiveRecordSubscriber < RailsSubscriber
     def format_payload(payload)
       {
         query: Util::SQL.obfuscate(payload[:sql], payload[:connection]&.adapter_name),
@@ -113,13 +123,13 @@ module Honeybadger
       }
     end
 
-    def process?(event, payload)
+    def process?(name, payload)
       return false if payload[:name] == "SCHEMA"
       true
     end
   end
 
-  class ActiveJobSubscriber < NotificationSubscriber
+  class ActiveJobSubscriber < RailsSubscriber
     def format_payload(payload)
       job = payload[:job]
       jobs = payload[:jobs]
@@ -145,7 +155,7 @@ module Honeybadger
     end
   end
 
-  class ActionMailerSubscriber < NotificationSubscriber
+  class ActionMailerSubscriber < RailsSubscriber
     def format_payload(payload)
       # Don't include the mail object in the payload...
       mail = payload.delete(:mail)
@@ -161,7 +171,7 @@ module Honeybadger
     end
   end
 
-  class ActiveStorageSubscriber < NotificationSubscriber
+  class ActiveStorageSubscriber < RailsSubscriber
   end
 
   class RailsEventSubscriber
