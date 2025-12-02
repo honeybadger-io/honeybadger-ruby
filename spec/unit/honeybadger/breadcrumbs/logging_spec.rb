@@ -46,6 +46,16 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
     expect(subject.progname).to eq("Honeybadger")
   end
 
+  it "does not crash when message.to_s returns nil" do
+    logger = Logger.new(nil)
+    logger.extend(Honeybadger::Breadcrumbs::LogWrapper)
+
+    bad = Class.new { def to_s; nil; end }.new
+
+    expect { logger.add(Logger::ERROR, bad) }.not_to raise_error
+  end
+
+
   describe "ignores messages on" do
     before { expect(Honeybadger).to_not receive(:add_breadcrumb) }
 
