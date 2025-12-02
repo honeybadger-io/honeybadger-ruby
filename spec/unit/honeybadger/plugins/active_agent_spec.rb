@@ -34,7 +34,7 @@ describe "Active Agent Dependency" do
         allow(ActiveSupport::Notifications).to receive(:subscribe)
       end
 
-      it "subscribes to prompt.active_agent notifications" do
+      it "subscribes to Active Agent notifications" do
         expect(ActiveSupport::Notifications).to receive(:subscribe).with(
           match("prompt.active_agent"),
           subscriber
