@@ -77,6 +77,14 @@ RSpec.configure do |config|
     config.exclude_pattern = "spec/unit/honeybadger/rack/*_spec.rb"
   end
 
+  begin
+    # ActiveSupport::Notifications is also a soft dependency.
+    require "active_support/notifications"
+  rescue LoadError
+    puts "Excluding specs which depend on ActiveSupport::Notifications."
+    # noop
+  end
+
   config.before(:each, framework: :rails) do
     FileUtils.cp_r(FIXTURES_PATH.join("rails"), current_dir)
     cd("rails")

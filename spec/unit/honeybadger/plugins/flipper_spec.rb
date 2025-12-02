@@ -1,13 +1,6 @@
 require "honeybadger/plugins/flipper"
 require "honeybadger/config"
 
-module ActiveSupport
-  module Notifications
-    def self.subscribe(*args)
-    end
-  end
-end
-
 describe "Flipper Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
@@ -21,7 +14,7 @@ describe "Flipper Dependency" do
     end
   end
 
-  context "when flipper is installed" do
+  context "when flipper is installed", if: defined?(::ActiveSupport::Notifications) do
     let(:flipper_shim) do
       Module.new
     end
