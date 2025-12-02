@@ -5,6 +5,7 @@ module Honeybadger
     module Flipper
       Plugin.register :flipper do
         requirement { defined?(::Flipper) }
+        requirement { defined?(::ActiveSupport::Notifications) }
 
         execution do
           if config.load_plugin_insights?(:flipper)
