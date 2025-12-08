@@ -77,4 +77,30 @@ describe Honeybadger::ActiveAgentSubscriber do
   it "is a NotificationSubscriber" do
     expect(subscriber).to be_a(Honeybadger::NotificationSubscriber)
   end
+
+  describe "#format_payload" do
+    context "with prompt.active_agent event" do
+      it "excludes messages and parameters keys" do
+        expect(
+          described_class.new.format_payload("prompt.active_agent", { provider: "OpenAI", provider_module: "OpenAI::Responses", model: "gpt-4o-mini", trace_id: "1234", messages: :value, parameters: :value })
+        ).to eq({ provider: "OpenAI", provider_module: "OpenAI::Responses", model: "gpt-4o-mini", trace_id: "1234" })
+      end
+    end
+  end
+
+  context "with embed.active_agent event" do
+    it "excludes parameters key" do
+      expect(
+        described_class.new.format_payload("embed.active_agent", { provider: "OpenAI", provider_module: "OpenAI::Responses", model: "gpt-4o-mini", trace_id: "1234", parameters: :value })
+      ).to eq({ provider: "OpenAI", provider_module: "OpenAI::Responses", model: "gpt-4o-mini", trace_id: "1234" })
+    end
+  end
+
+  context "with other events" do
+    it "includes all keys" do
+      expect(
+        described_class.new.format_payload("other.active_agent", { provider: "OpenAI", provider_module: "OpenAI::Responses", model: "gpt-4o-mini", trace_id: "1234", unknown: :value })
+      ).to eq({ provider: "OpenAI", provider_module: "OpenAI::Responses", model: "gpt-4o-mini", trace_id: "1234", unknown: :value })
+    end
+  end
 end

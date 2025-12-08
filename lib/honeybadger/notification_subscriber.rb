@@ -16,7 +16,7 @@ module Honeybadger
       payload = {
         instrumenter_id: id,
         duration: ((finish_time - payload.delete(:_start_time)) * 1000).round(2)
-      }.merge(format_payload(payload).compact)
+      }.merge(format_payload(name, payload).compact)
 
       record(name, payload)
       record_metrics(name, payload)
@@ -34,7 +34,7 @@ module Honeybadger
       true
     end
 
-    def format_payload(payload)
+    def format_payload(name, payload)
       payload
     end
   end
@@ -66,27 +66,27 @@ module Honeybadger
   end
 
   class ActionControllerSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       payload.except(:headers, :request, :response)
     end
   end
 
   class ActionControllerCacheSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       payload[:key] = ::ActiveSupport::Cache.expand_cache_key(payload[:key]) if payload[:key]
       payload
     end
   end
 
   class ActiveSupportCacheSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       payload[:key] = ::ActiveSupport::Cache.expand_cache_key(payload[:key]) if payload[:key]
       payload
     end
   end
 
   class ActiveSupportCacheMultiSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       payload[:key] = expand_cache_keys_from_payload(payload[:key])
       payload[:hits] = expand_cache_keys_from_payload(payload[:hits])
       payload
@@ -106,7 +106,7 @@ module Honeybadger
   class ActionViewSubscriber < RailsSubscriber
     PROJECT_ROOT = defined?(::Rails) ? ::Rails.root.to_s : ""
 
-    def format_payload(payload)
+    def format_payload(_name, payload)
       {
         view: payload[:identifier].to_s.gsub(PROJECT_ROOT, "[PROJECT_ROOT]"),
         layout: payload[:layout]
@@ -115,7 +115,7 @@ module Honeybadger
   end
 
   class ActiveRecordSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       {
         query: Util::SQL.obfuscate(payload[:sql], payload[:connection]&.adapter_name),
         cached: payload[:cached],
@@ -130,7 +130,7 @@ module Honeybadger
   end
 
   class ActiveJobSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       job = payload[:job]
       jobs = payload[:jobs]
       adapter = payload[:adapter]
@@ -156,7 +156,7 @@ module Honeybadger
   end
 
   class ActionMailerSubscriber < RailsSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       # Don't include the mail object in the payload...
       mail = payload.delete(:mail)
 

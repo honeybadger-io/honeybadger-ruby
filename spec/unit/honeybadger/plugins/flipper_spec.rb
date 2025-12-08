@@ -85,7 +85,7 @@ describe Honeybadger::FlipperSubscriber do
         extra_data: "ignored"
       }
 
-      formatted = subscriber.format_payload(payload)
+      formatted = subscriber.format_payload("feature_operation.flipper", payload)
 
       expect(formatted).to eq({
         feature_name: "new_feature",
