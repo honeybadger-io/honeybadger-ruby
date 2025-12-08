@@ -19,7 +19,7 @@ describe Honeybadger::ActiveSupportCacheMultiSubscriber do
       allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:key].keys[1]).and_return("foo/bar")
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("cache_write_multi.active_support", payload) }
 
     it "returns a payload with all keys expanded and without cache values" do
       expect(subject).to be_a(Hash)
@@ -44,7 +44,7 @@ describe Honeybadger::ActiveSupportCacheMultiSubscriber do
       allow(::ActiveSupport::Cache).to receive(:expand_cache_key).with(payload[:hits][0]).and_return("one")
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("cache_read_multi.active_support", payload) }
 
     it "returns a payload with all keys expanded" do
       expect(subject).to be_a(Hash)
@@ -69,7 +69,7 @@ describe Honeybadger::ActiveJobSubscriber do
       }
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("enqueue.active_job", payload) }
 
     it "returns a payload with job data" do
       expect(subject).to eq({
@@ -93,7 +93,7 @@ describe Honeybadger::ActiveJobSubscriber do
       }
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("enqueue_all.active_job", payload) }
 
     it "returns a payload with jobs array" do
       expect(subject).to eq({
@@ -116,7 +116,7 @@ describe Honeybadger::ActiveJobSubscriber do
       }
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("other.active_job", payload) }
 
     it "returns payload without job data" do
       expect(subject).to eq({
@@ -134,7 +134,7 @@ describe Honeybadger::ActiveJobSubscriber do
       }
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("other.active_job", payload) }
 
     it "returns payload without job data" do
       expect(subject).to eq({
@@ -154,7 +154,7 @@ describe Honeybadger::ActiveJobSubscriber do
       }
     end
 
-    subject { described_class.new.format_payload(payload) }
+    subject { described_class.new.format_payload("other.active_job", payload) }
 
     it "handles nil adapter gracefully" do
       expect(subject).to eq({
