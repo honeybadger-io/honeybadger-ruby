@@ -22,7 +22,7 @@ module Honeybadger
     end
 
     def record(name, payload)
-      if Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events)
+      if Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_notifications)
         Honeybadger.event(name, payload)
       end
 

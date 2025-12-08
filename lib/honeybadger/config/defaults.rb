@@ -420,9 +420,9 @@ module Honeybadger
         default: true,
         type: Boolean,
         deprecated: true,
-        deprecated_by: :"rails.insights.active_support_events"
+        deprecated_by: :"rails.insights.active_support_notifications"
       },
-      "rails.insights.active_support_events": {
+      "rails.insights.active_support_notifications": {
         description: "Enable automatic ActiveSupport::Notifications event capturing for Ruby on Rails.",
         default: true,
         type: Boolean
