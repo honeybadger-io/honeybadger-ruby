@@ -22,7 +22,7 @@ end
 
 module Honeybadger
   class FlipperSubscriber < NotificationSubscriber
-    def format_payload(payload)
+    def format_payload(_name, payload)
       payload.slice(:feature_name, :operation, :result)
     end
 
