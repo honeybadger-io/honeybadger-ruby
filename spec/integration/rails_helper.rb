@@ -25,6 +25,13 @@ end
 # don't want to attach these hooks to the global config
 def load_rails_hooks(spec)
   spec.before(:all) do
+    Honeybadger.configure do |config|
+      config.api_key = "gem testing"
+      config.backend = "test"
+      config.events.batch_size = 0
+      config.rails.insights.structured_events = true
+    end
+
     # Because we create a new Agent after each spec run, we need to make sure
     # that rerun the after_initialize hook to initilize our Agent
     if RailsApp.initialized?
@@ -35,14 +42,8 @@ def load_rails_hooks(spec)
     end
   end
 
-  spec.before(:each) do
-    Honeybadger.configure do |config|
-      config.api_key = "gem testing"
-      config.backend = "test"
-    end
-  end
-
   spec.after(:each) do
     Honeybadger::Backend::Test.notifications[:notices].clear
+    Honeybadger::Backend::Test.events.clear
   end
 end
