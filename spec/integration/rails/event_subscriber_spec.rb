@@ -1,6 +1,6 @@
 require_relative "../rails_helper"
 
-describe "Rails Insights Event Subscriber", if: -> { RAILS_PRESENT && defined?(Rails.event) } do
+describe "Rails Insights Event Subscriber", if: (RAILS_PRESENT && defined?(Rails.event)) do
   load_rails_hooks(self)
 
   it "captures Rails.event events" do
