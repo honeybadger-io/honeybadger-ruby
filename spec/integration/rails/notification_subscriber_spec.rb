@@ -4,12 +4,6 @@ require "honeybadger/notification_subscriber"
 class TestSubscriber < Honeybadger::NotificationSubscriber; end
 
 describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT do
-  before(:all) do
-    Honeybadger.configure do |config|
-      config.events.batch_size = 0
-    end
-  end
-
   load_rails_hooks(self)
 
   it "records correct durations for concurrent notifications" do
