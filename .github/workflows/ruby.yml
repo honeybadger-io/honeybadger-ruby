@@ -2,24 +2,23 @@ name: Ruby
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
-
   ruby:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       matrix:
         ruby:
-          - '3.0'
-          - '3.1'
-          - '3.2'
-          - '3.3'
-          - '3.4'
-          - 'ruby-head'
+          - "3.0"
+          - "3.1"
+          - "3.2"
+          - "3.3"
+          - "3.4"
+          - "ruby-head"
         gemfile:
           - binding_of_caller.gemfile
           - delayed_job.gemfile
@@ -37,19 +36,19 @@ jobs:
           - sidekiq7.gemfile
           - standalone.gemfile
         exclude:
-          - ruby: '3.0'
+          - ruby: "3.0"
             gemfile: rails7.2.gemfile
-          - ruby: '3.0'
+          - ruby: "3.0"
             gemfile: rails8.gemfile
-          - ruby: '3.1'
+          - ruby: "3.1"
             gemfile: rails8.gemfile
-          - ruby: '3.4'
+          - ruby: "3.4"
             gemfile: rails6.1.gemfile
-          - ruby: 'ruby-head'
+          - ruby: "ruby-head"
             gemfile: rails6.1.gemfile
-          - ruby: '3.4'
+          - ruby: "3.4"
             gemfile: rails7.0.gemfile
-          - ruby: 'ruby-head'
+          - ruby: "ruby-head"
             gemfile: rails7.0.gemfile
     # Has to be top level to cache properly
     env:
@@ -58,25 +57,25 @@ jobs:
       BUNDLE_PATH: "vendor/bundle"
       BUNDLE_WITHOUT: "development"
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: ${{ matrix.ruby != 'ruby-head' }} # Try to avoid problems with ruby-head breaking bundler
-      continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: ${{ matrix.ruby != 'ruby-head' }} # Try to avoid problems with ruby-head breaking bundler
+        continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
 
-    # Deal with a lack of bundler cache for ruby-head
-    - name: Install gems for ruby-head
-      if: matrix.ruby == 'ruby-head'
-      run: bundle install
-      continue-on-error: true
+      # Deal with a lack of bundler cache for ruby-head
+      - name: Install gems for ruby-head
+        if: matrix.ruby == 'ruby-head'
+        run: bundle install
+        continue-on-error: true
 
-    - name: Build and test regular ruby
-      run: |
-        bundle exec rake
-      continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
+      - name: Build and test regular ruby
+        run: |
+          bundle exec rake
+        continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
 
   jruby:
     runs-on: ubuntu-22.04
@@ -84,19 +83,19 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - 'jruby-9.4.14.0'
-          - 'jruby-10.0.2.0'
+          - "jruby-9.4.14.0"
+          - "jruby-10.0.2.0"
         gemfile:
           - rails6.1.gemfile
           - rails7.1.gemfile
           - rails8.gemfile
           - rails.gemfile
         exclude:
-          - ruby: 'jruby-9.4.14.0'
+          - ruby: "jruby-9.4.14.0"
             gemfile: rails.gemfile
-          - ruby: 'jruby-9.4.14.0'
+          - ruby: "jruby-9.4.14.0"
             gemfile: rails8.gemfile
-          - ruby: 'jruby-10.0.2.0'
+          - ruby: "jruby-10.0.2.0"
             gemfile: rails6.1.gemfile
 
     # Has to be top level to cache properly
@@ -106,13 +105,13 @@ jobs:
       BUNDLE_PATH: "vendor/bundle"
       BUNDLE_WITHOUT: "development"
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JRuby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+      - uses: actions/checkout@v4
+      - name: Set up JRuby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
-    - name: Build and test jruby
-      run: |
-        bundle exec rake spec:integrations spec:units
+      - name: Build and test jruby
+        run: |
+          bundle exec rake spec[units,integrations]
