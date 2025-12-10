@@ -1,6 +1,6 @@
 require "honeybadger/instrumentation"
 
-describe Honeybadger::Instrumentation do
+RSpec.describe Honeybadger::Instrumentation do
   let(:agent) { Honeybadger::Agent.new }
   let(:instrumentation) { described_class.new(agent) }
 

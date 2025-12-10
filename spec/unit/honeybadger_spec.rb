@@ -6,7 +6,7 @@ RSpec::Matchers.define :define do |expected|
   end
 end
 
-describe Honeybadger do
+RSpec.describe Honeybadger do
   it { should be_a Module }
   it { should respond_to :notify }
   it { should respond_to :event }

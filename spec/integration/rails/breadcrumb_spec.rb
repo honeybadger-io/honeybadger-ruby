@@ -7,7 +7,7 @@ Honeybadger.configure do |config|
   config.backend = "test"
 end
 
-describe "Rails Breadcrumbs integration", type: :request do
+RSpec.describe "Rails Breadcrumbs integration", type: :request do
   unless SKIP_ACTIVE_RECORD
     around(:example) do |example|
       ActiveRecord::Base.connection.execute("CREATE TABLE things (name char(200));")

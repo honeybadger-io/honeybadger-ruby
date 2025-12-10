@@ -1,7 +1,7 @@
 require "honeybadger/plugins/passenger"
 require "honeybadger/config"
 
-describe "Passenger integration" do
+RSpec.describe "Passenger integration" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do

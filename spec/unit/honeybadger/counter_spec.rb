@@ -1,4 +1,4 @@
-describe Honeybadger::Counter do
+RSpec.describe Honeybadger::Counter do
   describe "#payloads" do
     let(:metric) { described_class.new(name, attributes) }
     let(:name) { "perform" }

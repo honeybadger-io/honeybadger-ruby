@@ -11,7 +11,7 @@ Honeybadger.configure do |config|
   config.backend = "test"
 end
 
-describe "Rails error subscriber integration" do
+RSpec.describe "Rails error subscriber integration" do
   it "always reports handled exceptions" do
     Honeybadger.flush do
       Rails.error.handle(severity: :warning, context: {key: "value"}) do

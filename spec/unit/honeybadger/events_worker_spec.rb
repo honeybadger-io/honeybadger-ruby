@@ -4,7 +4,7 @@ require "honeybadger/events_worker"
 require "honeybadger/config"
 require "honeybadger/backend"
 
-describe Honeybadger::EventsWorker do
+RSpec.describe Honeybadger::EventsWorker do
   let!(:instance) { described_class.new(config) }
   let(:config) {
     Honeybadger::Config.new(

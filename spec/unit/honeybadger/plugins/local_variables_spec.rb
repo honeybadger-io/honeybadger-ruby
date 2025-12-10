@@ -1,7 +1,7 @@
 require "honeybadger/plugins/local_variables"
 require "honeybadger/config"
 
-describe "Local variables integration", order: :defined do
+RSpec.describe "Local variables integration", order: :defined do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do

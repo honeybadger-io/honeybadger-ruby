@@ -1,4 +1,4 @@
-describe Honeybadger::Timer do
+RSpec.describe Honeybadger::Timer do
   describe "#payloads" do
     let(:metric) { described_class.new(name, attributes) }
     let(:name) { "perform" }

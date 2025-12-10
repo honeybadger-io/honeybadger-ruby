@@ -1,7 +1,7 @@
 require "honeybadger/plugins/flipper"
 require "honeybadger/config"
 
-describe "Flipper Dependency" do
+RSpec.describe "Flipper Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do
@@ -71,7 +71,7 @@ describe "Flipper Dependency" do
   end
 end
 
-describe Honeybadger::FlipperSubscriber do
+RSpec.describe Honeybadger::FlipperSubscriber do
   let(:subscriber) { described_class.new }
 
   describe "#format_payload" do

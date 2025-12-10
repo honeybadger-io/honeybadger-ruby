@@ -1,4 +1,4 @@
-describe Honeybadger::Gauge do
+RSpec.describe Honeybadger::Gauge do
   describe "#payloads" do
     let(:metric) { described_class.new(name, attributes) }
     let(:name) { "perform" }

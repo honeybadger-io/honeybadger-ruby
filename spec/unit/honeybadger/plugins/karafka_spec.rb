@@ -2,7 +2,7 @@ require "honeybadger/plugins/karafka"
 require "honeybadger/karafka"
 require "honeybadger/config"
 
-describe "Karafka Dependency" do
+RSpec.describe "Karafka Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": false) }
 
   before do

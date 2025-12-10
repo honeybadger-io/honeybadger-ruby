@@ -1,7 +1,7 @@
 require "honeybadger/event"
 require "timecop"
 
-describe Honeybadger::Event do
+RSpec.describe Honeybadger::Event do
   let(:event_type) { "event_type" }
   let(:payload) { {} }
 

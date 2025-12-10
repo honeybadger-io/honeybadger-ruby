@@ -5,7 +5,7 @@ require "net/http"
 INIT_LOGGER = Logger.new(File::NULL)
 CONFIGURE_LOGGER = Logger.new(File::NULL)
 
-describe Honeybadger::Config do
+RSpec.describe Honeybadger::Config do
   specify { expect(subject[:env]).to eq nil }
   specify { expect(subject[:"delayed_job.attempt_threshold"]).to eq 0 }
   specify { expect(subject[:debug]).to eq false }

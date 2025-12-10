@@ -3,7 +3,7 @@ require "timecop"
 require "honeybadger/metrics_worker"
 require "honeybadger/config"
 
-describe Honeybadger::MetricsWorker do
+RSpec.describe Honeybadger::MetricsWorker do
   let!(:instance) { described_class.new(config) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
   let(:obj) { double("CollectionExecution", tick: 1) }

@@ -1,6 +1,6 @@
 require "honeybadger/util/stats"
 
-describe Honeybadger::Util::Stats do
+RSpec.describe Honeybadger::Util::Stats do
   describe ".memory" do
     subject { Honeybadger::Util::Stats.memory }
 

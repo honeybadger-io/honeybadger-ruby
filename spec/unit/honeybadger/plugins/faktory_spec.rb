@@ -1,7 +1,7 @@
 require "honeybadger/plugins/faktory"
 require "honeybadger/config"
 
-describe "Faktory Dependency" do
+RSpec.describe "Faktory Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do

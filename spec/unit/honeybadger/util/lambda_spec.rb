@@ -1,6 +1,6 @@
 require "honeybadger/util/lambda"
 
-describe Honeybadger::Util::Lambda do
+RSpec.describe Honeybadger::Util::Lambda do
   subject { described_class }
 
   describe ".lambda_execution?" do

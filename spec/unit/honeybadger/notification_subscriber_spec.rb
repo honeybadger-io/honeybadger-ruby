@@ -4,7 +4,7 @@ module ActiveSupport
   module Cache; end
 end
 
-describe Honeybadger::ActiveSupportCacheMultiSubscriber do
+RSpec.describe Honeybadger::ActiveSupportCacheMultiSubscriber do
   context "with a cache_write_multi.active_support payload" do
     let(:payload) do
       obj = Object.new
@@ -56,7 +56,7 @@ describe Honeybadger::ActiveSupportCacheMultiSubscriber do
   end
 end
 
-describe Honeybadger::ActiveJobSubscriber do
+RSpec.describe Honeybadger::ActiveJobSubscriber do
   let(:adapter) { double("adapter", class: Class) }
 
   context "with a single job payload" do

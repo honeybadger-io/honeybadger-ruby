@@ -1,4 +1,4 @@
-describe Honeybadger::Metric do
+RSpec.describe Honeybadger::Metric do
   let(:registry) { Honeybadger::Registry.new }
 
   describe ".register" do

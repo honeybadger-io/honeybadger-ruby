@@ -1,7 +1,7 @@
 require "honeybadger/breadcrumbs/breadcrumb"
 require "honeybadger/breadcrumbs/collector"
 
-describe Honeybadger::Breadcrumbs::Collector do
+RSpec.describe Honeybadger::Breadcrumbs::Collector do
   let(:buffer) { double("Buffer") }
   let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, "breadcrumbs.enabled": true) }
   subject { described_class.new(config, buffer) }

@@ -1,7 +1,7 @@
 require "honeybadger/rack/user_feedback"
 require "honeybadger/config"
 
-describe Honeybadger::Rack::UserFeedback do
+RSpec.describe Honeybadger::Rack::UserFeedback do
   let(:agent) { Honeybadger::Agent.new }
   let(:config) { agent.config }
   let(:main_app) do

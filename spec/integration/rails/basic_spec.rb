@@ -6,7 +6,7 @@ Honeybadger.configure do |config|
   config.backend = "test"
 end
 
-describe "Rails integration", type: :request do
+RSpec.describe "Rails integration", type: :request do
   it "inserts the middleware" do
     expect(RailsApp.middleware).to include(Honeybadger::Rack::ErrorNotifier)
   end

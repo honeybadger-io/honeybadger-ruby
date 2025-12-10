@@ -1,7 +1,7 @@
 require "honeybadger/rack/user_informer"
 require "honeybadger/config"
 
-describe Honeybadger::Rack::UserInformer do
+RSpec.describe Honeybadger::Rack::UserInformer do
   let(:agent) { Honeybadger::Agent.new }
   let(:config) { agent.config }
 

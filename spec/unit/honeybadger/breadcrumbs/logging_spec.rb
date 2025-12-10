@@ -1,6 +1,6 @@
 require "honeybadger/breadcrumbs/logging"
 
-describe Honeybadger::Breadcrumbs::LogWrapper do
+RSpec.describe Honeybadger::Breadcrumbs::LogWrapper do
   let(:logger) do
     Class.new do
       prepend Honeybadger::Breadcrumbs::LogWrapper

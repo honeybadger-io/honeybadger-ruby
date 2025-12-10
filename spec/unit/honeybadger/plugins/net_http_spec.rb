@@ -1,7 +1,7 @@
 require "honeybadger/plugins/net_http"
 require "honeybadger/config"
 
-describe "Net::HTTP integration" do
+RSpec.describe "Net::HTTP integration" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
 
   before do
