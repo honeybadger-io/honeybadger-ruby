@@ -1,7 +1,7 @@
 require "honeybadger"
 
-feature "Running the test cli command" do
-  scenario "in a standalone project" do
+RSpec.describe "Running the test cli command", type: :aruba do
+  context "in a standalone project" do
     it "displays expected debug output and sends notification" do
       set_environment_variable("HONEYBADGER_API_KEY", "asdf")
       expect(run_command("honeybadger test")).to be_successfully_executed
@@ -29,7 +29,7 @@ feature "Running the test cli command" do
     end
   end
 
-  scenario "in a rails project", framework: :rails do
+  context "in a rails project", framework: :rails do
     let(:config_file) { Pathname(current_dir).join("config", "honeybadger.yml") }
 
     it "displays expected debug output and sends notification" do

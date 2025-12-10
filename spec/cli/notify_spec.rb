@@ -1,4 +1,4 @@
-feature "Running the notify CLI command" do
+RSpec.describe "Running the notify CLI command", type: :aruba do
   before do
     set_environment_variable("HONEYBADGER_API_KEY", "asdf")
     set_environment_variable("HONEYBADGER_LOGGING_LEVEL", "DEBUG")
@@ -41,7 +41,7 @@ feature "Running the notify CLI command" do
 
   context "when Rails is detected via the presence of environment.rb" do
     before do
-      config_path = File.join(Dir.pwd, "tmp", "features", "config")
+      config_path = File.join(Dir.pwd, "tmp", "aruba", "config")
       Dir.mkdir(config_path) unless File.exist?(config_path)
       File.open(File.join(config_path, "environment.rb"), "w")
     end

@@ -1,6 +1,6 @@
 require "honeybadger"
 
-feature "Running the exec cli command" do
+RSpec.describe "Running the exec cli command", type: :aruba do
   before { set_environment_variable("HONEYBADGER_BACKEND", "debug") }
 
   it "quietly executes the requested command" do

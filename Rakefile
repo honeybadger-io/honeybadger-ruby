@@ -34,14 +34,14 @@ namespace :spec do
     t.rspec_opts = "--require spec_helper"
   end
 
-  desc "Run feature specs"
-  RSpec::Core::RakeTask.new(:features) do |t|
-    t.pattern = "spec/features/**/*_spec.rb"
+  desc "Run CLI specs"
+  RSpec::Core::RakeTask.new(:cli) do |t|
+    t.pattern = "spec/cli/**/*_spec.rb"
     t.rspec_opts = "--require spec_helper"
   end
 
   desc "Runs unit and feature specs"
-  task all: [:units, :integrations, :features]
+  task all: [:units, :integrations, :cli]
 end
 
 desc "Alias for spec:all (default task)"

@@ -1,4 +1,4 @@
-feature "Rescuing exceptions at exit" do
+RSpec.describe "Rescuing exceptions at exit", type: :aruba do
   let(:crash_cmd) { "ruby #{FIXTURES_PATH.join("ruby_crash.rb")}" }
 
   def custom_crash_cmd(crash_type)

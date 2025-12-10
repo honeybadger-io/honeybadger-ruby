@@ -28,7 +28,7 @@ NULL_LOGGER.level = Logger::Severity::DEBUG
 
 Aruba.configure do |config|
   t = (RUBY_PLATFORM == "java") ? 120 : 12
-  config.working_directory = "tmp/features"
+  config.working_directory = "tmp/aruba"
   config.exit_timeout = t
   config.io_wait_timeout = t
 end
@@ -43,17 +43,13 @@ RSpec.configure do |config|
     config.default_formatter = "doc"
   end
 
-  config.alias_example_group_to :feature, type: :feature
-  config.alias_example_group_to :scenario
+  config.include ArubaHelpers, type: :aruba
 
-  config.include Aruba::Api, type: :feature
-  config.include FeatureHelpers, type: :feature
-
-  config.before(:all, type: :feature) do
+  config.before(:all, type: :aruba) do
     require "honeybadger/cli"
   end
 
-  config.before(:each, type: :feature) do
+  config.before(:each, type: :aruba) do
     set_environment_variable("HONEYBADGER_BACKEND", "debug")
     set_environment_variable("HONEYBADGER_LOGGING_PATH", "STDOUT")
   end
