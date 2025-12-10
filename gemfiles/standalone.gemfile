@@ -18,7 +18,6 @@ gem "capistrano"
 gem "rake"
 gem "rdoc"
 gem "reline"
-gem "bump", "~> 0.10.0"
 
 group :development do
   gem "guard"

@@ -26,8 +26,6 @@ gem "rdoc"
 # (required by standard)
 gem "reline"
 
-gem "bump", "~> 0.10.0"
-
 group :development do
   gem "guard"
   gem "guard-rspec"

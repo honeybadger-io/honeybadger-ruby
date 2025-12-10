@@ -1,16 +1,7 @@
 # frozen_string_literal: true
-
-require "rubygems"
 require "bundler/setup"
-require "bump"
 require "appraisal"
-require "honeybadger/version"
-require_relative "tools/release"
-
-NAME = Dir["*.gemspec"].first.split(".").first.freeze
-VERSION = Honeybadger::VERSION
-GEM_FILE = "#{NAME}-#{VERSION}.gem"
-GEMSPEC_FILE = "#{NAME}.gemspec"
+require "rdoc/task"
 
 SPEC_DIRS = {
   units: "spec/unit/",
@@ -18,7 +9,6 @@ SPEC_DIRS = {
   cli: "spec/cli/"
 }.freeze
 
-require "rdoc/task"
 RDoc::Task.new do |rdoc|
   rdoc.main = "README.md"
   rdoc.markup = "tomdoc"
