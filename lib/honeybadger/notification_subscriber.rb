@@ -176,9 +176,13 @@ module Honeybadger
 
   class RailsEventSubscriber
     def emit(event)
-      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :structured_events)
-
-      Honeybadger.event(event[:name], event.except(:name, :timestamp))
+      payload = {}.tap do |hash|
+        hash[:source_location] = event[:source_location] if event.has_key?(:source_location)
+        hash.merge!(Hash(event[:tags])) if event.has_key?(:tags)
+        hash.merge!(Hash(event[:context])) if event.has_key?(:context)
+        hash.merge!(Hash(event[:payload])) if event.has_key?(:payload)
+      end
+      Honeybadger.event(event[:name], payload)
     end
   end
 end
