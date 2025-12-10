@@ -41,7 +41,7 @@ module Honeybadger
 
   class RailsSubscriber < NotificationSubscriber
     def record(name, payload)
-      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_events)
+      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_notifications_events)
       Honeybadger.event(name, payload)
     end
 

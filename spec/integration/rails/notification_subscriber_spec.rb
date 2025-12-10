@@ -3,14 +3,8 @@ require "honeybadger/notification_subscriber"
 
 class TestSubscriber < Honeybadger::NotificationSubscriber; end
 
-describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT, type: :request do
+describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT do
   load_rails_hooks(self)
-
-  before do
-    Honeybadger.config[:"events.batch_size"] = 0
-
-    Honeybadger::Backend::Test.events.clear
-  end
 
   it "records correct durations for concurrent notifications" do
     mutex, sequence = Mutex.new, 1
