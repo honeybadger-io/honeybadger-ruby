@@ -20,28 +20,26 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.include("README.md", "lib/**/*.rb")
 end
 
-require "rspec/core/rake_task"
 namespace :spec do
   desc "Run unit specs"
-  RSpec::Core::RakeTask.new(:units) do |t|
-    t.pattern = "spec/unit/**/*_spec.rb"
-    t.rspec_opts = "--require spec_helper"
+  task :units do
+    sh "forking-test-runner spec/unit/ --rspec --parallel 4 --quiet"
   end
 
   desc "Run integration specs"
-  RSpec::Core::RakeTask.new(:integrations) do |t|
-    t.pattern = "spec/integration/**/*_spec.rb"
-    t.rspec_opts = "--require spec_helper"
+  task :integrations do
+    sh "forking-test-runner spec/integration/ --rspec --parallel 4 --quiet"
   end
 
   desc "Run CLI specs"
-  RSpec::Core::RakeTask.new(:cli) do |t|
-    t.pattern = "spec/cli/**/*_spec.rb"
-    t.rspec_opts = "--require spec_helper"
+  task :cli do
+    sh "forking-test-runner spec/cli/ --rspec --parallel 4 --quiet"
   end
 
-  desc "Runs unit and feature specs"
-  task all: [:units, :integrations, :cli]
+  desc "Runs all specs"
+  task :all do
+    sh "forking-test-runner spec/ --rspec --parallel 4 --quiet"
+  end
 end
 
 desc "Alias for spec:all (default task)"

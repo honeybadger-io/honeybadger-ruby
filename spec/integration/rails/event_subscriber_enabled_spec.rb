@@ -1,8 +1,14 @@
 require_relative "../rails_helper"
 
-describe "Rails Insights Event Subscriber", if: (RAILS_PRESENT && defined?(Rails.event)) do
-  load_rails_hooks(self)
+return unless RAILS_PRESENT && defined?(Rails.event)
 
+Honeybadger.configure do |config|
+  config.rails.insights.structured_events = true
+  config.backend = "test"
+  config.events.batch_size = 0
+end
+
+RSpec.describe "Rails Insights Event Subscriber" do
   it "captures Rails.event events" do
     Honeybadger.flush do
       Rails.event.notify("test.rails_event", {rails_key: "rails_value"})

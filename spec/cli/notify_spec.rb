@@ -41,7 +41,7 @@ RSpec.describe "Running the notify CLI command", type: :aruba do
 
   context "when Rails is detected via the presence of environment.rb" do
     before do
-      config_path = File.join(Dir.pwd, "tmp", "aruba", "config")
+      config_path = File.join(Aruba.config.working_directory, "config")
       Dir.mkdir(config_path) unless File.exist?(config_path)
       File.open(File.join(config_path, "environment.rb"), "w")
     end

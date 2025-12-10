@@ -1,11 +1,16 @@
 require_relative "../rails_helper"
 require "honeybadger/notification_subscriber"
 
+return unless RAILS_PRESENT
+
 class TestSubscriber < Honeybadger::NotificationSubscriber; end
 
-describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT do
-  load_rails_hooks(self)
+Honeybadger.configure do |config|
+  config.backend = "test"
+  config.events.batch_size = 0
+end
 
+RSpec.describe "Rails Insights Notification Subscribers" do
   it "records correct durations for concurrent notifications" do
     mutex, sequence = Mutex.new, 1
     allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC) do

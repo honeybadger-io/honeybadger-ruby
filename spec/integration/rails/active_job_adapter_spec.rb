@@ -1,8 +1,13 @@
 require_relative "../rails_helper"
 
-describe "Rails ActiveJob Adapter Test", if: RAILS_PRESENT, type: :request do
-  include ActiveJob::TestHelper if RAILS_PRESENT
-  load_rails_hooks(self)
+return unless RAILS_PRESENT
+
+Honeybadger.configure do |config|
+  config.backend = "test"
+end
+
+RSpec.describe "Rails ActiveJob Adapter Test", type: :request do
+  include ActiveJob::TestHelper
 
   it "reports exceptions" do
     Honeybadger.flush do

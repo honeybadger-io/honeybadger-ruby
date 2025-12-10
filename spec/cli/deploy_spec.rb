@@ -27,19 +27,20 @@ RSpec.describe "Running the deploy cli command", type: :aruba do
 
   context "when Rails is not detected due to a missing environment.rb" do
     it "skips rails initialization without logging" do
-      output = capture(:stdout) { Honeybadger::CLI.start(%w[deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user --skip-rails-load]) }
-      expect(output).not_to match(/Skipping Rails initialization/i)
+      cmd = run_command("honeybadger deploy --api-key=test-api-key --environment=test-env --revision=test-rev --repository=test-repo --user=test-user --skip-rails-load")
+      expect(cmd).to be_successfully_executed
+      expect(cmd.output).not_to match(/Skipping Rails initialization/i)
     end
   end
 
   context "when Rails is detected via the presence of environment.rb" do
     before do
-      @aruba_dir = File.join(Dir.pwd, "tmp", "aruba")
-      config_path = File.join(@aruba_dir, "config")
+      aruba_dir = Aruba.config.working_directory
+      config_path = File.join(aruba_dir, "config")
       Dir.mkdir(config_path) unless File.exist?(config_path)
       File.open(File.join(config_path, "environment.rb"), "w")
       @_previous_dir = Dir.pwd
-      Dir.chdir(@aruba_dir)
+      Dir.chdir(aruba_dir)
     end
 
     after { Dir.chdir(@_previous_dir) }

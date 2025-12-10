@@ -1,18 +1,13 @@
 require_relative "../rails_helper"
 
-describe "Rails Breadcrumbs integration", if: RAILS_PRESENT, type: :request do
-  # The plugin is defaulted to off, we need to make sure we re-load plugins
-  # after config as plugins only check requirement only at load time
-  before(:all) do
-    # Clear the thread local so it reload correctly
-    Thread.current[:__hb_breadcrumbs] = nil
-    Honeybadger.configure do |config|
-      config.breadcrumbs.enabled = true
-    end
-  end
+return unless RAILS_PRESENT
 
-  load_rails_hooks(self)
+Honeybadger.configure do |config|
+  config.breadcrumbs.enabled = true
+  config.backend = "test"
+end
 
+describe "Rails Breadcrumbs integration", type: :request do
   unless SKIP_ACTIVE_RECORD
     around(:example) do |example|
       ActiveRecord::Base.connection.execute("CREATE TABLE things (name char(200));")

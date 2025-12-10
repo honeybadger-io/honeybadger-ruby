@@ -1,5 +1,4 @@
 require "forwardable"
-require "rack/request"
 
 require "honeybadger/ruby"
 
