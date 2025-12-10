@@ -22,6 +22,10 @@ gem "rake"
 # rdoc has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/rdoc
 gem "rdoc"
 
+# reline has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/reline
+# (required by standard)
+gem "reline"
+
 gem "bump", "~> 0.10.0"
 
 group :development do
