@@ -1,6 +1,19 @@
 # Change Log
 
 
+## [6.2.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.3...v6.2.0) (2025-12-11)
+
+
+### Features
+
+* add Active Agent monitoring plugin ([#754](https://github.com/honeybadger-io/honeybadger-ruby/issues/754)) ([e78cd04](https://github.com/honeybadger-io/honeybadger-ruby/commit/e78cd0419eec02979872500c81b30e274396ca34))
+* send Flipper events to Insights ([#758](https://github.com/honeybadger-io/honeybadger-ruby/issues/758)) ([12d5010](https://github.com/honeybadger-io/honeybadger-ruby/commit/12d501009033884dd77c0b4daedd12cfff1c5cae))
+
+
+### Bug Fixes
+
+* handle nil messages in Breadcrumbs::LogWrapper ([#757](https://github.com/honeybadger-io/honeybadger-ruby/issues/757)) ([b141f14](https://github.com/honeybadger-io/honeybadger-ruby/commit/b141f14a873d16a8be9b087c8720a734929aca9f))
+
 ## [6.1.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.2...v6.1.3) (2025-10-28)
 
 
