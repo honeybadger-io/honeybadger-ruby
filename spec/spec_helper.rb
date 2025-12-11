@@ -52,12 +52,9 @@ RSpec.configure do |config|
   # Global RSpec config
   Kernel.srand config.seed
 
-  config.filter_run :focus
-  config.run_all_when_everything_filtered = true
+  config.default_formatter = "doc" if config.files_to_run.one?
 
-  if config.files_to_run.one?
-    config.default_formatter = "doc"
-  end
+  config.filter_run_when_matching :focus
 
   if /rails/.match?(ENV["BUNDLE_GEMFILE"])
     config.filter_run_excluding framework: ->(v) { !v || v != :rails }
