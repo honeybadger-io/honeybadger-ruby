@@ -423,8 +423,7 @@ module Honeybadger
       "rails.insights.events": {
         description: "Enable automatic event capturing for Ruby on Rails.",
         default: true,
-        type: Boolean,
-        deprecated: true
+        type: Boolean
       },
       "rails.insights.metrics": {
         description: "Enable automatic metric data collection for Ruby on Rails.",
