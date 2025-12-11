@@ -41,7 +41,7 @@ module Honeybadger
 
   class RailsSubscriber < NotificationSubscriber
     def record(name, payload)
-      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :active_support_notifications_events)
+      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :events)
       Honeybadger.event(name, payload)
     end
 
@@ -172,13 +172,5 @@ module Honeybadger
   end
 
   class ActiveStorageSubscriber < RailsSubscriber
-  end
-
-  class RailsEventSubscriber
-    def emit(event)
-      return unless Honeybadger.config.load_plugin_insights?(:rails, feature: :structured_events)
-
-      Honeybadger.event(event[:name], event.except(:name, :timestamp))
-    end
   end
 end
