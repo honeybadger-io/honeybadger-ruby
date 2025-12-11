@@ -7,7 +7,6 @@
 ### Features
 
 * add Active Agent monitoring plugin ([#754](https://github.com/honeybadger-io/honeybadger-ruby/issues/754)) ([e78cd04](https://github.com/honeybadger-io/honeybadger-ruby/commit/e78cd0419eec02979872500c81b30e274396ca34))
-* add Rails.event subscriber ([#734](https://github.com/honeybadger-io/honeybadger-ruby/issues/734)) ([1762fc4](https://github.com/honeybadger-io/honeybadger-ruby/commit/1762fc43bcd70219659b7340fb2c19158eb18099))
 * send Flipper events to Insights ([#758](https://github.com/honeybadger-io/honeybadger-ruby/issues/758)) ([12d5010](https://github.com/honeybadger-io/honeybadger-ruby/commit/12d501009033884dd77c0b4daedd12cfff1c5cae))
 
 
