@@ -11,11 +11,11 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT do
       get "/"
     end
 
-    action_controller_processe_action_events = Honeybadger::Backend::Test.events.select { |e| e[:event_type] == "process_action.action_controller" }
+    action_controller_process_action_events = Honeybadger::Backend::Test.events.select { |e| e[:event_type] == "process_action.action_controller" }
 
-    expect(action_controller_processe_action_events.size).to eq(1)
+    expect(action_controller_process_action_events.size).to eq(1)
 
-    action_controller_processe_action_events.first.tap do |event|
+    action_controller_process_action_events.first.tap do |event|
       expect(event[:path]).to eq("/")
       expect(event[:controller]).to eq("RailsController")
       expect(event[:action]).to eq("index")
