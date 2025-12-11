@@ -29,7 +29,6 @@ def load_rails_hooks(spec)
       config.api_key = "gem testing"
       config.backend = "test"
       config.events.batch_size = 0
-      config.rails.insights.structured_events = true
     end
 
     # Because we create a new Agent after each spec run, we need to make sure
