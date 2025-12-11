@@ -19,9 +19,22 @@ end
 # This lets you pass args to the `sh` command, like this:
 # rake spec -- --quiet
 def sh_with_args(cmd)
-  separator_index = ARGV.index('--')
-  extra_args = separator_index ? " #{ARGV[(separator_index + 1)..].join(' ')}" : ""
-  sh "#{cmd}#{extra_args}"
+  separator_index = ARGV.index("--")
+  extra_args = separator_index ? " #{ARGV[(separator_index + 1)..].join(" ")}" : ""
+  sh("#{cmd}#{extra_args}")
+end
+
+def run_specs(dirs)
+  if RUBY_ENGINE == "jruby"
+    isolated_dirs, other_dirs = dirs.partition { |d| d == SPEC_DIRS[:integrations] }
+    isolated_dirs.map do |dir|
+      # Integration specs must run in separate processes
+      sh_with_args "find #{dir} -name '*_spec.rb' | xargs -I {} bundle exec rspec {}"
+    end
+    sh_with_args "bundle exec rspec #{other_dirs.join(" ")}" if other_dirs.any?
+  else
+    sh_with_args "forking-test-runner #{dirs.join(" ")} --rspec --parallel 4"
+  end
 end
 
 desc "Run spec suites (defaults to all, e.g., rake spec[units,integrations,cli])"
@@ -38,7 +51,7 @@ task :spec, [:suites] do |_t, args|
     end
   end
 
-  sh_with_args "forking-test-runner #{dirs.join(' ')} --rspec --parallel 4"
+  run_specs(dirs)
 end
 
 desc "Alias for spec"

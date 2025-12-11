@@ -22,7 +22,7 @@ end
 # We are unable to run Activerecord with rails edge on jruby as the sqlite
 # adapter is not supported, so we are skipping activrecord specs just for that
 # runtime and Rails version.
-SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && (Rails::VERSION::PRE == "alpha" || Rails::VERSION::MAJOR >= 8))
+SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && defined?(Rails) && (Rails::VERSION::PRE == "alpha" || Rails::VERSION::MAJOR >= 8))
 
 Dir[File.expand_path("../support/**/*.rb", __FILE__)].sort.each { |f| require f }
 
