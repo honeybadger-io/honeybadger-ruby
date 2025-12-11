@@ -12,7 +12,7 @@ return unless HANAMI_PRESENT
 require FIXTURES_PATH.join("hanami", "app.rb")
 require "honeybadger/init/hanami"
 
-describe "Hanami integration" do
+RSpec.describe "Hanami integration" do
   include Rack::Test::Methods
 
   def app

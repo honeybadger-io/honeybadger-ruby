@@ -7,6 +7,7 @@ gem "appraisal", "~> 2.1"
 gem "aruba", "~> 2.0"
 gem "rspec", "~> 3.0"
 gem "rspec-its", "~> 1.3.1"
+gem "forking_test_runner", "~> 1.16"
 gem "ruby-prof", platforms: :mri, require: false
 gem "timecop"
 gem "webmock"
@@ -21,7 +22,9 @@ gem "rake"
 # rdoc has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/rdoc
 gem "rdoc"
 
-gem "bump", "~> 0.10.0"
+# reline has moved to a rubygem in Ruby 3.5.0: https://github.com/ruby/reline
+# (required by standard)
+gem "reline"
 
 group :development do
   gem "guard"

@@ -1,7 +1,7 @@
 require "honeybadger/plugin"
 require "honeybadger/config"
 
-describe Honeybadger::Plugin::CALLER_FILE do
+RSpec.describe Honeybadger::Plugin::CALLER_FILE do
   it { should_not match "/foo/bar" }
   it { should match "/foo/bar:32" }
   it { should match "D:/foo/bar:32" }
@@ -21,7 +21,7 @@ describe Honeybadger::Plugin::CALLER_FILE do
   end
 end
 
-describe Honeybadger::Plugin do
+RSpec.describe Honeybadger::Plugin do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:plugin) { Honeybadger::Plugin.new(:testing) }
   subject { plugin }

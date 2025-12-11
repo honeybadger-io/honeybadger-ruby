@@ -1,7 +1,7 @@
 require "honeybadger/plugins/sidekiq"
 require "honeybadger/config"
 
-describe "Sidekiq Dependency" do
+RSpec.describe "Sidekiq Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do

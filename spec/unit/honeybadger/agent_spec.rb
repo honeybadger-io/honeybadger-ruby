@@ -4,7 +4,7 @@ require "timecop"
 
 NULL_BLOCK = proc {}.freeze
 
-describe Honeybadger::Agent do
+RSpec.describe Honeybadger::Agent do
   describe "class methods" do
     subject { described_class }
 

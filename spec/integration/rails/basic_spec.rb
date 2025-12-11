@@ -1,8 +1,12 @@
 require_relative "../rails_helper"
 
-describe "Rails integration", if: RAILS_PRESENT, type: :request do
-  load_rails_hooks(self)
+return unless RAILS_PRESENT
 
+Honeybadger.configure do |config|
+  config.backend = "test"
+end
+
+RSpec.describe "Rails integration", type: :request do
   it "inserts the middleware" do
     expect(RailsApp.middleware).to include(Honeybadger::Rack::ErrorNotifier)
   end

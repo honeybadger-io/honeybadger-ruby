@@ -3,7 +3,7 @@ require "honeybadger/backtrace"
 require "honeybadger/config"
 require "honeybadger/notice"
 
-describe Honeybadger::Backtrace do
+RSpec.describe Honeybadger::Backtrace do
   let(:config) { Honeybadger::Config.new }
 
   it "parses a backtrace into lines" do

@@ -1,18 +1,14 @@
 # frozen_string_literal: true
-
-require "rubygems"
 require "bundler/setup"
-require "bump"
 require "appraisal"
-require "honeybadger/version"
-require_relative "tools/release"
-
-NAME = Dir["*.gemspec"].first.split(".").first.freeze
-VERSION = Honeybadger::VERSION
-GEM_FILE = "#{NAME}-#{VERSION}.gem"
-GEMSPEC_FILE = "#{NAME}.gemspec"
-
 require "rdoc/task"
+
+SPEC_DIRS = {
+  units: "spec/unit/",
+  integrations: "spec/integration/",
+  cli: "spec/cli/"
+}.freeze
+
 RDoc::Task.new do |rdoc|
   rdoc.main = "README.md"
   rdoc.markup = "tomdoc"
@@ -20,31 +16,46 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.include("README.md", "lib/**/*.rb")
 end
 
-require "rspec/core/rake_task"
-namespace :spec do
-  desc "Run unit specs"
-  RSpec::Core::RakeTask.new(:units) do |t|
-    t.pattern = "spec/unit/**/*_spec.rb"
-    t.rspec_opts = "--require spec_helper"
-  end
-
-  desc "Run integration specs"
-  RSpec::Core::RakeTask.new(:integrations) do |t|
-    t.pattern = "spec/integration/**/*_spec.rb"
-    t.rspec_opts = "--require spec_helper"
-  end
-
-  desc "Run feature specs"
-  RSpec::Core::RakeTask.new(:features) do |t|
-    t.pattern = "spec/features/**/*_spec.rb"
-    t.rspec_opts = "--require spec_helper"
-  end
-
-  desc "Runs unit and feature specs"
-  task all: [:units, :integrations, :features]
+# This lets you pass args to the `sh` command, like this:
+# rake spec -- --quiet
+def sh_with_args(cmd)
+  separator_index = ARGV.index("--")
+  extra_args = separator_index ? " #{ARGV[(separator_index + 1)..].join(" ")}" : ""
+  sh("#{cmd}#{extra_args}")
 end
 
-desc "Alias for spec:all (default task)"
-task spec: :"spec:all"
+def run_specs(dirs)
+  if RUBY_ENGINE == "jruby"
+    isolated_dirs, other_dirs = dirs.partition { |d| d == SPEC_DIRS[:integrations] }
+    isolated_dirs.map do |dir|
+      # Integration specs must run in separate processes
+      sh_with_args "find #{dir} -name '*_spec.rb' | xargs -I {} bundle exec rspec {}"
+    end
+    sh_with_args "bundle exec rspec #{other_dirs.join(" ")}" if other_dirs.any?
+  else
+    sh_with_args "forking-test-runner #{dirs.join(" ")} --rspec --parallel 4"
+  end
+end
+
+desc "Run spec suites (defaults to all, e.g., rake spec[units,integrations,cli])"
+task :spec, [:suites] do |_t, args|
+  suites = args[:suites]&.split(",") || []
+  suites += args.extras if args.extras.any?
+
+  dirs = if suites.empty?
+    SPEC_DIRS.values
+  else
+    suites.map do |suite|
+      suite = suite.strip.to_sym
+      SPEC_DIRS[suite] || abort("Unknown suite: #{suite}. Valid options: #{SPEC_DIRS.keys.join(', ')}")
+    end
+  end
+
+  run_specs(dirs)
+end
+
+desc "Alias for spec"
 task test: :spec
+
+desc "Alias for spec (default task)"
 task default: :spec

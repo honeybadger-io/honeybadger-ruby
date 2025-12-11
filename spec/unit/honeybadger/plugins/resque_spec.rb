@@ -9,7 +9,7 @@ class TestWorker
   end
 end
 
-describe TestWorker do
+RSpec.describe TestWorker do
   describe "::on_failure_with_honeybadger" do
     let(:error) { RuntimeError.new("Failure in Honeybadger resque_spec") }
 

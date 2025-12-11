@@ -1,4 +1,4 @@
-feature "Creating a custom agent" do
+RSpec.describe "Creating a custom agent", type: :aruba do
   let(:crash_cmd) { "ruby #{FIXTURES_PATH.join("ruby_custom.rb")}" }
 
   it "reports the exception to Honeybadger" do

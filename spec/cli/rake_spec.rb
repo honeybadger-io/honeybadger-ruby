@@ -1,4 +1,4 @@
-feature "Rescuing exceptions in a rake task" do
+RSpec.describe "Rescuing exceptions in a rake task", type: :aruba do
   before do
     FileUtils.cp(FIXTURES_PATH.join("Rakefile"), current_dir)
     set_environment_variable("HONEYBADGER_API_KEY", "asdf")

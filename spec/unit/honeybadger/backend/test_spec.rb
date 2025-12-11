@@ -1,7 +1,7 @@
 require "honeybadger/backend/test"
 require "honeybadger/config"
 
-describe Honeybadger::Backend::Test do
+RSpec.describe Honeybadger::Backend::Test do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER) }
   let(:logger) { config.logger }
 

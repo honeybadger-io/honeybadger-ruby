@@ -1,7 +1,7 @@
 require "honeybadger/config"
 require "pathname"
 
-feature "Installing honeybadger via the cli" do
+RSpec.describe "Installing honeybadger via the cli", type: :aruba do
   shared_examples_for "cli installer" do |rails|
     let(:config) { Honeybadger::Config.new(api_key: "asdf", "config.path": config_file) }
 
@@ -77,7 +77,7 @@ feature "Installing honeybadger via the cli" do
       end
     end
 
-    scenario "when the configuration file already exists" do
+    context "when the configuration file already exists" do
       before { File.write(config_file, <<~YML) }
         ---
         api_key: 'asdf'
@@ -96,7 +96,7 @@ feature "Installing honeybadger via the cli" do
       end
     end
 
-    scenario "when capistrano is detected" do
+    context "when capistrano is detected" do
       let(:capfile) { Pathname(current_dir).join("Capfile") }
 
       before { File.write(capfile, <<~YML) }
@@ -116,13 +116,13 @@ feature "Installing honeybadger via the cli" do
     end
   end
 
-  scenario "in a plain ruby project" do
+  context "in a plain ruby project" do
     let(:config_file) { Pathname(current_dir).join("honeybadger.yml") }
 
     it_behaves_like "cli installer", false
   end
 
-  scenario "in a Rails project", framework: :rails do
+  context "in a Rails project", framework: :rails do
     let(:config_file) { Pathname(current_dir).join("config", "honeybadger.yml") }
 
     it_behaves_like "cli installer", true

@@ -1,6 +1,6 @@
 require "json"
 
-module FeatureHelpers
+module ArubaHelpers
   # https://github.com/erikhuda/thor/blob/011dc48b5ea92767445b062f971664235973c8b4/spec/helper.rb#L49
   def capture(stream)
     begin

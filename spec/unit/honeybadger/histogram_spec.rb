@@ -1,4 +1,4 @@
-describe Honeybadger::Histogram do
+RSpec.describe Honeybadger::Histogram do
   describe "#payloads" do
     let(:metric) { described_class.new(name, attributes) }
     let(:name) { "perform" }

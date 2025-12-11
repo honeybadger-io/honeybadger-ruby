@@ -1,7 +1,7 @@
 require "honeybadger/plugins/breadcrumbs"
 require "honeybadger/config"
 
-describe "Breadcrumbs Plugin" do
+RSpec.describe "Breadcrumbs Plugin" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:active_support) { double("ActiveSupport::Notifications") }
 

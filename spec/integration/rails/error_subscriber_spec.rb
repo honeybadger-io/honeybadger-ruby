@@ -1,13 +1,17 @@
 require_relative "../rails_helper"
 
+return unless RAILS_PRESENT
+
 RAILS_ERROR_REPORTER_SUPPORTED = defined?(::ActiveSupport::ErrorReporter)
 return unless RAILS_ERROR_REPORTER_SUPPORTED
 
 RAILS_ERROR_SOURCE_SUPPORTED = ::Rails::VERSION::STRING >= "7.1"
 
-describe "Rails error subscriber integration" do
-  load_rails_hooks(self)
+Honeybadger.configure do |config|
+  config.backend = "test"
+end
 
+RSpec.describe "Rails error subscriber integration" do
   it "always reports handled exceptions" do
     Honeybadger.flush do
       Rails.error.handle(severity: :warning, context: {key: "value"}) do

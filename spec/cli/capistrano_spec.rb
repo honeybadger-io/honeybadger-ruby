@@ -1,4 +1,4 @@
-feature "capistrano task" do
+RSpec.describe "capistrano task", type: :aruba do
   before do
     FileUtils.cp(FIXTURES_PATH.join("Capfile"), current_dir)
   end

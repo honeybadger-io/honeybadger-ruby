@@ -19,7 +19,7 @@ def build_exception(opts = {})
   BacktracedException.new(opts)
 end
 
-describe Honeybadger::Rack::ErrorNotifier do
+RSpec.describe Honeybadger::Rack::ErrorNotifier do
   let(:agent) { Honeybadger::Agent.new }
   let(:config) { agent.config }
 

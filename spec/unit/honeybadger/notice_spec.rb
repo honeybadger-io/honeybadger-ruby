@@ -26,7 +26,7 @@ class ContinuedExceptionError < StandardError
   end
 end
 
-describe Honeybadger::Notice do
+RSpec.describe Honeybadger::Notice do
   let(:config) { build_config }
 
   def build_config(opts = {})

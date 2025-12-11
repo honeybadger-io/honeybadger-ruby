@@ -7,6 +7,7 @@ gem "appraisal", "~> 2.1"
 gem "aruba", "~> 2.0"
 gem "rspec", "~> 3.0"
 gem "rspec-its", "~> 1.3.1"
+gem "forking_test_runner", "~> 1.16"
 gem "ruby-prof", platforms: :mri, require: false
 gem "timecop"
 gem "webmock"
@@ -16,7 +17,7 @@ gem "mutex_m"
 gem "capistrano"
 gem "rake"
 gem "rdoc"
-gem "bump", "~> 0.10.0"
+gem "reline"
 gem "rack", ">= 2.0.0"
 
 group :development do
@@ -24,6 +25,7 @@ group :development do
   gem "guard-rspec"
   gem "pry"
   gem "pry-byebug", platforms: :mri
+  gem "standard"
 end
 
 gemspec path: "../"

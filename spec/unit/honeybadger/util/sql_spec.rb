@@ -1,6 +1,6 @@
 require "honeybadger/util/sql"
 
-describe Honeybadger::Util::SQL do
+RSpec.describe Honeybadger::Util::SQL do
   describe "#obfuscate" do
     it "works with non UTF-8 strings" do
       expect {

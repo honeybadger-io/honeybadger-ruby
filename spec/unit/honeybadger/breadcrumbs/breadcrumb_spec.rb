@@ -1,7 +1,7 @@
 require "timecop"
 require "honeybadger/breadcrumbs/ring_buffer"
 
-describe Honeybadger::Breadcrumbs::Breadcrumb do
+RSpec.describe Honeybadger::Breadcrumbs::Breadcrumb do
   let(:category) { :test }
   let(:message) { "A test message" }
   let(:metadata) { {a: "foo"} }

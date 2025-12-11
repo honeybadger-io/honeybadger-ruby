@@ -5,7 +5,7 @@ require "honeybadger/config"
 require "honeybadger/backend"
 require "honeybadger/notice"
 
-describe Honeybadger::Worker do
+RSpec.describe Honeybadger::Worker do
   let!(:instance) { described_class.new(config) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: "null") }
   let(:obj) { double("Badger", id: :foo, to_json: "{}") }

@@ -14,7 +14,7 @@ class TestSanitizer
   end
 end
 
-describe Honeybadger::Util::RequestPayload do
+RSpec.describe Honeybadger::Util::RequestPayload do
   let(:sanitizer) { TestSanitizer.new }
 
   describe "::build" do

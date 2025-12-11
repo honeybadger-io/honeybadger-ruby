@@ -1,7 +1,7 @@
 require "honeybadger/plugins/active_agent"
 require "honeybadger/config"
 
-describe "Active Agent Dependency" do
+RSpec.describe "Active Agent Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do
@@ -14,16 +14,16 @@ describe "Active Agent Dependency" do
     end
   end
 
-  context "when Active Agent is installed", if: defined?(::ActiveSupport::Notifications) do
+  context "when Active Agent is installed" do
+    let(:active_support) { double("ActiveSupport::Notifications") }
     let(:active_agent_shim) do
       Module.new
     end
 
     before do
-      Object.const_set(:ActiveAgent, active_agent_shim)
+      stub_const("ActiveSupport::Notifications", active_support)
+      stub_const("ActiveAgent", active_agent_shim)
     end
-
-    after { Object.send(:remove_const, :ActiveAgent) }
 
     context "when insights are enabled" do
       let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "active_agent.insights.enabled": true) }
@@ -71,7 +71,7 @@ describe "Active Agent Dependency" do
   end
 end
 
-describe Honeybadger::ActiveAgentSubscriber do
+RSpec.describe Honeybadger::ActiveAgentSubscriber do
   let(:subscriber) { described_class.new }
 
   it "is a NotificationSubscriber" do

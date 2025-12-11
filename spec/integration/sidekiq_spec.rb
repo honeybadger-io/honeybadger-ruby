@@ -38,7 +38,7 @@ class SidekiqJobNoRetry
   end
 end
 
-describe "Sidekiq integration" do
+RSpec.describe "Sidekiq integration" do
   it "calls the error handler" do
     expect(Honeybadger).to receive(:notify).once.with(ERROR, anything)
 

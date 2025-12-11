@@ -26,69 +26,35 @@ FIXTURES_PATH = Pathname.new(File.expand_path("../fixtures/", __FILE__))
 NULL_LOGGER = Logger.new(File::NULL)
 NULL_LOGGER.level = Logger::Severity::DEBUG
 
+def init_honeybadger_agent_instance!
+  Honeybadger::Agent.instance = Honeybadger::Agent.new(Honeybadger::Config.new(api_key: "gem testing", backend: "null", logger: NULL_LOGGER))
+end
+
+# We call this once on load and once after each spec context runs to restore the
+# global agent instance. This helps the unit tests run faster.
+init_honeybadger_agent_instance!
+
+# Clean up the aruba directory (similar to what Aruba does before each scenario)
+FileUtils.rm_rf(TMP_DIR.join("aruba"))
+FileUtils.mkdir_p(TMP_DIR.join("aruba"))
+
 Aruba.configure do |config|
+  # Create a unique directory to support parallel test runners
+  config.working_directory = "tmp/aruba/test_#{Process.pid}_#{SecureRandom.hex(4)}"
+
   t = (RUBY_PLATFORM == "java") ? 120 : 12
-  config.working_directory = "tmp/features"
   config.exit_timeout = t
   config.io_wait_timeout = t
 end
 
 RSpec.configure do |config|
+  ##
+  # Global RSpec config
   Kernel.srand config.seed
 
-  config.filter_run :focus
-  config.run_all_when_everything_filtered = true
+  config.default_formatter = "doc" if config.files_to_run.one?
 
-  if config.files_to_run.one?
-    config.default_formatter = "doc"
-  end
-
-  config.alias_example_group_to :feature, type: :feature
-  config.alias_example_group_to :scenario
-
-  config.include Aruba::Api, type: :feature
-  config.include FeatureHelpers, type: :feature
-
-  config.before(:all, type: :feature) do
-    require "honeybadger/cli"
-  end
-
-  config.before(:each, type: :feature) do
-    set_environment_variable("HONEYBADGER_BACKEND", "debug")
-    set_environment_variable("HONEYBADGER_LOGGING_PATH", "STDOUT")
-  end
-
-  config.include Helpers
-
-  config.before(:all) do
-    Honeybadger::Agent.instance = Honeybadger::Agent.new(Honeybadger::Config.new(backend: "null", logger: NULL_LOGGER))
-  end
-
-  config.after(:each) do
-    Honeybadger.clear!
-  end
-
-  begin
-    # Rack is a soft dependency, and so we want to be able to run the test suite
-    # without it.
-    require "rack"
-  rescue LoadError
-    puts "Excluding specs which depend on Rack."
-    config.exclude_pattern = "spec/unit/honeybadger/rack/*_spec.rb"
-  end
-
-  begin
-    # ActiveSupport::Notifications is also a soft dependency.
-    require "active_support/notifications"
-  rescue LoadError
-    puts "Excluding specs which depend on ActiveSupport::Notifications."
-    # noop
-  end
-
-  config.before(:each, framework: :rails) do
-    FileUtils.cp_r(FIXTURES_PATH.join("rails"), current_dir)
-    cd("rails")
-  end
+  config.filter_run_when_matching :focus
 
   if /rails/.match?(ENV["BUNDLE_GEMFILE"])
     config.filter_run_excluding framework: ->(v) { !v || v != :rails }
@@ -100,8 +66,43 @@ RSpec.configure do |config|
     config.filter_run_excluding framework: ->(v) { !v || v != :ruby }
   end
 
+  config.include Helpers
+
+  config.after(:each) do
+    # Clear thread-local context
+    Honeybadger.clear!
+
+    # Clear test backend data
+    Honeybadger::Backend::Test.notifications.clear
+    Honeybadger::Backend::Test.events.clear
+    Honeybadger::Backend::Test.check_ins.clear
+  end
+
+  config.after(:all) do
+    init_honeybadger_agent_instance!
+  end
+
   config.before(:each) do
     stub_request(:post, "https://api.honeybadger.io/v1/notices")
       .to_return(status: 200)
+  end
+
+  ##
+  # Aruba config (for CLI tests)
+
+  config.include ArubaHelpers, type: :aruba
+
+  config.before(:all, type: :aruba) do
+    require "honeybadger/cli"
+  end
+
+  config.before(:each, type: :aruba) do
+    set_environment_variable("HONEYBADGER_BACKEND", "debug")
+    set_environment_variable("HONEYBADGER_LOGGING_PATH", "STDOUT")
+  end
+
+  config.before(:each, type: :aruba, framework: :rails) do
+    FileUtils.cp_r(FIXTURES_PATH.join("rails"), current_dir)
+    cd("rails")
   end
 end

@@ -1,6 +1,6 @@
 require "honeybadger/config"
 
-describe Honeybadger::Config::Ruby do
+RSpec.describe Honeybadger::Config::Ruby do
   subject { described_class.new(config) }
 
   let(:config) { Honeybadger::Config.new(api_key: "foo", "user_informer.enabled": true) }

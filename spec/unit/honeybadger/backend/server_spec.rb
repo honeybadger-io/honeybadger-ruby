@@ -2,7 +2,7 @@ require "logger"
 require "honeybadger/backend/server"
 require "honeybadger/config"
 
-describe Honeybadger::Backend::Server do
+RSpec.describe Honeybadger::Backend::Server do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, api_key: "abc123") }
   let(:logger) { config.logger }
   let(:payload) { double("Notice", to_json: "{}") }

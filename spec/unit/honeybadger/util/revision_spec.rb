@@ -1,6 +1,6 @@
 require "honeybadger/util/revision"
 
-describe Honeybadger::Util::Revision do
+RSpec.describe Honeybadger::Util::Revision do
   after do
     ENV.delete("HEROKU_SLUG_COMMIT")
   end

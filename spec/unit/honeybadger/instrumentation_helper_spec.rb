@@ -1,6 +1,6 @@
 require "honeybadger/instrumentation_helper"
 
-describe Honeybadger::InstrumentationHelper do
+RSpec.describe Honeybadger::InstrumentationHelper do
   let(:test_object) { Object.new.tap { |o| o.extend(described_class) } }
 
   before do

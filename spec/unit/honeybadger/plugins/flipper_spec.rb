@@ -1,7 +1,7 @@
 require "honeybadger/plugins/flipper"
 require "honeybadger/config"
 
-describe "Flipper Dependency" do
+RSpec.describe "Flipper Dependency" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
 
   before do
@@ -14,17 +14,15 @@ describe "Flipper Dependency" do
     end
   end
 
-  context "when flipper is installed", if: defined?(::ActiveSupport::Notifications) do
+  context "when flipper is installed" do
+    let(:active_support) { double("ActiveSupport::Notifications") }
     let(:flipper_shim) do
       Module.new
     end
 
     before do
-      Object.const_set(:Flipper, flipper_shim)
-    end
-
-    after do
-      Object.send(:remove_const, :Flipper)
+      stub_const("ActiveSupport::Notifications", active_support)
+      stub_const("Flipper", flipper_shim)
     end
 
     context "when insights are enabled" do
@@ -73,7 +71,7 @@ describe "Flipper Dependency" do
   end
 end
 
-describe Honeybadger::FlipperSubscriber do
+RSpec.describe Honeybadger::FlipperSubscriber do
   let(:subscriber) { described_class.new }
 
   describe "#format_payload" do
