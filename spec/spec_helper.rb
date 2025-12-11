@@ -19,11 +19,6 @@ rescue LoadError
   nil
 end
 
-# We are unable to run ActiveRecord with rails edge on jruby as the sqlite
-# adapter is not supported, so we are skipping ActiveRecord specs just for that
-# runtime and Rails version.
-SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && defined?(Rails) && (Rails::VERSION::PRE == "alpha" || Rails::VERSION::MAJOR >= 8))
-
 Dir[File.expand_path("../support/**/*.rb", __FILE__)].sort.each { |f| require f }
 
 TMP_DIR = Pathname.new(File.expand_path("../../tmp", __FILE__))

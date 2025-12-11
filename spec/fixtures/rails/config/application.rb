@@ -1,7 +1,7 @@
 require "rails"
 require "action_controller/railtie"
 
-# Duplicating here as the CLI specs don't use the spec helper.
+# Duplicating here as the CLI specs don't use the rails helper.
 SKIP_ACTIVE_RECORD = !!(defined?(JRUBY_VERSION) && (Rails::VERSION::PRE == "alpha" || Rails::VERSION::MAJOR >= 8)) unless defined?(SKIP_ACTIVE_RECORD)
 
 if SKIP_ACTIVE_RECORD
