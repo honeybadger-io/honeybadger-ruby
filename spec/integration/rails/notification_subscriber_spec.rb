@@ -6,6 +6,22 @@ class TestSubscriber < Honeybadger::NotificationSubscriber; end
 describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT do
   load_rails_hooks(self)
 
+  it "records internal Rails ActiveSupport::Notifications events", type: :request do
+    Honeybadger.flush do
+      get "/"
+    end
+
+    action_controller_processe_action_events = Honeybadger::Backend::Test.events.select { |e| e[:event_type] == "process_action.action_controller" }
+
+    expect(action_controller_processe_action_events.size).to eq(1)
+
+    action_controller_processe_action_events.first.tap do |event|
+      expect(event[:path]).to eq("/")
+      expect(event[:controller]).to eq("RailsController")
+      expect(event[:action]).to eq("index")
+    end
+  end
+
   it "records correct durations for concurrent notifications" do
     mutex, sequence = Mutex.new, 1
     allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC) do
