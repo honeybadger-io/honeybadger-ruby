@@ -57,7 +57,6 @@ module Honeybadger
   #     @see Agent#$2
   def_delegator :"Honeybadger::Agent.instance", :config
   def_delegator :"Honeybadger::Agent.instance", :init!
-  def_delegator :"Honeybadger::Agent.instance", :with_rack_env
 
   # @!method notify(...)
   # Forwards to {Agent.instance}.

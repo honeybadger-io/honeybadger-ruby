@@ -5,6 +5,7 @@ module Honeybadger
     class Collector
       include Enumerable
       extend Forwardable
+
       # The Collector manages breadcrumbs and provides an interface for accessing
       # and affecting breadcrumbs
       #

@@ -1,133 +1,51 @@
 require "honeybadger/conversions"
-require "monitor"
 
 module Honeybadger
   # @api private
   class ContextManager
     include Conversions
 
-    def self.current
-      Thread.current[:__hb_context_manager] ||= new
+    EMPTY_CONTEXT = {}.freeze
+
+    def initialize(context_key)
+      @context_key = context_key
     end
 
-    def initialize
-      @monitor = Monitor.new
-      _initialize
-    end
-
-    def clear!
-      _initialize
-    end
-
-    # Internal helpers
+    attr_reader :context_key
 
     def set_context(hash, &block)
-      local = block_given?
-      @monitor.synchronize do
-        @global_context ||= {}
-        @local_context ||= []
+      new_context = Context(hash)
 
-        new_context = Context(hash)
-
-        if local
-          @local_context << new_context
-        else
-          @global_context.update(new_context)
-        end
-      end
-
-      if local
+      if block_given?
+        existing = Fiber[context_key]
         begin
+          Fiber[context_key] = (existing || {}).merge(new_context)
           yield
         ensure
-          @monitor.synchronize { @local_context&.pop }
+          Fiber[context_key] = existing
         end
+      else
+        Fiber[context_key] = (Fiber[context_key] || {}).merge(new_context)
       end
     end
+    alias_method :context, :set_context
 
     def get_context
-      @monitor.synchronize do
-        return @global_context unless @local_context
-
-        @global_context.merge(@local_context.inject({}, :merge))
-      end
+      Fiber[context_key] || EMPTY_CONTEXT
     end
 
-    def clear_context
-      @monitor.synchronize do
-        @global_context = nil
-        @local_context = nil
-      end
+    def clear
+      Fiber[context_key] = nil
     end
-
-    def set_event_context(hash, &block)
-      local = block_given?
-      @monitor.synchronize do
-        @global_event_context ||= {}
-        @local_event_context ||= []
-
-        new_context = Context(hash)
-
-        if local
-          @local_event_context << new_context
-        else
-          @global_event_context.update(new_context)
-        end
-      end
-
-      if local
-        begin
-          yield
-        ensure
-          @monitor.synchronize { @local_event_context&.pop }
-        end
-      end
-    end
-
-    def get_event_context
-      @monitor.synchronize do
-        return @global_event_context unless @local_event_context
-
-        @global_event_context.merge(@local_event_context.inject({}, :merge))
-      end
-    end
-
-    def clear_event_context
-      @monitor.synchronize do
-        @global_event_context = nil
-        @local_event_context = nil
-      end
-    end
-
-    def set_rack_env(env)
-      @monitor.synchronize { @rack_env = env }
-    end
-
-    def get_rack_env
-      @monitor.synchronize { @rack_env }
-    end
-
-    def set_request_id(request_id)
-      @monitor.synchronize { @request_id = request_id }
-    end
-
-    def get_request_id
-      @monitor.synchronize { @request_id }
-    end
-
-    private
-
-    attr_accessor :custom, :rack_env, :request_id
-
-    def _initialize
-      @monitor.synchronize do
-        @global_context = nil
-        @local_context = nil
-        @global_event_context = nil
-        @local_event_context = nil
-        @rack_env = nil
-        @request_id = nil
-      end
-    end
+    alias_method :clear!, :clear
   end
+
+  # @api private
+  ErrorContext = ContextManager.new(:__hb_error_context)
+
+  # @api private
+  EventContext = ContextManager.new(:__hb_event_context)
+
+  # @api private
+  ExecutionContext = ContextManager.new(:__hb_execution_context)
 end
