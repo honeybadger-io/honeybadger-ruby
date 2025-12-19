@@ -27,22 +27,25 @@ module Honeybadger
       end
 
       def call(env)
-        agent.with_rack_env(env) do
-          begin
-            env["honeybadger.config"] = config
-            response = @app.call(env)
-          rescue => error
-            env["honeybadger.error_id"] = notify_honeybadger(error, env)
-            raise
-          end
+        agent.execution_context(
+          rack_env: env,
+          request_id: rack_env["action_dispatch.request_id"] || SecureRandom.uuid
+        )
 
-          framework_exception = framework_exception(env)
-          if framework_exception
-            env["honeybadger.error_id"] = notify_honeybadger(framework_exception, env)
-          end
-
-          response
+        begin
+          env["honeybadger.config"] = config
+          response = @app.call(env)
+        rescue => error
+          env["honeybadger.error_id"] = notify_honeybadger(error, env)
+          raise
         end
+
+        framework_exception = framework_exception(env)
+        if framework_exception
+          env["honeybadger.error_id"] = notify_honeybadger(framework_exception, env)
+        end
+
+        response
       ensure
         agent.clear!
       end

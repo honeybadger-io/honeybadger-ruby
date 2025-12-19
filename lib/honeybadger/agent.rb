@@ -68,16 +68,19 @@ module Honeybadger
         opts = {}
       end
 
-      @context = opts.delete(:context)
       local_context = opts.delete(:local_context)
 
       @config ||= Config.new(opts)
 
+      @error_context_manager = ErrorContext
+      @event_context_manager = EventContext
+      @execution_context_manager = ExecutionContext
+
       if local_context
-        @context ||= ContextManager.new
+        @error_context_manager = ContextManager.new(:"__hb_error_context_#{object_id}")
+        @event_context_manager = ContextManager.new(:"__hb_event_context_#{object_id}")
+        @execution_context_manager = ContextManager.new(:"__hb_execution_context_#{object_id}")
         @breadcrumbs = Breadcrumbs::Collector.new(config)
-      else
-        @breadcrumbs = nil
       end
 
       init_worker
@@ -153,10 +156,10 @@ module Honeybadger
         )
       end
 
-      opts[:rack_env] ||= context_manager.get_rack_env
-      opts[:global_context] ||= context_manager.get_context
+      opts[:rack_env] ||= execution_context_manager.get_context[:rack_env]
+      opts[:request_id] ||= execution_context_manager.get_context[:request_id]
+      opts[:global_context] ||= error_context_manager.get_context
       opts[:breadcrumbs] ||= breadcrumbs.dup
-      opts[:request_id] ||= context_manager.get_request_id
 
       notice = Notice.new(config, opts)
 
@@ -272,15 +275,17 @@ module Honeybadger
     #
     # @return [Object, self] value of the block if passed, otherwise self
     def context(context = nil, &block)
-      block_result = context_manager.set_context(context, &block) unless context.nil?
+      block_result = error_context_manager.set_context(context, &block) unless context.nil?
       return block_result if block_given?
 
-      self
+      error_context_manager
     end
 
     # Clear all transaction scoped data.
     def clear!
-      context_manager.clear!
+      error_context_manager.clear
+      event_context_manager.clear
+      execution_context_manager.clear
       breadcrumbs.clear!
     end
 
@@ -292,7 +297,7 @@ module Honeybadger
     #
     # @return [Hash, nil]
     def get_context
-      context_manager.get_context
+      error_context_manager.get_context
     end
 
     # @api private
@@ -412,9 +417,10 @@ module Honeybadger
       init_events_worker
 
       extra_payload = {}.tap do |p|
-        p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
+        request_id = execution_context_manager.get_context[:request_id]
+        p[:request_id] = request_id if request_id
         p[:hostname] = config[:hostname].to_s if config[:"events.attach_hostname"]
-        p.update(context_manager.get_event_context || {})
+        p.update(event_context_manager.get_context)
       end
 
       event = Event.new(event_type, extra_payload.merge(payload))
@@ -475,10 +481,10 @@ module Honeybadger
     #
     # @return [Object, self] value of the block if passed, otherwise self
     def event_context(context = nil, &block)
-      block_result = context_manager.set_event_context(context, &block) unless context.nil?
+      block_result = event_context_manager.set_context(context, &block) unless context.nil?
       return block_result if block_given?
 
-      self
+      event_context_manager
     end
 
     # Get event-specific context for the current request.
@@ -489,7 +495,7 @@ module Honeybadger
     #
     # @return [Hash, nil]
     def get_event_context
-      context_manager.get_event_context
+      event_context_manager.get_context
     end
 
     # @api private
@@ -506,6 +512,19 @@ module Honeybadger
       @registry = Honeybadger::Registry.new.tap do |r|
         collect(Honeybadger::RegistryExecution.new(r, config, {}))
       end
+    end
+
+    # @api private
+    def execution_context(context = nil, &block)
+      block_result = execution_context_manager.set_context(context, &block) unless context.nil?
+      return block_result if block_given?
+
+      execution_context_manager
+    end
+
+    # @api private
+    def get_execution_context
+      execution_context_manager.get_context
     end
 
     # @api private
@@ -572,16 +591,6 @@ module Honeybadger
     def_delegator :config, :backtrace_filter
 
     # @api private
-    def with_rack_env(rack_env, &block)
-      context_manager.set_rack_env(rack_env)
-      context_manager.set_request_id(rack_env["action_dispatch.request_id"] || SecureRandom.uuid)
-      yield
-    ensure
-      context_manager.set_rack_env(nil)
-      context_manager.set_request_id(nil)
-    end
-
-    # @api private
     attr_reader :worker, :events_worker, :metrics_worker
 
     # @api private
@@ -625,6 +634,8 @@ module Honeybadger
 
     private
 
+    attr_reader :error_context_manager, :event_context_manager, :execution_context_manager
+
     def strip_metadata(event)
       event.delete(:_hb)
     end
@@ -651,11 +662,6 @@ module Honeybadger
       msg = sprintf("`Honeybadger.notify` was called with invalid arguments. You must pass either an Exception or options Hash containing the `:error_message` key. location=%s", caller[caller.size - 1])
       raise ArgumentError.new(msg) if config.dev?
       warn(msg)
-    end
-
-    def context_manager
-      return @context if @context
-      ContextManager.current
     end
 
     def push(object)

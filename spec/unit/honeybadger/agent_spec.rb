@@ -83,7 +83,7 @@ describe Honeybadger::Agent do
     end
 
     it "allows chaining" do
-      expect(instance.context({a: "context"})).to eq(instance)
+      expect(instance.context({a: "context"})).to eq(Honeybadger::ErrorContext)
     end
 
     context "with local context" do
@@ -117,11 +117,12 @@ describe Honeybadger::Agent do
       config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
       instance = described_class.new(config)
       instance.context({a: "context"})
+      instance.event_context({a: "context"})
       instance.add_breadcrumb("Chomp")
 
       instance.clear!
 
-      expect(instance.get_context).to be nil
+      expect(instance.get_context).to be_empty
       expect(instance.breadcrumbs.to_a).to be_empty
     end
   end
@@ -722,8 +723,8 @@ describe Honeybadger::Agent do
       expect(subject.get_event_context).to eq({user_id: 123, email: "test@example.com"})
     end
 
-    it "returns self when no block given" do
-      expect(subject.event_context(user_id: 123)).to eq(subject)
+    it "returns EventContext when no block given" do
+      expect(subject.event_context(user_id: 123)).to eq(Honeybadger::EventContext)
     end
 
     it "executes block with local context" do
@@ -774,7 +775,7 @@ describe Honeybadger::Agent do
     subject { instance }
 
     it "returns nil when no event context is set" do
-      expect(subject.get_event_context).to be_nil
+      expect(subject.get_event_context).to be_empty
     end
 
     it "returns event context when set" do
@@ -867,6 +868,54 @@ describe Honeybadger::Agent do
         end
         subject.collect(collection_execution)
       end
+    end
+  end
+
+  context "with local_context: false (default)" do
+    let(:config) { {} }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    after do
+      instance.clear!
+    end
+
+    it "initializes the global error context" do
+      instance.context(error_context_key: :expected_value)
+      expect(Fiber[:__hb_error_context]).to eq({error_context_key: :expected_value})
+    end
+
+    it "initializes the global event context" do
+      instance.event_context(event_context_key: :expected_value)
+      expect(Fiber[:__hb_event_context]).to eq({event_context_key: :expected_value})
+    end
+
+    it "initializes the global execution context" do
+      instance.execution_context(execution_context_key: :expected_value)
+      expect(Fiber[:__hb_execution_context]).to eq({execution_context_key: :expected_value})
+    end
+  end
+
+  context "with local_context: true" do
+    let(:config) { {local_context: true} }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    after do
+      instance.clear!
+    end
+
+    it "initializes a unique error context with the agent's object_id" do
+      instance.context(error_context_key: :expected_value)
+      expect(Fiber[:"__hb_error_context_#{instance.object_id}"]).to eq({error_context_key: :expected_value})
+    end
+
+    it "initializes a unique event context with the agent's object_id" do
+      instance.event_context(event_context_key: :expected_value)
+      expect(Fiber[:"__hb_event_context_#{instance.object_id}"]).to eq({event_context_key: :expected_value})
+    end
+
+    it "initializes a unique execution context with the agent's object_id" do
+      instance.execution_context(execution_context_key: :expected_value)
+      expect(Fiber[:"__hb_execution_context_#{instance.object_id}"]).to eq({execution_context_key: :expected_value})
     end
   end
 end
