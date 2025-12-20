@@ -185,3 +185,122 @@ RSpec.describe Honeybadger::ExecutionContext do
     expect(described_class.context_key).to eq(:__hb_execution_context)
   end
 end
+
+TestCollection = Honeybadger::CollectionManager.new(:__hb_test_collection)
+
+RSpec.describe TestCollection do
+  subject(:collection_manager) { described_class }
+
+  before do
+    collection_manager.clear
+  end
+
+  describe "#push" do
+    it "adds items to the collection" do
+      collection_manager.push(:item_a)
+      collection_manager.push(:item_b)
+      expect(collection_manager.get_collection).to eq([:item_a, :item_b])
+    end
+  end
+
+  describe "#pop" do
+    it "removes and returns the last item" do
+      collection_manager.push(:item_a)
+      collection_manager.push(:item_b)
+      expect(collection_manager.pop).to eq(:item_b)
+      expect(collection_manager.get_collection).to eq([:item_a])
+    end
+  end
+
+  describe "#shift" do
+    it "removes and returns the first item" do
+      collection_manager.push(:item_a)
+      collection_manager.push(:item_b)
+      expect(collection_manager.shift).to eq(:item_a)
+      expect(collection_manager.get_collection).to eq([:item_b])
+    end
+  end
+
+  describe "#clear" do
+    it "clears all items" do
+      collection_manager.push(:item_a)
+      collection_manager.clear
+      expect(collection_manager.get_collection).to eq([])
+    end
+  end
+
+  describe "#get_collection" do
+    it "returns empty array by default" do
+      expect(collection_manager.get_collection).to eq([])
+    end
+
+    it "returns the collection directly (not a dup)" do
+      collection_manager.push(:item_a)
+      result = collection_manager.get_collection
+      expect(result).to eq([:item_a])
+      expect(result.object_id).to eq(collection_manager.get_collection.object_id)
+    end
+  end
+
+  describe "fiber isolation" do
+    it "child fiber inherits parent collection" do
+      collection_manager.push(:parent_item)
+
+      child_collection = nil
+      Fiber.new { child_collection = collection_manager.get_collection }.resume
+
+      expect(child_collection).to eq([:parent_item])
+    end
+
+    it "child fiber mutations don't affect parent" do
+      collection_manager.push(:parent_item)
+
+      Fiber.new do
+        collection_manager.push(:child_item)
+      end.resume
+
+      expect(collection_manager.get_collection).to eq([:parent_item])
+    end
+
+    it "isolates items added after fiber creation" do
+      collection_manager.push(:initial_item)
+
+      fiber = Fiber.new do
+        collection_manager.get_collection
+      end
+
+      collection_manager.push(:later_item)
+      child_collection = fiber.resume
+
+      expect(child_collection).to eq([:initial_item])
+      expect(collection_manager.get_collection).to eq([:initial_item, :later_item])
+    end
+  end
+
+  describe "thread isolation" do
+    it "thread inherits parent collection but mutations are isolated" do
+      collection_manager.push(:main_thread_item)
+
+      thread_collection = nil
+      thread = Thread.new do
+        # Thread inherits Fiber storage, but dup-on-write isolates mutations
+        collection_manager.push(:other_thread_item)
+        thread_collection = collection_manager.get_collection
+      end
+      thread.join
+
+      expect(thread_collection).to eq([:main_thread_item, :other_thread_item])
+      expect(collection_manager.get_collection).to eq([:main_thread_item])
+    end
+  end
+end
+
+RSpec.describe Honeybadger::BreadcrumbsCollection do
+  it "inherits from ContextCollection" do
+    expect(described_class).to be_a(Honeybadger::CollectionManager)
+  end
+
+  it "implements #context_key" do
+    expect(described_class.context_key).to eq(:__hb_breadcrumbs)
+  end
+end
