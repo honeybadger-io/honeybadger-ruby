@@ -49,4 +49,18 @@ describe Honeybadger::Breadcrumbs::RingBuffer do
       expect(subject.previous).to eq(:b)
     end
   end
+
+  describe "#dup" do
+    it "duplicates the buffer" do
+      subject.add!(:a)
+      subject.add!(:b)
+
+      dup = subject.dup
+
+      dup.add!(:c)
+
+      expect(subject.buffer).to eq([:a, :b])
+      expect(dup.buffer).to eq([:a, :b, :c])
+    end
+  end
 end

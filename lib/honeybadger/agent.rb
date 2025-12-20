@@ -76,11 +76,17 @@ module Honeybadger
       @event_context_manager = EventContext
       @execution_context_manager = ExecutionContext
 
+      @breadcrumbs = Breadcrumbs::Collector.new(config)
+
       if local_context
         @error_context_manager = ContextManager.new(:"__hb_error_context_#{object_id}")
         @event_context_manager = ContextManager.new(:"__hb_event_context_#{object_id}")
         @execution_context_manager = ContextManager.new(:"__hb_execution_context_#{object_id}")
-        @breadcrumbs = Breadcrumbs::Collector.new(config)
+        @breadcrumbs = Breadcrumbs::Collector.new(config,
+          Breadcrumbs::RingBuffer.new(
+            collection: CollectionManager.new(:"__hb_breadcrumbs_#{object_id}")
+          )
+        )
       end
 
       init_worker
@@ -302,11 +308,7 @@ module Honeybadger
 
     # @api private
     # Direct access to the Breadcrumbs::Collector instance
-    def breadcrumbs
-      return @breadcrumbs if @breadcrumbs
-
-      Thread.current[:__hb_breadcrumbs] ||= Breadcrumbs::Collector.new(config)
-    end
+    attr_reader :breadcrumbs
 
     # Appends a breadcrumb to the trace. Use this when you want to add some
     # custom data to your breadcrumb trace in effort to help debugging. If a
@@ -634,7 +636,8 @@ module Honeybadger
 
     private
 
-    attr_reader :error_context_manager, :event_context_manager, :execution_context_manager
+    attr_reader :error_context_manager, :event_context_manager,
+      :execution_context_manager, :breadcrumbs_storage_key
 
     def strip_metadata(event)
       event.delete(:_hb)

@@ -237,37 +237,19 @@ describe Honeybadger::Agent do
   end
 
   context "breadcrumbs" do
-    let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector, clear!: nil) }
     let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
     subject { described_class.new(config) }
 
-    before do
-      Thread.current[:__hb_breadcrumbs] = nil
-    end
-
     describe "#breadcrumbs" do
-      context "when local_context: true" do
-        let(:config) { {local_context: true} }
-
-        it "creates instance local breadcrumb" do
-          subject.breadcrumbs
-          expect(Thread.current[:__hb_breadcrumbs]).to be nil
-        end
-
-        it "instantiates the breadcrumb collector with the right config" do
-          allow(Honeybadger::Breadcrumbs::Collector).to receive(:new).and_call_original
-          subject.breadcrumbs
-          expect(Honeybadger::Breadcrumbs::Collector).to have_received(:new).with(instance_of(Honeybadger::Config))
-        end
-      end
-
-      it "stores breadcrumbs in thread local" do
-        bc = subject.breadcrumbs
-        expect(Thread.current[:__hb_breadcrumbs]).to eq(bc)
+      it "initializes the breadcrumb collector with the agent's config" do
+        Fiber[:__hb_breadcrumbs] = nil
+        expect(subject.breadcrumbs.config).to eq(config)
       end
     end
 
     describe "#add_breadcrumb" do
+      let(:breadcrumbs) { instance_double(Honeybadger::Breadcrumbs::Collector, clear!: nil) }
+
       before do
         Timecop.freeze
         allow(subject).to receive(:breadcrumbs).and_return(breadcrumbs)
@@ -893,11 +875,27 @@ describe Honeybadger::Agent do
       instance.execution_context(execution_context_key: :expected_value)
       expect(Fiber[:__hb_execution_context]).to eq({execution_context_key: :expected_value})
     end
+
+    it "initializes a global breadcrumbs collector" do
+      instance.add_breadcrumb("expected breadcrumb")
+
+      collector = Fiber[:__hb_breadcrumbs]
+      expect(collector).to be_a(Array)
+      expect(collector.to_a.size).to eq(1)
+      expect(collector.to_a.first.message).to eq("expected breadcrumb")
+    end
   end
 
   context "with local_context: true" do
     let(:config) { {local_context: true} }
     let(:instance) { Honeybadger::Agent.new(config) }
+
+    before do
+      Fiber[:__hb_error_context] = nil
+      Fiber[:__hb_event_context] = nil
+      Fiber[:__hb_execution_context] = nil
+      Fiber[:__hb_breadcrumbs] = nil
+    end
 
     after do
       instance.clear!
@@ -905,17 +903,30 @@ describe Honeybadger::Agent do
 
     it "initializes a unique error context with the agent's object_id" do
       instance.context(error_context_key: :expected_value)
+      expect(Fiber[:__hb_error_context]).to be nil
       expect(Fiber[:"__hb_error_context_#{instance.object_id}"]).to eq({error_context_key: :expected_value})
     end
 
     it "initializes a unique event context with the agent's object_id" do
       instance.event_context(event_context_key: :expected_value)
+      expect(Fiber[:__hb_event_context]).to be nil
       expect(Fiber[:"__hb_event_context_#{instance.object_id}"]).to eq({event_context_key: :expected_value})
     end
 
     it "initializes a unique execution context with the agent's object_id" do
       instance.execution_context(execution_context_key: :expected_value)
+      expect(Fiber[:__hb_execution_context]).to be nil
       expect(Fiber[:"__hb_execution_context_#{instance.object_id}"]).to eq({execution_context_key: :expected_value})
+    end
+
+    it "initializes a unique breadcrumbs collector with the agent's object_id" do
+      instance.add_breadcrumb("expected breadcrumb")
+
+      collector = Fiber[:"__hb_breadcrumbs_#{instance.object_id}"]
+      expect(Fiber[:__hb_breadcrumbs]).to be nil
+      expect(collector).to be_a(Array)
+      expect(collector.to_a.size).to eq(1)
+      expect(collector.to_a.first.message).to eq("expected breadcrumb")
     end
   end
 end
