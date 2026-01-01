@@ -88,13 +88,6 @@ module Honeybadger
 
                 sidekiq.error_handlers << lambda { |ex, sidekiq_params, sidekiq_config = sidekiq_default_configuration|
                   params = sidekiq_params.dup
-                  if defined?(::Sidekiq::Config)
-                    params[:_config] = if params[:_config].is_a?(::Sidekiq::Config) # Sidekiq > 6 and < 7.1.5
-                      params[:_config].instance_variable_get(:@options)
-                    else # Sidekiq >= 7.1.5
-                      sidekiq_config.instance_variable_get(:@options)
-                    end
-                  end
 
                   job = params[:job] || params
 
