@@ -86,7 +86,7 @@ module Honeybadger
                 sidekiq_default_configuration = (::Sidekiq::VERSION > "7") ?
                   ::Sidekiq.default_configuration : Class.new
 
-                sidekiq.error_handlers << lambda { |ex, sidekiq_params, sidekiq_config = sidekiq_default_configuration|
+                sidekiq.error_handlers << lambda { |ex, sidekiq_params, _sidekiq_config|
                   params = sidekiq_params.dup
 
                   job = params[:job] || params
