@@ -9,7 +9,7 @@ RSpec.describe TestContext do
     context_manager.clear
   end
 
-  describe "#set_context" do
+  describe "#get_context" do
     it "retrieves the context" do
       context_manager.set_context(shop_id: :expected_shop_id)
       expect(context_manager.get_context).to eq(shop_id: :expected_shop_id)

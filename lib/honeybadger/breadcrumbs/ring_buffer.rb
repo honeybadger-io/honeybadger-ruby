@@ -43,7 +43,7 @@ module Honeybadger
       private
 
       # The collection must be duplicated when duplicating the buffer to prevent
-      # conurrent modifications. This converts it to a plain array.
+      # concurrent modifications. This converts it to a plain array.
       def initialize_dup(source)
         @collection = source.to_a.dup
         super
