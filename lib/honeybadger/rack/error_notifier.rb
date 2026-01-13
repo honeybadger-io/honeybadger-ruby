@@ -29,7 +29,7 @@ module Honeybadger
       def call(env)
         agent.execution_context(
           rack_env: env,
-          request_id: rack_env["action_dispatch.request_id"] || SecureRandom.uuid
+          request_id: env["action_dispatch.request_id"] || SecureRandom.uuid
         )
 
         begin
