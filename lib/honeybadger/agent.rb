@@ -637,7 +637,7 @@ module Honeybadger
     private
 
     attr_reader :error_context_manager, :event_context_manager,
-      :execution_context_manager, :breadcrumbs_storage_key
+      :execution_context_manager
 
     def strip_metadata(event)
       event.delete(:_hb)
