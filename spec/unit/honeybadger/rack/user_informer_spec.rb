@@ -28,4 +28,17 @@ describe Honeybadger::Rack::UserInformer do
 
     expect(result[2][0]).to eq "<!-- HONEYBADGER ERROR -->"
   end
+
+  it "removes Transfer-Encoding header when setting Content-Length" do
+    main_app = lambda do |env|
+      env["honeybadger.error_id"] = 1
+      [200, {"Transfer-Encoding" => "chunked"}, ["<!-- HONEYBADGER ERROR -->"]]
+    end
+    informer_app = Honeybadger::Rack::UserInformer.new(main_app, agent)
+
+    result = informer_app.call({})
+
+    expect(result[1]["Transfer-Encoding"]).to be_nil
+    expect(result[1]["Content-Length"].to_i).to eq 19
+  end
 end

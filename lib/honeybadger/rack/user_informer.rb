@@ -25,6 +25,7 @@ module Honeybadger
             new_body << chunk.gsub("<!-- HONEYBADGER ERROR -->", replace)
           end
           body.close if body.respond_to?(:close)
+          headers.delete("Transfer-Encoding")
           headers["Content-Length"] = new_body.reduce(0) { |a, e| a + e.bytesize }.to_s
           body = new_body
         end

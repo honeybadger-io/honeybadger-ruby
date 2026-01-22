@@ -50,4 +50,19 @@ describe Honeybadger::Rack::UserFeedback do
       expect(result[2][0]).to eq "<!-- HONEYBADGER FEEDBACK -->"
     end
   end
+
+  context "when Transfer-Encoding header is present" do
+    let(:honeybadger_id) { 1 }
+    let(:main_app) do
+      lambda do |env|
+        env["honeybadger.error_id"] = honeybadger_id
+        [200, {"Transfer-Encoding" => "chunked"}, ["<!-- HONEYBADGER FEEDBACK -->"]]
+      end
+    end
+
+    it "removes Transfer-Encoding header when setting Content-Length" do
+      expect(result[1]["Transfer-Encoding"]).to be_nil
+      expect(result[1]["Content-Length"].to_i).to eq informer_app.render_form(1).size
+    end
+  end
 end
