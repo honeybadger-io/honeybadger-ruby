@@ -19,7 +19,7 @@ describe Honeybadger::Rack::UserFeedback do
     it "modifies output" do
       rendered_length = informer_app.render_form(1).size
       expect(result[2][0]).to match(/honeybadger_feedback_token/)
-      expect(result[1]["Content-Length"].to_i).to eq rendered_length
+      expect(result[1]["content-length"].to_i).to eq rendered_length
     end
 
     context "a project root is configured" do
@@ -62,7 +62,37 @@ describe Honeybadger::Rack::UserFeedback do
 
     it "removes Transfer-Encoding header when setting Content-Length" do
       expect(result[1]["Transfer-Encoding"]).to be_nil
-      expect(result[1]["Content-Length"].to_i).to eq informer_app.render_form(1).size
+      expect(result[1]["content-length"].to_i).to eq informer_app.render_form(1).size
+    end
+  end
+
+  context "when lowercase transfer-encoding header is present (Rack 3 style)" do
+    let(:honeybadger_id) { 1 }
+    let(:main_app) do
+      lambda do |env|
+        env["honeybadger.error_id"] = honeybadger_id
+        [200, {"transfer-encoding" => "chunked"}, ["<!-- HONEYBADGER FEEDBACK -->"]]
+      end
+    end
+
+    it "removes transfer-encoding header when setting content-length" do
+      expect(result[1]["transfer-encoding"]).to be_nil
+      expect(result[1]["content-length"].to_i).to eq informer_app.render_form(1).size
+    end
+  end
+
+  context "when duplicate Content-Length headers are present" do
+    let(:honeybadger_id) { 1 }
+    let(:main_app) do
+      lambda do |env|
+        env["honeybadger.error_id"] = honeybadger_id
+        [200, {"content-length" => "100", "Content-Length" => "100"}, ["<!-- HONEYBADGER FEEDBACK -->"]]
+      end
+    end
+
+    it "normalizes Content-Length headers" do
+      expect(result[1]["Content-Length"]).to be_nil
+      expect(result[1]["content-length"].to_i).to eq informer_app.render_form(1).size
     end
   end
 end

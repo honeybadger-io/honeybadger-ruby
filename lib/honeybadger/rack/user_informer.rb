@@ -25,8 +25,13 @@ module Honeybadger
             new_body << chunk.gsub("<!-- HONEYBADGER ERROR -->", replace)
           end
           body.close if body.respond_to?(:close)
+          # Delete both cases to handle Rack 2 (mixed case) and Rack 3 (lowercase) headers
           headers.delete("Transfer-Encoding")
-          headers["Content-Length"] = new_body.reduce(0) { |a, e| a + e.bytesize }.to_s
+          headers.delete("transfer-encoding")
+          # Also normalize Content-Length - delete both cases before setting
+          headers.delete("Content-Length")
+          headers.delete("content-length")
+          headers["content-length"] = new_body.reduce(0) { |a, e| a + e.bytesize }.to_s
           body = new_body
         end
         [status, headers, body]
