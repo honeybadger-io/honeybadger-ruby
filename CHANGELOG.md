@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.2.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.2.0...v6.2.1) (2026-01-23)
+
+
+### Bug Fixes
+
+* remove Transfer-Encoding when setting Content-Length in Rack middlewares ([#773](https://github.com/honeybadger-io/honeybadger-ruby/issues/773)) ([dc8acaa](https://github.com/honeybadger-io/honeybadger-ruby/commit/dc8acaabf2276c9ced26f3734d2c27a2b89c6b66))
+
 ## [6.2.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.1.3...v6.2.0) (2025-12-11)
 
 
