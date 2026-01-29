@@ -130,7 +130,7 @@ module Honeybadger
   end
 
   class ActiveJobSubscriber < RailsSubscriber
-    def format_payload(_name, payload)
+    def format_payload(name, payload)
       job = payload[:job]
       jobs = payload[:jobs]
       adapter = payload[:adapter]
@@ -138,6 +138,11 @@ module Honeybadger
       base_payload = payload.except(:job, :jobs, :adapter).merge({
         adapter_class: adapter&.class&.to_s
       })
+
+      # Add status for perform events based on whether an exception occurred
+      if name == "perform.active_job"
+        base_payload[:status] = payload[:exception_object] ? "failure" : "success"
+      end
 
       if jobs
         base_payload.merge({
