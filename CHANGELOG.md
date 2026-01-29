@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.3.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.2.1...v6.3.0) (2026-01-29)
+
+
+### Features
+
+* add status to ActiveJob payload ([#775](https://github.com/honeybadger-io/honeybadger-ruby/issues/775)) ([c0357f5](https://github.com/honeybadger-io/honeybadger-ruby/commit/c0357f5161077b13e932d820f03ab9373f9df5b4))
+
 ## [6.2.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.2.0...v6.2.1) (2026-01-23)
 
 
