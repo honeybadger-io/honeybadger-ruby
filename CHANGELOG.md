@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.3.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.3.0...v6.3.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* prevent thread leak in EventsWorker#kill! ([#778](https://github.com/honeybadger-io/honeybadger-ruby/issues/778)) ([09ad0f7](https://github.com/honeybadger-io/honeybadger-ruby/commit/09ad0f7c32e0e3edb37fdb4d7db4d9ccde39f479))
+
 ## [6.3.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.2.1...v6.3.0) (2026-01-29)
 
 
