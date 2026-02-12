@@ -348,15 +348,36 @@ describe Honeybadger::EventsWorker do
   end
 
   describe "#kill!" do
-    context "when triggered by suspend from rate limiting" do
+    it "kills the timeout thread" do
+      subject.start
+      sleep(0.1)
+
+      timeout_thread = subject.send(:timeout_thread)
+      expect(timeout_thread).to be_alive
+
+      subject.send(:kill!)
+      sleep(0.1)
+
+      expect(timeout_thread).not_to be_alive
+    end
+
+    context "when suspend is called from the worker thread" do
       before do
-        allow(subject.send(:backend)).to receive(:event)
-          .and_return(Honeybadger::Backend::Response.new(429))
+        allow(instance).to receive(:work) do |msg|
+          instance.send(:suspend, 300)
+        end
+      end
+
+      def wait_for_no_worker_threads
+        50.times do
+          break if Thread.list.none? { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
+          sleep(0.1)
+        end
       end
 
       it "kills all worker threads" do
-        5.times { subject.push(event) }
-        sleep(0.5)
+        subject.push(event)
+        wait_for_no_worker_threads
 
         worker_threads = Thread.list.select { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
         expect(worker_threads).to be_empty
@@ -364,9 +385,9 @@ describe Honeybadger::EventsWorker do
 
       it "does not leak threads across multiple suspend/restart cycles" do
         3.times do |i|
-          Timecop.travel(Time.now + 3601) if i > 0
-          5.times { subject.push(event) }
-          sleep(0.5)
+          Timecop.travel(Time.now + 301) if i > 0
+          subject.push(event)
+          wait_for_no_worker_threads
         end
 
         worker_threads = Thread.list.select { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
