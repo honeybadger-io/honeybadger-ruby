@@ -139,7 +139,7 @@ module Honeybadger
 
       if timeout_thread
         Thread.kill(timeout_thread)
-        timeout_thread.join
+        timeout_thread.join # Allow ensure blocks to execute.
       end
 
       if thread
