@@ -347,6 +347,36 @@ describe Honeybadger::EventsWorker do
     end
   end
 
+  describe "#kill!" do
+    context "when triggered by suspend from rate limiting" do
+      before do
+        allow(subject.send(:backend)).to receive(:event)
+          .and_return(Honeybadger::Backend::Response.new(429))
+      end
+
+      it "kills all worker threads" do
+        5.times { subject.push(event) }
+        sleep(0.5)
+
+        worker_threads = Thread.list.select { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
+        expect(worker_threads).to be_empty
+      end
+
+      it "does not leak threads across multiple suspend/restart cycles" do
+        3.times do |i|
+          Timecop.travel(Time.now + 3601) if i > 0
+          5.times { subject.push(event) }
+          sleep(0.5)
+        end
+
+        worker_threads = Thread.list.select { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
+        expect(worker_threads).to be_empty
+      ensure
+        Timecop.return
+      end
+    end
+  end
+
   describe "batching" do
     it "should send after batch size is reached" do
       expect(subject.send(:backend)).to receive(:event).with([event] * 5).and_return(Honeybadger::Backend::Null::StubbedResponse.new)
