@@ -414,6 +414,7 @@ module Honeybadger
       extra_payload = {}.tap do |p|
         p[:request_id] = context_manager.get_request_id if context_manager.get_request_id
         p[:hostname] = config[:hostname].to_s if config[:"events.attach_hostname"]
+        p[:environment] = config[:env].to_s if config[:"events.attach_environment"]
         p.update(context_manager.get_event_context || {})
       end
 

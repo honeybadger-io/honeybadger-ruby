@@ -125,6 +125,11 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      "events.attach_environment": {
+        description: "Add the environment to all event payloads.",
+        default: true,
+        type: Boolean
+      },
       "events.ignore": {
         description: "A list of additional events to ignore. Use a hash to query nested payloads, match using a string or regex. Non-hash will match on the event_type.",
         default: IGNORE_EVENTS_DEFAULT,

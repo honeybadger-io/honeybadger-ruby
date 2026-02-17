@@ -848,6 +848,41 @@ describe Honeybadger::Agent do
     end
   end
 
+  context "#event with attach_environment" do
+    let(:events_worker) { double(Honeybadger::EventsWorker.new(config)) }
+    let(:instance) { Honeybadger::Agent.new(config) }
+
+    subject { instance }
+
+    before do
+      allow(instance).to receive(:events_worker).and_return(events_worker)
+    end
+
+    context "when events.attach_environment is true (default)" do
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, env: "production", "events.attach_hostname": false) }
+
+      it "includes the environment in event payloads" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg[:environment]).to eq("production")
+        end
+
+        subject.event("test_event", some_data: "is here")
+      end
+    end
+
+    context "when events.attach_environment is false" do
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, env: "production", "events.attach_hostname": false, "events.attach_environment": false) }
+
+      it "does not include the environment in event payloads" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg).not_to have_key(:environment)
+        end
+
+        subject.event("test_event", some_data: "is here")
+      end
+    end
+  end
+
   context "#collect" do
     let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, debug: true, "insights.enabled": true) }
     let(:metrics_worker) { double(Honeybadger::MetricsWorker.new(config)) }
