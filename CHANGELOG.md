@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.4.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.3.1...v6.4.0) (2026-02-18)
+
+
+### Features
+
+* attach environment to Insights event payloads ([#780](https://github.com/honeybadger-io/honeybadger-ruby/issues/780)) ([97d1db1](https://github.com/honeybadger-io/honeybadger-ruby/commit/97d1db12bbe474657bee71d0b822af4774ebb61e))
+
 ## [6.3.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.3.0...v6.3.1) (2026-02-12)
 
 
