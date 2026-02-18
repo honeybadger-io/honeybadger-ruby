@@ -881,6 +881,18 @@ describe Honeybadger::Agent do
         subject.event("test_event", some_data: "is here")
       end
     end
+
+    context "when environment is not set" do
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, "events.attach_hostname": false) }
+
+      it "does not include the environment in event payloads" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg).not_to have_key(:environment)
+        end
+
+        subject.event("test_event", some_data: "is here")
+      end
+    end
   end
 
   context "#collect" do
