@@ -75,4 +75,23 @@ describe "ActiveJob Plugin" do
       on_load_callbacks.each { |cb| active_job_base.instance_eval(&cb) }
     end
   end
+
+  context "when exceptions are disabled" do
+    before do
+      allow(Honeybadger).to receive(:config).and_return(config)
+      config[:"exceptions.enabled"] = false
+    end
+
+    it "does not register any ActiveSupport.on_load(:active_job) callbacks" do
+      Honeybadger::Plugin.instances[:active_job].load!(config)
+
+      expect(ActiveSupport).not_to have_received(:on_load).with(:active_job)
+      expect(on_load_callbacks).to be_empty
+    end
+
+    it "does not call ActiveJob::Base.set_callback" do
+      expect(active_job_base).not_to receive(:set_callback)
+      Honeybadger::Plugin.instances[:active_job].load!(config)
+    end
+  end
 end
