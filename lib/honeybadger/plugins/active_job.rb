@@ -53,7 +53,11 @@ module Honeybadger
         end
 
         execution do
-          ::ActiveJob::Base.set_callback(:perform, :around, prepend: true, &ActiveJob.method(:perform_around)) if Honeybadger.config[:"exceptions.enabled"]
+          if Honeybadger.config[:"exceptions.enabled"]
+            ::ActiveSupport.on_load(:active_job) do
+              ::ActiveJob::Base.set_callback(:perform, :around, prepend: true, &ActiveJob.method(:perform_around))
+            end
+          end
 
           if config.load_plugin_insights?(:active_job)
             ::ActiveSupport::Notifications.subscribe(/(enqueue_at|enqueue|enqueue_retry|enqueue_all|perform|retry_stopped|discard)\.active_job/, Honeybadger::ActiveJobSubscriber.new)
