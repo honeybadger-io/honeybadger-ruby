@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.4.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.4.0...v6.4.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* defer ActiveJob callback registration via on_load hook ([#783](https://github.com/honeybadger-io/honeybadger-ruby/issues/783)) ([2003726](https://github.com/honeybadger-io/honeybadger-ruby/commit/2003726d28520e22ab078cc3f4170b0a81d31a6b)), closes [#782](https://github.com/honeybadger-io/honeybadger-ruby/issues/782)
+
 ## [6.4.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.3.1...v6.4.0) (2026-02-18)
 
 
