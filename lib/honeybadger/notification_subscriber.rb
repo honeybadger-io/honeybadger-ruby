@@ -57,8 +57,6 @@ module Honeybadger
         gauge("duration.process_action.action_controller", value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
         gauge("db_runtime.process_action.action_controller", value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
         gauge("view_runtime.process_action.action_controller", value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
-      when "perform.active_job"
-        gauge("duration.perform.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
       when /^cache_.*.active_support$/
         gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
       end
@@ -130,6 +128,30 @@ module Honeybadger
   end
 
   class ActiveJobSubscriber < RailsSubscriber
+    def record(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:active_job, feature: :events)
+      Honeybadger.event(name, payload)
+    end
+
+    def record_metrics(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:active_job, feature: :metrics)
+
+      metric_source "active_job"
+
+      case name
+      when "perform.active_job"
+        gauge("duration.perform.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name, :status))
+      when "enqueue.active_job", "enqueue_at.active_job"
+        gauge("duration.enqueue.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "enqueue_retry.active_job"
+        gauge("duration.enqueue_retry.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "discard.active_job"
+        gauge("duration.discard.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "retry_stopped.active_job"
+        gauge("duration.retry_stopped.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      end
+    end
+
     def format_payload(name, payload)
       job = payload[:job]
       jobs = payload[:jobs]

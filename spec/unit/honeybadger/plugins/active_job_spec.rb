@@ -95,3 +95,98 @@ describe "ActiveJob Plugin" do
     end
   end
 end
+
+describe Honeybadger::ActiveJobSubscriber do
+  let(:config) do
+    Honeybadger::Config.new(
+      logger: NULL_LOGGER,
+      debug: true,
+      "insights.enabled": true,
+      "active_job.insights.enabled": true,
+      "active_job.insights.events": true,
+      "active_job.insights.metrics": true
+    )
+  end
+
+  let(:subscriber) { described_class.new }
+
+  before do
+    allow(Honeybadger).to receive(:config).and_return(config)
+    allow(Honeybadger).to receive(:event)
+  end
+
+  describe "#record" do
+    it "emits an event when events feature is enabled" do
+      expect(Honeybadger).to receive(:event).with("perform.active_job", hash_including(duration: 100.0))
+      subscriber.record("perform.active_job", {duration: 100.0, job_class: "TestJob", queue_name: "default"})
+    end
+
+    context "when events feature is disabled" do
+      let(:config) do
+        Honeybadger::Config.new(
+          logger: NULL_LOGGER,
+          debug: true,
+          "insights.enabled": true,
+          "active_job.insights.enabled": true,
+          "active_job.insights.events": false,
+          "active_job.insights.metrics": true
+        )
+      end
+
+      it "does not emit an event" do
+        expect(Honeybadger).not_to receive(:event)
+        subscriber.record("perform.active_job", {duration: 100.0})
+      end
+    end
+  end
+
+  describe "#record_metrics" do
+    it "records perform duration gauge for perform events" do
+      expect(subscriber).to receive(:gauge).with("duration.perform.active_job", hash_including(value: 150.5, job_class: "TestJob", queue_name: "default", status: "success"))
+      subscriber.record_metrics("perform.active_job", {duration: 150.5, job_class: "TestJob", queue_name: "default", status: "success"})
+    end
+
+    it "records enqueue duration gauge for enqueue events" do
+      expect(subscriber).to receive(:gauge).with("duration.enqueue.active_job", hash_including(value: 5.2, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("enqueue.active_job", {duration: 5.2, job_class: "TestJob", queue_name: "default"})
+    end
+
+    it "records enqueue duration gauge for enqueue_at events" do
+      expect(subscriber).to receive(:gauge).with("duration.enqueue.active_job", hash_including(value: 3.1, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("enqueue_at.active_job", {duration: 3.1, job_class: "TestJob", queue_name: "default"})
+    end
+
+    it "records duration gauge for enqueue_retry events" do
+      expect(subscriber).to receive(:gauge).with("duration.enqueue_retry.active_job", hash_including(value: 2.0, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("enqueue_retry.active_job", {duration: 2.0, job_class: "TestJob", queue_name: "default"})
+    end
+
+    it "records duration gauge for discard events" do
+      expect(subscriber).to receive(:gauge).with("duration.discard.active_job", hash_including(value: 1.5, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("discard.active_job", {duration: 1.5, job_class: "TestJob", queue_name: "default"})
+    end
+
+    it "records duration gauge for retry_stopped events" do
+      expect(subscriber).to receive(:gauge).with("duration.retry_stopped.active_job", hash_including(value: 4.3, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("retry_stopped.active_job", {duration: 4.3, job_class: "TestJob", queue_name: "default"})
+    end
+
+    context "when metrics feature is disabled" do
+      let(:config) do
+        Honeybadger::Config.new(
+          logger: NULL_LOGGER,
+          debug: true,
+          "insights.enabled": true,
+          "active_job.insights.enabled": true,
+          "active_job.insights.events": true,
+          "active_job.insights.metrics": false
+        )
+      end
+
+      it "does not record gauges" do
+        expect(subscriber).not_to receive(:gauge)
+        subscriber.record_metrics("perform.active_job", {duration: 100.0, job_class: "TestJob", queue_name: "default", status: "success"})
+      end
+    end
+  end
+end
