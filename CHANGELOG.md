@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.5.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.4.1...v6.5.0) (2026-02-27)
+
+
+### Features
+
+* add Active Job metrics collection ([#787](https://github.com/honeybadger-io/honeybadger-ruby/issues/787)) ([cb97bd8](https://github.com/honeybadger-io/honeybadger-ruby/commit/cb97bd8252b9d0788adb215a87503cff9c04ecbc))
+
 ## [6.4.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.4.0...v6.4.1) (2026-02-25)
 
 
