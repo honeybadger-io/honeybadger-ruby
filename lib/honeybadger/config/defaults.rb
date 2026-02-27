@@ -355,11 +355,6 @@ module Honeybadger
         default: false,
         type: Boolean
       },
-      "active_job.insights.collection_interval": {
-        description: "The frequency in seconds at which Active Job metrics are collected.",
-        default: 60,
-        type: Integer
-      },
       "delayed_job.attempt_threshold": {
         description: "The number of attempts before notifications will be sent.",
         default: 0,

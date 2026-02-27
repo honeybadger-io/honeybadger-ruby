@@ -150,8 +150,6 @@ module Honeybadger
       when "retry_stopped.active_job"
         gauge("duration.retry_stopped.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
       end
-
-      Honeybadger::Plugins::ActiveJob.record_metric(name, payload)
     end
 
     def format_payload(name, payload)

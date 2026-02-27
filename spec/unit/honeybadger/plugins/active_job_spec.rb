@@ -94,203 +94,6 @@ describe "ActiveJob Plugin" do
       Honeybadger::Plugin.instances[:active_job].load!(config)
     end
   end
-
-  describe "metric counters" do
-    before do
-      Honeybadger::Plugins::ActiveJob.reset_counters!
-    end
-
-    describe ".record_metric" do
-      it "tracks performed jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_performed]).to eq(1)
-        expect(data[:queues]["default"][:performed]).to eq(1)
-      end
-
-      it "tracks failed jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "failure"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_performed]).to eq(1)
-        expect(data[:stats][:jobs_failed]).to eq(1)
-        expect(data[:queues]["default"][:performed]).to eq(1)
-        expect(data[:queues]["default"][:failed]).to eq(1)
-      end
-
-      it "tracks enqueued jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("enqueue.active_job", {queue_name: "mailers"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_enqueued]).to eq(1)
-        expect(data[:queues]["mailers"][:enqueued]).to eq(1)
-      end
-
-      it "tracks enqueue_at jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("enqueue_at.active_job", {queue_name: "default"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_enqueued]).to eq(1)
-      end
-
-      it "tracks bulk enqueued jobs from enqueue_all" do
-        Honeybadger::Plugins::ActiveJob.record_metric("enqueue_all.active_job", {
-          jobs: [
-            {queue_name: "default"},
-            {queue_name: "default"},
-            {queue_name: "mailers"}
-          ]
-        })
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_enqueued]).to eq(3)
-        expect(data[:queues]["default"][:enqueued]).to eq(2)
-        expect(data[:queues]["mailers"][:enqueued]).to eq(1)
-      end
-
-      it "tracks retried jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("enqueue_retry.active_job", {queue_name: "default"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_retried]).to eq(1)
-        expect(data[:queues]["default"][:retried]).to eq(1)
-      end
-
-      it "tracks discarded jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("discard.active_job", {queue_name: "default"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_discarded]).to eq(1)
-        expect(data[:queues]["default"][:discarded]).to eq(1)
-      end
-
-      it "tracks retry_stopped jobs" do
-        Honeybadger::Plugins::ActiveJob.record_metric("retry_stopped.active_job", {queue_name: "default"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_retry_stopped]).to eq(1)
-        expect(data[:queues]["default"][:retry_stopped]).to eq(1)
-      end
-
-      it "defaults queue_name to 'default' when missing" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {status: "success"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:queues]["default"][:performed]).to eq(1)
-      end
-
-      it "accumulates counts across multiple events" do
-        3.times { Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"}) }
-        2.times { Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "failure"}) }
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats][:jobs_performed]).to eq(5)
-        expect(data[:stats][:jobs_failed]).to eq(2)
-      end
-
-      it "tracks per-queue metrics separately" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "mailers", status: "success"})
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "mailers", status: "failure"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:queues]["default"][:performed]).to eq(1)
-        expect(data[:queues]["mailers"][:performed]).to eq(2)
-        expect(data[:queues]["mailers"][:failed]).to eq(1)
-      end
-    end
-
-    describe ".flush_counters" do
-      it "resets counters after flush" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-        Honeybadger::Plugins::ActiveJob.flush_counters
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats]).to be_empty
-        expect(data[:queues]).to be_empty
-      end
-    end
-
-    describe ".reset_counters!" do
-      it "clears all counters" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-        Honeybadger::Plugins::ActiveJob.reset_counters!
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats]).to be_empty
-        expect(data[:queues]).to be_empty
-      end
-    end
-  end
-
-  describe "collectors" do
-    let(:config) do
-      Honeybadger::Config.new(
-        logger: NULL_LOGGER,
-        debug: true,
-        "insights.enabled": true,
-        "active_job.insights.enabled": true,
-        "active_job.insights.metrics": true,
-        "active_job.insights.events": true
-      )
-    end
-
-    before do
-      allow(Honeybadger).to receive(:config).and_return(config)
-      config[:"exceptions.enabled"] = true
-      Honeybadger::Plugin.instances[:active_job].load!(config)
-
-      Honeybadger::Plugins::ActiveJob.reset_counters!
-    end
-
-    it "can execute collectors" do
-      Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-
-      Honeybadger::Plugin.instances[:active_job].collectors.each do |options, collect_block|
-        Honeybadger::Plugin::CollectorExecution.new("active_job", config, options, &collect_block).call
-      end
-    end
-
-    it "skips collection when no metrics have been recorded" do
-      expect(Honeybadger).not_to receive(:event)
-
-      Honeybadger::Plugin.instances[:active_job].collectors.each do |options, collect_block|
-        Honeybadger::Plugin::CollectorExecution.new("active_job", config, options, &collect_block).call
-      end
-    end
-
-    it "emits a stats event when events feature is enabled" do
-      Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-
-      expect(Honeybadger).to receive(:event).with("stats.active_job", hash_including(jobs_performed: 1))
-
-      Honeybadger::Plugin.instances[:active_job].collectors.each do |options, collect_block|
-        Honeybadger::Plugin::CollectorExecution.new("active_job", config, options, &collect_block).call
-      end
-    end
-
-    context "when metrics feature is disabled" do
-      let(:config) do
-        Honeybadger::Config.new(
-          logger: NULL_LOGGER,
-          debug: true,
-          "insights.enabled": true,
-          "active_job.insights.enabled": true,
-          "active_job.insights.metrics": false
-        )
-      end
-
-      it "does not execute collection" do
-        Honeybadger::Plugins::ActiveJob.record_metric("perform.active_job", {queue_name: "default", status: "success"})
-        expect(Honeybadger).not_to receive(:event)
-
-        Honeybadger::Plugin.instances[:active_job].collectors.each do |options, collect_block|
-          Honeybadger::Plugin::CollectorExecution.new("active_job", config, options, &collect_block).call
-        end
-      end
-    end
-  end
 end
 
 describe Honeybadger::ActiveJobSubscriber do
@@ -310,7 +113,6 @@ describe Honeybadger::ActiveJobSubscriber do
   before do
     allow(Honeybadger).to receive(:config).and_return(config)
     allow(Honeybadger).to receive(:event)
-    Honeybadger::Plugins::ActiveJob.reset_counters!
   end
 
   describe "#record" do
@@ -369,14 +171,6 @@ describe Honeybadger::ActiveJobSubscriber do
       subscriber.record_metrics("retry_stopped.active_job", {duration: 4.3, job_class: "TestJob", queue_name: "default"})
     end
 
-    it "tracks metrics in ActiveJob counters" do
-      allow(subscriber).to receive(:gauge)
-      subscriber.record_metrics("perform.active_job", {duration: 100.0, job_class: "TestJob", queue_name: "default", status: "success"})
-
-      data = Honeybadger::Plugins::ActiveJob.flush_counters
-      expect(data[:stats][:jobs_performed]).to eq(1)
-    end
-
     context "when metrics feature is disabled" do
       let(:config) do
         Honeybadger::Config.new(
@@ -392,13 +186,6 @@ describe Honeybadger::ActiveJobSubscriber do
       it "does not record gauges" do
         expect(subscriber).not_to receive(:gauge)
         subscriber.record_metrics("perform.active_job", {duration: 100.0, job_class: "TestJob", queue_name: "default", status: "success"})
-      end
-
-      it "does not track metrics in counters" do
-        subscriber.record_metrics("perform.active_job", {duration: 100.0, job_class: "TestJob", queue_name: "default", status: "success"})
-
-        data = Honeybadger::Plugins::ActiveJob.flush_counters
-        expect(data[:stats]).to be_empty
       end
     end
   end
