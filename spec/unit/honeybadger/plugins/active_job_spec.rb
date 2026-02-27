@@ -354,6 +354,21 @@ describe Honeybadger::ActiveJobSubscriber do
       subscriber.record_metrics("enqueue_at.active_job", {duration: 3.1, job_class: "TestJob", queue_name: "default"})
     end
 
+    it "records duration gauge for enqueue_retry events" do
+      expect(subscriber).to receive(:gauge).with("duration.enqueue_retry.active_job", hash_including(value: 2.0, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("enqueue_retry.active_job", {duration: 2.0, job_class: "TestJob", queue_name: "default"})
+    end
+
+    it "records duration gauge for discard events" do
+      expect(subscriber).to receive(:gauge).with("duration.discard.active_job", hash_including(value: 1.5, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("discard.active_job", {duration: 1.5, job_class: "TestJob", queue_name: "default"})
+    end
+
+    it "records duration gauge for retry_stopped events" do
+      expect(subscriber).to receive(:gauge).with("duration.retry_stopped.active_job", hash_including(value: 4.3, job_class: "TestJob", queue_name: "default"))
+      subscriber.record_metrics("retry_stopped.active_job", {duration: 4.3, job_class: "TestJob", queue_name: "default"})
+    end
+
     it "tracks metrics in ActiveJob counters" do
       allow(subscriber).to receive(:gauge)
       subscriber.record_metrics("perform.active_job", {duration: 100.0, job_class: "TestJob", queue_name: "default", status: "success"})
