@@ -130,6 +130,26 @@ module Honeybadger
   end
 
   class ActiveJobSubscriber < RailsSubscriber
+    def record(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:active_job, feature: :events)
+      Honeybadger.event(name, payload)
+    end
+
+    def record_metrics(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:active_job, feature: :metrics)
+
+      metric_source "active_job"
+
+      case name
+      when "perform.active_job"
+        gauge("duration.perform.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name, :status))
+      when "enqueue.active_job", "enqueue_at.active_job"
+        gauge("duration.enqueue.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      end
+
+      Honeybadger::Plugins::ActiveJob.record_metric(name, payload)
+    end
+
     def format_payload(name, payload)
       job = payload[:job]
       jobs = payload[:jobs]

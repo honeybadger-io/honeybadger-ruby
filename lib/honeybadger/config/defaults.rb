@@ -345,6 +345,21 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      "active_job.insights.events": {
+        description: "Enable automatic event capturing for Active Job.",
+        default: true,
+        type: Boolean
+      },
+      "active_job.insights.metrics": {
+        description: "Enable automatic metric data collection for Active Job.",
+        default: false,
+        type: Boolean
+      },
+      "active_job.insights.collection_interval": {
+        description: "The frequency in seconds at which Active Job metrics are collected.",
+        default: 60,
+        type: Integer
+      },
       "delayed_job.attempt_threshold": {
         description: "The number of attempts before notifications will be sent.",
         default: 0,
