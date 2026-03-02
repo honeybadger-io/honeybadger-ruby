@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.5.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.1...v6.5.2) (2026-03-02)
+
+
+### Bug Fixes
+
+* change logs about missing metrics values to debug ([#792](https://github.com/honeybadger-io/honeybadger-ruby/issues/792)) ([8316f4e](https://github.com/honeybadger-io/honeybadger-ruby/commit/8316f4e20a1c93e2c24b4b17de39c77feecf8d2c))
+
 ## [6.5.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.0...v6.5.1) (2026-03-02)
 
 
