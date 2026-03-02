@@ -55,8 +55,8 @@ module Honeybadger
         gauge("duration.sql.active_record", value: payload[:duration], **payload.slice(:query))
       when "process_action.action_controller"
         gauge("duration.process_action.action_controller", value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
-        gauge("db_runtime.process_action.action_controller", value: payload[:db_runtime]&.round(2), **payload.slice(:method, :controller, :action, :format, :status))
-        gauge("view_runtime.process_action.action_controller", value: payload[:view_runtime]&.round(2), **payload.slice(:method, :controller, :action, :format, :status))
+        gauge("db_runtime.process_action.action_controller", value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
+        gauge("view_runtime.process_action.action_controller", value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
       when /^cache_.*.active_support$/
         gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
       end
