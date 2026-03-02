@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [6.5.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.0...v6.5.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* reduce metric cardinality for cache and SQL insights ([#789](https://github.com/honeybadger-io/honeybadger-ruby/issues/789)) ([56fed2b](https://github.com/honeybadger-io/honeybadger-ruby/commit/56fed2bf345203b31d8f2a03097280cf1ba673b0))
+* round metric duration values to 2 decimal places  ([#790](https://github.com/honeybadger-io/honeybadger-ruby/issues/790)) ([fbf14d7](https://github.com/honeybadger-io/honeybadger-ruby/commit/fbf14d7605083978ebd9f8c36761af2016eee1f0))
+
 ## [6.5.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.4.1...v6.5.0) (2026-02-27)
 
 
