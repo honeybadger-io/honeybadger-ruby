@@ -58,7 +58,7 @@ module Honeybadger
 
       Honeybadger::Timer.register(registry, name, attributes).tap do |timer|
         if value.nil?
-          agent.config.logger.warn("No value found for timer #{name}. Must specify either duration or value. Skipping.")
+          agent.config.logger.debug("No value found for timer #{name}. Must specify either duration or value. Skipping.")
         else
           timer.record(value)
         end
@@ -79,7 +79,7 @@ module Honeybadger
 
       Honeybadger::Histogram.register(registry, name, attributes).tap do |histogram|
         if value.nil?
-          agent.config.logger.warn("No value found for histogram #{name}. Must specify either duration or value. Skipping.")
+          agent.config.logger.debug("No value found for histogram #{name}. Must specify either duration or value. Skipping.")
         else
           histogram.record(value)
         end
@@ -134,7 +134,7 @@ module Honeybadger
 
       Honeybadger::Gauge.register(registry, name, attributes).tap do |gauge|
         if value.nil?
-          agent.config.logger.warn("No value found for gauge #{name}. Must specify value. Skipping.")
+          agent.config.logger.debug("No value found for gauge #{name}. Must specify value. Skipping.")
         else
           gauge.record(value)
         end
