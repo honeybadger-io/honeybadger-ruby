@@ -32,7 +32,6 @@ module Honeybadger
       "Sidekiq::JobRetry::Skip"].map(&:freeze).freeze
 
     IGNORE_EVENTS_DEFAULT = [
-      {event_type: "metric.hb", metric_name: "duration.sql.active_record", query: /^(begin|commit)( immediate)?( transaction)?$/i},
       {event_type: "sql.active_record", query: /^(begin|commit)( immediate)?( transaction)?$/i},
       {event_type: "sql.active_record", query: /(solid_queue|good_job)/i},
       {event_type: "sql.active_record", name: /^GoodJob/},

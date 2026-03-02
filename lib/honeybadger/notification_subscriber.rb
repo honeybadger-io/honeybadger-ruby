@@ -52,6 +52,7 @@ module Honeybadger
 
       case name
       when "sql.active_record"
+        return if payload[:query]&.match?(/^(begin|commit)( immediate)?( transaction)?$/i)
         gauge("duration.sql.active_record", value: payload[:duration])
       when "process_action.action_controller"
         gauge("duration.process_action.action_controller", value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
