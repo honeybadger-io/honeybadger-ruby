@@ -52,13 +52,14 @@ module Honeybadger
 
       case name
       when "sql.active_record"
-        gauge("duration.sql.active_record", value: payload[:duration], **payload.slice(:query))
+        return if payload[:query]&.match?(/^(begin|commit)( immediate)?( transaction)?$/i)
+        gauge("duration.sql.active_record", value: payload[:duration])
       when "process_action.action_controller"
         gauge("duration.process_action.action_controller", value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
         gauge("db_runtime.process_action.action_controller", value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
         gauge("view_runtime.process_action.action_controller", value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
       when /^cache_.*.active_support$/
-        gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
+        gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store))
       end
     end
   end
