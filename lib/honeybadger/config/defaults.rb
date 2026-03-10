@@ -336,6 +336,11 @@ module Honeybadger
         default: true,
         type: Boolean
       },
+      "ruby_llm.insights.enabled": {
+        description: "Enable automatic data collection for ruby_llm.",
+        default: true,
+        type: Boolean
+      },
       "active_job.attempt_threshold": {
         description: "The number of attempts before notifications will be sent.",
         default: 0,
