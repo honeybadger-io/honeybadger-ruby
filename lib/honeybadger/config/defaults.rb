@@ -337,7 +337,7 @@ module Honeybadger
         type: Boolean
       },
       "ruby_llm.insights.enabled": {
-        description: "Enable automatic data collection for ruby_llm.",
+        description: "Enable automatic data collection for RubyLLM.",
         default: true,
         type: Boolean
       },

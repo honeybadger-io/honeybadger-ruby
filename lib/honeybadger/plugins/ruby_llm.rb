@@ -9,11 +9,12 @@ module Honeybadger
           response = super
           duration = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round(2)
 
+          model_id = model.respond_to?(:id) ? model.id : model
+
           payload = {
-            event_type: "complete.ruby_llm",
             duration: duration,
             provider: slug,
-            model: model.id,
+            model: model_id,
             stream: !block.nil?,
             temperature: temperature,
             tool_count: tools.size,
@@ -32,17 +33,16 @@ module Honeybadger
             payload[:tool_call_count] = response.tool_calls.size
           end
 
-          Honeybadger.event(payload)
+          Honeybadger.event("complete.ruby_llm", payload)
           response
         end
 
-        def embed(text, model:, dimensions:)
+        def embed(text, model:, dimensions:, **kwargs)
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           response = super
           duration = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round(2)
 
           payload = {
-            event_type: "embed.ruby_llm",
             duration: duration,
             provider: slug,
             model: model
@@ -50,37 +50,37 @@ module Honeybadger
 
           payload[:input_tokens] = response.input_tokens if response.respond_to?(:input_tokens)
 
-          Honeybadger.event(payload)
+          Honeybadger.event("embed.ruby_llm", payload)
           response
         end
 
-        def paint(prompt, model:, size:)
+        def paint(prompt, model:, size:, **kwargs)
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           response = super
           duration = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round(2)
 
-          Honeybadger.event(
-            event_type: "paint.ruby_llm",
+          Honeybadger.event("paint.ruby_llm", {
             duration: duration,
             provider: slug,
             model: model,
             size: size
-          )
+          })
           response
         end
 
-        def transcribe(audio_file, model:, language:, **options)
+        def transcribe(audio_file, model:, **kwargs)
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           response = super
           duration = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round(2)
 
-          Honeybadger.event(
-            event_type: "transcribe.ruby_llm",
+          payload = {
             duration: duration,
             provider: slug,
-            model: model,
-            language: language
-          )
+            model: model
+          }
+          payload[:language] = kwargs[:language] if kwargs[:language]
+
+          Honeybadger.event("transcribe.ruby_llm", payload)
           response
         end
       end
@@ -93,17 +93,16 @@ module Honeybadger
           result = super
           duration = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round(2)
 
-          Honeybadger.event(
-            event_type: "tool_call.ruby_llm",
+          Honeybadger.event("tool_call.ruby_llm", {
             duration: duration,
             tool_name: tool_call.name
-          )
+          })
           result
         end
       end
 
       Plugin.register :ruby_llm do
-        requirement { defined?(::RubyLLM::Provider) }
+        requirement { defined?(::RubyLLM::Provider) && defined?(::RubyLLM::Chat) }
 
         execution do
           if config.load_plugin_insights?(:ruby_llm)

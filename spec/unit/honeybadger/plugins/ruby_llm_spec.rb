@@ -25,15 +25,15 @@ describe "RubyLLM Plugin" do
           "response"
         end
 
-        def embed(text, model:, dimensions:)
+        def embed(text, model:, dimensions:, **kwargs)
           "embedding"
         end
 
-        def paint(prompt, model:, size:)
+        def paint(prompt, model:, size:, **kwargs)
           "image"
         end
 
-        def transcribe(audio_file, model:, language:, **options)
+        def transcribe(audio_file, model:, **kwargs)
           "transcription"
         end
       end
@@ -61,7 +61,7 @@ describe "RubyLLM Plugin" do
     end
 
     after do
-      # Remove prepended modules by restoring original classes
+      # Remove the RubyLLM constant so the requirement check can be re-evaluated
       Object.send(:remove_const, :RubyLLM)
     end
 
@@ -122,15 +122,15 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
         @response
       end
 
-      def embed(text, model:, dimensions:)
+      def embed(text, model:, dimensions:, **kwargs)
         @embed_response
       end
 
-      def paint(prompt, model:, size:)
+      def paint(prompt, model:, size:, **kwargs)
         @paint_response
       end
 
-      def transcribe(audio_file, model:, language:, **options)
+      def transcribe(audio_file, model:, **kwargs)
         @transcribe_response
       end
     end.prepend(described_class)
@@ -150,8 +150,7 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
     it "calls Honeybadger.event with complete payload" do
       provider.complete(["msg1", "msg2"], tools: [:tool1], temperature: 0.7, model: model_info)
 
-      expect(Honeybadger).to have_received(:event).with(hash_including(
-        event_type: "complete.ruby_llm",
+      expect(Honeybadger).to have_received(:event).with("complete.ruby_llm", hash_including(
         provider: "openai",
         model: "gpt-4o",
         stream: false,
@@ -169,7 +168,7 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
     it "includes duration" do
       provider.complete(["msg"], tools: [], temperature: 0.5, model: model_info)
 
-      expect(Honeybadger).to have_received(:event).with(hash_including(
+      expect(Honeybadger).to have_received(:event).with("complete.ruby_llm", hash_including(
         duration: a_kind_of(Numeric)
       ))
     end
@@ -182,7 +181,7 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
     it "detects streaming when a block is given" do
       provider.complete(["msg"], tools: [], temperature: 0.5, model: model_info) { |chunk| }
 
-      expect(Honeybadger).to have_received(:event).with(hash_including(stream: true))
+      expect(Honeybadger).to have_received(:event).with("complete.ruby_llm", hash_including(stream: true))
     end
   end
 
@@ -196,8 +195,7 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
     it "calls Honeybadger.event with embed payload" do
       provider.embed("hello", model: "text-embedding-3-small", dimensions: 1536)
 
-      expect(Honeybadger).to have_received(:event).with(hash_including(
-        event_type: "embed.ruby_llm",
+      expect(Honeybadger).to have_received(:event).with("embed.ruby_llm", hash_including(
         provider: "openai",
         model: "text-embedding-3-small",
         input_tokens: 42
@@ -220,8 +218,7 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
     it "calls Honeybadger.event with paint payload" do
       provider.paint("a cat", model: "dall-e-3", size: "1024x1024")
 
-      expect(Honeybadger).to have_received(:event).with(hash_including(
-        event_type: "paint.ruby_llm",
+      expect(Honeybadger).to have_received(:event).with("paint.ruby_llm", hash_including(
         provider: "openai",
         model: "dall-e-3",
         size: "1024x1024"
@@ -244,8 +241,7 @@ describe Honeybadger::Plugins::RubyLLM::ProviderInstrumentation do
     it "calls Honeybadger.event with transcribe payload" do
       provider.transcribe("audio.mp3", model: "whisper-1", language: "en")
 
-      expect(Honeybadger).to have_received(:event).with(hash_including(
-        event_type: "transcribe.ruby_llm",
+      expect(Honeybadger).to have_received(:event).with("transcribe.ruby_llm", hash_including(
         provider: "openai",
         model: "whisper-1",
         language: "en"
@@ -281,8 +277,7 @@ describe Honeybadger::Plugins::RubyLLM::ChatInstrumentation do
   it "calls Honeybadger.event with tool_call payload" do
     chat.send(:execute_tool, tool_call)
 
-    expect(Honeybadger).to have_received(:event).with(hash_including(
-      event_type: "tool_call.ruby_llm",
+    expect(Honeybadger).to have_received(:event).with("tool_call.ruby_llm", hash_including(
       tool_name: "search",
       duration: a_kind_of(Numeric)
     ))
