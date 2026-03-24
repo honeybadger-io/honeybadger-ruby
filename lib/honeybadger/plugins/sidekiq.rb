@@ -69,7 +69,7 @@ module Honeybadger
       end
 
       Plugin.register :sidekiq do
-        leader_checker = nil
+        enterprise_leader = false
 
         requirement { defined?(::Sidekiq) }
 
@@ -137,30 +137,12 @@ module Honeybadger
               require "sidekiq"
               require "sidekiq/api"
 
-              if Gem::Version.new(::Sidekiq::VERSION) >= Gem::Version.new("6.5")
-                require "sidekiq/component"
-
-                class SidekiqClusterCollectionChecker
-                  include ::Sidekiq::Component
-                  def initialize(config)
-                    @config = config
-                  end
-
-                  def collect?
-                    return true unless defined?(::Sidekiq::Enterprise)
-                    leader?
-                  end
-                end
-              end
-
               ::Sidekiq.configure_server do |config|
                 config.server_middleware { |chain| chain.add(ServerMiddlewareInstrumentation) }
                 config.client_middleware { |chain| chain.add(ClientMiddlewareInstrumentation) }
 
-                if defined?(SidekiqClusterCollectionChecker)
-                  config.on(:startup) do
-                    leader_checker = SidekiqClusterCollectionChecker.new(config)
-                  end
+                if defined?(::Sidekiq::Enterprise)
+                  config.on(:leader) { enterprise_leader = true }
                 end
               end
 
@@ -222,7 +204,7 @@ module Honeybadger
         end
 
         collect do
-          if config.cluster_collection?(:sidekiq) && (leader_checker ? leader_checker.collect? : !defined?(::Sidekiq::Enterprise))
+          if config.cluster_collection?(:sidekiq) && (!defined?(::Sidekiq::Enterprise) || enterprise_leader)
             stats = collect_sidekiq_stats.call
 
             if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :events)
