@@ -248,6 +248,41 @@ describe "Sidekiq Dependency" do
           Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
         end
       end
+
+      context "when Sidekiq::Enterprise is defined but leader_checker is nil (startup not yet fired)" do
+        before do
+          # Simulate Sidekiq Enterprise being loaded but the :startup callback
+          # not yet having fired — leader_checker remains nil in the collect block
+          ::Sidekiq.const_set(:Enterprise, Module.new) unless defined?(::Sidekiq::Enterprise)
+        end
+
+        after do
+          ::Sidekiq.send(:remove_const, :Enterprise) if defined?(::Sidekiq::Enterprise)
+        end
+
+        it "does not collect metrics when leader_checker is nil" do
+          expect(Honeybadger).not_to receive(:event)
+
+          Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
+            Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+          end
+        end
+      end
+
+      context "when Sidekiq::Enterprise is not defined (open-source Sidekiq)" do
+        before do
+          ::Sidekiq.send(:remove_const, :Enterprise) if defined?(::Sidekiq::Enterprise)
+        end
+
+        it "collects metrics from all processes (no leader election available)" do
+          Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
+            # Should not raise — falls back to collecting when Enterprise is absent
+            expect {
+              Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+            }.not_to raise_error
+          end
+        end
+      end
     end
   end
 end

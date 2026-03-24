@@ -222,7 +222,7 @@ module Honeybadger
         end
 
         collect do
-          if config.cluster_collection?(:sidekiq) && (leader_checker.nil? || leader_checker.collect?)
+          if config.cluster_collection?(:sidekiq) && (leader_checker ? leader_checker.collect? : !defined?(::Sidekiq::Enterprise))
             stats = collect_sidekiq_stats.call
 
             if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :events)
