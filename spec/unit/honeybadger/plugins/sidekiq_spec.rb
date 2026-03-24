@@ -15,25 +15,31 @@ describe "Sidekiq Dependency" do
   end
 
   context "when sidekiq is installed" do
-    let(:shim) do
-      Class.new do
-        def self.configure_server
-        end
+      let(:shim) do
+        Class.new do
+          def self.configure_server
+          end
 
-        def self.default_configuration
+          def self.configure_client
+          end
+
+          def self.default_configuration
+          end
         end
       end
-    end
 
     let(:sidekiq_options) { {} }
     let(:sidekiq) { double(Sidekiq, error_handlers: [], options: sidekiq_options) }
-    let(:chain) { double("chain", prepend: true) }
+      let(:chain) { double("chain", prepend: true, add: true) }
 
-    before do
-      Object.const_set(:Sidekiq, shim)
-      allow(::Sidekiq).to receive(:configure_server).and_yield(sidekiq)
-      allow(sidekiq).to receive(:server_middleware).and_yield(chain)
-    end
+      before do
+        Object.const_set(:Sidekiq, shim)
+        allow(::Sidekiq).to receive(:configure_server).and_yield(sidekiq)
+        allow(::Sidekiq).to receive(:configure_client).and_yield(sidekiq)
+        allow(sidekiq).to receive(:server_middleware).and_yield(chain)
+        allow(sidekiq).to receive(:client_middleware).and_yield(chain)
+        allow(sidekiq).to receive(:on)
+      end
 
     after { Object.send(:remove_const, :Sidekiq) }
 
@@ -264,6 +270,47 @@ describe "Sidekiq Dependency" do
           Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
             Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
           end
+        end
+
+        it "collects metrics after the leader callback fires" do
+          plugin_file = File.expand_path("../../../../lib/honeybadger/plugins/sidekiq.rb", __dir__)
+          original_plugin = Honeybadger::Plugin.instances.delete(:sidekiq)
+
+          load(plugin_file)
+          plugin = Honeybadger::Plugin.instances[:sidekiq]
+          leader_callback = nil
+
+          allow_any_instance_of(Honeybadger::Plugin::Execution).to receive(:require) do |_execution, path|
+            next true if ["sidekiq", "sidekiq/api"].include?(path)
+
+            Kernel.require(path)
+          end
+
+          allow(Honeybadger).to receive(:collect)
+          allow(Honeybadger).to receive(:event)
+          allow(sidekiq).to receive(:on) do |event, &block|
+            leader_callback = block if event == :leader
+          end
+
+          plugin.load!(config)
+
+          expect(sidekiq).to have_received(:on).with(:leader)
+          expect(leader_callback).to be_a(Proc)
+
+          plugin.collectors.each do |options, collect_block|
+            Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+          end
+          expect(Honeybadger).not_to have_received(:event)
+
+          leader_callback.call
+
+          plugin.collectors.each do |options, collect_block|
+            Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+          end
+          expect(Honeybadger).to have_received(:event).at_least(:once)
+        ensure
+          Honeybadger::Plugin.instances.delete(:sidekiq)
+          Honeybadger::Plugin.instances[:sidekiq] = original_plugin if original_plugin
         end
       end
 
