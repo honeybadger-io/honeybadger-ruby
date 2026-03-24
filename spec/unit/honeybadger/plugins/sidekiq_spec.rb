@@ -273,10 +273,10 @@ describe "Sidekiq Dependency" do
         end
 
         it "collects metrics from all processes" do
+          expect(Honeybadger).to receive(:event).at_least(:once)
+
           Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
-            expect {
-              Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
-            }.not_to raise_error
+            Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
           end
         end
       end
