@@ -243,9 +243,28 @@ describe "Sidekiq Dependency" do
         allow(::Sidekiq::ProcessSet).to receive(:new).and_return(processes)
       end
 
-      it "can execute collectors" do
-        Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
-          Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+      context "when running in a sidekiq server process" do
+        before do
+          allow(::Sidekiq).to receive(:server?).and_return(true)
+        end
+
+        it "can execute collectors" do
+          Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
+            Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+          end
+        end
+      end
+
+      context "when running in a non-server process (e.g. puma)" do
+        before do
+          allow(::Sidekiq).to receive(:server?).and_return(false)
+        end
+
+        it "does not collect sidekiq stats" do
+          expect(::Sidekiq::Stats).not_to receive(:new)
+          Honeybadger::Plugin.instances[:sidekiq].collectors.each do |options, collect_block|
+            Honeybadger::Plugin::CollectorExecution.new("sidekiq", config, options, &collect_block).call
+          end
         end
       end
     end
