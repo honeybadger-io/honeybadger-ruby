@@ -5,9 +5,16 @@ on:
     branches: [ master ]
     types: [opened, edited, synchronize, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   commitlint:
     name: Check PR title
+    if: >-
+      !contains(github.event.pull_request.title, '[skip ci]') &&
+      !startsWith(github.head_ref, 'release-please--')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
