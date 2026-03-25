@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.5.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.2...v6.5.3) (2026-03-25)
+
+
+### Bug Fixes
+
+* restrict sidekiq cluster metrics collection to server processes ([#798](https://github.com/honeybadger-io/honeybadger-ruby/issues/798)) ([78562d5](https://github.com/honeybadger-io/honeybadger-ruby/commit/78562d5eaad785b87f4bce8dd8865dead3441a6c))
+
 ## [6.5.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.1...v6.5.2) (2026-03-02)
 
 
