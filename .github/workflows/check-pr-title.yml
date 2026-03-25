@@ -13,8 +13,7 @@ jobs:
   commitlint:
     name: Check PR title
     if: >-
-      !contains(github.event.pull_request.title, '[skip ci]') &&
-      !startsWith(github.head_ref, 'release-please--')
+      !startsWith(github.head_ref || '', 'release-please--')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
