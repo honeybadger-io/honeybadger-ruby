@@ -6,9 +6,17 @@ on:
   pull_request:
     branches: [ master ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
   ruby:
+    if: >-
+      !contains(github.event.head_commit.message || '', '[skip ci]') &&
+      !contains(github.event.pull_request.title || '', '[skip ci]') &&
+      !startsWith(github.head_ref || '', 'release-please--')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -79,6 +87,10 @@ jobs:
       continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
 
   jruby:
+    if: >-
+      !contains(github.event.head_commit.message || '', '[skip ci]') &&
+      !contains(github.event.pull_request.title || '', '[skip ci]') &&
+      !startsWith(github.head_ref || '', 'release-please--')
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     strategy:
