@@ -42,6 +42,7 @@ describe Honeybadger::Agent do
       instance = described_class.new(config)
 
       expect(instance.check_in("https://api.honeybadger.io/v1/check_in/hbp_abc123/my-check-in")).to eq(true)
+      expect(instance.check_in("/v1/check_in/hbp_abc123/my-check-in")).to eq(true)
     end
 
     it "returns false for failed check ins" do
