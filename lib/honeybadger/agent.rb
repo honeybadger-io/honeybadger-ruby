@@ -208,7 +208,11 @@ module Honeybadger
     def check_in(id)
       id_str = id.to_s.strip.gsub(/\/$/, "")
       check_in_id = if id_str.match?(/\Ahttps?:\/\//)
-        URI.parse(id_str).path.sub(%r{.*/check_in/}, "")
+        begin
+          URI.parse(id_str).path.sub(%r{.*/check_in/}, "")
+        rescue URI::InvalidURIError
+          id_str.split("/").last
+        end
       else
         id_str.split("/").last
       end
