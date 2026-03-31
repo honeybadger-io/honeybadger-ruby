@@ -1,4 +1,5 @@
 require "forwardable"
+require "uri"
 require "zlib"
 
 require "honeybadger/version"
@@ -205,8 +206,12 @@ module Honeybadger
     # @return [Boolean] true if the check in was successful and false
     #   otherwise.
     def check_in(id)
-      # this is to allow check ins even if a url is passed
-      check_in_id = id.to_s.strip.gsub(/\/$/, "").split("/").last
+      id_str = id.to_s.strip.gsub(/\/$/, "")
+      check_in_id = if id_str.match?(/\Ahttps?:\/\//)
+        URI.parse(id_str).path.sub(%r{.*/check_in/}, "")
+      else
+        id_str.split("/").last
+      end
       response = backend.check_in(check_in_id)
       response.success?
     end
