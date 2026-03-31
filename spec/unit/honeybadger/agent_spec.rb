@@ -34,6 +34,27 @@ describe Honeybadger::Agent do
       expect(instance.check_in("/foobar/")).to eq(true)
     end
 
+    it "parses check_in id from a url with project api key" do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/hbp_abc123/my-check-in")
+        .to_return(status: 200)
+
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
+      instance = described_class.new(config)
+
+      expect(instance.check_in("https://api.honeybadger.io/v1/check_in/hbp_abc123/my-check-in")).to eq(true)
+      expect(instance.check_in("/v1/check_in/hbp_abc123/my-check-in")).to eq(true)
+    end
+
+    it "parses check_in id from a path-only url with project api key" do
+      stub_request(:get, "https://api.honeybadger.io/v1/check_in/hbp_abc123/my-check-in")
+        .to_return(status: 200)
+
+      config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
+      instance = described_class.new(config)
+
+      expect(instance.check_in("/v1/check_in/hbp_abc123/my-check-in")).to eq(true)
+    end
+
     it "returns false for failed check ins" do
       stub_request(:get, "https://api.honeybadger.io/v1/check_in/danny")
         .to_return(status: 400)
