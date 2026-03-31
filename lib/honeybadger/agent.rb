@@ -1,5 +1,4 @@
 require "forwardable"
-require "uri"
 require "zlib"
 
 require "honeybadger/version"
@@ -207,12 +206,8 @@ module Honeybadger
     #   otherwise.
     def check_in(id)
       id_str = id.to_s.strip.gsub(/\/$/, "")
-      check_in_id = if id_str.match?(/\Ahttps?:\/\//)
-        begin
-          URI.parse(id_str).path.sub(%r{.*/check_in/}, "")
-        rescue URI::InvalidURIError
-          id_str.split("/").last
-        end
+      check_in_id = if id_str.include?("/check_in/")
+        id_str.sub(%r{.*/check_in/}, "")
       else
         id_str.split("/").last
       end
