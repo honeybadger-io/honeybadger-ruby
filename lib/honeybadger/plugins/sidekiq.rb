@@ -56,6 +56,7 @@ module Honeybadger
 
         def call(worker, msg, queue, _redis)
           context = {
+            jid: msg["jid"],
             worker: msg["wrapped"] || msg["class"],
             queue: queue
           }
