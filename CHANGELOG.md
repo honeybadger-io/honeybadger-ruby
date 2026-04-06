@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.5.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.3...v6.5.4) (2026-04-06)
+
+
+### Bug Fixes
+
+* include jid in sidekiq enqueue.sidekiq event ([#804](https://github.com/honeybadger-io/honeybadger-ruby/issues/804)) ([0b46e6b](https://github.com/honeybadger-io/honeybadger-ruby/commit/0b46e6bfe66c5152d11ff04062b4c1f0d30304eb))
+
 ## [6.5.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.2...v6.5.3) (2026-03-25)
 
 
