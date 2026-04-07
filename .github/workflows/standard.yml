@@ -5,8 +5,15 @@ on:
     branches:
       - 'master'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    if: >-
+      !contains(github.event.pull_request.title, '[skip ci]') &&
+      !startsWith(github.head_ref, 'release-please--')
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -21,4 +28,3 @@ jobs:
     - name: Run standard
       run: |
         bundle exec standardrb .
-
