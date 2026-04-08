@@ -56,6 +56,7 @@ module Honeybadger
 
         def call(worker, msg, queue, _redis)
           context = {
+            jid: msg["jid"],
             worker: msg["wrapped"] || msg["class"],
             queue: queue
           }
@@ -215,7 +216,7 @@ module Honeybadger
         end
 
         collect do
-          if config.cluster_collection?(:sidekiq) && (leader_checker.nil? || leader_checker.collect?)
+          if ::Sidekiq.server? && config.cluster_collection?(:sidekiq) && (leader_checker.nil? || leader_checker.collect?)
             stats = collect_sidekiq_stats.call
 
             if Honeybadger.config.load_plugin_insights?(:sidekiq, feature: :events)

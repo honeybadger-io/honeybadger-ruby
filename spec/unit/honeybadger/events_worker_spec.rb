@@ -347,6 +347,57 @@ describe Honeybadger::EventsWorker do
     end
   end
 
+  describe "#kill!" do
+    it "kills the timeout thread" do
+      subject.start
+      sleep(0.1)
+
+      timeout_thread = subject.send(:timeout_thread)
+      expect(timeout_thread).to be_alive
+
+      subject.send(:kill!)
+      sleep(0.1)
+
+      expect(timeout_thread).not_to be_alive
+    end
+
+    context "when suspend is called from the worker thread" do
+      before do
+        allow(instance).to receive(:work) do |msg|
+          instance.send(:suspend, 300)
+        end
+      end
+
+      def wait_for_no_worker_threads
+        50.times do
+          break if Thread.list.none? { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
+          sleep(0.1)
+        end
+      end
+
+      it "kills all worker threads" do
+        subject.push(event)
+        wait_for_no_worker_threads
+
+        worker_threads = Thread.list.select { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
+        expect(worker_threads).to be_empty
+      end
+
+      it "does not leak threads across multiple suspend/restart cycles" do
+        3.times do |i|
+          Timecop.travel(Time.now + 301) if i > 0
+          subject.push(event)
+          wait_for_no_worker_threads
+        end
+
+        worker_threads = Thread.list.select { |t| t.is_a?(Honeybadger::EventsWorker::Thread) && t.alive? }
+        expect(worker_threads).to be_empty
+      ensure
+        Timecop.return
+      end
+    end
+  end
+
   describe "batching" do
     it "should send after batch size is reached" do
       expect(subject.send(:backend)).to receive(:event).with([event] * 5).and_return(Honeybadger::Backend::Null::StubbedResponse.new)

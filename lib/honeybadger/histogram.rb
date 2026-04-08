@@ -34,11 +34,11 @@ module Honeybadger
 
     def payloads
       [{
-        total: @total,
-        min: @min,
-        max: @max,
-        avg: @avg,
-        latest: @latest,
+        total: @total&.round(2),
+        min: @min&.round(2),
+        max: @max&.round(2),
+        avg: @avg&.round(2),
+        latest: @latest&.round(2),
         bins: (bins + [INFINITY]).map { |bin| [bin.to_f, @bin_counts[bin]] }
       }]
     end

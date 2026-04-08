@@ -5,10 +5,17 @@ on:
     branches: [ master ]
     types: [opened, edited, synchronize, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   commitlint:
     name: Check PR title
+    if: >-
+      !startsWith(github.head_ref || '', 'release-please--')
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -18,7 +18,7 @@ describe "Rails error subscriber integration" do
     expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
-    expect(notice.context).to eq({key: "value"})
+    expect(notice.context).to include({key: "value"})
     tags = ["severity:warning", "handled:true"]
     tags << "source:application" if RAILS_ERROR_SOURCE_SUPPORTED
     expect(notice.tags).to eq(tags)
@@ -60,7 +60,7 @@ describe "Rails error subscriber integration" do
     expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
     notice = Honeybadger::Backend::Test.notifications[:notices].first
     expect(notice.error_class).to eq("RuntimeError")
-    expect(notice.context).to eq({key: "value"})
+    expect(notice.context).to include({key: "value"})
     expect(notice.tags).to eq(["severity:warning", "handled:true", "source:task"])
   end
 

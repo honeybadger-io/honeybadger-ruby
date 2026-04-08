@@ -14,6 +14,7 @@ jobs:
   release-if-needed:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Create Release PR
         uses: google-github-actions/release-please-action@v3

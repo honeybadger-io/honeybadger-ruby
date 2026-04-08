@@ -32,11 +32,12 @@ module Honeybadger
       "Sidekiq::JobRetry::Skip"].map(&:freeze).freeze
 
     IGNORE_EVENTS_DEFAULT = [
-      {event_type: "metric.hb", metric_name: "duration.sql.active_record", query: /^(begin|commit)( immediate)?( transaction)?$/i},
       {event_type: "sql.active_record", query: /^(begin|commit)( immediate)?( transaction)?$/i},
       {event_type: "sql.active_record", query: /(solid_queue|good_job)/i},
       {event_type: "sql.active_record", name: /^GoodJob/},
       {event_type: "process_action.action_controller", controller: "Rails::HealthController"},
+      {event_type: "cache_read.active_support"},
+      {event_type: "cache_fetch_hit.active_support"},
       {event_type: "cache_exist?.active_support"},
       {event_type: "cache_write.active_support"},
       {event_type: "cache_generate.active_support"},
@@ -122,6 +123,11 @@ module Honeybadger
       },
       "events.attach_hostname": {
         description: "Add the hostname to all event paylaods.",
+        default: true,
+        type: Boolean
+      },
+      "events.attach_environment": {
+        description: "Add the environment to all event payloads.",
         default: true,
         type: Boolean
       },
@@ -338,6 +344,16 @@ module Honeybadger
       "active_job.insights.enabled": {
         description: "Enable automatic data collection for Active Job.",
         default: true,
+        type: Boolean
+      },
+      "active_job.insights.events": {
+        description: "Enable automatic event capturing for Active Job.",
+        default: true,
+        type: Boolean
+      },
+      "active_job.insights.metrics": {
+        description: "Enable automatic metric data collection for Active Job.",
+        default: false,
         type: Boolean
       },
       "delayed_job.attempt_threshold": {

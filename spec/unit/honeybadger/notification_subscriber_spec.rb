@@ -166,4 +166,54 @@ describe Honeybadger::ActiveJobSubscriber do
       })
     end
   end
+
+  context "with perform.active_job event with exception" do
+    let(:job) { double("job", class: String, job_id: "123", queue_name: "default") }
+    let(:exception) { StandardError.new("Job failed") }
+    let(:payload) do
+      {
+        job: job,
+        adapter: adapter,
+        exception_object: exception
+      }
+    end
+
+    subject { described_class.new.format_payload("perform.active_job", payload) }
+
+    it "sets status to failure" do
+      expect(subject[:status]).to eq("failure")
+    end
+  end
+
+  context "with perform.active_job event without exception" do
+    let(:job) { double("job", class: String, job_id: "123", queue_name: "default") }
+    let(:payload) do
+      {
+        job: job,
+        adapter: adapter
+      }
+    end
+
+    subject { described_class.new.format_payload("perform.active_job", payload) }
+
+    it "sets status to success" do
+      expect(subject[:status]).to eq("success")
+    end
+  end
+
+  context "with non-perform event" do
+    let(:job) { double("job", class: String, job_id: "123", queue_name: "default") }
+    let(:payload) do
+      {
+        job: job,
+        adapter: adapter
+      }
+    end
+
+    subject { described_class.new.format_payload("enqueue.active_job", payload) }
+
+    it "does not include status field" do
+      expect(subject).not_to have_key(:status)
+    end
+  end
 end

@@ -52,15 +52,14 @@ module Honeybadger
 
       case name
       when "sql.active_record"
-        gauge("duration.sql.active_record", value: payload[:duration], **payload.slice(:query))
+        return if payload[:query]&.match?(/^(begin|commit)( immediate)?( transaction)?$/i)
+        gauge("duration.sql.active_record", value: payload[:duration])
       when "process_action.action_controller"
         gauge("duration.process_action.action_controller", value: payload[:duration], **payload.slice(:method, :controller, :action, :format, :status))
         gauge("db_runtime.process_action.action_controller", value: payload[:db_runtime], **payload.slice(:method, :controller, :action, :format, :status))
         gauge("view_runtime.process_action.action_controller", value: payload[:view_runtime], **payload.slice(:method, :controller, :action, :format, :status))
-      when "perform.active_job"
-        gauge("duration.perform.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
       when /^cache_.*.active_support$/
-        gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store, :key))
+        gauge("duration.#{name}", value: payload[:duration], **payload.slice(:store))
       end
     end
   end
@@ -130,7 +129,31 @@ module Honeybadger
   end
 
   class ActiveJobSubscriber < RailsSubscriber
-    def format_payload(_name, payload)
+    def record(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:active_job, feature: :events)
+      Honeybadger.event(name, payload)
+    end
+
+    def record_metrics(name, payload)
+      return unless Honeybadger.config.load_plugin_insights?(:active_job, feature: :metrics)
+
+      metric_source "active_job"
+
+      case name
+      when "perform.active_job"
+        gauge("duration.perform.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name, :status))
+      when "enqueue.active_job", "enqueue_at.active_job"
+        gauge("duration.enqueue.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "enqueue_retry.active_job"
+        gauge("duration.enqueue_retry.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "discard.active_job"
+        gauge("duration.discard.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      when "retry_stopped.active_job"
+        gauge("duration.retry_stopped.active_job", value: payload[:duration], **payload.slice(:job_class, :queue_name))
+      end
+    end
+
+    def format_payload(name, payload)
       job = payload[:job]
       jobs = payload[:jobs]
       adapter = payload[:adapter]
@@ -138,6 +161,11 @@ module Honeybadger
       base_payload = payload.except(:job, :jobs, :adapter).merge({
         adapter_class: adapter&.class&.to_s
       })
+
+      # Add status for perform events based on whether an exception occurred
+      if name == "perform.active_job"
+        base_payload[:status] = payload[:exception_object] ? "failure" : "success"
+      end
 
       if jobs
         base_payload.merge({

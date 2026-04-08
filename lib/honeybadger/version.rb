@@ -1,4 +1,4 @@
 module Honeybadger
   # The current String Honeybadger version.
-  VERSION = "6.2.0".freeze
+  VERSION = "6.5.4".freeze
 end
