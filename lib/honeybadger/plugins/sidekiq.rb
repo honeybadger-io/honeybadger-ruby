@@ -84,9 +84,6 @@ module Honeybadger
 
             if defined?(::Sidekiq::VERSION) && ::Sidekiq::VERSION > "3"
               ::Sidekiq.configure_server do |sidekiq|
-                sidekiq_default_configuration = (::Sidekiq::VERSION > "7") ?
-                  ::Sidekiq.default_configuration : Class.new
-
                 sidekiq.error_handlers << lambda { |ex, sidekiq_params, _sidekiq_config = nil|
                   params = sidekiq_params.dup
 
@@ -136,6 +133,7 @@ module Honeybadger
 
                 class SidekiqClusterCollectionChecker
                   include ::Sidekiq::Component
+
                   def initialize(config)
                     @config = config
                   end
