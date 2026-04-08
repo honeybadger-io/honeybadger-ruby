@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [6.5.5](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.4...v6.5.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* preserve API key path segment when parsing check_in URLs ([#803](https://github.com/honeybadger-io/honeybadger-ruby/issues/803)) ([229bbd2](https://github.com/honeybadger-io/honeybadger-ruby/commit/229bbd2895475c44180d71df64bc848ca130afe9))
+* remove Sidekiq server configuration from payloads ([#768](https://github.com/honeybadger-io/honeybadger-ruby/issues/768)) ([2425c6b](https://github.com/honeybadger-io/honeybadger-ruby/commit/2425c6b9917fd63f66c5c9562ea9b76d4e4d1f24)), closes [#767](https://github.com/honeybadger-io/honeybadger-ruby/issues/767)
+
 ## [6.5.4](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.3...v6.5.4) (2026-04-06)
 
 
