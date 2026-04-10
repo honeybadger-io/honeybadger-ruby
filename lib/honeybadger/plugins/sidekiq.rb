@@ -91,7 +91,7 @@ module Honeybadger
 
                   job_retry = job["retry".freeze]
 
-                  threshold = (job["honeybadger_attempt_threshold"] || config[:"sidekiq.attempt_threshold"]).to_i
+                  threshold = (job["honeybadger_attempt_threshold".freeze] || config[:"sidekiq.attempt_threshold"]).to_i
                   if threshold > 0 && job_retry
                     # We calculate the job attempts to determine the need to
                     # skip. Sidekiq's first job execution will have nil for the
