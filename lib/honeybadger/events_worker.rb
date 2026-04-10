@@ -137,14 +137,12 @@ module Honeybadger
     def kill!
       d { 'killing worker thread' }
 
-      current_thread = ::Thread.current
-
-      if timeout_thread && timeout_thread != current_thread
+      if timeout_thread
         Thread.kill(timeout_thread)
         timeout_thread.join # Allow ensure blocks to execute.
       end
 
-      if thread && thread != current_thread
+      if thread
         Thread.kill(thread)
         thread.join # Allow ensure blocks to execute.
       end
