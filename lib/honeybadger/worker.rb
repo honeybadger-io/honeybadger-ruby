@@ -127,7 +127,7 @@ module Honeybadger
     def kill!
       d { "killing worker thread" }
 
-      if thread
+      if thread && thread != ::Thread.current
         Thread.kill(thread)
         thread.join # Allow ensure blocks to execute.
       end
