@@ -14,7 +14,8 @@ module Honeybadger
         rescue => e
           per_job = begin
             job.class.honeybadger_attempt_threshold if job.class.respond_to?(:honeybadger_attempt_threshold)
-          rescue
+          rescue => threshold_error
+            Honeybadger.config.logger.error("Error reading honeybadger_attempt_threshold from #{job.class}: #{threshold_error}")
             nil
           end
           threshold = (per_job.nil? ? Honeybadger.config[:"active_job.attempt_threshold"] : per_job).to_i
