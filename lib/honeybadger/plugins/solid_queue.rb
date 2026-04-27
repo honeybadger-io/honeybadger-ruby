@@ -19,7 +19,7 @@ module Honeybadger
           data[:queues] = {}
 
           ::SolidQueue::Queue.all.each do |queue|
-            data[:queues][queue.name] = {depth: queue.size}
+            data[:queues][queue.name] = {depth: queue.size, latency: queue.latency}
           end
 
           data

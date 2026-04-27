@@ -89,7 +89,7 @@ describe "SolidQueue Dependency" do
         let(:where_chain) { double("where_chain", not: finished_jobs) }
         let(:job) { double("Job") }
         let(:process) { double("Process") }
-        let(:queue) { double("Queue", name: "default", size: 10) }
+        let(:queue) { double("Queue", name: "default", size: 10, latency: 42) }
 
         before do
           supervisor_result = supervisor
@@ -125,6 +125,8 @@ describe "SolidQueue Dependency" do
           expect(::SolidQueue::Job).to receive(:where).with(no_args).and_return(where_chain)
           expect(where_chain).to receive(:not).with(finished_at: nil).and_return(finished_jobs)
           expect(::SolidQueue::Queue).to receive(:all).and_return([queue])
+          expect(queue).to receive(:size).and_return(10)
+          expect(queue).to receive(:latency).and_return(42)
 
           Honeybadger::Plugin.instances[:solid_queue].collectors.each do |options, collect_block|
             Honeybadger::Plugin::CollectorExecution.new("solid_queue", config, options, &collect_block).call
