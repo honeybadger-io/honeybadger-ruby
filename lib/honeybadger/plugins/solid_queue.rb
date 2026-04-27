@@ -2,8 +2,7 @@ module Honeybadger
   module Plugins
     module SolidQueue
       Plugin.register :solid_queue do
-        requirement { config.load_plugin_insights?(:solid_queue) && defined?(::SolidQueue) }
-        requirement { defined?(ActiveRecord::Base) && ActiveRecord::Base.connected? }
+        requirement { config.load_plugin_insights?(:solid_queue) && defined?(::SolidQueue) && defined?(ActiveRecord::Base) }
 
         collect_solid_queue_stats = -> do
           data = {}
@@ -20,14 +19,14 @@ module Honeybadger
           data[:queues] = {}
 
           ::SolidQueue::Queue.all.each do |queue|
-            data[:queues][queue.name] = {depth: queue.size}
+            data[:queues][queue.name] = {depth: queue.size, latency: queue.latency}
           end
 
           data
         end
 
         collect do
-          if config.cluster_collection?(:solid_queue)
+          if ::SolidQueue.supervisor? && ActiveRecord::Base.connected? && config.cluster_collection?(:solid_queue)
             stats = collect_solid_queue_stats.call
 
             if Honeybadger.config.load_plugin_insights?(:solid_queue, feature: :events)
