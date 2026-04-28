@@ -1,6 +1,25 @@
 # Change Log
 
 
+## [5.30.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.29.1...v5.30.0) (2026-04-28)
+
+Backport of Insights improvements from master ([#808](https://github.com/honeybadger-io/honeybadger-ruby/pull/808)).
+
+### Features
+* send Flipper events to Insights
+* attach environment to Insights event payloads
+* add cached attribute to ActiveRecordSubscriber
+
+### Bug Fixes
+* allow jobs in Active Job subscriber payloads
+* prevent thread leak in EventsWorker#kill!
+* reduce Insights logging
+* log fewer 429 responses in events worker
+* replace `return` with `next` in execution blocks to prevent LocalJumpError
+
+### Performance
+* ignore cache_* ActiveSupport events by default
+
 ## [5.29.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v5.29.0...v5.29.1) (2025-07-01)
 
 
