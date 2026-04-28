@@ -36,7 +36,13 @@ module Honeybadger
       { event_type: 'sql.active_record', query: /^(begin|commit)( immediate)?( transaction)?$/i },
       { event_type: 'sql.active_record', query: /(solid_queue|good_job)/i },
       { event_type: 'sql.active_record', name: /^GoodJob/ },
-      { event_type: 'process_action.action_controller', controller: 'Rails::HealthController' }
+      { event_type: 'process_action.action_controller', controller: 'Rails::HealthController' },
+      { event_type: 'cache_exist?.active_support' },
+      { event_type: 'cache_write.active_support' },
+      { event_type: 'cache_generate.active_support' },
+      { event_type: 'cache_delete.active_support' },
+      { event_type: 'cache_increment.active_support' },
+      { event_type: 'cache_decrement.active_support' }
     ].freeze
 
     DEVELOPMENT_ENVIRONMENTS = ['development', 'test', 'cucumber'].map(&:freeze).freeze
@@ -116,6 +122,11 @@ module Honeybadger
       },
       :'events.attach_hostname' => {
         description: 'Add the hostname to all event paylaods.',
+        default: true,
+        type: Boolean
+      },
+      :'events.attach_environment' => {
+        description: 'Add the environment to all event payloads.',
         default: true,
         type: Boolean
       },
@@ -520,6 +531,11 @@ module Honeybadger
       :'autotuner.insights.metrics' => {
         description: 'Enable automatic metric data aggregation for Autotuner stats.',
         default: false,
+        type: Boolean
+      },
+      :'flipper.insights.enabled' => {
+        description: 'Enable automatic data collection for Flipper.',
+        default: true,
         type: Boolean
       }
     }.freeze
