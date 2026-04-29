@@ -50,11 +50,14 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
     logger = Logger.new(nil)
     logger.extend(Honeybadger::Breadcrumbs::LogWrapper)
 
-    bad = Class.new { def to_s; nil; end }.new
+    bad = Class.new do
+      def to_s
+        nil
+      end
+    end.new
 
     expect { logger.add(Logger::ERROR, bad) }.not_to raise_error
   end
-
 
   describe "ignores messages on" do
     before { expect(Honeybadger).to_not receive(:add_breadcrumb) }
@@ -76,5 +79,77 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
       subject.add("test", "a message")
       Thread.current[:__hb_within_log_subscriber] = false
     end
+
+    it "within broadcast logger call" do
+      Thread.current[:__hb_within_broadcast_logger] = true
+      subject.add("test", "a message")
+      Thread.current[:__hb_within_broadcast_logger] = false
+    end
+  end
+end
+
+describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
+  let(:sink_logger) do
+    Class.new do
+      prepend Honeybadger::Breadcrumbs::LogWrapper
+
+      attr_reader :entries
+
+      def initialize
+        @entries = []
+      end
+
+      def add(severity, message = nil, progname = nil)
+        @entries << [severity, message, progname]
+        true
+      end
+
+      def format_severity(str)
+        str
+      end
+    end
+  end
+
+  let(:broadcast_logger) do
+    Class.new do
+      prepend Honeybadger::Breadcrumbs::BroadcastLogWrapper
+
+      def initialize(*loggers)
+        @loggers = loggers
+      end
+
+      def add(*args, &block)
+        @loggers.each { |logger| logger.add(*args, &block) }
+        true
+      end
+
+      def info(message = nil, &block)
+        @loggers.each { |logger| logger.add(::Logger::INFO, nil, message, &block) }
+        true
+      end
+    end
+  end
+
+  let(:first_sink) { sink_logger.new }
+  let(:second_sink) { sink_logger.new }
+
+  before { Thread.current[:__hb_within_broadcast_logger] = nil }
+  after { Thread.current[:__hb_within_broadcast_logger] = nil }
+
+  subject { broadcast_logger.new(first_sink, second_sink) }
+
+  it "adds one breadcrumb for one broadcast log event" do
+    expect(Honeybadger).to receive(:add_breadcrumb).once.with("Message", hash_including(category: :log, metadata: hash_including(severity: "INFO", progname: nil)))
+
+    subject.info("Message")
+
+    expect(first_sink.entries).to eq([[::Logger::INFO, nil, "Message"]])
+    expect(second_sink.entries).to eq([[::Logger::INFO, nil, "Message"]])
+  end
+
+  it "restores the broadcast logger thread flag" do
+    subject.info("Message")
+
+    expect(Thread.current[:__hb_within_broadcast_logger]).to be_nil
   end
 end
