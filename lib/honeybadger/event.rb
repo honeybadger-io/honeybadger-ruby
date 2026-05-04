@@ -24,7 +24,7 @@ module Honeybadger
         @payload = payload
       elsif event_type_or_payload.is_a?(Hash)
         @event_type = event_type_or_payload[:event_type] || event_type_or_payload["event_type"]
-        @payload = event_type_or_payload
+        @payload = payload.merge(event_type_or_payload)
       end
 
       @ts = payload[:ts] || Time.now.utc.strftime("%FT%T.%LZ")

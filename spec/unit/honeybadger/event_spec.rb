@@ -24,6 +24,33 @@ describe Honeybadger::Event do
       its(:event_type) { should eq "action" }
       its(:payload) { should eq({event_type: "action"}) }
     end
+
+    context "event_type is passed as a Hash with a second payload argument" do
+      subject { described_class.new(event_type_or_payload, payload) }
+
+      let(:event_type_or_payload) { {event_type: "action", caller_key: "caller"} }
+      let(:payload) { {environment: "production", hostname: "host"} }
+
+      its(:event_type) { should eq "action" }
+
+      it "merges the second payload into the first, with the first winning on conflicts" do
+        expect(subject.payload).to eq({
+          event_type: "action",
+          caller_key: "caller",
+          environment: "production",
+          hostname: "host"
+        })
+      end
+
+      context "when the same key appears in both arguments" do
+        let(:event_type_or_payload) { {event_type: "action", environment: "staging"} }
+        let(:payload) { {environment: "production"} }
+
+        it "the first argument takes precedence" do
+          expect(subject.payload[:environment]).to eq("staging")
+        end
+      end
+    end
   end
 
   describe "ts" do
