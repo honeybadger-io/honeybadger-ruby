@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.5.6](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.5...v6.5.6) (2026-05-04)
+
+
+### Bug Fixes
+
+* attach environment and hostname to metric events ([#815](https://github.com/honeybadger-io/honeybadger-ruby/issues/815)) ([0762115](https://github.com/honeybadger-io/honeybadger-ruby/commit/0762115e6f396e4d2d5389394c845b75dc1796c8))
+
 ## [6.5.5](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.4...v6.5.5) (2026-04-08)
 
 
