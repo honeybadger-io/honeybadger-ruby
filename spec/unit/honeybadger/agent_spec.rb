@@ -904,6 +904,21 @@ describe Honeybadger::Agent do
         subject.event("test_event", some_data: "is here")
       end
     end
+
+    context "when called with a single Hash payload (as metrics do)" do
+      let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, env: "production", hostname: "test-host") }
+
+      it "still attaches environment and hostname to the payload" do
+        expect(events_worker).to receive(:push) do |msg|
+          expect(msg[:environment]).to eq("production")
+          expect(msg[:hostname]).to eq("test-host")
+          expect(msg[:event_type]).to eq("metric.hb")
+          expect(msg[:metric_name]).to eq("duration.process_action.action_controller")
+        end
+
+        subject.event(event_type: "metric.hb", metric_name: "duration.process_action.action_controller", interval: 60)
+      end
+    end
   end
 
   context "#collect" do
