@@ -33,7 +33,7 @@ module Honeybadger
 
     IGNORE_EVENTS_DEFAULT = [
       {event_type: "sql.active_record", query: /^(begin|commit)( immediate)?( transaction)?$/i},
-      {event_type: "sql.active_record", query: /(solid_queue|good_job)/i},
+      {event_type: "sql.active_record", query: /(solid_queue|good_job|solid_cable_messages)/i},
       {event_type: "sql.active_record", name: /^GoodJob/},
       {event_type: "process_action.action_controller", controller: "Rails::HealthController"},
       {event_type: "cache_read.active_support"},
