@@ -602,6 +602,16 @@ describe Honeybadger::Agent do
         end
       end
 
+      context "by default ignores solid_cable_messages processor sql events" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { {query: 'SELECT * FROM "solid_cable_messages"'} }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
       context "override default ignores" do
         let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER, backend: :debug, "events.ignore_only": ignore_only) }
         let(:ignore_only) { [] }
