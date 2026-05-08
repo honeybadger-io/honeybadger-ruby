@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.6.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.6...v6.6.0) (2026-05-08)
+
+
+### Features
+
+* ignore solid_cable_messages queries ([#817](https://github.com/honeybadger-io/honeybadger-ruby/issues/817)) ([5292bb6](https://github.com/honeybadger-io/honeybadger-ruby/commit/5292bb6002fb48bb6d427bdc33767358e933417c))
+
 ## [6.5.6](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.5...v6.5.6) (2026-05-04)
 
 
