@@ -8,6 +8,13 @@
 
 * change logging level for messages emitted in the development environment ([b615c83](https://github.com/honeybadger-io/honeybadger-ruby/commit/b615c83a75b8fcb45cd8b775696a6231e5c4e107))
 
+## [6.6.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.6.0...v6.6.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* change logging level for messages emitted in the development environment ([b615c83](https://github.com/honeybadger-io/honeybadger-ruby/commit/b615c83a75b8fcb45cd8b775696a6231e5c4e107))
+
 ## [6.6.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.5.6...v6.6.0) (2026-05-08)
 
 
