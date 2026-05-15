@@ -305,7 +305,7 @@ module Honeybadger
           debug { sprintf("Success ⚡ Insights Event sent code=%s", response.code) }
         end
       when :stubbed
-        info { "Success ⚡ Development mode is enabled; This event will be sent after app is deployed." }
+        debug { "Success ⚡ Development mode is enabled; This event will be sent after app is deployed." }
       when :error
         warn { sprintf("Insights Event send failed: an unknown error occurred. code=%s error=%s", response.code, response.message.to_s.dump) }
       else

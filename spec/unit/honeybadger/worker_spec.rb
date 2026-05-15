@@ -386,5 +386,17 @@ describe Honeybadger::Worker do
         handle_response
       end
     end
+
+    context "when stubbed" do
+      let(:response) { Honeybadger::Backend::Response.new(:stubbed) }
+
+      it "logs at debug level" do
+        allow(config.logger).to receive(:debug)
+        allow(config.logger).to receive(:info)
+        handle_response
+        expect(config.logger).to have_received(:debug).with(/Development mode is enabled/)
+        expect(config.logger).not_to have_received(:info)
+      end
+    end
   end
 end
