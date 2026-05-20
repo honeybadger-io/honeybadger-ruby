@@ -156,4 +156,10 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
 
     expect(Thread.current[:__hb_within_broadcast_logger]).to be_nil
   end
+
+  it "labels severity using the constant fallback when format_severity is undefined" do
+    expect(Honeybadger).to receive(:add_breadcrumb).with("msg", hash_including(metadata: hash_including(severity: "WARN")))
+
+    subject.add(::Logger::WARN, "msg")
+  end
 end
