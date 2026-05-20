@@ -104,6 +104,10 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
         true
       end
 
+      def info(message = nil, &block)
+        add(::Logger::INFO, nil, message, &block)
+      end
+
       def format_severity(str)
         str
       end
@@ -124,7 +128,7 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
       end
 
       def info(message = nil, &block)
-        @loggers.each { |logger| logger.add(::Logger::INFO, nil, message, &block) }
+        @loggers.each { |logger| logger.info(message, &block) }
         true
       end
     end
