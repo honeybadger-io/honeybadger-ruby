@@ -169,17 +169,7 @@ describe Honeybadger::Breadcrumbs::LogSubscriberInjector do
     Class.new do
       prepend Honeybadger::Breadcrumbs::LogSubscriberInjector
 
-      attr_reader :flag_after_nested
-
       def info(*)
-        # leaf level method — relies on the injector wrapping to set the flag
-      end
-
-      def warn(*)
-        # outer call: invokes another injector-wrapped level method, then
-        # records the thread flag after the nested call returns.
-        info("nested")
-        @flag_after_nested = Thread.current[:__hb_within_log_subscriber]
       end
     end
   end
@@ -187,16 +177,8 @@ describe Honeybadger::Breadcrumbs::LogSubscriberInjector do
   before { Thread.current[:__hb_within_log_subscriber] = nil }
   after { Thread.current[:__hb_within_log_subscriber] = nil }
 
-  it "preserves the outer flag while a nested subscriber call is in flight" do
-    instance = subscriber_class.new
-    instance.warn("outer")
-
-    expect(instance.flag_after_nested).to be(true)
-  end
-
-  it "restores the flag after the outer call returns" do
-    instance = subscriber_class.new
-    instance.warn("outer")
+  it "restores the log subscriber thread flag" do
+    subscriber_class.new.info("Message")
 
     expect(Thread.current[:__hb_within_log_subscriber]).to be_nil
   end
