@@ -104,6 +104,10 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
         true
       end
 
+      def info(message = nil, &block)
+        add(::Logger::INFO, nil, message, &block)
+      end
+
       def format_severity(str)
         str
       end
@@ -124,7 +128,7 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
       end
 
       def info(message = nil, &block)
-        @loggers.each { |logger| logger.add(::Logger::INFO, nil, message, &block) }
+        @loggers.each { |logger| logger.info(message, &block) }
         true
       end
     end
@@ -151,5 +155,31 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
     subject.info("Message")
 
     expect(Thread.current[:__hb_within_broadcast_logger]).to be_nil
+  end
+
+  it "labels severity using the constant fallback when format_severity is undefined" do
+    expect(Honeybadger).to receive(:add_breadcrumb).with("msg", hash_including(metadata: hash_including(severity: "WARN")))
+
+    subject.add(::Logger::WARN, "msg")
+  end
+end
+
+describe Honeybadger::Breadcrumbs::LogSubscriberInjector do
+  let(:subscriber_class) do
+    Class.new do
+      prepend Honeybadger::Breadcrumbs::LogSubscriberInjector
+
+      def info(*)
+      end
+    end
+  end
+
+  before { Thread.current[:__hb_within_log_subscriber] = nil }
+  after { Thread.current[:__hb_within_log_subscriber] = nil }
+
+  it "restores the log subscriber thread flag" do
+    subscriber_class.new.info("Message")
+
+    expect(Thread.current[:__hb_within_log_subscriber]).to be_nil
   end
 end

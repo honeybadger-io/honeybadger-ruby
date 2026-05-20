@@ -33,9 +33,7 @@ module Honeybadger
       end
 
       def log_severity_label(severity)
-        if self.class.method_defined?(:format_severity) || self.class.private_method_defined?(:format_severity)
-          return format_severity(severity)
-        end
+        return format_severity(severity) if respond_to?(:format_severity, true)
 
         LOG_SEVERITY_LABELS.fetch(severity, severity)
       end
@@ -111,10 +109,11 @@ module Honeybadger
     module LogSubscriberInjector
       %w[info debug warn error fatal unknown].each do |level|
         define_method(level) do |*args, &block|
+          previous = Thread.current[:__hb_within_log_subscriber]
           Thread.current[:__hb_within_log_subscriber] = true
           super(*args, &block)
         ensure
-          Thread.current[:__hb_within_log_subscriber] = false
+          Thread.current[:__hb_within_log_subscriber] = previous
         end
       end
     end

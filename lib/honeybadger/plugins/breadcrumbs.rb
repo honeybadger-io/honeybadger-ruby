@@ -50,8 +50,11 @@ module Honeybadger
           config[:"breadcrumbs.active_support_notifications"].each do |name, config|
             RailsBreadcrumbs.subscribe_to_notification(name, config)
           end
-          ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector) if config[:"breadcrumbs.logging.enabled"]
-          ActiveSupport::BroadcastLogger.prepend(Honeybadger::Breadcrumbs::BroadcastLogWrapper) if config[:"breadcrumbs.logging.enabled"] && defined?(ActiveSupport::BroadcastLogger)
+
+          if config[:"breadcrumbs.logging.enabled"]
+            ActiveSupport::LogSubscriber.prepend(Honeybadger::Breadcrumbs::LogSubscriberInjector)
+            ActiveSupport::BroadcastLogger.prepend(Honeybadger::Breadcrumbs::BroadcastLogWrapper) if defined?(ActiveSupport::BroadcastLogger)
+          end
         end
 
         ::Logger.prepend(Honeybadger::Breadcrumbs::LogWrapper) if config[:"breadcrumbs.logging.enabled"]
