@@ -19,9 +19,12 @@ describe Honeybadger::Breadcrumbs::LogSubscriberInjector do
 
   subject { logger.new }
 
-  it "resets __hb_within_log_subscriber to false" do
+  before { Thread.current[:__hb_within_log_subscriber] = nil }
+  after { Thread.current[:__hb_within_log_subscriber] = nil }
+
+  it "restores __hb_within_log_subscriber to its prior value" do
     subject.info "test"
-    expect(Thread.current[:__hb_within_log_subscriber]).to eq(false)
+    expect(Thread.current[:__hb_within_log_subscriber]).to be_nil
   end
 
   it "works when message is a string" do

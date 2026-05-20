@@ -163,23 +163,3 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
     subject.add(::Logger::WARN, "msg")
   end
 end
-
-describe Honeybadger::Breadcrumbs::LogSubscriberInjector do
-  let(:subscriber_class) do
-    Class.new do
-      prepend Honeybadger::Breadcrumbs::LogSubscriberInjector
-
-      def info(*)
-      end
-    end
-  end
-
-  before { Thread.current[:__hb_within_log_subscriber] = nil }
-  after { Thread.current[:__hb_within_log_subscriber] = nil }
-
-  it "restores the log subscriber thread flag" do
-    subscriber_class.new.info("Message")
-
-    expect(Thread.current[:__hb_within_log_subscriber]).to be_nil
-  end
-end
