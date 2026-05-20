@@ -113,7 +113,7 @@ module Honeybadger
           Thread.current[:__hb_within_log_subscriber] = true
           super(*args, &block)
         ensure
-          Thread.current[:__hb_within_log_subscriber] = previous.nil? ? false : previous
+          Thread.current[:__hb_within_log_subscriber] = previous
         end
       end
     end
