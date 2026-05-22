@@ -10,6 +10,19 @@ describe "Breadcrumbs Plugin" do
     stub_const("ActiveSupport::Notifications", active_support)
   end
 
+  describe ".load!" do
+    it "prepends the broadcast logger wrapper when BroadcastLogger is available" do
+      stub_const("Rails", double(application: true))
+      stub_const("ActiveSupport::LogSubscriber", Class.new)
+      stub_const("ActiveSupport::BroadcastLogger", Class.new)
+      allow(active_support).to receive(:subscribe)
+
+      Honeybadger::Plugin.instances[:breadcrumbs].load!(config)
+
+      expect(ActiveSupport::BroadcastLogger.ancestors).to include(Honeybadger::Breadcrumbs::BroadcastLogWrapper)
+    end
+  end
+
   describe Honeybadger::Plugins::RailsBreadcrumbs do
     describe ".subscribe_to_notification" do
       let(:name) { "a.notification" }
