@@ -121,6 +121,59 @@ describe "Sidekiq Dependency" do
             end
           end
 
+          context "when a per-job honeybadger_attempt_threshold is set" do
+            let(:job) { {"retry" => retry_config, "retry_count" => (attempt == 1) ? nil : attempt - 1, "honeybadger_attempt_threshold" => 5} }
+
+            context "and the attempt is below the per-job threshold" do
+              let(:attempt) { 3 }
+
+              it "doesn't notify Honeybadger" do
+                expect(Honeybadger).not_to receive(:notify)
+                sidekiq.error_handlers[0].call(exception, job_context)
+              end
+            end
+
+            context "and the attempt meets the per-job threshold" do
+              let(:attempt) { 5 }
+
+              it "notifies Honeybadger" do
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
+                sidekiq.error_handlers[0].call(exception, job_context)
+              end
+            end
+
+            context "and a global threshold is also configured" do
+              let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "sidekiq.attempt_threshold": 3) }
+              let(:attempt) { 3 }
+
+              it "uses the per-job threshold instead of the global config" do
+                expect(Honeybadger).not_to receive(:notify)
+                sidekiq.error_handlers[0].call(exception, job_context)
+              end
+            end
+
+            context "and the per-job threshold is 0" do
+              let(:job) { {"retry" => retry_config, "retry_count" => (attempt == 1) ? nil : attempt - 1, "honeybadger_attempt_threshold" => 0} }
+              let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "sidekiq.attempt_threshold": 3) }
+              let(:attempt) { 1 }
+
+              it "notifies on every attempt" do
+                expect(Honeybadger).to receive(:notify).with(exception, parameters: job_context, component: nil).once
+                sidekiq.error_handlers[0].call(exception, job_context)
+              end
+            end
+          end
+
+          context "when honeybadger_attempt_threshold is not in the job hash" do
+            let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "sidekiq.attempt_threshold": 3) }
+            let(:attempt) { 1 }
+
+            it "falls back to the global config" do
+              expect(Honeybadger).not_to receive(:notify)
+              sidekiq.error_handlers[0].call(exception, job_context)
+            end
+          end
+
           context "when the class info is present" do
             let(:job) { {"class" => "HardWorker"} }
 
