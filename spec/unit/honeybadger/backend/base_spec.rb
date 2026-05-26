@@ -7,6 +7,24 @@ describe Honeybadger::Backend::Response do
     its(:error) { should be_nil }
   end
 
+  describe "#error_message" do
+    context "when code is 403 and body contains a JSON error" do
+      let(:response) { described_class.new(403, %({"error":"api key denied: Quota exceeded"}\n)) }
+
+      it "returns the server error" do
+        expect(response.error_message).to eq("api key denied: Quota exceeded")
+      end
+    end
+
+    context "when code is 403 and body is not valid JSON" do
+      let(:response) { described_class.new(403, "Forbidden") }
+
+      it "falls back to the friendly 403 error" do
+        expect(response.error_message).to match(/API key is invalid/i)
+      end
+    end
+  end
+
   context "when unsuccessful" do
     subject { described_class.new(403, body) }
 
