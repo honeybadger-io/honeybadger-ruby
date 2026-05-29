@@ -221,7 +221,7 @@ module Honeybadger
         warn { sprintf("Error report failed: payment is required. id=%s code=%s", msg.id, response.code) }
         suspend(3600)
       when 403
-        warn { sprintf("Error report failed: API key is invalid. id=%s code=%s", msg.id, response.code) }
+        warn { sprintf("Error report failed: %s id=%s code=%s", response.error_message, msg.id, response.code) }
         suspend(3600)
       when 413
         warn { sprintf("Error report failed: Payload is too large. id=%s code=%s", msg.id, response.code) }

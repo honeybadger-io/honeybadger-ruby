@@ -50,6 +50,7 @@ module Honeybadger
 
       def error_message
         return message if code == :error
+        return error if code == 403 && NOT_BLANK.match?(error)
         return FRIENDLY_ERRORS[code] if FRIENDLY_ERRORS[code]
         return error if NOT_BLANK.match?(error)
         msg = "The server responded with #{code}"

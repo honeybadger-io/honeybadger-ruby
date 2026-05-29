@@ -294,7 +294,7 @@ module Honeybadger
         warn { sprintf("Insights Event send failed: payment is required. code=%s", response.code) }
         suspend(3600)
       when 403
-        warn { sprintf("Insights Event send failed: API key is invalid. code=%s", response.code) }
+        warn { sprintf("Insights Event send failed: %s code=%s", response.error_message, response.code) }
         suspend(3600)
       when 413
         warn { sprintf("Insights Event send failed: Payload is too large. code=%s", response.code) }

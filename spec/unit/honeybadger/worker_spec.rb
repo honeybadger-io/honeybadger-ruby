@@ -332,7 +332,7 @@ describe Honeybadger::Worker do
       end
 
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/invalid/)
+        expect(config.logger).to receive(:warn).with(/unauthorized/)
         handle_response
       end
     end
