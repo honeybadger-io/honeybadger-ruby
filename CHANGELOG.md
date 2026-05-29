@@ -1,6 +1,15 @@
 # Change Log
 
 
+## [6.6.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.6.0...v6.6.1) (2026-05-29)
+
+
+### Bug Fixes
+
+* avoid duplicate BroadcastLogger breadcrumbs ([#814](https://github.com/honeybadger-io/honeybadger-ruby/issues/814)) ([4f5c5e0](https://github.com/honeybadger-io/honeybadger-ruby/commit/4f5c5e0dad934cc6a96f6444e257b733fd6471cf)), closes [#765](https://github.com/honeybadger-io/honeybadger-ruby/issues/765)
+* change logging level for messages emitted in the development environment ([b615c83](https://github.com/honeybadger-io/honeybadger-ruby/commit/b615c83a75b8fcb45cd8b775696a6231e5c4e107))
+* log the real reason for 403 responses ([#822](https://github.com/honeybadger-io/honeybadger-ruby/issues/822)) ([0338892](https://github.com/honeybadger-io/honeybadger-ruby/commit/03388926bb0cbb22f647860437565abf5bafd526))
+
 ## [6.6.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.6.0...v6.6.1) (2026-05-15)
 
 
