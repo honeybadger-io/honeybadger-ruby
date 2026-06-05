@@ -89,21 +89,61 @@ module Honeybadger
       def before_notify(action = nil, &block)
         hooks = Array(get(:before_notify)).dup
 
-        if action && validate_before_action(action, "notify")
+        if action && validate_hook_action(action, "before notify", 1)
           hooks << action
-        elsif block_given? && validate_before_action(block, "notify")
+        elsif block_given? && validate_hook_action(block, "before notify", 1)
           hooks << block
         end
 
         hash[:before_notify] = hooks
       end
 
+      # Run a hook after each error notice delivery attempt.
+      #
+      # The hook is called for every backend response, including successful
+      # deliveries. Response codes are usually HTTP status integers, but may be
+      # symbols such as :stubbed or :error for non-server backends or connection
+      # failures. Filter with exact response codes (e.g. `response.code == 413`)
+      # rather than broad integer comparisons, or use `response.success?`.
+      # (Note: `response.error_message` may raise for non-HTTP responses like `:stubbed`.)
+      #
+      # Prefer `Honeybadger.event` for reporting failed notice deliveries. Calling
+      # `Honeybadger.notify` from this hook can trigger another after_notify call;
+      # guard against self-reporting loops if a notice must be sent.
+      #
+      # @example Report oversized notice payloads
+      #   config.after_notify do |notice, response|
+      #     next unless response.code == 413
+      #
+      #     Honeybadger.event("honeybadger.notice_rejected", {
+      #       reason: "payload_too_large",
+      #       notice_id: notice.id,
+      #       payload_bytes: notice.to_json.bytesize
+      #     })
+      #   end
+      #
+      # @yieldparam notice [Honeybadger::Notice] The notice that was sent.
+      # @yieldparam response [Honeybadger::Backend::Response] The backend response.
+      # @return [Array<Proc>] configured hooks
+      # @api public
+      def after_notify(action = nil, &block)
+        hooks = Array(get(:after_notify)).dup
+
+        if action && validate_hook_action(action, "after notify", 2)
+          hooks << action
+        elsif block_given? && validate_hook_action(block, "after notify", 2)
+          hooks << block
+        end
+
+        hash[:after_notify] = hooks
+      end
+
       def before_event(action = nil, &block)
         hooks = Array(get(:before_event)).dup
 
-        if action && validate_before_action(action, "event")
+        if action && validate_hook_action(action, "before event", 1)
           hooks << action
-        elsif block_given? && validate_before_action(block, "event")
+        elsif block_given? && validate_hook_action(block, "before event", 1)
           hooks << block
         end
 
@@ -139,18 +179,18 @@ module Honeybadger
 
       private
 
-      def validate_before_action(action, type)
+      def validate_hook_action(action, name, arity)
         if !action.respond_to?(:call)
           logger.warn(
-            "You attempted to add a before #{type} hook that does not respond " \
+            "You attempted to add a #{name} hook that does not respond " \
             "to #call. We are discarding this hook so your intended behavior " \
             "will not occur."
           )
           false
-        elsif action.arity != 1
+        elsif action.arity != arity
           logger.warn(
-            "You attempted to add a before #{type} hook that has an arity " \
-            "other than one. We are discarding this hook so your intended " \
+            "You attempted to add a #{name} hook that has an arity " \
+            "other than #{arity}. We are discarding this hook so your intended " \
             "behavior will not occur."
           )
           false

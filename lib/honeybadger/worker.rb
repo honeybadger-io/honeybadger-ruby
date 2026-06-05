@@ -46,7 +46,9 @@ module Honeybadger
     end
 
     def send_now(msg)
-      handle_response(msg, notify_backend(msg))
+      response = notify_backend(msg)
+      run_after_notify_hooks(msg, response)
+      handle_response(msg, response)
     end
 
     def shutdown(force = false)
@@ -187,6 +189,21 @@ module Honeybadger
     def notify_backend(payload)
       d { sprintf("worker notifying backend id=%s", payload.id) }
       backend.notify(:notices, payload)
+    end
+
+    def run_after_notify_hooks(msg, response)
+      config.after_notify_hooks.each do |hook|
+        with_error_handling { hook.call(msg, response) }
+      end
+    end
+
+    def with_error_handling
+      yield
+    rescue => ex
+      error {
+        msg = "Rescued an error in an after notify hook class=%s message=%s\n\t%s"
+        sprintf(msg, ex.class, ex.message.dump, Array(ex.backtrace).join("\n\t"))
+      }
     end
 
     def calc_throttle_interval

@@ -115,6 +115,50 @@ describe Honeybadger::Config::Ruby do
     end
   end
 
+  describe "#after_notify" do
+    it "adds a block as an after hook" do
+      block = ->(_notice, _response) {}
+
+      subject.after_notify(&block)
+
+      expect(subject.to_hash).to eq(after_notify: [block])
+    end
+
+    it "adds a callable as an after hook" do
+      callable = ->(_notice, _response) {}
+
+      subject.after_notify(callable)
+
+      expect(subject.to_hash).to eq(after_notify: [callable])
+    end
+
+    it "gives access to the after hooks when passed nothing" do
+      expect(subject.after_notify).to eq([])
+
+      callable = ->(_notice, _response) {}
+      subject.after_notify(callable)
+
+      expect(subject.after_notify).to eq([callable])
+    end
+
+    it "configures multiple hooks" do
+      subject.after_notify { |n, r| [n, r] }
+      subject.after_notify { |n, r| [n, r] }
+
+      expect(subject.after_notify.size).to eq(2)
+    end
+
+    it "rejects hooks with invalid arity" do
+      hook = ->(_notice) {}
+      allow(config.logger).to receive(:warn)
+
+      subject.after_notify(hook)
+
+      expect(config.logger).to have_received(:warn).with(/arity other than 2/)
+      expect(subject.after_notify).to eq([])
+    end
+  end
+
   describe "#exception_filter" do
     it "assigns the exception_filter" do
       block = -> {}
