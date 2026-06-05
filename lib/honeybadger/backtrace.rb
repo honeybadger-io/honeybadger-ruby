@@ -4,7 +4,6 @@ module Honeybadger
   # @api private
   # Front end to parsing the backtrace for each notice.
   class Backtrace
-    # Keep in sync with the exceptions.backtrace_limit config default.
     DEFAULT_LIMIT = 1000
 
     # Handles backtrace parsing line by line.

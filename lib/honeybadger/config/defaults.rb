@@ -1,5 +1,6 @@
 require "socket"
 require "honeybadger/breadcrumbs/active_support"
+require "honeybadger/backtrace"
 
 module Honeybadger
   class Config
@@ -323,7 +324,7 @@ module Honeybadger
       },
       "exceptions.backtrace_limit": {
         description: "The maximum number of backtrace lines to include in error reports.",
-        default: 1000,
+        default: Backtrace::DEFAULT_LIMIT,
         type: Integer
       },
       "exceptions.local_variables": {
