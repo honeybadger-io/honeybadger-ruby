@@ -259,6 +259,12 @@ describe Honeybadger::Backtrace do
     expect(backtrace.to_a).to eq([])
   end
 
+  it "falls back to the default limit when the limit is nil" do
+    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array(1001), limit: nil)
+
+    expect(backtrace.to_a.length).to eq(1000)
+  end
+
   it "generates json from to_array template" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
     array = [{"foo" => "bar"}]

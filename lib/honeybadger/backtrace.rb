@@ -130,7 +130,7 @@ module Honeybadger
     def initialize(lines, limit = DEFAULT_LIMIT)
       self.lines = lines
       self.application_lines = lines.select(&:application?)
-      self.limit = limit
+      self.limit = limit || DEFAULT_LIMIT
     end
 
     # Convert Backtrace to arry.
