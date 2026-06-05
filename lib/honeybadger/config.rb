@@ -92,6 +92,10 @@ module Honeybadger
       (ruby[:before_notify] || []).clone
     end
 
+    def after_notify_hooks
+      (ruby[:after_notify] || []).clone
+    end
+
     def before_event_hooks
       (ruby[:before_event] || []).clone
     end

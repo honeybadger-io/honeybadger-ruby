@@ -362,6 +362,18 @@ describe Honeybadger::Config do
       expect(subject.before_notify_hooks.size).to eq(2)
     end
 
+    it "configures multiple after_notify hooks" do
+      subject.configure do |config|
+        config.after_notify { |n, r| [n, r] }
+      end
+
+      subject.configure do |config|
+        config.after_notify { |n, r| [n, r] }
+      end
+
+      expect(subject.after_notify_hooks.size).to eq(2)
+    end
+
     it "only responds to methods that correspond to default keys" do
       known_key_response = nil
       unknown_key_response = nil

@@ -134,6 +134,62 @@ describe Honeybadger::Worker do
     end
   end
 
+  describe "#send_now" do
+    let(:response) { Honeybadger::Backend::Response.new(413, %({"error":"Payload exceeds maximum size"})) }
+
+    it "calls after_notify hooks with the notice and response" do
+      hook = spy("after notify hook", arity: 2)
+      config.configure { |config| config.after_notify(hook) }
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(response)
+
+      instance.send_now(obj)
+
+      expect(hook).to have_received(:call).with(obj, response)
+    end
+
+    it "calls after_notify hooks for successful responses" do
+      response = Honeybadger::Backend::Response.new(201)
+      hook = spy("after notify hook", arity: 2)
+      config.configure { |config| config.after_notify(hook) }
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(response)
+
+      instance.send_now(obj)
+
+      expect(hook).to have_received(:call).with(obj, response)
+    end
+
+    it "handles the response after calling after_notify hooks" do
+      config.configure do |config|
+        config.after_notify { |_notice, _response| expect(instance).not_to have_received(:handle_response) }
+      end
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(response)
+      allow(instance).to receive(:handle_response).and_call_original
+
+      instance.send_now(obj)
+
+      expect(instance).to have_received(:handle_response).with(obj, response)
+    end
+
+    it "continues processing even if an after_notify hook raises an error" do
+      config.configure do |config|
+        config.after_notify(->(_notice, _response) { raise ArgumentError, "bad hook" })
+      end
+
+      expect { instance.send_now(obj) }.not_to raise_error
+    end
+
+    it "logs hook errors with class and backtrace" do
+      config.configure do |config|
+        config.after_notify(->(_notice, _response) { raise ArgumentError, "bad hook" })
+      end
+      allow(config.logger).to receive(:error)
+
+      instance.send_now(obj)
+
+      expect(config.logger).to have_received(:error).with(/ArgumentError.*bad hook/m)
+    end
+  end
+
   describe "#start" do
     it "starts the thread" do
       expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
