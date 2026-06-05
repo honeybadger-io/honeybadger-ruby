@@ -103,9 +103,9 @@ module Honeybadger
       # The hook is called for every backend response, including successful
       # deliveries. Response codes are usually HTTP status integers, but may be
       # symbols such as :stubbed or :error for non-server backends or connection
-      # failures. Filter with exact response codes, such as `response.code == 413`,
-      # rather than integer comparisons, or use #success? and #error_message helper 
-      # methods on the response object.
+      # failures. Filter with exact response codes (e.g. `response.code == 413`)
+      # rather than broad integer comparisons, or use `response.success?`.
+      # (Note: `response.error_message` may raise for non-HTTP responses like `:stubbed`.)
       #
       # Prefer `Honeybadger.event` for reporting failed notice deliveries. Calling
       # `Honeybadger.notify` from this hook can trigger another after_notify call;
