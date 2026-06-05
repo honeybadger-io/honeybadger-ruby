@@ -1,6 +1,14 @@
 # Change Log
 
 
+## [6.7.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.6.2...v6.7.0) (2026-06-05)
+
+
+### Features
+
+* add after_notify hooks ([#825](https://github.com/honeybadger-io/honeybadger-ruby/issues/825)) ([950fee2](https://github.com/honeybadger-io/honeybadger-ruby/commit/950fee2bb2ab81ebbfa20ea34b36045bd6b57034))
+* make backtrace limit configurable ([#824](https://github.com/honeybadger-io/honeybadger-ruby/issues/824)) ([f62ce3a](https://github.com/honeybadger-io/honeybadger-ruby/commit/f62ce3ab09ffa497fbfb2ec1fa193359b66b1a23))
+
 ## [6.6.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.6.0...v6.6.1) (2026-05-29)
 
 
