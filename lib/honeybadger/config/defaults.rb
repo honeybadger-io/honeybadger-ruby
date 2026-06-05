@@ -1,5 +1,6 @@
 require "socket"
 require "honeybadger/breadcrumbs/active_support"
+require "honeybadger/backtrace"
 
 module Honeybadger
   class Config
@@ -319,6 +320,11 @@ module Honeybadger
       "exceptions.source_radius": {
         description: "The number of lines before and after the source when reporting snippets.",
         default: 2,
+        type: Integer
+      },
+      "exceptions.backtrace_limit": {
+        description: "The maximum number of backtrace lines to include in error reports.",
+        default: Backtrace::DEFAULT_LIMIT,
         type: Integer
       },
       "exceptions.local_variables": {

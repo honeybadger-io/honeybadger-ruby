@@ -509,7 +509,8 @@ module Honeybadger
         backtrace,
         filters: construct_backtrace_filters(opts),
         config: config,
-        source_radius: config[:"exceptions.source_radius"]
+        source_radius: config[:"exceptions.source_radius"],
+        limit: config[:"exceptions.backtrace_limit"]
       ).to_a
     end
 

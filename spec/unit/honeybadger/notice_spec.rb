@@ -761,6 +761,21 @@ describe Honeybadger::Notice do
       build_notice({exception: @exception, callbacks: config, config: config}).to_json
     end
 
+    it "passes the configured backtrace limit for parsing" do
+      config = build_config("exceptions.backtrace_limit": 2)
+
+      expect(Honeybadger::Backtrace).to receive(:parse).with(@backtrace_array, hash_including(limit: 2)).and_call_original
+
+      build_notice({exception: @exception, config: config}).to_json
+    end
+
+    it "limits serialized backtrace lines using exceptions.backtrace_limit" do
+      config = build_config("exceptions.backtrace_limit": 2)
+      notice = build_notice({exception: @exception, config: config})
+
+      expect(notice.as_json[:error][:backtrace].length).to eq(2)
+    end
+
     it "accepts a backtrace from an exception or hash" do
       backtrace = @backtrace_array
       notice_from_exception = build_notice(exception: @exception)

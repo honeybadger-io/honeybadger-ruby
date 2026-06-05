@@ -4,6 +4,8 @@ module Honeybadger
   # @api private
   # Front end to parsing the backtrace for each notice.
   class Backtrace
+    DEFAULT_LIMIT = 1000
+
     # Handles backtrace parsing line by line.
     class Line
       # Backtrace line regexp (optionally allowing leading X: for windows support).
@@ -122,19 +124,20 @@ module Honeybadger
         Line.parse(unparsed_line.to_s, opts)
       end.compact
 
-      new(lines)
+      new(lines, opts.fetch(:limit, DEFAULT_LIMIT))
     end
 
-    def initialize(lines)
+    def initialize(lines, limit = DEFAULT_LIMIT)
       self.lines = lines
       self.application_lines = lines.select(&:application?)
+      self.limit = limit || DEFAULT_LIMIT
     end
 
     # Convert Backtrace to arry.
     #
     # Returns array containing backtrace lines.
     def to_ary
-      lines.take(1000).map { |l| {number: l.filtered_number, file: l.filtered_file, method: l.filtered_method, source: l.source} }
+      lines.take(limit.clamp(0..)).map { |l| {number: l.filtered_number, file: l.filtered_file, method: l.filtered_method, source: l.source} }
     end
     alias_method :to_a, :to_ary
 
@@ -171,6 +174,8 @@ module Honeybadger
     private
 
     attr_writer :lines, :application_lines
+
+    attr_accessor :limit
 
     class << self
       private
