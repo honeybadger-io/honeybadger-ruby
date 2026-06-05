@@ -240,6 +240,25 @@ describe Honeybadger::Backtrace do
     expect(backtrace.to_a).to eq backtrace.to_ary
   end
 
+  it "limits serialized backtrace lines to 1000 by default" do
+    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array(1001))
+
+    expect(backtrace.to_a.length).to eq(1000)
+  end
+
+  it "uses the configured serialized backtrace line limit" do
+    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array(3), limit: 2)
+
+    expect(backtrace.to_a.length).to eq(2)
+    expect(backtrace.to_a.last[:file]).to eq("app/models/user_1.rb")
+  end
+
+  it "treats a negative serialized backtrace line limit as zero" do
+    backtrace = Honeybadger::Backtrace.parse(build_backtrace_array(3), limit: -1)
+
+    expect(backtrace.to_a).to eq([])
+  end
+
   it "generates json from to_array template" do
     backtrace = Honeybadger::Backtrace.parse(build_backtrace_array)
     array = [{"foo" => "bar"}]
@@ -252,7 +271,9 @@ describe Honeybadger::Backtrace do
     expect(payload).to eq array
   end
 
-  def build_backtrace_array
+  def build_backtrace_array(size = nil)
+    return Array.new(size) { |i| "app/models/user_#{i}.rb:13:in `magic'" } if size
+
     ["app/models/user.rb:13:in `magic'",
       "app/controllers/users_controller.rb:8:in `index'"]
   end

@@ -321,6 +321,11 @@ module Honeybadger
         default: 2,
         type: Integer
       },
+      "exceptions.backtrace_limit": {
+        description: "The maximum number of backtrace lines to include in error reports.",
+        default: 1000,
+        type: Integer
+      },
       "exceptions.local_variables": {
         description: "Enable sending local variables. Requires binding_of_caller to be loaded.",
         default: false,
