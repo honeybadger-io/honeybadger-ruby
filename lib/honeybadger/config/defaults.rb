@@ -574,6 +574,11 @@ module Honeybadger
         description: "Enable automatic data collection for Flipper.",
         default: true,
         type: Boolean
+      },
+      "ruby_llm.insights.enabled": {
+        description: "Enable automatic data collection for RubyLLM.",
+        default: true,
+        type: Boolean
       }
     }.freeze
 
