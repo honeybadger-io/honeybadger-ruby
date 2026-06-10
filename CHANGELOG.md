@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.8.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.7.0...v6.8.0) (2026-06-10)
+
+
+### Features
+
+* add RubyLLM monitoring plugin ([#827](https://github.com/honeybadger-io/honeybadger-ruby/issues/827)) ([4b2c32d](https://github.com/honeybadger-io/honeybadger-ruby/commit/4b2c32d933b1dd35599b2a292027d50458f2c384))
+
 ## [6.7.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.6.2...v6.7.0) (2026-06-05)
 
 
