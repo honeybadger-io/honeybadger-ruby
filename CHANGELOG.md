@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.9.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.8.0...v6.9.0) (2026-06-11)
+
+
+### Features
+
+* make RubyLLM insights subscriber configurable ([#829](https://github.com/honeybadger-io/honeybadger-ruby/issues/829)) ([fc9ff42](https://github.com/honeybadger-io/honeybadger-ruby/commit/fc9ff42689b87f972183286d34c7e4059bf23442))
+
 ## [6.8.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.7.0...v6.8.0) (2026-06-10)
 
 
