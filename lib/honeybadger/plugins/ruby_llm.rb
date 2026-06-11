@@ -10,12 +10,24 @@ module Honeybadger
 
         execution do
           if config.load_plugin_insights?(:ruby_llm)
+            class_name = config[:"ruby_llm.insights.subscriber"].to_s.strip
+            subscriber = if class_name.empty?
+              Honeybadger::RubyLLMSubscriber.new
+            else
+              begin
+                Object.const_get(class_name).new
+              rescue => e
+                logger.error("Unable to load ruby_llm.insights.subscriber=#{class_name} (#{e.class}: #{e.message}); falling back to Honeybadger::RubyLLMSubscriber")
+                Honeybadger::RubyLLMSubscriber.new
+              end
+            end
+
             # request.ruby_llm is intentionally excluded: it fires for every
             # provider HTTP request (including retries and streams) and
             # duplicates chat-level metadata.
             ::ActiveSupport::Notifications.subscribe(
               /(chat|tool_call|embedding|image|moderation|transcription|models\.refresh)\.ruby_llm/,
-              Honeybadger::RubyLLMSubscriber.new
+              subscriber
             )
           end
         end

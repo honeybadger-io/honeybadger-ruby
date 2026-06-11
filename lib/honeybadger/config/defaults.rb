@@ -579,6 +579,11 @@ module Honeybadger
         description: "Enable automatic data collection for RubyLLM.",
         default: true,
         type: Boolean
+      },
+      "ruby_llm.insights.subscriber": {
+        description: "Fully qualified class name of a custom subscriber for RubyLLM instrumentation. Defaults to Honeybadger::RubyLLMSubscriber.",
+        default: nil,
+        type: String
       }
     }.freeze
 
