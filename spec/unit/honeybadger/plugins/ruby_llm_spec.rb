@@ -58,6 +58,148 @@ describe "RubyLLM Dependency" do
       end
     end
 
+    context "when a custom subscriber is configured" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "CustomRubyLLMSubscriber") }
+
+      let(:custom_subscriber_class) do
+        Class.new(Honeybadger::RubyLLMSubscriber) do
+          def format_payload(name, payload)
+            super.merge(tenant: payload.dig(:chat, :tenant))
+          end
+        end
+      end
+
+      let(:subscribed) do
+        subscriber = nil
+        allow(ActiveSupport::Notifications).to receive(:subscribe) { |_, s| subscriber = s }
+        Honeybadger::Plugin.instances[:ruby_llm].load!(config)
+        subscriber
+      end
+
+      before do
+        # The constant is only defined during the example (long after the
+        # plugin file is required), so resolution must happen lazily at
+        # plugin execution time for these to pass.
+        stub_const("CustomRubyLLMSubscriber", custom_subscriber_class)
+      end
+
+      it "subscribes an instance of the configured class" do
+        expect(subscribed).to be_a(CustomRubyLLMSubscriber)
+      end
+
+      it "emits events formatted by the custom subscriber" do
+        allow(Honeybadger).to receive(:event)
+
+        payload = {provider: "openai", model: "gpt-4o-mini", chat: {tenant: "acme"}}
+        subscribed.start("chat.ruby_llm", "abc123", payload)
+        subscribed.finish("chat.ruby_llm", "abc123", payload)
+
+        expect(Honeybadger).to have_received(:event).with("chat.ruby_llm", hash_including(model: "gpt-4o-mini", tenant: "acme"))
+        expect(Honeybadger).to have_received(:event).with("chat.ruby_llm", hash_excluding(:chat))
+      end
+
+      context "when the custom subscriber gates events via process?" do
+        let(:custom_subscriber_class) do
+          Class.new(Honeybadger::RubyLLMSubscriber) do
+            def process?(name, payload)
+              payload[:tools].nil?
+            end
+          end
+        end
+
+        it "does not emit gated events" do
+          allow(Honeybadger).to receive(:event)
+
+          payload = {provider: "openai", model: "gpt-4o-mini", tools: [:weather]}
+          subscribed.start("chat.ruby_llm", "abc123", payload)
+          subscribed.finish("chat.ruby_llm", "abc123", payload)
+
+          expect(Honeybadger).not_to have_received(:event)
+        end
+      end
+
+      context "when the configured name has a leading ::" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "::CustomRubyLLMSubscriber") }
+
+        it "subscribes an instance of the configured class" do
+          expect(subscribed).to be_a(CustomRubyLLMSubscriber)
+        end
+      end
+
+      context "when the configured class is not a notification subscriber" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "NotASubscriber") }
+
+        before { stub_const("NotASubscriber", Class.new) }
+
+        it "logs an error and subscribes the default subscriber" do
+          allow(config.logger).to receive(:error)
+
+          expect(subscribed).to be_an_instance_of(Honeybadger::RubyLLMSubscriber)
+          expect(config.logger).to have_received(:error).with(/NotASubscriber.*start.*finish/)
+        end
+      end
+
+      context "when the configured value is the class itself" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": CustomRubyLLMSubscriber) }
+
+        it "subscribes an instance of that class" do
+          expect(subscribed).to be_a(CustomRubyLLMSubscriber)
+        end
+      end
+
+      context "when the configured value is blank" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "") }
+
+        it "subscribes the default subscriber without logging an error" do
+          allow(config.logger).to receive(:error)
+
+          expect(subscribed).to be_an_instance_of(Honeybadger::RubyLLMSubscriber)
+          expect(config.logger).not_to have_received(:error)
+        end
+      end
+
+      context "when the configured class cannot be resolved" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "Nonexistent::Subscriber") }
+
+        it "logs an error and subscribes the default subscriber" do
+          allow(config.logger).to receive(:error)
+
+          expect(subscribed).to be_an_instance_of(Honeybadger::RubyLLMSubscriber)
+          expect(config.logger).to have_received(:error).with(/Nonexistent::Subscriber.*NameError/)
+        end
+      end
+
+      context "when the configured constant cannot be instantiated" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "CustomRubyLLMModule") }
+
+        before { stub_const("CustomRubyLLMModule", Module.new) }
+
+        it "logs the underlying error and subscribes the default subscriber" do
+          allow(config.logger).to receive(:error)
+
+          expect(subscribed).to be_an_instance_of(Honeybadger::RubyLLMSubscriber)
+          expect(config.logger).to have_received(:error).with(/CustomRubyLLMModule.*NoMethodError/)
+        end
+      end
+
+      context "when the configured class raises on instantiation" do
+        let(:custom_subscriber_class) do
+          Class.new(Honeybadger::RubyLLMSubscriber) do
+            def initialize(dependency)
+              super()
+            end
+          end
+        end
+
+        it "logs the underlying error and subscribes the default subscriber" do
+          allow(config.logger).to receive(:error)
+
+          expect(subscribed).to be_an_instance_of(Honeybadger::RubyLLMSubscriber)
+          expect(config.logger).to have_received(:error).with(/CustomRubyLLMSubscriber.*ArgumentError/)
+        end
+      end
+    end
+
     context "when insights are disabled" do
       let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": false) }
 
