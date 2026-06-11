@@ -156,7 +156,7 @@ module Honeybadger
     end
 
     def to_s
-      lines.map(&:to_s).join("\n")
+      lines.join("\n")
     end
 
     def inspect
