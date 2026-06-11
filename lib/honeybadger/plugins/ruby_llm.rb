@@ -15,7 +15,11 @@ module Honeybadger
               Honeybadger::RubyLLMSubscriber.new
             else
               begin
-                Object.const_get(class_name).new
+                candidate = Object.const_get(class_name).new
+                unless candidate.respond_to?(:start) && candidate.respond_to?(:finish)
+                  raise TypeError, "does not respond to #start and #finish"
+                end
+                candidate
               rescue => e
                 logger.error("Unable to load ruby_llm.insights.subscriber=#{class_name} (#{e.class}: #{e.message}); falling back to Honeybadger::RubyLLMSubscriber")
                 Honeybadger::RubyLLMSubscriber.new

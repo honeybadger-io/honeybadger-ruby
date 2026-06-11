@@ -118,6 +118,27 @@ describe "RubyLLM Dependency" do
         end
       end
 
+      context "when the configured name has a leading ::" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "::CustomRubyLLMSubscriber") }
+
+        it "subscribes an instance of the configured class" do
+          expect(subscribed).to be_a(CustomRubyLLMSubscriber)
+        end
+      end
+
+      context "when the configured class is not a notification subscriber" do
+        let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": "NotASubscriber") }
+
+        before { stub_const("NotASubscriber", Class.new) }
+
+        it "logs an error and subscribes the default subscriber" do
+          allow(config.logger).to receive(:error)
+
+          expect(subscribed).to be_an_instance_of(Honeybadger::RubyLLMSubscriber)
+          expect(config.logger).to have_received(:error).with(/NotASubscriber.*start.*finish/)
+        end
+      end
+
       context "when the configured value is the class itself" do
         let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "insights.enabled": true, "ruby_llm.insights.enabled": true, "ruby_llm.insights.subscriber": CustomRubyLLMSubscriber) }
 
