@@ -63,6 +63,32 @@ describe Honeybadger::Logging::ConfigLogger do
     it { should respond_to severity }
   end
 
+  context "when logging.level is above the shared logger level" do
+    let(:config) do
+      Honeybadger::Config.new(
+        debug: true,
+        "logging.level": "ERROR",
+        "logging.tty_level": "DEBUG"
+      )
+    end
+
+    before do
+      logger.level = Logger::DEBUG
+      allow(logger).to receive(:add).and_call_original
+    end
+
+    it "suppresses lower-severity Honeybadger logs without changing the shared logger" do
+      subject.info(:info)
+      subject.warn(:warn)
+      subject.error(:error)
+
+      expect(logger).not_to have_received(:add).with(Logger::Severity::INFO, :info, "honeybadger")
+      expect(logger).not_to have_received(:add).with(Logger::Severity::WARN, :warn, "honeybadger")
+      expect(logger).to have_received(:add).with(Logger::Severity::ERROR, :error, "honeybadger")
+      expect(logger.level).to eq(Logger::DEBUG)
+    end
+  end
+
   context "when not attached to terminal", unless: $stdout.tty? do
     LOG_SEVERITIES.each do |severity|
       it "delegates ##{severity} to configured logger" do

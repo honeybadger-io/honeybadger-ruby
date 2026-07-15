@@ -124,12 +124,14 @@ module Honeybadger
 
       def initialize(config, logger = Logger.new(nil))
         @config = config
+        @log_level = @config.log_level
         @tty = $stdout.tty?
         @tty_level = @config.log_level(:"logging.tty_level")
         super(logger)
       end
 
       def add(severity, msg)
+        return true if suppress_log_level?(severity)
         return true if suppress_tty?(severity)
 
         # There is no debug level in Honeybadger. Debug logs will be logged at
@@ -147,6 +149,11 @@ module Honeybadger
       end
 
       private
+
+      def suppress_log_level?(severity)
+        effective_severity = (severity == Logger::Severity::DEBUG) ? Logger::Severity::INFO : severity
+        effective_severity < @log_level
+      end
 
       def suppress_debug?
         !debug?
