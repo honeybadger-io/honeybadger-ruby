@@ -96,6 +96,134 @@ describe "ActiveJob Plugin" do
   end
 end
 
+describe Honeybadger::Plugins::ActiveJob, ".perform_around" do
+  let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
+  let(:error) { RuntimeError.new("boom") }
+  let(:job_class) { Class.new }
+  let(:job) do
+    double("job",
+      class: job_class,
+      executions: executions,
+      arguments: ["arg1"],
+      try: nil,
+      priority: nil,
+      job_id: "abc-123",
+      queue_name: "default",
+      scheduled_at: nil
+    )
+  end
+  let(:block) { proc { raise error } }
+
+  before do
+    allow(Honeybadger).to receive(:clear!)
+    allow(Honeybadger).to receive(:config).and_return(config)
+    allow(Honeybadger).to receive(:notify)
+  end
+
+  context "when the job class defines honeybadger_attempt_threshold" do
+    let(:executions) { 1 }
+
+    before do
+      def job_class.honeybadger_attempt_threshold
+        3
+      end
+    end
+
+    context "and executions is below the per-job threshold" do
+      let(:executions) { 2 }
+
+      it "does not notify Honeybadger" do
+        expect(Honeybadger).not_to receive(:notify)
+        expect {
+          described_class.perform_around(job, block)
+        }.to raise_error(error)
+      end
+    end
+
+    context "and executions meets the per-job threshold" do
+      let(:executions) { 3 }
+
+      it "notifies Honeybadger" do
+        expect(Honeybadger).to receive(:notify).once
+        expect {
+          described_class.perform_around(job, block)
+        }.to raise_error(error)
+      end
+    end
+
+    context "and a global threshold is also configured" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "active_job.attempt_threshold": 1) }
+      let(:executions) { 2 }
+
+      it "uses the per-job threshold instead of the global config" do
+        expect(Honeybadger).not_to receive(:notify)
+        expect {
+          described_class.perform_around(job, block)
+        }.to raise_error(error)
+      end
+    end
+
+    context "and the per-job threshold returns nil" do
+      let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "active_job.attempt_threshold": 3) }
+      let(:executions) { 2 }
+
+      before do
+        def job_class.honeybadger_attempt_threshold
+          nil
+        end
+      end
+
+      it "falls back to the global config" do
+        expect(Honeybadger).not_to receive(:notify)
+        expect {
+          described_class.perform_around(job, block)
+        }.to raise_error(error)
+      end
+    end
+  end
+
+  context "when the job class defines honeybadger_attempt_threshold as 0" do
+    let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "active_job.attempt_threshold": 3) }
+    let(:executions) { 1 }
+
+    before do
+      def job_class.honeybadger_attempt_threshold
+        0
+      end
+    end
+
+    it "notifies on every attempt" do
+      expect(Honeybadger).to receive(:notify).once
+      expect {
+        described_class.perform_around(job, block)
+      }.to raise_error(error)
+    end
+  end
+
+  context "when the job class does not define honeybadger_attempt_threshold" do
+    let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, "active_job.attempt_threshold": 3) }
+    let(:executions) { 2 }
+
+    it "falls back to the global config" do
+      expect(Honeybadger).not_to receive(:notify)
+      expect {
+        described_class.perform_around(job, block)
+      }.to raise_error(error)
+    end
+
+    context "and the global threshold is met" do
+      let(:executions) { 3 }
+
+      it "notifies Honeybadger" do
+        expect(Honeybadger).to receive(:notify).once
+        expect {
+          described_class.perform_around(job, block)
+        }.to raise_error(error)
+      end
+    end
+  end
+end
+
 describe Honeybadger::ActiveJobSubscriber do
   let(:config) do
     Honeybadger::Config.new(
