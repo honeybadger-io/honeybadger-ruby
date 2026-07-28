@@ -133,6 +133,18 @@ describe "SolidQueue Dependency" do
           end
         end
 
+        context "when the queue does not support latency" do
+          let(:queue) { double("Queue", name: "default", size: 10) }
+
+          it "omits latency from the queue data" do
+            expect(Honeybadger).to receive(:event).with("stats.solid_queue", hash_including(queues: {"default" => {depth: 10}}))
+
+            Honeybadger::Plugin.instances[:solid_queue].collectors.each do |options, collect_block|
+              Honeybadger::Plugin::CollectorExecution.new("solid_queue", config, options, &collect_block).call
+            end
+          end
+        end
+
         context "when ActiveRecord is not connected" do
           let(:ar_connected) { false }
 
