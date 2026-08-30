@@ -299,7 +299,23 @@ describe Honeybadger::EventsWorker do
     end
 
     context "when 201" do
-      let(:response) { Honeybadger::Backend::Response.new(201) }
+      let(:response) {
+        Honeybadger::Backend::Response.new(201, %({"errors":false,"events":[{"status":201}]}))
+      }
+
+      context "and the response contains rejected events" do
+        let(:response) {
+          Honeybadger::Backend::Response.new(
+            201,
+            %({"errors":true,"events":[null,{"status":201},{"status":413,"error":"event payload is too large"}]})
+          )
+        }
+
+        it "warns with the rejected event details" do
+          expect(config.logger).to receive(:warn).with(/failed for 1 of 3 events.*status=413.*event payload is too large/)
+          handle_response
+        end
+      end
 
       context "and there is no throttle" do
         it "doesn't change throttle" do
