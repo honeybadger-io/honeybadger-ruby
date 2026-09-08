@@ -5,17 +5,43 @@ module Honeybadger
       SQUOTE_DATA = /'(?:[^']|'')*'/
       DQUOTE_DATA = /"(?:[^"]|"")*"/
       NUMBER_DATA = /\b\d+\b/
+      HEX_DATA = /\b0[xb][0-9a-f]+\b/i
       DOUBLE_QUOTERS = /(postgres|sqlite|postgis)/i
+      TRUNCATED_HEAD_LENGTH = 200
+      # Leading run of characters that can't start a string literal or a
+      # comment in any supported adapter: stops at ', $, /, -, #, \ and so
+      # on. Double quotes and backticks are kept because they quote
+      # identifiers; adapters that use double quotes for strings are cut
+      # at the first double quote in .truncate.
+      TRUNCATED_HEAD_SAFE = /\A[\w\s.,()=*"`]*/
 
-      def self.obfuscate(sql, adapter)
-        force_utf_8(sql.to_s.dup).tap do |s|
+      # Obfuscates literal values in a SQL query. When +max_length+ is given
+      # and the query is larger than that many bytes, the query is truncated
+      # instead (see .truncate): scanning multi-megabyte queries (e.g. an
+      # INSERT of a serialized cache value) is slow, and can exceed the
+      # Regexp.timeout that Rails 8.1+ sets by default.
+      def self.obfuscate(sql, adapter, max_length: nil)
+        sql = sql.to_s
+        return truncate(sql, adapter, max_length) if max_length && sql.bytesize > max_length
+
+        force_utf_8(sql.dup).tap do |s|
           s.gsub!(/\s+/, " ")
           s.gsub!(ESCAPE_QUOTES, "".freeze)
           s.gsub!(SQUOTE_DATA, "'?'".freeze)
           s.gsub!(DQUOTE_DATA, '"?"'.freeze) unless adapter.to_s.match?(DOUBLE_QUOTERS)
+          s.gsub!(HEX_DATA, "?".freeze)
           s.gsub!(NUMBER_DATA, "?".freeze)
           s.strip!
         end
+      end
+
+      # Keeps only the head of the statement (up to the first quoted value or
+      # comment) so that no literal data leaks, and notes the original size.
+      def self.truncate(sql, adapter, max_length)
+        head = force_utf_8(sql.byteslice(0, TRUNCATED_HEAD_LENGTH)).scrub("")[TRUNCATED_HEAD_SAFE]
+        head = head[0, head.index('"')] if head.include?('"') && !adapter.to_s.match?(DOUBLE_QUOTERS)
+
+        "#{obfuscate(head, adapter)} ... [truncated #{sql.bytesize} bytes]"
       end
 
       def self.force_utf_8(string)

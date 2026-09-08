@@ -592,6 +592,16 @@ describe Honeybadger::Agent do
         end
       end
 
+      context "by default ignores solid_cache sql events" do
+        let(:ignored_events) { [] }
+        let(:event_type) { "sql.active_record" }
+        let(:payload) { {query: 'INSERT INTO "solid_cache_entries" ("key","value","key_hash","byte_size","created_at") VALUES (?, ?, ?, ?, ?)'} }
+
+        it "does not push an event" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
+
       context "by default ignores good_job processor sql events" do
         let(:ignored_events) { [] }
         let(:event_type) { "sql.active_record" }

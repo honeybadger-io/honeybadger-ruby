@@ -67,6 +67,18 @@ describe "Breadcrumbs Plugin" do
         described_class.send_breadcrumb_notification("message", nil, config, {})
       end
 
+      it "does not raise when the transform fails" do
+        config = {transform: ->(_data) { raise "boom" }}
+        expect(Honeybadger).not_to receive(:add_breadcrumb)
+        expect { described_class.send_breadcrumb_notification("message", 1, config, {}) }.not_to raise_error
+      end
+
+      it "logs the error when the transform fails" do
+        config = {transform: ->(_data) { raise "boom" }}
+        expect(Honeybadger.config.logger).to receive(:error).with(/boom/)
+        described_class.send_breadcrumb_notification("message", 1, config, {})
+      end
+
       describe ":message" do
         it "can allow a string" do
           config = {message: "config message"}
