@@ -76,6 +76,17 @@ describe Honeybadger::Util::SQL do
         sql = "INSERT INTO `solid_cache_entries` (`key`, `value`) VALUES ('a', '#{"x" * 200}')"
         expect(described_class.obfuscate(sql, "mysql", max_length: 100)).to start_with("INSERT INTO `solid_cache_entries` (`key`, `value`) VALUES ( ...")
       end
+
+      it "does not include unquoted hexadecimal or binary literals from oversized SQL" do
+        sql = "INSERT INTO t (a, b) VALUES (0xDEADBEEF, 0b1010) #{"x" * 200}"
+        result = described_class.obfuscate(sql, "mysql", max_length: 100)
+        expect(result).not_to include("DEADBEEF")
+        expect(result).not_to include("1010")
+      end
+    end
+
+    it "sanitizes unquoted hexadecimal and binary literals" do
+      expect(described_class.obfuscate("INSERT INTO t (a, b) VALUES (0xDEADBEEF, 0b1010)", "mysql")).to eq "INSERT INTO t (a, b) VALUES (?, ?)"
     end
   end
 end

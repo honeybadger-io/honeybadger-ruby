@@ -5,10 +5,14 @@ module Honeybadger
       SQUOTE_DATA = /'(?:[^']|'')*'/
       DQUOTE_DATA = /"(?:[^"]|"")*"/
       NUMBER_DATA = /\b\d+\b/
+      HEX_DATA = /\b0[xb][0-9a-f]+\b/i
       DOUBLE_QUOTERS = /(postgres|sqlite|postgis)/i
       TRUNCATED_HEAD_LENGTH = 200
-      # Leading run of characters that can't start a literal value or a
-      # comment in any supported adapter (no quotes, $, /, -, #, \ ...).
+      # Leading run of characters that can't start a string literal or a
+      # comment in any supported adapter: stops at ', $, /, -, #, \ and so
+      # on. Double quotes and backticks are kept because they quote
+      # identifiers; adapters that use double quotes for strings are cut
+      # at the first double quote in .truncate.
       TRUNCATED_HEAD_SAFE = /\A[\w\s.,()=*"`]*/
 
       # Obfuscates literal values in a SQL query. When +max_length+ is given
@@ -25,6 +29,7 @@ module Honeybadger
           s.gsub!(ESCAPE_QUOTES, "".freeze)
           s.gsub!(SQUOTE_DATA, "'?'".freeze)
           s.gsub!(DQUOTE_DATA, '"?"'.freeze) unless adapter.to_s.match?(DOUBLE_QUOTERS)
+          s.gsub!(HEX_DATA, "?".freeze)
           s.gsub!(NUMBER_DATA, "?".freeze)
           s.strip!
         end
