@@ -20,7 +20,7 @@ module Honeybadger
               if data[:sql]
                 connection = data.delete(:connection)
                 adapter = connection&.adapter_name&.downcase || active_record_connection_db_config[:adapter]
-                data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
+                data[:sql] = Util::SQL.obfuscate(data[:sql], adapter, max_length: Honeybadger.config[:"sql.max_length"])
               end
               data
             end,

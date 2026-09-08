@@ -34,5 +34,31 @@ describe Honeybadger::Util::SQL do
     it "handles double-quoted strings" do
       expect(described_class.obfuscate(%(SELECT * FROM "users" WHERE name = 'foo'), "postgres")).to eq %(SELECT * FROM "users" WHERE name = '?')
     end
+
+    describe "with max_length" do
+      it "obfuscates normally when the SQL is within max_length" do
+        expect(described_class.obfuscate("SELECT * FROM users WHERE name = 'foo'", "mysql", max_length: 1000)).to eq "SELECT * FROM users WHERE name = '?'"
+      end
+
+      it "replaces oversized SQL with a placeholder that keeps the statement head" do
+        sql = %(INSERT INTO "solid_cache_entries" ("key", "value") VALUES ('\\xabc', '\\x#{"ff" * 100}'))
+        expect(described_class.obfuscate(sql, "postgres", max_length: 100)).to eq "INSERT INTO \"solid_cache_entries\" (\"key\", \"value\") VALUES ( ... [truncated #{sql.bytesize} bytes]"
+      end
+
+      it "does not include single-quoted data from oversized SQL" do
+        sql = "SELECT * FROM users WHERE name = 'secret#{"x" * 200}'"
+        expect(described_class.obfuscate(sql, "postgres", max_length: 100)).not_to include("secret")
+      end
+
+      it "does not include double-quoted data from oversized SQL for adapters that quote data with double quotes" do
+        sql = %(SELECT * FROM users WHERE name = "secret#{"x" * 200}")
+        expect(described_class.obfuscate(sql, "mysql", max_length: 100)).not_to include("secret")
+      end
+
+      it "limits the head of oversized SQL to a short prefix" do
+        sql = "SELECT * FROM users WHERE id IN (#{(1..1000).to_a.join(", ")})"
+        expect(described_class.obfuscate(sql, "postgres", max_length: 100).bytesize).to be < 300
+      end
+    end
   end
 end
