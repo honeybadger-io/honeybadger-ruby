@@ -25,9 +25,10 @@ module Honeybadger
               data
             end,
             exclude_when: lambda do |data|
-              # Ignore schema, begin, and commit transaction queries
+              # Ignore schema, begin, and commit transaction queries. Those
+              # statements are tiny, so skip the scan for large queries.
               data[:name] == "SCHEMA" ||
-                (data[:sql] && (Util::SQL.force_utf_8(data[:sql].dup) =~ /^(begin|commit)( immediate)?( transaction)?$/i))
+                (data[:sql] && data[:sql].bytesize <= 64 && (Util::SQL.force_utf_8(data[:sql].dup) =~ /^(begin|commit)( immediate)?( transaction)?$/i))
             end
           },
 

@@ -20,5 +20,20 @@ describe Honeybadger::Breadcrumbs::ActiveSupport do
         expect(data[:sql]).not_to include("secret")
       end
     end
+
+    describe "exclude_when" do
+      it "excludes transaction statements" do
+        expect(notification[:exclude_when].call({sql: "BEGIN"})).to be_truthy
+        expect(notification[:exclude_when].call({sql: "COMMIT"})).to be_truthy
+      end
+
+      it "keeps other queries" do
+        expect(notification[:exclude_when].call({sql: "SELECT 1"})).to be_falsey
+      end
+
+      it "does not scan long queries for transaction statements" do
+        expect(notification[:exclude_when].call({sql: "#{"x" * 200}\nCOMMIT"})).to be_falsey
+      end
+    end
   end
 end

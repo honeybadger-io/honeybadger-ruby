@@ -59,6 +59,23 @@ describe Honeybadger::Util::SQL do
         sql = "SELECT * FROM users WHERE id IN (#{(1..1000).to_a.join(", ")})"
         expect(described_class.obfuscate(sql, "postgres", max_length: 100).bytesize).to be < 300
       end
+
+      it "does not include dollar-quoted data from oversized SQL" do
+        sql = "SELECT $$secret#{"x" * 200}$$"
+        expect(described_class.obfuscate(sql, "postgres", max_length: 100)).not_to include("secret")
+      end
+
+      it "does not include comments from oversized SQL" do
+        sql = "/* secret */ SELECT * FROM users WHERE id IN (#{(1..1000).to_a.join(", ")})"
+        expect(described_class.obfuscate(sql, "postgres", max_length: 100)).not_to include("secret")
+        sql = "-- secret\nSELECT * FROM users WHERE id IN (#{(1..1000).to_a.join(", ")})"
+        expect(described_class.obfuscate(sql, "postgres", max_length: 100)).not_to include("secret")
+      end
+
+      it "keeps backtick-quoted identifiers in the head of oversized SQL" do
+        sql = "INSERT INTO `solid_cache_entries` (`key`, `value`) VALUES ('a', '#{"x" * 200}')"
+        expect(described_class.obfuscate(sql, "mysql", max_length: 100)).to start_with("INSERT INTO `solid_cache_entries` (`key`, `value`) VALUES ( ...")
+      end
     end
   end
 end

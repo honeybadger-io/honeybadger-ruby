@@ -7,6 +7,9 @@ module Honeybadger
       NUMBER_DATA = /\b\d+\b/
       DOUBLE_QUOTERS = /(postgres|sqlite|postgis)/i
       TRUNCATED_HEAD_LENGTH = 200
+      # Leading run of characters that can't start a literal value or a
+      # comment in any supported adapter (no quotes, $, /, -, #, \ ...).
+      TRUNCATED_HEAD_SAFE = /\A[\w\s.,()=*"`]*/
 
       # Obfuscates literal values in a SQL query. When +max_length+ is given
       # and the query is larger than that many bytes, the query is truncated
@@ -27,11 +30,10 @@ module Honeybadger
         end
       end
 
-      # Keeps only the head of the statement (up to the first quoted value)
-      # so that no literal data leaks, and notes the original size.
+      # Keeps only the head of the statement (up to the first quoted value or
+      # comment) so that no literal data leaks, and notes the original size.
       def self.truncate(sql, adapter, max_length)
-        head = force_utf_8(sql.byteslice(0, TRUNCATED_HEAD_LENGTH)).scrub("")
-        head = head[0, head.index("'")] if head.include?("'")
+        head = force_utf_8(sql.byteslice(0, TRUNCATED_HEAD_LENGTH)).scrub("")[TRUNCATED_HEAD_SAFE]
         head = head[0, head.index('"')] if head.include?('"') && !adapter.to_s.match?(DOUBLE_QUOTERS)
 
         "#{obfuscate(head, adapter)} ... [truncated #{sql.bytesize} bytes]"
