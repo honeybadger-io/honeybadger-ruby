@@ -1,5 +1,4 @@
 begin
-  require "ostruct"
   require "sidekiq"
   SIDEKIQ_PRESENT = true
 rescue LoadError
@@ -18,10 +17,11 @@ def run_sidekiq_job(klass, args)
   config = (Sidekiq::VERSION >= "7") ? ::Sidekiq.default_configuration.default_capsule : ::Sidekiq
   processor = Sidekiq::Processor.new(config)
 
+  unit_of_work_class = Struct.new(:acknowledge, :job, :queue, :queue_name, keyword_init: true)
   job_str = {
     "args" => args, "class" => klass.to_s, "jid" => SecureRandom.uuid
   }.to_json
-  unit_of_work = OpenStruct.new(job: job_str, queue: "default")
+  unit_of_work = unit_of_work_class.new(job: job_str, queue: "default")
   processor.__send__(:process, unit_of_work)
 end
 
