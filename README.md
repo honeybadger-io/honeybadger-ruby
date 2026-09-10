@@ -28,7 +28,7 @@ We use [YARD](https://yardoc.org/) to document our API. Classes and methods whic
 
 1. Fork it.
 2. Create a topic branch `git checkout -b my_branch`
-3. Make your changes and add an entry to the [CHANGELOG](CHANGELOG.md).
+3. Make your changes.
 4. Commit your changes `git commit -am "Boom"`
 5. Push to your branch `git push origin my_branch`
 6. Send a [pull request](https://github.com/honeybadger-io/honeybadger-ruby/pulls)
