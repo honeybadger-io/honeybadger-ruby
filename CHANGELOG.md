@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.9.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.1...v6.9.2) (2026-09-15)
+
+
+### Bug Fixes
+
+* truncate very large SQL queries instead of obfuscating them ([#841](https://github.com/honeybadger-io/honeybadger-ruby/issues/841)) ([c80e046](https://github.com/honeybadger-io/honeybadger-ruby/commit/c80e0468ee167496ba7f5798aca2974463cf1af2))
+
 ## [6.9.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.0...v6.9.1) (2026-07-16)
 
 
