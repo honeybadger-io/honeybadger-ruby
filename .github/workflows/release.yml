@@ -17,12 +17,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Create Release PR
-        uses: google-github-actions/release-please-action@v3
+        uses: googleapis/release-please-action@v5
         id: release
-        with:
-          release-type: ruby
-          package-name: honeybadger
-          version-file: lib/honeybadger/version.rb
 
       - uses: actions/checkout@v4
 
