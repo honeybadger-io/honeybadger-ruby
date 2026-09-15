@@ -4,8 +4,10 @@ module Honeybadger
       ESCAPE_QUOTES = /(\\"|\\')/
       SQUOTE_DATA = /'(?:[^']|'')*'/
       DQUOTE_DATA = /"(?:[^"]|"")*"/
-      NUMBER_DATA = /\b\d+\b/
-      HEX_DATA = /\b0[xb][0-9a-f]+\b/i
+      # Underscore separators are allowed in numeric literals by PostgreSQL
+      # 16+ and SQLite 3.46+, and \b does not match next to one.
+      NUMBER_DATA = /\b\d+(?:_\d+)*\b/
+      HEX_DATA = /\b0[xbo][0-9a-f]+(?:_[0-9a-f]+)*\b/i
       DOUBLE_QUOTERS = /(postgres|sqlite|postgis)/i
       TRUNCATED_HEAD_LENGTH = 200
       # Leading run of characters that can't start a string literal or a

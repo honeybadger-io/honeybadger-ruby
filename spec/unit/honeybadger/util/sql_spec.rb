@@ -83,10 +83,22 @@ describe Honeybadger::Util::SQL do
         expect(result).not_to include("DEADBEEF")
         expect(result).not_to include("1010")
       end
+
+      it "does not include underscored numeric literals from oversized SQL" do
+        sql = "INSERT INTO t (a, b) VALUES (0xDE_AD_BE_EF, 1_000_000) #{"x" * 200}"
+        result = described_class.obfuscate(sql, "sqlite3", max_length: 100)
+        expect(result).not_to include("DE_AD")
+        expect(result).not_to include("1_000")
+      end
     end
 
     it "sanitizes unquoted hexadecimal and binary literals" do
       expect(described_class.obfuscate("INSERT INTO t (a, b) VALUES (0xDEADBEEF, 0b1010)", "mysql")).to eq "INSERT INTO t (a, b) VALUES (?, ?)"
+    end
+
+    it "sanitizes numeric literals which use underscore separators" do
+      expect(described_class.obfuscate("INSERT INTO t (a, b) VALUES (0xDE_AD_BE_EF, 1_000_000)", "sqlite3")).to eq "INSERT INTO t (a, b) VALUES (?, ?)"
+      expect(described_class.obfuscate("INSERT INTO t (a, b) VALUES (0o7_7_7, 0b10_10)", "postgres")).to eq "INSERT INTO t (a, b) VALUES (?, ?)"
     end
   end
 end
