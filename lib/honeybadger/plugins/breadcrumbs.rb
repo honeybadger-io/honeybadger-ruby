@@ -100,6 +100,9 @@ module Honeybadger
           category: notification_config[:category] || :custom,
           metadata: data
         )
+      rescue => e
+        # Instrumentation must never break the instrumented code.
+        Honeybadger.config.logger.error("Error in Honeybadger breadcrumb for #{name}: #{e.class}: #{e.message}")
       end
 
       # @api private

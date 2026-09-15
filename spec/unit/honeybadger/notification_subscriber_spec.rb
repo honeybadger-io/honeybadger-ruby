@@ -217,3 +217,53 @@ describe Honeybadger::ActiveJobSubscriber do
     end
   end
 end
+
+describe Honeybadger::ActiveRecordSubscriber do
+  let(:connection) { double("connection", adapter_name: "PostgreSQL") }
+
+  describe "#format_payload" do
+    it "obfuscates the query" do
+      payload = {sql: "SELECT * FROM users WHERE id = 1", connection: connection}
+      expect(described_class.new.format_payload("sql.active_record", payload)[:query]).to eq "SELECT * FROM users WHERE id = ?"
+    end
+
+    context "when the query is longer than sql.max_length" do
+      before { Honeybadger.config[:"sql.max_length"] = 20 }
+      after { Honeybadger.config[:"sql.max_length"] = Honeybadger::Config::DEFAULTS[:"sql.max_length"] }
+
+      it "truncates the query instead of obfuscating it" do
+        payload = {sql: "SELECT * FROM users WHERE name = 'secret'", connection: connection}
+        query = described_class.new.format_payload("sql.active_record", payload)[:query]
+        expect(query).to start_with("SELECT * FROM users WHERE name = ")
+        expect(query).to include("[truncated")
+        expect(query).not_to include("secret")
+      end
+    end
+  end
+
+  describe "#finish" do
+    let(:subscriber) { described_class.new }
+    let(:payload) { {sql: "SELECT 1", connection: connection} }
+
+    before do
+      allow(Honeybadger).to receive(:event)
+      subscriber.start("sql.active_record", "id", payload)
+    end
+
+    it "does not raise when formatting the payload fails" do
+      allow(subscriber).to receive(:format_payload).and_raise(RuntimeError.new("regexp match timeout"))
+      expect { subscriber.finish("sql.active_record", "id", payload) }.not_to raise_error
+    end
+
+    it "logs the error when formatting the payload fails" do
+      allow(subscriber).to receive(:format_payload).and_raise(RuntimeError.new("regexp match timeout"))
+      expect(Honeybadger.config.logger).to receive(:error).with(/regexp match timeout/)
+      subscriber.finish("sql.active_record", "id", payload)
+    end
+
+    it "records the event when nothing fails" do
+      expect(Honeybadger).to receive(:event).with("sql.active_record", hash_including(query: "SELECT ?"))
+      subscriber.finish("sql.active_record", "id", payload)
+    end
+  end
+end

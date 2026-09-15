@@ -34,7 +34,7 @@ module Honeybadger
 
     IGNORE_EVENTS_DEFAULT = [
       {event_type: "sql.active_record", query: /^(begin|commit)( immediate)?( transaction)?$/i},
-      {event_type: "sql.active_record", query: /(solid_queue|good_job|solid_cable_messages)/i},
+      {event_type: "sql.active_record", query: /(solid_queue|solid_cache|good_job|solid_cable_messages)/i},
       {event_type: "sql.active_record", name: /^GoodJob/},
       {event_type: "process_action.action_controller", controller: "Rails::HealthController"},
       {event_type: "cache_read.active_support"},
@@ -151,6 +151,11 @@ module Honeybadger
       "events.sample_rate": {
         description: "Percentage of events to send to the API (0-100). A value of 0 means no events are sent, 100 means all events are sent.",
         default: 100,
+        type: Integer
+      },
+      "sql.max_length": {
+        description: "SQL queries larger than this many bytes are truncated instead of obfuscated (in Insights events and breadcrumbs). Scanning very large queries is slow and can exceed Regexp.timeout.",
+        default: 1_000_000,
         type: Integer
       },
       plugins: {

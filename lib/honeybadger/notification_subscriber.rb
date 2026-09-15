@@ -20,6 +20,9 @@ module Honeybadger
 
       record(name, payload)
       record_metrics(name, payload)
+    rescue => e
+      # Instrumentation must never break the instrumented code.
+      Honeybadger.config.logger.error("Error in Honeybadger instrumentation for #{name}: #{e.class}: #{e.message}")
     end
 
     def record(name, payload)
@@ -116,7 +119,7 @@ module Honeybadger
   class ActiveRecordSubscriber < RailsSubscriber
     def format_payload(_name, payload)
       {
-        query: Util::SQL.obfuscate(payload[:sql], payload[:connection]&.adapter_name),
+        query: Util::SQL.obfuscate(payload[:sql], payload[:connection]&.adapter_name, max_length: Honeybadger.config[:"sql.max_length"]),
         cached: payload[:cached],
         async: payload[:async]
       }

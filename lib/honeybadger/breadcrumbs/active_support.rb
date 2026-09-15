@@ -20,14 +20,15 @@ module Honeybadger
               if data[:sql]
                 connection = data.delete(:connection)
                 adapter = connection&.adapter_name&.downcase || active_record_connection_db_config[:adapter]
-                data[:sql] = Util::SQL.obfuscate(data[:sql], adapter)
+                data[:sql] = Util::SQL.obfuscate(data[:sql], adapter, max_length: Honeybadger.config[:"sql.max_length"])
               end
               data
             end,
             exclude_when: lambda do |data|
-              # Ignore schema, begin, and commit transaction queries
+              # Ignore schema, begin, and commit transaction queries. Those
+              # statements are tiny, so skip the scan for large queries.
               data[:name] == "SCHEMA" ||
-                (data[:sql] && (Util::SQL.force_utf_8(data[:sql].dup) =~ /^(begin|commit)( immediate)?( transaction)?$/i))
+                (data[:sql] && data[:sql].bytesize <= 64 && (Util::SQL.force_utf_8(data[:sql].dup) =~ /^(begin|commit)( immediate)?( transaction)?$/i))
             end
           },
 
