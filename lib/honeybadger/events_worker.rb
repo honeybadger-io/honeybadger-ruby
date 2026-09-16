@@ -1,4 +1,5 @@
 require "forwardable"
+require "json"
 require "net/http"
 
 require "honeybadger/logging"
@@ -299,6 +300,7 @@ module Honeybadger
       when 413
         warn { sprintf("Insights Event send failed: Payload is too large. code=%s", response.code) }
       when 201
+        warn_rejected_events(response)
         if (throttle = dec_throttle)
           debug { sprintf("Success ⚡ Insights Event sent code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
         else
@@ -311,6 +313,27 @@ module Honeybadger
       else
         warn { sprintf("Insights Event send failed: unknown response from server. code=%s", response.code) }
       end
+    end
+
+    def warn_rejected_events(response)
+      body = response.body.to_s
+      return unless body.match?(/"errors"\s*:\s*true/)
+
+      result = JSON.parse(body)
+      return unless result.is_a?(Hash) && result["errors"]
+
+      events = result["events"]
+      return unless events.is_a?(Array)
+
+      rejected_events = events.select { |event| event.is_a?(Hash) && event["status"] != 201 }
+      return if rejected_events.empty?
+
+      details = rejected_events.map { |event|
+        sprintf("status=%s error=%s", event["status"], event["error"].to_s.dump)
+      }.uniq.join(", ")
+      warn { sprintf("Insights Event send failed for %s of %s events: %s", rejected_events.length, events.length, details) }
+    rescue JSON::ParserError
+      nil
     end
 
     # Release the marker. Important to perform during cleanup when shutting
