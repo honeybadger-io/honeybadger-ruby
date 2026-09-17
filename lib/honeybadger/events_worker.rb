@@ -54,7 +54,7 @@ module Honeybadger
     end
 
     def send_now(msg)
-      handle_response(send_to_backend(msg))
+      send_to_backend(msg).tap { |response| handle_response(response) }
     end
 
     def shutdown(force = false)
@@ -209,7 +209,18 @@ module Honeybadger
     end
 
     def send_batch
-      send_now(mutex.synchronize { send_queue })
+      batch = mutex.synchronize { send_queue.dup }
+      response = send_now(batch)
+
+      while response.retryable? && !shutdown?
+        info { sprintf("Server requested retry, waiting %ss", response.retry_after) }
+        response.retry_after.times do
+          break if shutdown?
+          sleep(1)
+        end
+        response = send_now(batch)
+      end
+
       mutex.synchronize do
         @last_sent = Time.now
         debug { sprintf("Sending %s events", send_queue.length) }
@@ -287,9 +298,11 @@ module Honeybadger
 
       case response.code
       when 429, 503
-        throttle = inc_throttle
-        debug { sprintf("Insights Event send failed: project is sending too many events. code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
-        suspend(3600)
+        unless response.retryable?
+          throttle = inc_throttle
+          debug { sprintf("Insights Event send failed: project is sending too many events. code=%s throttle=%s interval=%s", response.code, throttle, throttle_interval) }
+          suspend(3600)
+        end
       when 402
         warn { sprintf("Insights Event send failed: payment is required. code=%s", response.code) }
         suspend(3600)

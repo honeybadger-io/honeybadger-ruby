@@ -352,6 +352,49 @@ describe Honeybadger::EventsWorker do
     end
   end
 
+  describe "retryable 429" do
+    let(:retryable) do
+      response = Honeybadger::Backend::Response.new(429)
+      allow(response).to receive_messages(retryable?: true, retry_after: 30)
+      response
+    end
+    let(:success) { Honeybadger::Backend::Response.new(201) }
+
+    before do
+      allow(instance).to receive(:sleep)
+    end
+
+    it "retries after sleeping when backend returns retryable 429" do
+      allow(instance.send(:backend)).to receive(:event).and_return(retryable, success)
+      5.times { instance.push(event) }
+      instance.flush
+      expect(instance.send(:backend)).to have_received(:event).twice
+      expect(instance).to have_received(:sleep).with(1).at_least(:once)
+    end
+
+    it "does not suspend on retryable 429" do
+      allow(instance.send(:backend)).to receive(:event).and_return(retryable, success)
+      5.times { instance.push(event) }
+      instance.flush
+      expect(instance.send(:start_at)).to be_nil
+    end
+
+    it "suspends on non-retryable 429" do
+      non_retryable = Honeybadger::Backend::Response.new(429)
+      allow(instance.send(:backend)).to receive(:event).and_return(non_retryable)
+      5.times { instance.push(event) }
+      sleep(0.1)
+      expect(instance.send(:start_at)).not_to be_nil
+    end
+
+    it "completes shutdown during retry loop" do
+      allow(instance.send(:backend)).to receive(:event).and_return(retryable)
+      5.times { instance.push(event) }
+      sleep(0.05)
+      expect { instance.shutdown }.not_to raise_error
+    end
+  end
+
   describe "#kill!" do
     it "kills the timeout thread" do
       subject.start
