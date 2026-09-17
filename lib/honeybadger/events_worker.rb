@@ -209,8 +209,7 @@ module Honeybadger
     end
 
     def send_batch
-      batch = mutex.synchronize { send_queue.dup }
-      response = send_now(batch)
+      response = send_now(mutex.synchronize { send_queue })
 
       while response.retryable? && !shutdown?
         info { sprintf("Server requested retry, waiting %ss", response.retry_after) }
@@ -218,7 +217,7 @@ module Honeybadger
           break if shutdown?
           sleep(1)
         end
-        response = send_now(batch)
+        response = send_now(mutex.synchronize { send_queue })
       end
 
       mutex.synchronize do
