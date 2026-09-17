@@ -383,7 +383,10 @@ describe Honeybadger::EventsWorker do
       non_retryable = Honeybadger::Backend::Response.new(429)
       allow(instance.send(:backend)).to receive(:event).and_return(non_retryable)
       5.times { instance.push(event) }
-      sleep(0.1)
+      50.times do
+        break if instance.send(:start_at)
+        sleep(0.05)
+      end
       expect(instance.send(:start_at)).not_to be_nil
     end
 

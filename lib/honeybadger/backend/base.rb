@@ -70,6 +70,7 @@ module Honeybadger
       # but the go-collector only sends seconds.
       def parse_retry_after(value)
         return nil unless value
+        return nil unless /\A\d+\z/.match?(value.strip)
         seconds = value.to_i
         (seconds > 0) ? seconds : nil
       end
