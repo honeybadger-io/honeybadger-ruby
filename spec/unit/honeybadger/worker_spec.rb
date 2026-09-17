@@ -183,6 +183,58 @@ describe Honeybadger::Worker do
     end
   end
 
+  describe "retryable 429" do
+    let(:retryable) do
+      response = Honeybadger::Backend::Response.new(429)
+      allow(response).to receive_messages(retryable?: true, retry_after: 30)
+      response
+    end
+    let(:success) { Honeybadger::Backend::Response.new(201) }
+
+    before do
+      allow(instance).to receive(:sleep)
+    end
+
+    it "retries after sleeping when backend returns retryable 429" do
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(retryable, success)
+      instance.push(obj)
+      instance.flush
+      expect(instance.send(:backend)).to have_received(:notify).with(:notices, obj).twice
+      expect(instance).to have_received(:sleep).with(1).at_least(:once)
+    end
+
+    it "does not throttle on retryable 429" do
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(retryable, success)
+      instance.push(obj)
+      instance.flush
+      expect(instance.send(:throttle_interval)).to eq(0)
+    end
+
+    it "fires after_notify hooks once with final response" do
+      hook = spy("after notify hook", arity: 2)
+      config.configure { |config| config.after_notify(hook) }
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(retryable, success)
+      instance.push(obj)
+      instance.flush
+      expect(hook).to have_received(:call).with(obj, success).once
+    end
+
+    it "throttles on non-retryable 429" do
+      non_retryable = Honeybadger::Backend::Response.new(429)
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(non_retryable)
+      instance.push(obj)
+      instance.flush
+      expect(instance.send(:throttle_interval)).to be > 0
+    end
+
+    it "completes shutdown during retry loop" do
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(retryable)
+      instance.push(obj)
+      sleep(0.05)
+      expect { instance.shutdown }.not_to raise_error
+    end
+  end
+
   describe "#start" do
     it "starts the thread" do
       expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
