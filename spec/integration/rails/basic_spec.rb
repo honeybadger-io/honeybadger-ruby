@@ -16,6 +16,16 @@ describe "Rails integration", if: RAILS_PRESENT, type: :request do
     expect(Honeybadger::Backend::Test.notifications[:notices].size).to eq(1)
   end
 
+  it "reports the request id assigned by ActionDispatch::RequestId" do
+    Honeybadger.flush do
+      get "/runtime_error", headers: {"X-Request-Id" => "rails-request-id-12345"}
+      expect(response.status).to eq(500)
+    end
+
+    notice = Honeybadger::Backend::Test.notifications[:notices].first
+    expect(notice.request_id).to eq("rails-request-id-12345")
+  end
+
   it "sets the root from the Rails root" do
     expect(Honeybadger.config.get(:root)).to eq(Rails.root.to_s)
   end
