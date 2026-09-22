@@ -1,4 +1,5 @@
 require "timecop"
+require "timeout"
 
 require "honeybadger/events_worker"
 require "honeybadger/config"
@@ -395,6 +396,21 @@ describe Honeybadger::EventsWorker do
       5.times { instance.push(event) }
       sleep(0.05)
       expect { instance.shutdown }.not_to raise_error
+    end
+
+    it "gives up after MAX_RETRIES so flush returns" do
+      allow(instance.send(:backend)).to receive(:event).and_return(retryable)
+      5.times { instance.push(event) }
+      Timeout.timeout(5) { instance.flush }
+      expect(instance.send(:backend)).to have_received(:event).exactly(described_class::MAX_RETRIES + 1).times
+    end
+
+    it "warns with the dropped event count when retries are exhausted" do
+      allow(config.logger).to receive(:warn)
+      allow(instance.send(:backend)).to receive(:event).and_return(retryable)
+      5.times { instance.push(event) }
+      Timeout.timeout(5) { instance.flush }
+      expect(config.logger).to have_received(:warn).with(/still requesting retry.*5 events/)
     end
   end
 

@@ -24,6 +24,8 @@ module Honeybadger
     # after around 100 429 responses from the server.
     BASE_THROTTLE = 1.05
 
+    MAX_RETRIES = 5
+
     # TODO: These could be configurable?
 
     def initialize(config)
@@ -211,7 +213,8 @@ module Honeybadger
     def send_batch
       response = send_now(mutex.synchronize { send_queue })
 
-      while response.retryable? && !shutdown?
+      MAX_RETRIES.times do
+        break unless response.retryable? && !shutdown?
         info { sprintf("Server requested retry, waiting %ss", response.retry_after) }
         response.retry_after.times do
           break if shutdown?
@@ -222,6 +225,9 @@ module Honeybadger
 
       mutex.synchronize do
         @last_sent = Time.now
+        if response.retryable?
+          warn { sprintf("Insights Event send failed: server still requesting retry, dropping %s events. code=%s", send_queue.length, response.code) }
+        end
         debug { sprintf("Sending %s events", send_queue.length) }
         send_queue.clear
         if @dropped_events > 0

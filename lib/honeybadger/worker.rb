@@ -22,6 +22,8 @@ module Honeybadger
     # after around 100 429 responses from the server.
     BASE_THROTTLE = 1.05
 
+    MAX_RETRIES = 5
+
     def initialize(config)
       @config = config
       @throttle = 0
@@ -171,7 +173,8 @@ module Honeybadger
 
     def work(msg)
       response = notify_backend(msg)
-      while response.retryable? && !shutdown?
+      MAX_RETRIES.times do
+        break unless response.retryable? && !shutdown?
         info { sprintf("Server requested retry, waiting %ss. id=%s", response.retry_after, msg.id) }
         response.retry_after.times do
           break if shutdown?
@@ -243,7 +246,11 @@ module Honeybadger
       case response.code
       when 429, 503
         throttle = inc_throttle
-        warn { sprintf("Error report failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s", msg.id, response.code, throttle, throttle_interval) }
+        if response.retryable?
+          warn { sprintf("Error report failed: server still requesting retry, giving up. id=%s code=%s throttle=%s interval=%s", msg.id, response.code, throttle, throttle_interval) }
+        else
+          warn { sprintf("Error report failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s", msg.id, response.code, throttle, throttle_interval) }
+        end
       when 402
         warn { sprintf("Error report failed: payment is required. id=%s code=%s", msg.id, response.code) }
         suspend(3600)

@@ -1,4 +1,5 @@
 require "timecop"
+require "timeout"
 
 require "honeybadger/worker"
 require "honeybadger/config"
@@ -232,6 +233,21 @@ describe Honeybadger::Worker do
       instance.push(obj)
       sleep(0.05)
       expect { instance.shutdown }.not_to raise_error
+    end
+
+    it "gives up after MAX_RETRIES so flush returns" do
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(retryable)
+      instance.push(obj)
+      Timeout.timeout(5) { instance.flush }
+      expect(instance.send(:backend)).to have_received(:notify).with(:notices, obj).exactly(described_class::MAX_RETRIES + 1).times
+    end
+
+    it "warns when retries are exhausted" do
+      allow(config.logger).to receive(:warn)
+      allow(instance.send(:backend)).to receive(:notify).with(:notices, obj).and_return(retryable)
+      instance.push(obj)
+      Timeout.timeout(5) { instance.flush }
+      expect(config.logger).to have_received(:warn).with(/still requesting retry/)
     end
   end
 
