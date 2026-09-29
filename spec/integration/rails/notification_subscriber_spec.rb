@@ -22,6 +22,15 @@ describe "Rails Insights Notification Subscribers", if: RAILS_PRESENT do
     end
   end
 
+  it "attaches the Rails request id to events", type: :request do
+    Honeybadger.flush do
+      get "/", headers: {"X-Request-Id" => "rails-request-id-12345"}
+    end
+
+    event = Honeybadger::Backend::Test.events.find { |e| e[:event_type] == "process_action.action_controller" }
+    expect(event[:request_id]).to eq("rails-request-id-12345")
+  end
+
   it "records correct durations for concurrent notifications" do
     mutex, sequence = Mutex.new, 1
     allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC) do

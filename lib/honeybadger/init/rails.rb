@@ -2,6 +2,7 @@ require "rails"
 require "yaml"
 
 require "honeybadger/ruby"
+require "honeybadger/rack/request_id"
 
 module Honeybadger
   module Init
@@ -14,8 +15,14 @@ module Honeybadger
         initializer "honeybadger.install_middleware" do |app|
           honeybadger_config = Honeybadger::Agent.instance.config
 
-          if honeybadger_config[:"exceptions.enabled"]
+          # ErrorNotifier also sets up the request context that Insights events
+          # read. Agent#notify does nothing when exceptions are disabled.
+          if honeybadger_config[:"exceptions.enabled"] || honeybadger_config[:"insights.enabled"]
             app.config.middleware.insert(0, Honeybadger::Rack::ErrorNotifier)
+            app.config.middleware.insert_after(::ActionDispatch::RequestId, Honeybadger::Rack::RequestId)
+          end
+
+          if honeybadger_config[:"exceptions.enabled"]
             app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserInformer) if honeybadger_config[:"user_informer.enabled"]
             app.config.middleware.insert_before(Honeybadger::Rack::ErrorNotifier, Honeybadger::Rack::UserFeedback) if honeybadger_config[:"feedback.enabled"]
           end

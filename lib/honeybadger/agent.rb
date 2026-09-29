@@ -579,11 +579,16 @@ module Honeybadger
     # @api private
     def with_rack_env(rack_env, &block)
       context_manager.set_rack_env(rack_env)
-      context_manager.set_request_id(rack_env["action_dispatch.request_id"] || SecureRandom.uuid)
+      context_manager.set_request_id(SecureRandom.uuid)
       yield
     ensure
       context_manager.set_rack_env(nil)
       context_manager.set_request_id(nil)
+    end
+
+    # @api private
+    def set_request_id(request_id)
+      context_manager.set_request_id(request_id)
     end
 
     # @api private
