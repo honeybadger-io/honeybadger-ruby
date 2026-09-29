@@ -170,7 +170,17 @@ module Honeybadger
     end
 
     def work(msg)
-      send_now(msg)
+      response = notify_backend(msg)
+      while response.retryable? && !shutdown?
+        info { sprintf("Server requested retry, waiting %ss. id=%s", response.retry_after, msg.id) }
+        response.retry_after.times do
+          break if shutdown?
+          sleep(1)
+        end
+        response = notify_backend(msg)
+      end
+      run_after_notify_hooks(msg, response)
+      handle_response(msg, response)
 
       if shutdown? && throttled?
         warn { sprintf("Unable to report %s error(s) to Honeybadger (currently throttled)", queue.size) } if queue.size > 1

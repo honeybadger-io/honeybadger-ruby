@@ -9,7 +9,7 @@ module Honeybadger
     class Response
       NOT_BLANK = /\S/
 
-      attr_reader :code, :body, :message, :error
+      attr_reader :code, :body, :message, :error, :retry_after
 
       FRIENDLY_ERRORS = {
         429 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
@@ -36,6 +36,7 @@ module Honeybadger
       def initialize(*args)
         if (response = args.first).is_a?(Net::HTTPResponse)
           @code, @body, @message = response.code.to_i, response.body.to_s, response.message
+          @retry_after = parse_retry_after(response["Retry-After"])
         else
           @code, @body, @message = args
         end
@@ -46,6 +47,11 @@ module Honeybadger
 
       def success?
         @success
+      end
+
+      # Server wants us to retry soon (short Retry-After), not a quota/rate limit.
+      def retryable?
+        (code == 429 || code == 503) && retry_after && retry_after <= 300
       end
 
       def error_message
@@ -59,6 +65,15 @@ module Honeybadger
       end
 
       private
+
+      # Only handles integer seconds format. RFC 7231 also allows HTTP-date
+      # but the go-collector only sends seconds.
+      def parse_retry_after(value)
+        return nil unless value
+        return nil unless /\A\d+\z/.match?(value.strip)
+        seconds = value.to_i
+        (seconds > 0) ? seconds : nil
+      end
 
       def parse_error(body)
         return unless NOT_BLANK.match?(body)

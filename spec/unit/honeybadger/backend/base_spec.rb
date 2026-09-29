@@ -7,6 +7,67 @@ describe Honeybadger::Backend::Response do
     its(:error) { should be_nil }
   end
 
+  def http_response(code, retry_after: nil)
+    response = Net::HTTPResponse.new("1.1", code.to_s, "")
+    response["Retry-After"] = retry_after.to_s if retry_after
+    allow(response).to receive(:body).and_return("")
+    response
+  end
+
+  describe "#retry_after" do
+    context "with Retry-After header" do
+      subject { described_class.new(http_response(429, retry_after: 30)) }
+      its(:retry_after) { should eq 30 }
+    end
+
+    context "without Retry-After header" do
+      subject { described_class.new(429) }
+      its(:retry_after) { should be_nil }
+    end
+
+    context "with Retry-After: 0" do
+      subject { described_class.new(http_response(429, retry_after: 0)) }
+      its(:retry_after) { should be_nil }
+    end
+
+    context "with non-numeric Retry-After header" do
+      subject { described_class.new(http_response(429, retry_after: "abc")) }
+      its(:retry_after) { should be_nil }
+    end
+  end
+
+  describe "#retryable?" do
+    context "429 with short retry_after" do
+      subject { described_class.new(http_response(429, retry_after: 30)) }
+      it { should be_retryable }
+    end
+
+    context "503 with short retry_after" do
+      subject { described_class.new(http_response(503, retry_after: 30)) }
+      it { should be_retryable }
+    end
+
+    context "429 at boundary (300)" do
+      subject { described_class.new(http_response(429, retry_after: 300)) }
+      it { should be_retryable }
+    end
+
+    context "429 over boundary (301)" do
+      subject { described_class.new(http_response(429, retry_after: 301)) }
+      it { should_not be_retryable }
+    end
+
+    context "429 without retry_after" do
+      subject { described_class.new(429) }
+      it { should_not be_retryable }
+    end
+
+    context "201 with retry_after" do
+      subject { described_class.new(http_response(201, retry_after: 30)) }
+      it { should_not be_retryable }
+    end
+  end
+
   describe "#error_message" do
     context "when code is 403 and body contains a JSON error" do
       let(:response) { described_class.new(403, %({"error":"api key denied: Quota exceeded"}\n)) }
