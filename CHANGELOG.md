@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.9.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.2...v6.9.3) (2026-09-29)
+
+
+### Bug Fixes
+
+* propagate the Rails request ID to notices and Insights events ([#848](https://github.com/honeybadger-io/honeybadger-ruby/issues/848)) ([23edb08](https://github.com/honeybadger-io/honeybadger-ruby/commit/23edb08f4fda3b3f66fb697c5ec5502f39aeb127))
+
 ## [6.9.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.1...v6.9.2) (2026-09-15)
 
 
