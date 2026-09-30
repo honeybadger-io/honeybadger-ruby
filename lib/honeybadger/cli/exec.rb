@@ -5,7 +5,6 @@ require "honeybadger/cli/helpers"
 require "honeybadger/util/http"
 require "honeybadger/util/stats"
 require "open3"
-require "ostruct"
 require "thor/shell"
 
 module Honeybadger
@@ -17,14 +16,14 @@ module Honeybadger
       FAILED_TEMPLATE = <<~MSG
         Honeybadger detected failure or error output for the command:
         `<%= args.join(' ') %>`
-        
+
         PROCESS ID: <%= pid %>
-        
+
         RESULT CODE: <%= code %>
-        
+
         ERROR OUTPUT:
         <%= stderr %>
-        
+
         STANDARD OUTPUT:
         <%= stdout %>
       MSG
@@ -32,14 +31,14 @@ module Honeybadger
       NO_EXEC_TEMPLATE = <<~MSG
         Honeybadger failed to execute the following command:
         `<%= args.join(' ') %>`
-        
+
         The command was not executable. Try adjusting permissions on the file.
       MSG
 
       NOT_FOUND_TEMPLATE = <<~MSG
         Honeybadger failed to execute the following command:
         `<%= args.join(' ') %>`
-        
+
         The command was not found. Make sure it exists in your PATH.
       MSG
 
@@ -119,7 +118,7 @@ module Honeybadger
         code = status.to_i
         msg = ERB.new(FAILED_TEMPLATE).result(binding) unless success
 
-        OpenStruct.new(
+        ExecResult.new(
           msg: msg,
           pid: pid,
           code: code,
@@ -128,16 +127,18 @@ module Honeybadger
           success: success
         )
       rescue Errno::EACCES, Errno::ENOEXEC
-        OpenStruct.new(
+        ExecResult.new(
           msg: ERB.new(NO_EXEC_TEMPLATE).result(binding),
           code: 126
         )
       rescue Errno::ENOENT
-        OpenStruct.new(
+        ExecResult.new(
           msg: ERB.new(NOT_FOUND_TEMPLATE).result(binding),
           code: 127
         )
       end
+
+      ExecResult = Struct.new(:msg, :pid, :code, :stdout, :stderr, :success, keyword_init: true)
     end
   end
 end
