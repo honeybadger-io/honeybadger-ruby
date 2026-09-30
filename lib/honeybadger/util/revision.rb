@@ -4,6 +4,11 @@ module Honeybadger
       SHA_REGEX = /\A\h{40}(?:\h{24})?\z/
       MAX_SYMREF_DEPTH = 5
 
+      # Unset in the Git child process so it resolves the repository at root
+      # (like the file-based lookup) rather than one selected by the parent's
+      # environment.
+      GIT_ENV = {"GIT_DIR" => nil, "GIT_WORK_TREE" => nil, "GIT_COMMON_DIR" => nil}.freeze
+
       class << self
         def detect(root = Dir.pwd)
           revision = from_heroku ||
@@ -65,14 +70,33 @@ module Honeybadger
         end
 
         def from_git_command(root)
-          IO.popen(["git", "-C", root, "rev-parse", "HEAD"], err: File::NULL, &:read)
+          output = IO.popen(GIT_ENV, ["git", "-C", root, "rev-parse", "--verify", "HEAD"], err: File::NULL, &:read)
+          return nil unless $?&.success?
+
+          output = output.to_s.strip
+          output if SHA_REGEX.match?(output)
         rescue
           nil
         end
 
+        # Searches root and its parents, like Git does, so an application in a
+        # subdirectory of a repository (e.g. a monorepo) is still detected.
+        def find_git_dir(root)
+          dir = File.expand_path(root)
+
+          loop do
+            git_dir = git_dir_at(dir)
+            return git_dir if git_dir
+
+            parent = File.dirname(dir)
+            return nil if parent == dir
+            dir = parent
+          end
+        end
+
         # `.git` is a directory in a normal checkout, and a file containing
         # "gitdir: <path>" in worktrees and submodules.
-        def find_git_dir(root)
+        def git_dir_at(root)
           path = File.join(root, ".git")
           return path if File.directory?(path)
           return nil unless File.file?(path)

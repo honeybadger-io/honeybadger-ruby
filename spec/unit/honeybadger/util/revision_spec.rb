@@ -107,11 +107,38 @@ describe Honeybadger::Util::Revision do
       expect(Honeybadger::Util::Revision.detect(File.join(@root, "feature"))).to eq(sha)
     end
 
-    it "falls back to the git command when the ref cannot be read" do
-      write(".git/HEAD", "ref: refs/heads/.invalid\n")
-      expect(IO).to receive(:popen).with(["git", "-C", @root, "rev-parse", "HEAD"], err: File::NULL).and_return("#{sha}\n")
+    it "finds the repository in a parent of root" do
+      write(".git/HEAD", "#{sha}\n")
+      app_root = File.join(@root, "apps", "web")
+      FileUtils.mkdir_p(app_root)
 
-      expect(detect).to eq(sha)
+      expect(Honeybadger::Util::Revision.detect(app_root)).to eq(sha)
+    end
+
+    context "when the ref cannot be read from files" do
+      before do
+        write(".git/HEAD", "ref: refs/heads/.invalid\n")
+      end
+
+      it "falls back to the git command without inherited repository variables" do
+        expect(IO).to receive(:popen)
+          .with({"GIT_DIR" => nil, "GIT_WORK_TREE" => nil, "GIT_COMMON_DIR" => nil}, ["git", "-C", @root, "rev-parse", "--verify", "HEAD"], err: File::NULL)
+          .and_wrap_original { |_m, *_args| system("true") && "#{sha}\n" }
+
+        expect(detect).to eq(sha)
+      end
+
+      it "returns nil when the git command exits unsuccessfully" do
+        allow(IO).to receive(:popen).and_wrap_original { |_m, *_args| system("false") || "HEAD\n" }
+
+        expect(detect).to eq(nil)
+      end
+
+      it "returns nil when the git command prints something other than a sha" do
+        allow(IO).to receive(:popen).and_wrap_original { |_m, *_args| system("true") && "HEAD\n" }
+
+        expect(detect).to eq(nil)
+      end
     end
 
     it "returns nil when the git command fails" do
