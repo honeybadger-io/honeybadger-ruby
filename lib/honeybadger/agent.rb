@@ -306,7 +306,7 @@ module Honeybadger
     #
     # @return [Hash, nil]
     def get_context
-      error_context_manager.get_context
+      error_context_manager.get_context.dup
     end
 
     # @api private
@@ -501,7 +501,7 @@ module Honeybadger
     #
     # @return [Hash, nil]
     def get_event_context
-      event_context_manager.get_context
+      event_context_manager.get_context.dup
     end
 
     # @api private
@@ -530,7 +530,7 @@ module Honeybadger
 
     # @api private
     def get_execution_context
-      execution_context_manager.get_context
+      execution_context_manager.get_context.dup
     end
 
     # @api private

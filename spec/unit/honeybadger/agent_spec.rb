@@ -123,6 +123,34 @@ describe Honeybadger::Agent do
     end
   end
 
+  describe "context getters" do
+    let(:config) { Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER) }
+    subject(:instance) { described_class.new(config) }
+
+    it "returns a copy of the error context" do
+      instance.context({a: "context"})
+      instance.get_context[:b] = "mutated"
+      expect(instance.get_context).to eq({a: "context"})
+    end
+
+    it "returns a copy of the event context" do
+      instance.event_context({a: "context"})
+      instance.get_event_context[:b] = "mutated"
+      expect(instance.get_event_context).to eq({a: "context"})
+    end
+
+    it "returns a copy of the execution context" do
+      instance.execution_context({a: "context"})
+      instance.get_execution_context[:b] = "mutated"
+      expect(instance.get_execution_context).to eq({a: "context"})
+    end
+
+    it "returns a mutable hash when no context is set" do
+      expect { instance.get_context[:a] = 1 }.not_to raise_error
+      expect(instance.get_context).to eq({})
+    end
+  end
+
   describe "#clear!" do
     it "clears all transactional data" do
       config = Honeybadger::Config.new(api_key: "fake api key", logger: NULL_LOGGER)
