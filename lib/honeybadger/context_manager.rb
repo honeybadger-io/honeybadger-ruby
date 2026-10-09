@@ -1,3 +1,4 @@
+require "forwardable"
 require "honeybadger/conversions"
 
 module Honeybadger
