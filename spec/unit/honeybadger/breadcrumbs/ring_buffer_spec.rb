@@ -15,6 +15,20 @@ describe Honeybadger::Breadcrumbs::RingBuffer do
 
       expect(buffer.buffer).to eq([:b, :c])
     end
+
+    it "enforces the size limit per fiber when the collection is fiber-local" do
+      buffer = described_class.new(2)
+      buffer.add!(:a)
+      buffer.add!(:b)
+
+      other = Fiber.new(storage: {}) {
+        buffer.add!(:c)
+        buffer.buffer
+      }.resume
+
+      expect(other).to eq([:c])
+      expect(buffer.buffer).to eq([:a, :b])
+    end
   end
 
   describe "#clear" do

@@ -9,18 +9,15 @@ module Honeybadger
       def initialize(buffer_size = 40, collection: BreadcrumbsCollection)
         @buffer_size = buffer_size
         @collection = collection
-        @ct = 0
       end
 
       def add!(item)
         @collection << item
-        @ct += 1
-        @collection.shift(1) if @ct > @buffer_size
+        @collection.shift(1) if @collection.to_a.size > @buffer_size
       end
 
       def clear!
         @collection.clear
-        @ct = 0
       end
 
       def buffer
