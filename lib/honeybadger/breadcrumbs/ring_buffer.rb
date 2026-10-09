@@ -1,3 +1,5 @@
+require "honeybadger/context_manager"
+
 module Honeybadger
   module Breadcrumbs
     class RingBuffer
