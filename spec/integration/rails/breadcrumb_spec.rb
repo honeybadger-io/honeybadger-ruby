@@ -37,13 +37,17 @@ describe "Rails Breadcrumbs integration", if: RAILS_PRESENT, type: :request do
     Honeybadger::Backend::Test.notifications[:notices]
   end
 
+  def controller_notice
+    notices.find { |n| n.error_message.include?("test backend") }
+  end
+
   def get_trail(notice)
     notice.as_json[:breadcrumbs][:trail]
   end
 
   it "creates log event" do
     Honeybadger.flush { get "/breadcrumbs/log_breadcrumb_event" }
-    expect(notices.first).to contain_breadcrumb_including({
+    expect(controller_notice).to contain_breadcrumb_including({
       category: "log",
       message: "test log event",
       metadata: include({severity: "INFO"})
@@ -52,7 +56,7 @@ describe "Rails Breadcrumbs integration", if: RAILS_PRESENT, type: :request do
 
   it "creates active_record event", skip: SKIP_ACTIVE_RECORD do
     Honeybadger.flush { get "/breadcrumbs/active_record_event" }
-    expect(notices.first).to contain_breadcrumb_including({
+    expect(controller_notice).to contain_breadcrumb_including({
       category: "query",
       message: /Active Record - .*/,
       metadata: include({
@@ -63,7 +67,7 @@ describe "Rails Breadcrumbs integration", if: RAILS_PRESENT, type: :request do
 
   it "creates active_job event" do
     Honeybadger.flush { get "/breadcrumbs/active_job_event" }
-    expect(notices.first).to contain_breadcrumb_including({
+    expect(controller_notice).to contain_breadcrumb_including({
       category: "job",
       message: "Active Job Enqueue"
     })
@@ -71,7 +75,7 @@ describe "Rails Breadcrumbs integration", if: RAILS_PRESENT, type: :request do
 
   it "creates cache event" do
     Honeybadger.flush { get "/breadcrumbs/cache_event" }
-    expect(notices.first).to contain_breadcrumb_including({
+    expect(controller_notice).to contain_breadcrumb_including({
       category: "query",
       message: "Active Support Cache Read"
     })
