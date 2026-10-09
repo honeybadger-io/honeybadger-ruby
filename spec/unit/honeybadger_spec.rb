@@ -76,7 +76,7 @@ describe Honeybadger do
     end
 
     it "clears the context" do
-      expect { described_class.context.clear! }.to change { described_class.get_context }.from(c).to(nil)
+      expect { described_class.context.clear! }.to change { described_class.get_context }.from(c).to({})
     end
 
     context "with local context" do
@@ -104,20 +104,16 @@ describe Honeybadger do
         expect(described_class).to have_received(:get_context).at_least(:twice)
       end
 
-      it "tracks local context correctly" do
+      it "localizes global context" do
         allow(described_class).to receive(:get_context).and_call_original
 
-        begin
-          described_class.context({bar: :qux}) do
-            described_class.context({baz: :qux})
-
-            raise "exception"
-          end
-        rescue
-          # noop
+        described_class.context({bar: :baz}) do
+          described_class.context({baz: :qux})
+          expect(described_class.get_context).to eq({foo: :bar, bar: :baz, baz: :qux})
         end
+        expect(described_class.get_context).to eq({foo: :bar})
 
-        expect(described_class.get_context).to eq({foo: :bar, baz: :qux})
+        expect(described_class).to have_received(:get_context).at_least(:twice)
       end
     end
   end
