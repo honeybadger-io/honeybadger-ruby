@@ -362,33 +362,33 @@ describe Honeybadger::Worker do
     end
   end
 
-  describe "#signal_marker" do
+  describe "#signal_flush_done" do
     it "does not cause deadlock when called from within a synchronized block" do
       # This test verifies that the JRuby deadlock issue is fixed
-      # The original issue was that signal_marker would try to acquire
+      # The original issue was that signal_flush_done would try to acquire
       # a mutex that was already owned by the same thread, causing a deadlock
 
       subject.start
 
-      # Call signal_marker from within a synchronized block
+      # Call signal_flush_done from within a synchronized block
       # This should not cause a deadlock
       expect {
         subject.send(:mutex).synchronize do
-          subject.send(:signal_marker, subject.send(:marker))
+          subject.send(:signal_flush_done)
         end
       }.not_to raise_error
     end
 
     it "signals immediately without thread overhead" do
-      # This test verifies that signal_marker executes immediately
+      # This test verifies that signal_flush_done executes immediately
       # and doesn't create unnecessary threads
 
       subject.start
       initial_thread_count = Thread.list.count
 
-      # Call signal_marker and verify it executes immediately
+      # Call signal_flush_done and verify it executes immediately
       expect {
-        subject.send(:signal_marker, subject.send(:marker))
+        subject.send(:signal_flush_done)
       }.not_to raise_error
 
       # Verify no new threads were created

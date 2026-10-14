@@ -16,7 +16,6 @@ module Honeybadger
 
     # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
-    FLUSH = :__hb_worker_flush!
     CHECK_TIMEOUT = :__hb_worker_check_timeout!
 
     # Number of times a batch is resent while the server is unavailable
@@ -28,7 +27,7 @@ module Honeybadger
     def initialize(config)
       @config = config
       @mutex = Mutex.new
-      @marker = ConditionVariable.new
+      @flush_signal = ConditionVariable.new
       @queue = Queue.new
       @shutdown = false
       @flushes = 0
@@ -65,7 +64,6 @@ module Honeybadger
       return true unless thread&.alive?
 
       info { sprintf("Waiting to send %s events(s) to Honeybadger", queue.size) } unless queue.empty?
-      queue.push(FLUSH)
       queue.push(SHUTDOWN)
       !!thread.join
     ensure
@@ -79,10 +77,9 @@ module Honeybadger
       mutex.synchronize do
         if thread&.alive?
           @flushes += 1
-          queue.push(FLUSH)
-          queue.push(marker)
+          queue.push(flush_signal)
           begin
-            marker.wait(mutex)
+            flush_signal.wait(mutex)
           ensure
             @flushes -= 1
           end
@@ -109,7 +106,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :timeout_thread,
+    attr_reader :config, :queue, :pid, :mutex, :flush_signal, :thread, :timeout_thread,
       :start_at, :send_queue, :last_sent
 
     def_delegator :config, :backend
@@ -177,10 +174,13 @@ module Honeybadger
         end
         loop do
           case msg = queue.pop
-          when SHUTDOWN then break
+          when SHUTDOWN
+            send_pending_batch
+            break
           when CHECK_TIMEOUT then check_timeout
-          when FLUSH then flush_send_queue
-          when ConditionVariable then signal_marker(msg)
+          when flush_signal
+            send_pending_batch
+            signal_flush_done
           else work(msg)
           end
         end
@@ -193,7 +193,7 @@ module Honeybadger
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
     ensure
-      release_marker
+      release_flush_waiters
     end
 
     def check_timeout
@@ -245,7 +245,7 @@ module Honeybadger
       end
     end
 
-    def flush_send_queue
+    def send_pending_batch
       return if mutex.synchronize { send_queue.empty? }
       send_batch
     rescue => e
@@ -311,21 +311,22 @@ module Honeybadger
       end
     end
 
-    # Release every waiting flush. Important to perform during cleanup when
+    # Wake every waiting flush. Important to perform during cleanup when
     # shutting down, otherwise they could end up waiting indefinitely.
-    def release_marker
+    def release_flush_waiters
       if mutex.owned?
-        marker.broadcast
+        flush_signal.broadcast
       else
-        mutex.synchronize { marker.broadcast }
+        mutex.synchronize { flush_signal.broadcast }
       end
     end
 
-    def signal_marker(marker)
+    # Wakes the flush waiting on this point in the queue.
+    def signal_flush_done
       if mutex.owned?
-        marker.signal
+        flush_signal.signal
       else
-        mutex.synchronize { marker.signal }
+        mutex.synchronize { flush_signal.signal }
       end
     end
   end
