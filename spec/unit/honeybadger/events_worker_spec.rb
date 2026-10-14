@@ -342,9 +342,9 @@ describe Honeybadger::EventsWorker do
     end
 
     it "suspends itself for the rejection's interval" do
+      allow(config.logger).to receive(:warn)
       stub_sends(build_response(429, limit_reason: "rate_limited", retry_after: 30))
       5.times { instance.push(event) }
-      allow(config.logger).to receive(:warn)
       instance.flush
       expect(instance.send(:start_at)).to be_within(1).of(Time.now.to_i + 30)
       expect(config.logger).to have_received(:warn).with(/rejecting new ones for 30s/)
