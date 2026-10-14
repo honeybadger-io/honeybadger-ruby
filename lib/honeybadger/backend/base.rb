@@ -9,7 +9,10 @@ module Honeybadger
     class Response
       NOT_BLANK = /\S/
 
-      attr_reader :code, :body, :message, :error, :retry_after
+      attr_reader :code, :body, :message, :error, :retry_after, :limit_reason
+
+      # Longest Retry-After, in seconds, accepted for a single retry delay.
+      MAX_RETRY_AFTER = 60
 
       FRIENDLY_ERRORS = {
         429 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
@@ -37,6 +40,8 @@ module Honeybadger
         if (response = args.first).is_a?(Net::HTTPResponse)
           @code, @body, @message = response.code.to_i, response.body.to_s, response.message
           @retry_after = parse_retry_after(response["Retry-After"])
+          # Why a 429 was sent, e.g. "overloaded".
+          @limit_reason = response["Honeybadger-Limit-Reason"]&.strip&.downcase
         else
           @code, @body, @message = args
         end
@@ -49,9 +54,24 @@ module Honeybadger
         @success
       end
 
-      # Server wants us to retry soon (short Retry-After), not a quota/rate limit.
+      # The server is briefly unavailable (502/503/504, or 429 with
+      # Limit-Reason "overloaded") and Retry-After is absent or at most
+      # MAX_RETRY_AFTER. Hold the payload and retry it. Any other 429 means
+      # the server is rejecting data.
       def retryable?
-        (code == 429 || code == 503) && retry_after && retry_after <= 300
+        return false if retry_after && retry_after > MAX_RETRY_AFTER
+        [502, 503, 504].include?(code) || (code == 429 && limit_reason == "overloaded")
+      end
+
+      # Seconds to drop queued data and reject new data, or nil to keep going.
+      # Only meaningful when the response is not retryable.
+      def reject_interval
+        case code
+        when 429 then retry_after || 60
+        when 502, 503, 504 then retry_after
+        when 401, 403 then retry_after || 3600
+        when 402 then 3600 # billing: always an hour, ignoring Retry-After
+        end
       end
 
       def error_message
@@ -66,8 +86,8 @@ module Honeybadger
 
       private
 
-      # Only handles integer seconds format. RFC 7231 also allows HTTP-date
-      # but the go-collector only sends seconds.
+      # Positive integer seconds only. Zero, negative, HTTP-date, and other
+      # values are treated as absent; Honeybadger only sends seconds.
       def parse_retry_after(value)
         return nil unless value
         return nil unless /\A\d+\z/.match?(value.strip)

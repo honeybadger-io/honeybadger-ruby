@@ -178,60 +178,14 @@ describe Honeybadger::EventsWorker do
       expect(subject.send(:thread)).not_to be_alive
     end
 
-    context "when previously throttled" do
-      before do
-        100.times { subject.send(:inc_throttle) }
-        subject.push(event)
-        sleep(0.01) # Pause to allow throttle to activate
-      end
-
-      it "shuts down immediately" do
-        expect(subject.send(:backend)).not_to receive(:event)
-        subject.push(event)
-        subject.shutdown
-      end
-
-      it "does not warn the logger when the queue is empty" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).not_to receive(:warn)
-        subject.shutdown
-      end
-
-      it "warns the logger when queue has items" do
-        subject.push(event)
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/throttled/i)
-        subject.shutdown
-      end
-    end
-
-    context "when throttled during shutdown" do
+    context "when the server rejects data during shutdown" do
       before do
         allow(subject.send(:backend)).to receive(:event).with(anything).and_return(Honeybadger::Backend::Response.new(429))
       end
 
-      it "shuts down immediately" do
+      it "stops sending after the first rejection" do
         expect(subject.send(:backend)).to receive(:event).exactly(1).times
-        5.times { subject.push(event) }
-        subject.shutdown
-      end
-
-      it "does not warn the logger when the queue is empty" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).not_to receive(:warn).with(/throttled/)
-
-        subject.push(event)
-        subject.shutdown
-      end
-
-      it "warns the logger when the queue has additional items" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/throttled/i).at_least(:once)
-        100.times { subject.send(:inc_throttle) }
-        10.times do
-          subject.push(event)
-        end
-
+        15.times { subject.push(event) }
         subject.shutdown
       end
     end
@@ -254,11 +208,49 @@ describe Honeybadger::EventsWorker do
       allow(instance).to receive(:suspend).and_return true
     end
 
-    context "when 429" do
-      let(:response) { Honeybadger::Backend::Response.new(429) }
+    context "when 429 is rate-limited" do
+      let(:response) { build_response(429, limit_reason: "rate_limited", retry_after: 30) }
 
-      it "adds throttle" do
-        expect { handle_response }.to change(instance, :throttle_interval).by(0.05)
+      it "suspends for Retry-After" do
+        expect(instance).to receive(:suspend).with(30)
+        handle_response
+      end
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/rejecting new ones for 30s/)
+        handle_response
+      end
+    end
+
+    context "when 429 without Retry-After" do
+      let(:response) { build_response(429) }
+
+      it "suspends for 60 seconds" do
+        expect(instance).to receive(:suspend).with(60)
+        handle_response
+      end
+    end
+
+    context "when retryable" do
+      let(:response) { build_response(503) }
+
+      it "does not suspend" do
+        expect(instance).not_to receive(:suspend)
+        handle_response
+      end
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/unavailable/)
+        handle_response
+      end
+    end
+
+    context "when 401" do
+      let(:response) { build_response(401) }
+
+      it "suspends for an hour" do
+        expect(instance).to receive(:suspend).with(3600)
+        handle_response
       end
     end
 
@@ -302,20 +294,6 @@ describe Honeybadger::EventsWorker do
     context "when 201" do
       let(:response) { Honeybadger::Backend::Response.new(201) }
 
-      context "and there is no throttle" do
-        it "doesn't change throttle" do
-          expect { handle_response }.not_to change(instance, :throttle_interval)
-        end
-      end
-
-      context "and a throttle is set" do
-        before { instance.send(:inc_throttle) }
-
-        it "removes throttle" do
-          expect { handle_response }.to change(instance, :throttle_interval).by(-0.05)
-        end
-      end
-
       it "doesn't warn" do
         expect(config.logger).not_to receive(:warn)
         handle_response
@@ -353,64 +331,107 @@ describe Honeybadger::EventsWorker do
     end
   end
 
-  describe "retryable 429" do
-    let(:retryable) do
-      response = Honeybadger::Backend::Response.new(429)
-      allow(response).to receive_messages(retryable?: true, retry_after: 30)
-      response
-    end
+  describe "retrying" do
+    let(:backend) { instance.send(:backend) }
+    let(:overloaded) { build_response(429, limit_reason: "overloaded", retry_after: 30) }
     let(:success) { Honeybadger::Backend::Response.new(201) }
+    let(:sends) { Queue.new }
+    let(:batches) { [] }
 
+    # Skip the 1s retry sleeps; the timeout thread's own sleep still runs.
     before do
-      allow(instance).to receive(:sleep)
+      allow(instance).to receive(:sleep).and_call_original
+      allow(instance).to receive(:sleep).with(1)
     end
 
-    it "retries after sleeping when backend returns retryable 429" do
-      allow(instance.send(:backend)).to receive(:event).and_return(retryable, success)
-      5.times { instance.push(event) }
-      instance.flush
-      expect(instance.send(:backend)).to have_received(:event).twice
-      expect(instance).to have_received(:sleep).with(1).at_least(:once)
-    end
-
-    it "does not suspend on retryable 429" do
-      allow(instance.send(:backend)).to receive(:event).and_return(retryable, success)
-      5.times { instance.push(event) }
-      instance.flush
-      expect(instance.send(:start_at)).to be_nil
-    end
-
-    it "suspends on non-retryable 429" do
-      non_retryable = Honeybadger::Backend::Response.new(429)
-      allow(instance.send(:backend)).to receive(:event).and_return(non_retryable)
-      5.times { instance.push(event) }
-      50.times do
-        break if instance.send(:start_at)
-        sleep(0.05)
+    # Returns +responses+ in order, repeating the last, and records each send.
+    def stub_sends(*responses)
+      allow(backend).to receive(:event) do |batch|
+        batches << batch.dup # the worker clears its batch after sending
+        sends << true
+        (responses.size > 1) ? responses.shift : responses.first
       end
-      expect(instance.send(:start_at)).not_to be_nil
     end
 
-    it "completes shutdown during retry loop" do
-      allow(instance.send(:backend)).to receive(:event).and_return(retryable)
-      5.times { instance.push(event) }
-      sleep(0.05)
-      expect { instance.shutdown }.not_to raise_error
+    # Flush skips retries, so wait for the sends to happen before flushing.
+    def wait_for_sends(count)
+      Timeout.timeout(3) { count.times { sends.pop } }
+      instance.flush
     end
 
-    it "gives up after MAX_RETRIES so flush returns" do
-      allow(instance.send(:backend)).to receive(:event).and_return(retryable)
+    it "resends the batch after waiting Retry-After" do
+      stub_sends(overloaded, success)
       5.times { instance.push(event) }
-      Timeout.timeout(5) { instance.flush }
-      expect(instance.send(:backend)).to have_received(:event).exactly(described_class::MAX_RETRIES + 1).times
+      wait_for_sends(2)
+      expected_batch = Array.new(5, event)
+      expect(batches).to eq([expected_batch, expected_batch])
+      expect(instance).to have_received(:sleep).with(1).exactly(30).times
     end
 
-    it "warns with the dropped event count when retries are exhausted" do
-      allow(config.logger).to receive(:warn)
-      allow(instance.send(:backend)).to receive(:event).and_return(retryable)
+    it "waits 5-15 seconds when Retry-After is missing" do
+      stub_sends(build_response(503), success)
       5.times { instance.push(event) }
-      Timeout.timeout(5) { instance.flush }
-      expect(config.logger).to have_received(:warn).with(/still requesting retry.*5 events/)
+      wait_for_sends(2)
+      expect(instance).to have_received(:sleep).with(1).at_least(5).times
+      expect(instance).to have_received(:sleep).with(1).at_most(15).times
+    end
+
+    it "drops the batch after MAX_RETRIES and keeps sending" do
+      # Two 5-event batches: six failed sends for the first, then one success.
+      first_batch_failures = Array.new(described_class::MAX_RETRIES + 1, overloaded)
+      stub_sends(*first_batch_failures, success)
+      10.times { instance.push(event) }
+      wait_for_sends(described_class::MAX_RETRIES + 2)
+      expect(backend).to have_received(:event).exactly(described_class::MAX_RETRIES + 2).times
+      expect(instance.send(:start_at)).to be_nil # not suspended
+    end
+
+    it "does not retry a rejection" do
+      allow(backend).to receive(:event).and_return(build_response(429, limit_reason: "rate_limited", retry_after: 30))
+      5.times { instance.push(event) }
+      instance.flush
+      expect(backend).to have_received(:event).once
+    end
+
+    it "does not wait to retry during a flush" do
+      allow(instance).to receive(:sleep).with(1).and_call_original
+      allow(backend).to receive(:event).and_return(overloaded)
+      instance.push(event)
+      Timeout.timeout(3) { instance.flush }
+      expect(backend).to have_received(:event).once
+    end
+
+    it "releases every waiting flush when the worker stops" do
+      gate = Queue.new
+      allow(backend).to receive(:event) { gate.pop }
+      5.times { instance.push(event) }
+      flushers = Array.new(2) { Thread.new { instance.flush } }
+      Timeout.timeout(3) { sleep(0.01) until instance.instance_variable_get(:@flushes) == 2 }
+      gate << build_response(429, limit_reason: "rate_limited", retry_after: 30)
+      expect(flushers.map { |t| t.join(3) }).to all(be_truthy)
+      expect(instance.send(:flushing?)).to be(false)
+    end
+
+    it "does not send again after shutdown starts" do
+      # Real waits, so shutdown has something to interrupt.
+      allow(instance).to receive(:sleep).with(1).and_call_original
+      sent = Queue.new
+      allow(backend).to receive(:event) do
+        sent << true
+        overloaded
+      end
+      15.times { instance.push(event) }
+      Timeout.timeout(3) { sent.pop }
+      Timeout.timeout(3) { instance.shutdown }
+      expect(backend).to have_received(:event).once
+    end
+  end
+
+  describe "#suspend" do
+    it "drops the pending batch" do
+      instance.send(:enqueue_msg, event)
+      instance.send(:suspend, 60)
+      expect(instance.send(:send_queue)).to be_empty
     end
   end
 

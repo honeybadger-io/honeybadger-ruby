@@ -7,16 +7,9 @@ describe Honeybadger::Backend::Response do
     its(:error) { should be_nil }
   end
 
-  def http_response(code, retry_after: nil)
-    response = Net::HTTPResponse.new("1.1", code.to_s, "")
-    response["Retry-After"] = retry_after.to_s if retry_after
-    allow(response).to receive(:body).and_return("")
-    response
-  end
-
   describe "#retry_after" do
     context "with Retry-After header" do
-      subject { described_class.new(http_response(429, retry_after: 30)) }
+      subject { build_response(429, retry_after: 30) }
       its(:retry_after) { should eq 30 }
     end
 
@@ -26,45 +19,71 @@ describe Honeybadger::Backend::Response do
     end
 
     context "with Retry-After: 0" do
-      subject { described_class.new(http_response(429, retry_after: 0)) }
+      subject { build_response(429, retry_after: 0) }
       its(:retry_after) { should be_nil }
     end
 
     context "with non-numeric Retry-After header" do
-      subject { described_class.new(http_response(429, retry_after: "abc")) }
+      subject { build_response(429, retry_after: "abc") }
       its(:retry_after) { should be_nil }
     end
   end
 
+  describe "#limit_reason" do
+    context "with mixed case and surrounding whitespace" do
+      subject { build_response(429, limit_reason: " Overloaded ") }
+      its(:limit_reason) { should eq "overloaded" }
+    end
+
+    context "without Honeybadger-Limit-Reason header" do
+      subject { build_response(429) }
+      its(:limit_reason) { should be_nil }
+    end
+  end
+
   describe "#retryable?" do
-    context "429 with short retry_after" do
-      subject { described_class.new(http_response(429, retry_after: 30)) }
-      it { should be_retryable }
+    # code, limit_reason, retry_after, expected
+    [
+      [502, nil, nil, true],
+      [503, nil, nil, true],
+      [504, nil, nil, true],
+      [503, nil, 60, true],
+      [503, nil, 61, false],
+      [429, "overloaded", nil, true],
+      [429, "overloaded", 30, true],
+      [429, "overloaded", 61, false],
+      [429, "rate_limited", 30, false],
+      [429, "quota_exceeded", 30, false],
+      [429, nil, 30, false],
+      [500, nil, nil, false],
+      [201, nil, 30, false]
+    ].each do |code, limit_reason, retry_after, expected|
+      context "#{code} limit_reason=#{limit_reason.inspect} retry_after=#{retry_after.inspect}" do
+        subject { build_response(code, limit_reason: limit_reason, retry_after: retry_after) }
+        its(:retryable?) { should eq expected }
+      end
     end
+  end
 
-    context "503 with short retry_after" do
-      subject { described_class.new(http_response(503, retry_after: 30)) }
-      it { should be_retryable }
-    end
-
-    context "429 at boundary (300)" do
-      subject { described_class.new(http_response(429, retry_after: 300)) }
-      it { should be_retryable }
-    end
-
-    context "429 over boundary (301)" do
-      subject { described_class.new(http_response(429, retry_after: 301)) }
-      it { should_not be_retryable }
-    end
-
-    context "429 without retry_after" do
-      subject { described_class.new(429) }
-      it { should_not be_retryable }
-    end
-
-    context "201 with retry_after" do
-      subject { described_class.new(http_response(201, retry_after: 30)) }
-      it { should_not be_retryable }
+  describe "#reject_interval" do
+    # code, limit_reason, retry_after, expected
+    [
+      [429, "rate_limited", 30, 30],
+      [429, "quota_exceeded", 1800, 1800],
+      [429, nil, nil, 60],
+      [503, nil, 600, 600],
+      [503, nil, nil, nil],
+      [401, nil, 300, 300],
+      [401, nil, nil, 3600],
+      [403, nil, nil, 3600],
+      [402, nil, nil, 3600],
+      [413, nil, nil, nil],
+      [201, nil, nil, nil]
+    ].each do |code, limit_reason, retry_after, expected|
+      context "#{code} limit_reason=#{limit_reason.inspect} retry_after=#{retry_after.inspect}" do
+        subject { build_response(code, limit_reason: limit_reason, retry_after: retry_after) }
+        its(:reject_interval) { should eq expected }
+      end
     end
   end
 

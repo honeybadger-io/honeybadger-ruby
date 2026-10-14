@@ -17,21 +17,17 @@ module Honeybadger
     # Used to signal the worker to shutdown.
     SHUTDOWN = :__hb_worker_shutdown!
 
-    # The base number for the exponential backoff formula when calculating the
-    # throttle interval. `1.05 ** throttle` will reach an interval of 2 minutes
-    # after around 100 429 responses from the server.
-    BASE_THROTTLE = 1.05
-
+    # Number of times a notice is resent while the server is unavailable
+    # (6 attempts in total). Each notice gets its own retries.
     MAX_RETRIES = 5
 
     def initialize(config)
       @config = config
-      @throttle = 0
-      @throttle_interval = 0
       @mutex = Mutex.new
       @marker = ConditionVariable.new
       @queue = Queue.new
       @shutdown = false
+      @flushes = 0
       @start_at = nil
       @pid = Process.pid
     end
@@ -47,6 +43,8 @@ module Honeybadger
       queue.push(msg)
     end
 
+    # Sends synchronously without retrying. A rejection still suspends the
+    # async worker.
     def send_now(msg)
       response = notify_backend(msg)
       run_after_notify_hooks(msg, response)
@@ -63,11 +61,6 @@ module Honeybadger
       return true if force
       return true unless thread&.alive?
 
-      if throttled?
-        warn { sprintf("Unable to report %s error(s) to Honeybadger (currently throttled)", queue.size) } unless queue.empty?
-        return true
-      end
-
       info { sprintf("Waiting to report %s error(s) to Honeybadger", queue.size) } unless queue.empty?
 
       queue.push(SHUTDOWN)
@@ -77,12 +70,18 @@ module Honeybadger
       kill!
     end
 
-    # Blocks until queue is processed up to this point in time.
+    # Blocks until queue is processed up to this point in time. Retries are
+    # skipped while a flush is pending, since the caller is waiting.
     def flush
       mutex.synchronize do
         if thread&.alive?
+          @flushes += 1
           queue.push(marker)
-          marker.wait(mutex)
+          begin
+            marker.wait(mutex)
+          ensure
+            @flushes -= 1
+          end
         end
       end
     end
@@ -105,13 +104,16 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :throttle,
-      :throttle_interval, :start_at
+    attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :start_at
 
     def_delegator :config, :backend
 
     def shutdown?
       mutex.synchronize { @shutdown }
+    end
+
+    def flushing?
+      mutex.synchronize { @flushes > 0 }
     end
 
     def suspended?
@@ -122,10 +124,6 @@ module Honeybadger
       return false if shutdown?
       return false if suspended?
       true
-    end
-
-    def throttled?
-      mutex.synchronize { throttle > 0 }
     end
 
     def kill!
@@ -139,6 +137,8 @@ module Honeybadger
       true
     end
 
+    # Drops queued notices and rejects new ones (push returns false) for
+    # +interval+ seconds. The thread restarts on the first push after that.
     def suspend(interval)
       mutex.synchronize do
         @start_at = Time.now.to_i + interval
@@ -174,24 +174,17 @@ module Honeybadger
     def work(msg)
       response = notify_backend(msg)
       MAX_RETRIES.times do
-        break unless response.retryable? && !shutdown?
-        info { sprintf("Server requested retry, waiting %ss. id=%s", response.retry_after, msg.id) }
-        response.retry_after.times do
-          break if shutdown?
-          sleep(1)
-        end
+        break unless response.retryable?
+        break unless wait(response.retry_after || rand(5..15))
         response = notify_backend(msg)
       end
       run_after_notify_hooks(msg, response)
+      # A rejection suspends the worker, which terminates this thread.
       handle_response(msg, response)
 
-      if shutdown? && throttled?
-        warn { sprintf("Unable to report %s error(s) to Honeybadger (currently throttled)", queue.size) } if queue.size > 1
-        kill!
-        return
-      end
-
-      sleep(throttle_interval)
+      # Shutting down while the server is unavailable: stop without sending
+      # the rest of the queue.
+      kill! if shutdown? && response.retryable?
     rescue => e
       error {
         msg = "Error in worker thread class=%s message=%s\n\t%s"
@@ -219,53 +212,39 @@ module Honeybadger
       }
     end
 
-    def calc_throttle_interval
-      ((BASE_THROTTLE**throttle) - 1).round(3)
-    end
-
-    def inc_throttle
-      mutex.synchronize do
-        @throttle += 1
-        @throttle_interval = calc_throttle_interval
-        throttle
+    # Sleeps in one-second steps so shutdown or a flush can interrupt.
+    # Returns false if one did, including during the final second; the
+    # payload in hand is then dropped.
+    def wait(seconds)
+      seconds.times do
+        return false if shutdown? || flushing?
+        sleep(1)
       end
-    end
-
-    def dec_throttle
-      mutex.synchronize do
-        return nil if throttle == 0
-        @throttle -= 1
-        @throttle_interval = calc_throttle_interval
-        throttle
-      end
+      !(shutdown? || flushing?)
     end
 
     def handle_response(msg, response)
       d { sprintf("worker response id=%s code=%s message=%s", msg.id, response.code, response.message.to_s.dump) }
 
       case response.code
-      when 429, 503
-        throttle = inc_throttle
+      when 429, 502, 503, 504
         if response.retryable?
-          warn { sprintf("Error report failed: server still requesting retry, giving up. id=%s code=%s throttle=%s interval=%s", msg.id, response.code, throttle, throttle_interval) }
+          warn { sprintf("Error report failed: server unavailable, giving up on this error. id=%s code=%s", msg.id, response.code) }
         else
-          warn { sprintf("Error report failed: project is sending too many errors. id=%s code=%s throttle=%s interval=%s", msg.id, response.code, throttle, throttle_interval) }
+          warn { sprintf("Error report failed: server is rejecting data; dropping queued errors and rejecting new ones for %ss. id=%s code=%s reason=%s", response.reject_interval, msg.id, response.code, response.limit_reason) }
+          suspend(response.reject_interval)
         end
       when 402
-        warn { sprintf("Error report failed: payment is required. id=%s code=%s", msg.id, response.code) }
-        suspend(3600)
-      when 403
-        warn { sprintf("Error report failed: %s id=%s code=%s", response.error_message, msg.id, response.code) }
-        suspend(3600)
+        warn { sprintf("Error report failed: payment is required; dropping queued errors and rejecting new ones for %ss. id=%s code=%s", response.reject_interval, msg.id, response.code) }
+        suspend(response.reject_interval)
+      when 401, 403
+        warn { sprintf("Error report failed: %s Dropping queued errors and rejecting new ones for %ss. id=%s code=%s", response.error_message, response.reject_interval, msg.id, response.code) }
+        suspend(response.reject_interval)
       when 413
         warn { sprintf("Error report failed: Payload is too large. id=%s code=%s", msg.id, response.code) }
       when 201
         host = config.get(:"connection.ui_host")
-        if (throttle = dec_throttle)
-          info { sprintf("Success ⚡ https://%s/notice/%s id=%s code=%s throttle=%s interval=%s", host, msg.id, msg.id, response.code, throttle, throttle_interval) }
-        else
-          info { sprintf("Success ⚡ https://%s/notice/%s id=%s code=%s", host, msg.id, msg.id, response.code) }
-        end
+        info { sprintf("Success ⚡ https://%s/notice/%s id=%s code=%s", host, msg.id, msg.id, response.code) }
       when :stubbed
         debug { sprintf("Success ⚡ Development mode is enabled; this error will be reported if it occurs after you deploy your app. id=%s", msg.id) }
       when :error
@@ -275,10 +254,14 @@ module Honeybadger
       end
     end
 
-    # Release the marker. Important to perform during cleanup when shutting
-    # down, otherwise it could end up waiting indefinitely.
+    # Release every waiting flush. Important to perform during cleanup when
+    # shutting down, otherwise they could end up waiting indefinitely.
     def release_marker
-      signal_marker(marker)
+      if mutex.owned?
+        marker.broadcast
+      else
+        mutex.synchronize { marker.broadcast }
+      end
     end
 
     def signal_marker(marker)
