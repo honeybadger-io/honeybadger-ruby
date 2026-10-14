@@ -235,8 +235,6 @@ module Honeybadger
         else
           warn { sprintf("Error report failed: server is rejecting data. id=%s code=%s reason=%s", msg.id, response.code, response.limit_reason) }
         end
-      when 402
-        warn { sprintf("Error report failed: payment is required. id=%s code=%s", msg.id, response.code) }
       when 401, 403
         warn { sprintf("Error report failed: %s id=%s code=%s", response.error_message, msg.id, response.code) }
       when 413

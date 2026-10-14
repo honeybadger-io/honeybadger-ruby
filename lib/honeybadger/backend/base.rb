@@ -71,7 +71,6 @@ module Honeybadger
         when 429 then retry_after || 60
         when 502, 503, 504 then retry_after
         when 401, 403 then retry_after || 3600
-        when 402 then 3600 # billing: always an hour, ignoring Retry-After
         end
       end
 

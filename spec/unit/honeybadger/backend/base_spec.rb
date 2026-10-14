@@ -78,7 +78,6 @@ describe Honeybadger::Backend::Response do
       [401, nil, 300, 300],
       [401, nil, nil, 3600],
       [403, nil, nil, 3600],
-      [402, nil, nil, 3600],
       [413, nil, nil, nil],
       [201, nil, nil, nil]
     ].each do |code, limit_reason, retry_after, expected|

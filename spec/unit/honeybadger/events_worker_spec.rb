@@ -228,15 +228,6 @@ describe Honeybadger::EventsWorker do
       end
     end
 
-    context "when 402" do
-      let(:response) { Honeybadger::Backend::Response.new(402) }
-
-      it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/payment/)
-        handle_response
-      end
-    end
-
     context "when 403" do
       let(:response) { Honeybadger::Backend::Response.new(403, %({"error":"unauthorized"})) }
 

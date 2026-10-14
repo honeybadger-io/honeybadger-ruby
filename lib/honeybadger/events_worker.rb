@@ -293,8 +293,6 @@ module Honeybadger
         else
           warn { sprintf("Insights Event send failed: server is rejecting data. code=%s reason=%s", response.code, response.limit_reason) }
         end
-      when 402
-        warn { sprintf("Insights Event send failed: payment is required. code=%s", response.code) }
       when 401, 403
         warn { sprintf("Insights Event send failed: %s code=%s", response.error_message, response.code) }
       when 413
