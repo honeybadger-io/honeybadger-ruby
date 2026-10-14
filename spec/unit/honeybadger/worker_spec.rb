@@ -1,4 +1,5 @@
 require "timecop"
+require "timeout"
 
 require "honeybadger/worker"
 require "honeybadger/config"
@@ -183,6 +184,117 @@ describe Honeybadger::Worker do
     end
   end
 
+  describe "retrying" do
+    let(:backend) { instance.send(:backend) }
+    let(:overloaded) { build_response(429, limit_reason: "overloaded", retry_after: 30) }
+    let(:success) { Honeybadger::Backend::Response.new(201) }
+    let(:sends) { Queue.new }
+
+    before do
+      allow(instance).to receive(:sleep)
+    end
+
+    # Returns +responses+ in order, repeating the last, and records each send.
+    def stub_sends(*responses)
+      allow(backend).to receive(:notify) do
+        sends << true
+        (responses.size > 1) ? responses.shift : responses.first
+      end
+    end
+
+    # Flush skips retries, so wait for the sends to happen before flushing.
+    def wait_for_sends(count)
+      Timeout.timeout(3) { count.times { sends.pop } }
+      instance.flush
+    end
+
+    it "resends the notice after waiting Retry-After" do
+      stub_sends(overloaded, success)
+      instance.push(obj)
+      wait_for_sends(2)
+      expect(backend).to have_received(:notify).with(:notices, obj).twice
+      expect(instance).to have_received(:sleep).with(1).exactly(30).times
+    end
+
+    it "waits 5-15 seconds when Retry-After is missing" do
+      stub_sends(build_response(503), success)
+      instance.push(obj)
+      wait_for_sends(2)
+      expect(instance).to have_received(:sleep).with(1).at_least(5).times
+      expect(instance).to have_received(:sleep).with(1).at_most(15).times
+    end
+
+    it "fires after_notify hooks once with the final response" do
+      hook = spy("after notify hook", arity: 2)
+      config.configure { |config| config.after_notify(hook) }
+      stub_sends(overloaded, success)
+      instance.push(obj)
+      wait_for_sends(2)
+      expect(hook).to have_received(:call).with(obj, success).once
+    end
+
+    it "drops the notice after MAX_RETRIES and keeps sending" do
+      other = double("Badger", id: :bar, to_json: "{}")
+      stub_sends(*Array.new(described_class::MAX_RETRIES + 1, overloaded), success)
+      instance.push(obj)
+      instance.push(other)
+      wait_for_sends(described_class::MAX_RETRIES + 2)
+      expect(backend).to have_received(:notify).with(:notices, obj).exactly(described_class::MAX_RETRIES + 1).times
+      expect(backend).to have_received(:notify).with(:notices, other).once
+      expect(instance.send(:start_at)).to be_nil # not suspended
+    end
+
+    it "suspends itself for the rejection's interval" do
+      allow(config.logger).to receive(:warn)
+      stub_sends(build_response(429, limit_reason: "rate_limited", retry_after: 30))
+      instance.push(obj)
+      instance.flush
+      expect(instance.send(:start_at)).to be_within(1).of(Time.now.to_i + 30)
+      expect(config.logger).to have_received(:warn).with(/rejecting new ones for 30s/)
+    end
+
+    it "does not suspend when a sync send is rejected" do
+      instance.start
+      stub_sends(build_response(429, limit_reason: "rate_limited", retry_after: 30))
+      instance.send_now(obj)
+      expect(instance.send(:start_at)).to be_nil
+      expect(instance.send(:thread)).to be_alive
+    end
+
+    it "does not wait to retry during a flush" do
+      allow(instance).to receive(:sleep).and_call_original
+      allow(backend).to receive(:notify).with(:notices, obj).and_return(overloaded)
+      instance.push(obj)
+      Timeout.timeout(3) { instance.flush }
+      expect(backend).to have_received(:notify).with(:notices, obj).once
+    end
+
+    it "releases every waiting flush when the worker stops" do
+      gate = Queue.new
+      allow(backend).to receive(:notify) { gate.pop }
+      instance.push(obj)
+      flushers = Array.new(2) { Thread.new { instance.flush } }
+      Timeout.timeout(3) { sleep(0.01) until instance.instance_variable_get(:@flushes) == 2 }
+      gate << build_response(429, limit_reason: "rate_limited", retry_after: 30)
+      expect(flushers.map { |t| t.join(3) }).to all(be_truthy)
+      expect(instance.send(:flushing?)).to be(false)
+    end
+
+    it "does not send again after shutdown starts" do
+      # Real waits, so shutdown has something to interrupt.
+      allow(instance).to receive(:sleep).and_call_original
+      sent = Queue.new
+      allow(backend).to receive(:notify).with(:notices, obj) do
+        sent << true
+        overloaded
+      end
+      3.times { instance.push(obj) }
+      Timeout.timeout(3) { sent.pop }
+      Timeout.timeout(3) { instance.shutdown }
+      expect(backend).to have_received(:notify).with(:notices, obj).once
+    end
+  end
+
   describe "#start" do
     it "starts the thread" do
       expect { subject.start }.to change(subject, :thread).to(kind_of(Thread))
@@ -240,66 +352,14 @@ describe Honeybadger::Worker do
       expect(subject.send(:thread)).not_to be_alive
     end
 
-    context "when previously throttled" do
-      before do
-        100.times { subject.send(:inc_throttle) }
-        subject.push(obj)
-        sleep(0.01) # Pause to allow throttle to activate
-      end
-
-      it "shuts down immediately" do
-        expect(subject.send(:backend)).not_to receive(:notify)
-        subject.push(obj)
-        subject.shutdown
-      end
-
-      it "does not warn the logger when the queue is empty" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).not_to receive(:warn)
-        subject.shutdown
-      end
-
-      it "warns the logger when queue has items" do
-        subject.push(obj)
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/throttled/i)
-        subject.shutdown
-      end
-    end
-
-    context "when throttled during shutdown" do
+    context "when the server rejects data" do
       before do
         allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429))
       end
 
-      it "shuts down immediately" do
+      it "drops the rest of the queue" do
         expect(subject.send(:backend)).to receive(:notify).exactly(1).times
         5.times { subject.push(obj) }
-        subject.shutdown
-      end
-
-      it "does not warn the logger when the queue is empty" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).not_to receive(:warn).with(/throttled/)
-
-        subject.push(obj)
-        subject.shutdown
-      end
-
-      it "warns the logger when the queue has additional items" do
-        allow(config.logger).to receive(:warn)
-        expect(config.logger).to receive(:warn).with(/throttled/i).at_least(:once)
-
-        30.times do
-          subject.push(obj)
-        end
-
-        100.times do
-          break if subject.send(:throttled?)
-          sleep(0.01)
-        end
-        expect(subject.send(:throttled?)).to be(true)
-
         subject.shutdown
       end
     end
@@ -313,33 +373,33 @@ describe Honeybadger::Worker do
     end
   end
 
-  describe "#signal_marker" do
+  describe "#signal_flush_done" do
     it "does not cause deadlock when called from within a synchronized block" do
       # This test verifies that the JRuby deadlock issue is fixed
-      # The original issue was that signal_marker would try to acquire
+      # The original issue was that signal_flush_done would try to acquire
       # a mutex that was already owned by the same thread, causing a deadlock
 
       subject.start
 
-      # Call signal_marker from within a synchronized block
+      # Call signal_flush_done from within a synchronized block
       # This should not cause a deadlock
       expect {
         subject.send(:mutex).synchronize do
-          subject.send(:signal_marker, subject.send(:marker))
+          subject.send(:signal_flush_done)
         end
       }.not_to raise_error
     end
 
     it "signals immediately without thread overhead" do
-      # This test verifies that signal_marker executes immediately
+      # This test verifies that signal_flush_done executes immediately
       # and doesn't create unnecessary threads
 
       subject.start
       initial_thread_count = Thread.list.count
 
-      # Call signal_marker and verify it executes immediately
+      # Call signal_flush_done and verify it executes immediately
       expect {
-        subject.send(:signal_marker, subject.send(:marker))
+        subject.send(:signal_flush_done)
       }.not_to raise_error
 
       # Verify no new threads were created
@@ -352,39 +412,32 @@ describe Honeybadger::Worker do
       instance.send(:handle_response, obj, response)
     end
 
-    before do
-      allow(instance).to receive(:suspend).and_return true
+    it "only logs; the worker decides whether to suspend" do
+      allow(config.logger).to receive(:warn)
+      expect(instance).not_to receive(:suspend)
+      instance.send(:handle_response, obj, build_response(429, limit_reason: "rate_limited", retry_after: 30))
     end
 
-    context "when 429" do
-      let(:response) { Honeybadger::Backend::Response.new(429) }
-
-      it "adds throttle" do
-        expect { handle_response }.to change(instance, :throttle_interval).by(0.05)
-      end
-    end
-
-    context "when 402" do
-      let(:response) { Honeybadger::Backend::Response.new(402) }
-
-      it "shuts down the worker" do
-        expect(instance).to receive(:suspend)
-        handle_response
-      end
+    context "when 429 is rate-limited" do
+      let(:response) { build_response(429, limit_reason: "rate_limited", retry_after: 30) }
 
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/payment/)
+        expect(config.logger).to receive(:warn).with(/server is rejecting data/)
+        handle_response
+      end
+    end
+
+    context "when retryable" do
+      let(:response) { build_response(503) }
+
+      it "warns the logger" do
+        expect(config.logger).to receive(:warn).with(/unavailable/)
         handle_response
       end
     end
 
     context "when 403" do
       let(:response) { Honeybadger::Backend::Response.new(403, %({"error":"unauthorized"})) }
-
-      it "shuts down the worker" do
-        expect(instance).to receive(:suspend)
-        handle_response
-      end
 
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/unauthorized/)
@@ -403,20 +456,6 @@ describe Honeybadger::Worker do
 
     context "when 201" do
       let(:response) { Honeybadger::Backend::Response.new(201) }
-
-      context "and there is no throttle" do
-        it "doesn't change throttle" do
-          expect { handle_response }.not_to change(instance, :throttle_interval)
-        end
-      end
-
-      context "and a throttle is set" do
-        before { instance.send(:inc_throttle) }
-
-        it "removes throttle" do
-          expect { handle_response }.to change(instance, :throttle_interval).by(-0.05)
-        end
-      end
 
       it "doesn't warn" do
         expect(config.logger).not_to receive(:warn)
