@@ -43,8 +43,7 @@ module Honeybadger
       queue.push(msg)
     end
 
-    # Sends synchronously without retrying. A rejection still suspends the
-    # async worker.
+    # Sends synchronously without retrying.
     def send_now(msg)
       response = notify_backend(msg)
       run_after_notify_hooks(msg, response)
@@ -140,6 +139,7 @@ module Honeybadger
     # Drops queued notices and rejects new ones (push returns false) for
     # +interval+ seconds. The thread restarts on the first push after that.
     def suspend(interval)
+      warn { sprintf("Dropping queued errors and rejecting new ones for %ss", interval) }
       mutex.synchronize do
         @start_at = Time.now.to_i + interval
         queue.clear
@@ -179,8 +179,10 @@ module Honeybadger
         response = notify_backend(msg)
       end
       run_after_notify_hooks(msg, response)
-      # A rejection suspends the worker, which terminates this thread.
       handle_response(msg, response)
+      if (interval = response.reject_interval)
+        suspend(interval) # terminates this thread
+      end
 
       # Shutting down while the server is unavailable: stop without sending
       # the rest of the queue.
@@ -231,15 +233,12 @@ module Honeybadger
         if response.retryable?
           warn { sprintf("Error report failed: server unavailable, giving up on this error. id=%s code=%s", msg.id, response.code) }
         else
-          warn { sprintf("Error report failed: server is rejecting data; dropping queued errors and rejecting new ones for %ss. id=%s code=%s reason=%s", response.reject_interval, msg.id, response.code, response.limit_reason) }
-          suspend(response.reject_interval)
+          warn { sprintf("Error report failed: server is rejecting data. id=%s code=%s reason=%s", msg.id, response.code, response.limit_reason) }
         end
       when 402
-        warn { sprintf("Error report failed: payment is required; dropping queued errors and rejecting new ones for %ss. id=%s code=%s", response.reject_interval, msg.id, response.code) }
-        suspend(response.reject_interval)
+        warn { sprintf("Error report failed: payment is required. id=%s code=%s", msg.id, response.code) }
       when 401, 403
-        warn { sprintf("Error report failed: %s Dropping queued errors and rejecting new ones for %ss. id=%s code=%s", response.error_message, response.reject_interval, msg.id, response.code) }
-        suspend(response.reject_interval)
+        warn { sprintf("Error report failed: %s id=%s code=%s", response.error_message, msg.id, response.code) }
       when 413
         warn { sprintf("Error report failed: Payload is too large. id=%s code=%s", msg.id, response.code) }
       when 201

@@ -73,6 +73,8 @@ describe Honeybadger::Backend::Response do
       [429, nil, nil, 60],
       [503, nil, 600, 600],
       [503, nil, nil, nil],
+      [503, nil, 30, nil],
+      [429, "overloaded", 30, nil],
       [401, nil, 300, 300],
       [401, nil, nil, 3600],
       [403, nil, nil, 3600],

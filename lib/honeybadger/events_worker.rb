@@ -148,6 +148,7 @@ module Honeybadger
     # Drops queued and pending events and rejects new ones (push returns
     # false) for +interval+ seconds. The thread restarts on the first push after that.
     def suspend(interval)
+      warn { sprintf("Dropping queued events and rejecting new ones for %ss", interval) }
       mutex.synchronize do
         @start_at = Time.now.to_i + interval
         queue.clear
@@ -219,9 +220,10 @@ module Honeybadger
         break unless wait(response.retry_after || rand(5..15))
         response = send_to_backend(batch)
       end
-      # A rejection suspends the worker, which clears the batch and
-      # terminates this thread.
       handle_response(response)
+      if (interval = response.reject_interval)
+        suspend(interval) # clears the batch and terminates this thread
+      end
 
       mutex.synchronize do
         @last_sent = Time.now
@@ -289,15 +291,12 @@ module Honeybadger
         if response.retryable?
           warn { sprintf("Insights Event send failed: server unavailable, dropping this batch. code=%s", response.code) }
         else
-          warn { sprintf("Insights Event send failed: server is rejecting data; dropping queued events and rejecting new ones for %ss. code=%s reason=%s", response.reject_interval, response.code, response.limit_reason) }
-          suspend(response.reject_interval)
+          warn { sprintf("Insights Event send failed: server is rejecting data. code=%s reason=%s", response.code, response.limit_reason) }
         end
       when 402
-        warn { sprintf("Insights Event send failed: payment is required; dropping queued events and rejecting new ones for %ss. code=%s", response.reject_interval, response.code) }
-        suspend(response.reject_interval)
+        warn { sprintf("Insights Event send failed: payment is required. code=%s", response.code) }
       when 401, 403
-        warn { sprintf("Insights Event send failed: %s Dropping queued events and rejecting new ones for %ss. code=%s", response.error_message, response.reject_interval, response.code) }
-        suspend(response.reject_interval)
+        warn { sprintf("Insights Event send failed: %s code=%s", response.error_message, response.code) }
       when 413
         warn { sprintf("Insights Event send failed: Payload is too large. code=%s", response.code) }
       when 201

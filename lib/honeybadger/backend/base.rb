@@ -63,9 +63,10 @@ module Honeybadger
         [502, 503, 504].include?(code) || (code == 429 && limit_reason == "overloaded")
       end
 
-      # Seconds to drop queued data and reject new data, or nil to keep going.
-      # Only meaningful when the response is not retryable.
+      # Seconds to drop queued data and reject new data, or nil if this isn't
+      # a rejection.
       def reject_interval
+        return if retryable?
         case code
         when 429 then retry_after || 60
         when 502, 503, 504 then retry_after

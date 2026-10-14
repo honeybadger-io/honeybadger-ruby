@@ -204,29 +204,17 @@ describe Honeybadger::EventsWorker do
       instance.send(:handle_response, response)
     end
 
-    before do
-      allow(instance).to receive(:suspend).and_return true
+    it "only logs; the worker decides whether to suspend" do
+      allow(config.logger).to receive(:warn)
+      expect(instance).not_to receive(:suspend)
+      instance.send(:handle_response, build_response(429, limit_reason: "rate_limited", retry_after: 30))
     end
 
     context "when 429 is rate-limited" do
       let(:response) { build_response(429, limit_reason: "rate_limited", retry_after: 30) }
 
-      it "suspends for Retry-After" do
-        expect(instance).to receive(:suspend).with(30)
-        handle_response
-      end
-
       it "warns the logger" do
-        expect(config.logger).to receive(:warn).with(/rejecting new ones for 30s/)
-        handle_response
-      end
-    end
-
-    context "when 429 without Retry-After" do
-      let(:response) { build_response(429) }
-
-      it "suspends for 60 seconds" do
-        expect(instance).to receive(:suspend).with(60)
+        expect(config.logger).to receive(:warn).with(/server is rejecting data/)
         handle_response
       end
     end
@@ -234,33 +222,14 @@ describe Honeybadger::EventsWorker do
     context "when retryable" do
       let(:response) { build_response(503) }
 
-      it "does not suspend" do
-        expect(instance).not_to receive(:suspend)
-        handle_response
-      end
-
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/unavailable/)
         handle_response
       end
     end
 
-    context "when 401" do
-      let(:response) { build_response(401) }
-
-      it "suspends for an hour" do
-        expect(instance).to receive(:suspend).with(3600)
-        handle_response
-      end
-    end
-
     context "when 402" do
       let(:response) { Honeybadger::Backend::Response.new(402) }
-
-      it "shuts down the worker" do
-        expect(instance).to receive(:suspend)
-        handle_response
-      end
 
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/payment/)
@@ -270,11 +239,6 @@ describe Honeybadger::EventsWorker do
 
     context "when 403" do
       let(:response) { Honeybadger::Backend::Response.new(403, %({"error":"unauthorized"})) }
-
-      it "shuts down the worker" do
-        expect(instance).to receive(:suspend)
-        handle_response
-      end
 
       it "warns the logger" do
         expect(config.logger).to receive(:warn).with(/unauthorized/)
@@ -391,6 +355,15 @@ describe Honeybadger::EventsWorker do
       5.times { instance.push(event) }
       instance.flush
       expect(backend).to have_received(:event).once
+    end
+
+    it "suspends itself for the rejection's interval" do
+      stub_sends(build_response(429, limit_reason: "rate_limited", retry_after: 30))
+      5.times { instance.push(event) }
+      allow(config.logger).to receive(:warn)
+      instance.flush
+      expect(instance.send(:start_at)).to be_within(1).of(Time.now.to_i + 30)
+      expect(config.logger).to have_received(:warn).with(/rejecting new ones for 30s/)
     end
 
     it "does not wait to retry during a flush" do
