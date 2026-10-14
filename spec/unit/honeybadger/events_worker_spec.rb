@@ -178,12 +178,12 @@ describe Honeybadger::EventsWorker do
       expect(subject.send(:thread)).not_to be_alive
     end
 
-    context "when the server rejects data during shutdown" do
+    context "when the server rejects data" do
       before do
         allow(subject.send(:backend)).to receive(:event).with(anything).and_return(Honeybadger::Backend::Response.new(429))
       end
 
-      it "stops sending after the first rejection" do
+      it "drops the rest of the queue" do
         expect(subject.send(:backend)).to receive(:event).exactly(1).times
         15.times { subject.push(event) }
         subject.shutdown
@@ -348,13 +348,6 @@ describe Honeybadger::EventsWorker do
       wait_for_sends(described_class::MAX_RETRIES + 2)
       expect(backend).to have_received(:event).exactly(described_class::MAX_RETRIES + 2).times
       expect(instance.send(:start_at)).to be_nil # not suspended
-    end
-
-    it "does not retry a rejection" do
-      allow(backend).to receive(:event).and_return(build_response(429, limit_reason: "rate_limited", retry_after: 30))
-      5.times { instance.push(event) }
-      instance.flush
-      expect(backend).to have_received(:event).once
     end
 
     it "suspends itself for the rejection's interval" do

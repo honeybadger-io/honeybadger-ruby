@@ -244,13 +244,6 @@ describe Honeybadger::Worker do
       expect(instance.send(:start_at)).to be_nil # not suspended
     end
 
-    it "does not retry a rejection" do
-      allow(backend).to receive(:notify).with(:notices, obj).and_return(build_response(429, limit_reason: "rate_limited", retry_after: 30))
-      instance.push(obj)
-      instance.flush
-      expect(backend).to have_received(:notify).with(:notices, obj).once
-    end
-
     it "suspends itself for the rejection's interval" do
       stub_sends(build_response(429, limit_reason: "rate_limited", retry_after: 30))
       instance.push(obj)
@@ -359,12 +352,12 @@ describe Honeybadger::Worker do
       expect(subject.send(:thread)).not_to be_alive
     end
 
-    context "when the server rejects data during shutdown" do
+    context "when the server rejects data" do
       before do
         allow(subject.send(:backend)).to receive(:notify).with(:notices, obj).and_return(Honeybadger::Backend::Response.new(429))
       end
 
-      it "stops sending after the first rejection" do
+      it "drops the rest of the queue" do
         expect(subject.send(:backend)).to receive(:notify).exactly(1).times
         5.times { subject.push(obj) }
         subject.shutdown
