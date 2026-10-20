@@ -13,6 +13,14 @@ module Helpers
     http
   end
 
+  def build_response(code, retry_after: nil, limit_reason: nil)
+    http_response = Net::HTTPResponse.new("1.1", code.to_s, "")
+    http_response["Retry-After"] = retry_after.to_s if retry_after
+    http_response["Honeybadger-Limit-Reason"] = limit_reason if limit_reason
+    allow(http_response).to receive(:body).and_return("")
+    Honeybadger::Backend::Response.new(http_response)
+  end
+
   def build_exception(opts = {})
     backtrace = ["test/honeybadger/rack_test.rb:15:in `build_exception'",
       "test/honeybadger/rack_test.rb:52:in `test_delivers_exception_from_rack'",

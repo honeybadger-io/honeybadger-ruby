@@ -18,7 +18,7 @@ module Honeybadger
       @config = config
       @interval_seconds = 1
       @mutex = Mutex.new
-      @marker = ConditionVariable.new
+      @flush_signal = ConditionVariable.new
       @queue = Queue.new
       @shutdown = false
       @start_at = nil
@@ -60,8 +60,8 @@ module Honeybadger
     def flush
       mutex.synchronize do
         if thread&.alive?
-          queue.push(marker)
-          marker.wait(mutex)
+          queue.push(flush_signal)
+          flush_signal.wait(mutex)
         end
       end
     end
@@ -84,7 +84,7 @@ module Honeybadger
 
     private
 
-    attr_reader :config, :queue, :pid, :mutex, :marker, :thread, :interval_seconds, :start_at
+    attr_reader :config, :queue, :pid, :mutex, :flush_signal, :thread, :interval_seconds, :start_at
 
     def shutdown?
       mutex.synchronize { @shutdown }
@@ -127,7 +127,7 @@ module Honeybadger
         loop do
           case msg = queue.pop
           when SHUTDOWN then break
-          when ConditionVariable then signal_marker(msg)
+          when flush_signal then signal_flush_done
           else work(msg)
           end
         end
@@ -140,7 +140,7 @@ module Honeybadger
         sprintf(msg, e.class, e.message.dump, Array(e.backtrace).join("\n\t"))
       }
     ensure
-      release_marker
+      release_flush_waiters
     end
 
     def work(msg)
@@ -160,17 +160,22 @@ module Honeybadger
       sleep(interval_seconds)
     end
 
-    # Release the marker. Important to perform during cleanup when shutting
-    # down, otherwise it could end up waiting indefinitely.
-    def release_marker
-      signal_marker(marker)
+    # Wake every waiting flush. Important to perform during cleanup when
+    # shutting down, otherwise they could end up waiting indefinitely.
+    def release_flush_waiters
+      if mutex.owned?
+        flush_signal.broadcast
+      else
+        mutex.synchronize { flush_signal.broadcast }
+      end
     end
 
-    def signal_marker(marker)
+    # Wakes the flush waiting on this point in the queue.
+    def signal_flush_done
       if mutex.owned?
-        marker.signal
+        flush_signal.signal
       else
-        mutex.synchronize { marker.signal }
+        mutex.synchronize { flush_signal.signal }
       end
     end
   end

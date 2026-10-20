@@ -9,7 +9,10 @@ module Honeybadger
     class Response
       NOT_BLANK = /\S/
 
-      attr_reader :code, :body, :message, :error
+      attr_reader :code, :body, :message, :error, :retry_after, :limit_reason
+
+      # Longest Retry-After, in seconds, accepted for a single retry delay.
+      MAX_RETRY_AFTER = 60
 
       FRIENDLY_ERRORS = {
         429 => "Your project is currently sending too many errors.\nThis issue should resolve itself once error traffic is reduced.".freeze,
@@ -36,6 +39,9 @@ module Honeybadger
       def initialize(*args)
         if (response = args.first).is_a?(Net::HTTPResponse)
           @code, @body, @message = response.code.to_i, response.body.to_s, response.message
+          @retry_after = parse_retry_after(response["Retry-After"])
+          # Why a 429 was sent, e.g. "overloaded".
+          @limit_reason = response["Honeybadger-Limit-Reason"]&.strip&.downcase
         else
           @code, @body, @message = args
         end
@@ -46,6 +52,26 @@ module Honeybadger
 
       def success?
         @success
+      end
+
+      # The server is briefly unavailable (502/503/504, or 429 with
+      # Limit-Reason "overloaded") and Retry-After is absent or at most
+      # MAX_RETRY_AFTER. Hold the payload and retry it. Any other 429 means
+      # the server is rejecting data.
+      def retryable?
+        return false if retry_after && retry_after > MAX_RETRY_AFTER
+        [502, 503, 504].include?(code) || (code == 429 && limit_reason == "overloaded")
+      end
+
+      # Seconds to drop queued data and reject new data, or nil if this isn't
+      # a rejection.
+      def reject_interval
+        return if retryable?
+        case code
+        when 429 then retry_after || 60
+        when 502, 503, 504 then retry_after
+        when 401, 403 then retry_after || 3600
+        end
       end
 
       def error_message
@@ -59,6 +85,15 @@ module Honeybadger
       end
 
       private
+
+      # Positive integer seconds only. Zero, negative, HTTP-date, and other
+      # values are treated as absent; Honeybadger only sends seconds.
+      def parse_retry_after(value)
+        return nil unless value
+        return nil unless /\A\d+\z/.match?(value.strip)
+        seconds = value.to_i
+        (seconds > 0) ? seconds : nil
+      end
 
       def parse_error(body)
         return unless NOT_BLANK.match?(body)
