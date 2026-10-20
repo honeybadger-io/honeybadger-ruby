@@ -385,6 +385,15 @@ describe Honeybadger::EventsWorker do
   end
 
   describe "#suspend" do
+    it "reports events dropped at a full queue" do
+      config[:"events.max_queue_size"] = 1
+      allow(instance).to receive(:start).and_return(true) # keep the pushes in the queue
+      3.times { instance.push(event) }
+      allow(config.logger).to receive(:warn)
+      instance.send(:suspend, 60)
+      expect(config.logger).to have_received(:warn).with(/Dropped 2 messages/)
+    end
+
     it "drops the pending batch" do
       instance.send(:enqueue_msg, event)
       instance.send(:suspend, 60)

@@ -153,6 +153,9 @@ module Honeybadger
         @start_at = Time.now.to_i + interval
         queue.clear
         send_queue.clear
+        if @dropped_events > 0
+          warn { sprintf("Dropped %s messages due to exceeding max queue size of %s", @dropped_events, config.events_max_queue_size) }
+        end
         @dropped_events = 0
       end
 
