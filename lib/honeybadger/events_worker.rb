@@ -240,7 +240,10 @@ module Honeybadger
 
       # Shutting down while the server is unavailable: stop without sending
       # the rest of the queue.
-      kill! if shutdown? && response.retryable?
+      if shutdown? && response.retryable?
+        warn { "Shutting down while the server is unavailable; dropping queued events" }
+        kill!
+      end
     end
 
     def check_and_send

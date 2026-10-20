@@ -186,7 +186,10 @@ module Honeybadger
 
       # Shutting down while the server is unavailable: stop without sending
       # the rest of the queue.
-      kill! if shutdown? && response.retryable?
+      if shutdown? && response.retryable?
+        warn { "Shutting down while the server is unavailable; dropping queued errors" }
+        kill!
+      end
     rescue => e
       error {
         msg = "Error in worker thread class=%s message=%s\n\t%s"

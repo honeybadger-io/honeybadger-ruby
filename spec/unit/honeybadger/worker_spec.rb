@@ -290,8 +290,10 @@ describe Honeybadger::Worker do
       end
       3.times { instance.push(obj) }
       Timeout.timeout(3) { sent.pop }
+      allow(config.logger).to receive(:warn)
       Timeout.timeout(3) { instance.shutdown }
       expect(backend).to have_received(:notify).with(:notices, obj).once
+      expect(config.logger).to have_received(:warn).with(/dropping queued errors/)
     end
   end
 

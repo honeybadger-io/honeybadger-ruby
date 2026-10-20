@@ -379,8 +379,10 @@ describe Honeybadger::EventsWorker do
       end
       15.times { instance.push(event) }
       Timeout.timeout(3) { sent.pop }
+      allow(config.logger).to receive(:warn)
       Timeout.timeout(3) { instance.shutdown }
       expect(backend).to have_received(:event).once
+      expect(config.logger).to have_received(:warn).with(/dropping queued events/)
     end
   end
 
