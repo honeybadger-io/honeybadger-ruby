@@ -1,6 +1,17 @@
 # Change Log
 
 
+## [6.10.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.3...v6.10.0) (2026-10-20)
+
+
+### Bug Fixes
+
+* retry notices and events on short Retry-After instead of dropping them ([#847](https://github.com/honeybadger-io/honeybadger-ruby/issues/847)) ([bb948b3](https://github.com/honeybadger-io/honeybadger-ruby/commit/bb948b309f2dcc6c01c052f8ea3519c5a68187ac))
+
+### Changed
+
+* Default `events.max_queue_size` has been reduced from 100,000 to 10,000; raise it if your app sends large bursts of events ([#847](https://github.com/honeybadger-io/honeybadger-ruby/issues/847))
+
 ## [6.9.3](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.2...v6.9.3) (2026-09-29)
 
 
