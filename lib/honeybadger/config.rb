@@ -210,7 +210,7 @@ module Honeybadger
         elsif check.is_a?(Hash)
           flat_hash(check).transform_keys! { |key_array| key_array.map(&:to_sym) }
         end
-      end.compact
+      end.compact.each { |check| check.transform_values! { |value| compile_ignore_pattern(value) } }
     end
 
     def ca_bundle_path
@@ -505,6 +505,16 @@ module Honeybadger
           end
         end
       end
+    end
+
+    # Agent#event matches string patterns with String#match?, which compiles
+    # them into a Regexp on every call. Compile them once instead; invalid
+    # patterns stay strings so they keep failing per event as before.
+    def compile_ignore_pattern(value)
+      return value unless value.is_a?(String)
+      Regexp.new(value)
+    rescue RegexpError
+      value
     end
 
     # Converts a nested hash into a single layer where keys become arrays:
