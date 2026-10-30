@@ -1,6 +1,17 @@
 # Change Log
 
 
+## [6.10.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.10.0...v6.10.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* update bundled CA certificates ([#858](https://github.com/honeybadger-io/honeybadger-ruby/issues/858)) ([4f5489e](https://github.com/honeybadger-io/honeybadger-ruby/commit/4f5489ef806e3f9a8681063408cf4ec015d8aadf))
+
+### Changed
+
+* The bundled CA certificates no longer include roots that Mozilla has removed. If you set `connection.host` to your own server and TLS verification fails after upgrading, set `connection.system_ssl_cert_chain: true` or `connection.ssl_ca_bundle_path` ([#858](https://github.com/honeybadger-io/honeybadger-ruby/issues/858))
+
 ## [6.10.0](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.9.3...v6.10.0) (2026-10-20)
 
 
