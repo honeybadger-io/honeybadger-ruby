@@ -65,7 +65,6 @@ module Honeybadger
       self.framework = framework.freeze
       self.env = Env.new(env).freeze
       load_config_from_disk { |yaml| self.yaml = yaml.freeze }
-      detect_revision!
       process_deprecations!
       @loaded = true
       self
@@ -119,14 +118,11 @@ module Honeybadger
     end
 
     def get(key)
-      IVARS.each do |var|
-        source = instance_variable_get(var)
-        if source.has_key?(key)
-          return source[key]
-        end
-      end
+      value = configured_value(key)
+      return value unless key == :revision && value.nil? && @loaded
+      return @detected_revision if defined?(@detected_revision)
 
-      DEFAULTS[key]
+      @detected_revision = Util::Revision.detect(configured_value(:root))
     end
     alias_method :[], :get
 
@@ -351,9 +347,13 @@ module Honeybadger
 
     private
 
-    def detect_revision!
-      return if self[:revision]
-      set(:revision, Util::Revision.detect(self[:root]))
+    def configured_value(key)
+      IVARS.each do |var|
+        source = instance_variable_get(var)
+        return source[key] if source.has_key?(key)
+      end
+
+      DEFAULTS[key]
     end
 
     # When an option includes the `deprecated` property, warn the logger with
