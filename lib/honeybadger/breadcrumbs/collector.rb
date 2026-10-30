@@ -5,6 +5,7 @@ module Honeybadger
     class Collector
       include Enumerable
       extend Forwardable
+
       # The Collector manages breadcrumbs and provides an interface for accessing
       # and affecting breadcrumbs
       #
@@ -66,9 +67,11 @@ module Honeybadger
         }
       end
 
+      # @api private
+      attr_reader :config
+
       private
 
-      # @api private
       # Since the collector is shared with the worker thread, there is a chance
       # it can be cleared before we have prepared the request. We provide the
       # ability to duplicate a collector which should also duplicate the buffer

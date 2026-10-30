@@ -1,3 +1,5 @@
+require "honeybadger/context_manager"
+
 module Honeybadger
   module Breadcrumbs
     class RingBuffer
@@ -6,38 +8,44 @@ module Honeybadger
       # are pushed on the end of the stack.
       include Enumerable
 
-      attr_reader :buffer
-
-      def initialize(buffer_size = 40)
+      def initialize(buffer_size = 40, collection: BreadcrumbsCollection)
         @buffer_size = buffer_size
-        clear!
+        @collection = collection
       end
 
       def add!(item)
-        @buffer << item
-        @ct += 1
-        @buffer.shift(1) if @ct > @buffer_size
+        @collection << item
+        @collection.shift(1) if @collection.to_a.size > @buffer_size
       end
 
       def clear!
-        @buffer = []
-        @ct = 0
+        @collection.clear
       end
 
-      def to_a
-        @buffer
+      def buffer
+        @collection.to_a
       end
+      alias_method :to_a, :buffer
 
       def each(&blk)
-        @buffer.each(&blk)
+        @collection.each(&blk)
       end
 
       def previous
-        @buffer.last
+        @collection.last
       end
 
       def drop
-        @buffer.pop
+        @collection.pop
+      end
+
+      private
+
+      # The collection must be duplicated when duplicating the buffer to prevent
+      # concurrent modifications. This converts it to a plain array.
+      def initialize_dup(source)
+        @collection = source.to_a.dup
+        super
       end
     end
   end
