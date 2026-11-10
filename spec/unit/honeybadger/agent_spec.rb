@@ -486,6 +486,14 @@ describe Honeybadger::Agent do
         end
       end
 
+      context "when configured with a string containing regex metacharacters" do
+        let(:ignored_events) { ["report.sys"] }
+        let(:event_type) { "report_system" }
+
+        it "matches it as a regex, as before" do
+          expect(events_worker).not_to receive(:push)
+        end
+      end
       context "when configured with an event type matching regex" do
         let(:ignored_events) { [/.*\.system/] }
         let(:event_type) { "report.system" }

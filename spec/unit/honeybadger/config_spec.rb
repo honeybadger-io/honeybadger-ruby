@@ -401,7 +401,17 @@ describe Honeybadger::Config do
 
     context "a string" do
       let(:ignored_events) { ["foo"] }
-      it { expect(config.ignored_events).to eq([{[:event_type] => "foo"}]) }
+      it { expect(config.ignored_events).to eq([{[:event_type] => /foo/}]) }
+    end
+
+    context "a string with regex metacharacters" do
+      let(:ignored_events) { ["foo.bar?"] }
+      it { expect(config.ignored_events).to eq([{[:event_type] => /foo.bar?/}]) }
+    end
+
+    context "a string that is not a valid regex" do
+      let(:ignored_events) { ["foo("] }
+      it { expect(config.ignored_events).to eq([{[:event_type] => "foo("}]) }
     end
 
     context "a regex" do
@@ -411,7 +421,7 @@ describe Honeybadger::Config do
 
     context "a simple hash" do
       let(:ignored_events) { [{foo: "bar"}] }
-      it { expect(config.ignored_events).to eq([{[:foo] => "bar"}]) }
+      it { expect(config.ignored_events).to eq([{[:foo] => /bar/}]) }
     end
 
     context "a simple hash with a regex value" do
