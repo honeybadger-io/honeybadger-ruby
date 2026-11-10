@@ -1,6 +1,13 @@
 # Change Log
 
 
+## [6.10.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.10.1...v6.10.2) (2026-11-10)
+
+
+### Bug Fixes
+
+* **cli:** use connection.ui_host in test notice link ([#864](https://github.com/honeybadger-io/honeybadger-ruby/issues/864)) ([c4ca401](https://github.com/honeybadger-io/honeybadger-ruby/commit/c4ca4013f9d7c8e8072dd86850fcadd468c81c23)), closes [#863](https://github.com/honeybadger-io/honeybadger-ruby/issues/863)
+
 ## [6.10.1](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.10.0...v6.10.1) (2026-10-30)
 
 
