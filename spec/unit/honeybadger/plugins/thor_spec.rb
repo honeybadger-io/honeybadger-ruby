@@ -23,9 +23,8 @@ describe "Thor Dependency" do
     end
 
     before do
-      Object.const_set(:Thor, shim)
+      stub_const("Thor", shim)
     end
-    after { Object.send(:remove_const, :Thor) }
 
     it "includes integration module into Thor" do
       expect(shim).to receive(:send).with(:include, Honeybadger::Plugins::Thor)

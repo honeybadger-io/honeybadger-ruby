@@ -246,7 +246,8 @@ module Honeybadger
 
       def generate_success_message(response)
         notice_id = JSON.parse(response.body)["id"]
-        notice_url = "https://app.honeybadger.io/notice/#{notice_id}"
+        ui_host = Honeybadger.config.get(:"connection.ui_host")
+        notice_url = "https://#{ui_host}/notice/#{notice_id}"
 
         unless options[:install]
           return "⚡ Success: #{notice_url}"
