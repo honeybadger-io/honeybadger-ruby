@@ -37,7 +37,7 @@ describe TestWorker do
       expect {
         Honeybadger.context(badgers: true)
         described_class.on_failure_with_honeybadger(error, 1, 2, 3)
-      }.not_to change { Honeybadger::ContextManager.current.get_context }.from(nil)
+      }.not_to change { Honeybadger.get_context }.from({})
     end
 
     describe "with worker not extending Resque::Plugins::Retry" do
@@ -119,7 +119,7 @@ describe TestWorker do
       expect {
         Honeybadger.context(badgers: true)
         described_class.after_perform_with_honeybadger
-      }.not_to change { Honeybadger::ContextManager.current.get_context }.from(nil)
+      }.not_to change { Honeybadger.get_context }.from({})
     end
   end
 end

@@ -101,6 +101,6 @@ describe Honeybadger::Rack::ErrorNotifier do
 
     stack.call({})
 
-    expect(Honeybadger.get_context).to be_nil
+    expect(Honeybadger.get_context).to be_empty
   end
 end
