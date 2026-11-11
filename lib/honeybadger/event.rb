@@ -27,7 +27,7 @@ module Honeybadger
         @event_type = @payload[:event_type] || @payload["event_type"]
       end
 
-      @ts = @payload[:ts] || Time.now.utc.strftime("%FT%T.%LZ")
+      @ts = @payload[:ts] || @payload["ts"] || Time.now.utc.strftime("%FT%T.%LZ")
       @halted = false
     end
 
@@ -50,6 +50,7 @@ module Honeybadger
     # @return [Hash] JSON representation of the event.
     def as_json(*args)
       data = payload.tap do |p|
+        p.delete("ts")
         p[:ts] = ts
         p[:event_type] = event_type if event_type
       end

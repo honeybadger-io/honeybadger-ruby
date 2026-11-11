@@ -80,6 +80,35 @@ describe Honeybadger::Event do
     end
   end
 
+  describe "JSON payload timestamps" do
+    let(:timestamp) { "2020-01-02T03:04:05.000Z" }
+
+    ["ts", :ts].each do |key|
+      context "with a #{key.class} timestamp key" do
+        it "preserves the timestamp with an event type argument" do
+          event = described_class.new("action", {key => timestamp})
+
+          expect(event.ts).to eq(timestamp)
+          expect(JSON.parse(JSON.generate(event.as_json))["ts"]).to eq(timestamp)
+        end
+
+        it "preserves the timestamp with a payload argument" do
+          event = described_class.new({:event_type => "action", key => timestamp})
+
+          expect(event.ts).to eq(timestamp)
+          expect(JSON.parse(JSON.generate(event.as_json))["ts"]).to eq(timestamp)
+        end
+      end
+    end
+
+    it "prefers a symbol timestamp when both key forms are present" do
+      event = described_class.new("action", {"ts" => "older", :ts => timestamp})
+
+      expect(event.ts).to eq(timestamp)
+      expect(JSON.parse(JSON.generate(event.as_json))["ts"]).to eq(timestamp)
+    end
+  end
+
   describe "halted" do
     context "halt! is not called" do
       its(:halted?) { should be false }
