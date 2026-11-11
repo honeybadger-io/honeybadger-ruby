@@ -202,12 +202,26 @@ describe Honeybadger::Util::HTTP do
       expect(http.ca_file).to eq "/test/company-ca.pem"
     end
 
-    it "uses the default cert (OpenSSL::X509::DEFAULT_CERT_FILE) only if explicitly told to" do
+    it "uses the system certificate file by default" do
       allow(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(true)
       http = subject.send(:setup_http_connection)
 
+      expect(http.ca_file).to eq OpenSSL::X509::DEFAULT_CERT_FILE
+    end
+
+    it "uses the bundled certificates when the system certificate chain is disabled" do
+      allow(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(true)
+      config[:"connection.system_ssl_cert_chain"] = false
+
+      http = subject.send(:setup_http_connection)
       expect(http.ca_file).to eq config.local_cert_path
-      expect(http.ca_file).not_to eq OpenSSL::X509::DEFAULT_CERT_FILE
+    end
+
+    it "uses the bundled certificates by default when the system certificate file is missing" do
+      allow(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(false)
+
+      http = subject.send(:setup_http_connection)
+      expect(http.ca_file).to eq config.local_cert_path
     end
 
     it "verifies the connection when the use_ssl option is set (VERIFY_PEER)" do
