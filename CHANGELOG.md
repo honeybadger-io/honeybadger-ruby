@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+
+### Bug Fixes
+
+* Preserve custom event timestamps supplied with a string `ts` key without serializing duplicate timestamp keys.
+
 
 ## [6.10.2](https://github.com/honeybadger-io/honeybadger-ruby/compare/v6.10.1...v6.10.2) (2026-11-10)
 
