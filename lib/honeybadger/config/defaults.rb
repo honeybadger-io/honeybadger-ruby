@@ -219,8 +219,8 @@ module Honeybadger
         type: Integer
       },
       "connection.system_ssl_cert_chain": {
-        description: "Use the system's SSL certificate chain (if available).",
-        default: false,
+        description: "Use OpenSSL::X509::DEFAULT_CERT_FILE if it exists, otherwise use the bundled CA certificates.",
+        default: true,
         type: Boolean
       },
       "connection.ssl_ca_bundle_path": {
