@@ -21,7 +21,7 @@ gem "rake"
 # Nothing here requires rdoc directly, but it is a transitive dependency
 # (aruba -> irb -> rdoc), and RDoc 8 depends on RBS 4, whose native
 # extension does not build on JRuby. This pin constrains that resolution.
-gem "rdoc", "< 8"
+gem "rdoc", "<= 8.1.0"
 
 gem "bump", "~> 0.10.0"
 
