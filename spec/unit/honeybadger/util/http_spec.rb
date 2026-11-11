@@ -193,6 +193,15 @@ describe Honeybadger::Util::HTTP do
       expect(http.ca_file).to eq "/test/blargh.crt"
     end
 
+    it "prefers a custom ca bundle over the system certificate chain" do
+      allow(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(true)
+      config[:"connection.system_ssl_cert_chain"] = true
+      config[:"connection.ssl_ca_bundle_path"] = "/test/company-ca.pem"
+
+      http = subject.send(:setup_http_connection)
+      expect(http.ca_file).to eq "/test/company-ca.pem"
+    end
+
     it "uses the default cert (OpenSSL::X509::DEFAULT_CERT_FILE) only if explicitly told to" do
       allow(File).to receive(:exist?).with(OpenSSL::X509::DEFAULT_CERT_FILE).and_return(true)
       http = subject.send(:setup_http_connection)
