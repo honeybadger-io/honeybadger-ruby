@@ -45,7 +45,7 @@ module Honeybadger
 
           tags = ["severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
-          Honeybadger.notify(exception, context: context, tags: tags)
+          Honeybadger.notify(exception, context: context.except(:controller), tags: tags)
         end
 
         def self.source_ignored?(source)
@@ -71,7 +71,7 @@ module Honeybadger
           if Honeybadger.config[:"exceptions.enabled"] && defined?(::ActiveSupport::ErrorReporter) # Rails 7
             if defined?(::ActiveSupport::ExecutionContext)
               ::ActiveSupport::ExecutionContext.after_change do
-                Honeybadger.context(::ActiveSupport::ExecutionContext.to_h)
+                Honeybadger.context(::ActiveSupport::ExecutionContext.to_h.except(:controller))
               end
             end
 
