@@ -45,7 +45,7 @@ module Honeybadger
 
           tags = ["severity:#{severity}", "handled:#{handled}"]
           tags << "source:#{source}" if source
-          Honeybadger.notify(exception, context: context, tags: tags)
+          Honeybadger.notify(exception, context: context.except(:controller), tags: tags)
         end
 
         def self.source_ignored?(source)

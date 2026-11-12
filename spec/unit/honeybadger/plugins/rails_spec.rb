@@ -6,6 +6,21 @@ rescue LoadError
   return
 end
 
+describe Honeybadger::Plugins::Rails::ErrorSubscriber do
+  it "excludes the controller from handled errors while preserving user context" do
+    exception = StandardError.new("handled error")
+    context = {controller: Object.new, user_id: 123}
+
+    expect(Honeybadger).to receive(:notify).with(exception,
+      context: {user_id: 123}, tags: ["severity:warning", "handled:true", "source:application"])
+
+    described_class.report(exception, handled: true, severity: :warning,
+      context: context, source: "application")
+
+    expect(context).to have_key(:controller)
+  end
+end
+
 describe "Rails execution context integration" do
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true) }
   let(:execution_context) { double("ExecutionContext") }
