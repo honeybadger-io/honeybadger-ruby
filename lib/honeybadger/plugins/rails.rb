@@ -71,7 +71,7 @@ module Honeybadger
           if Honeybadger.config[:"exceptions.enabled"] && defined?(::ActiveSupport::ErrorReporter) # Rails 7
             if defined?(::ActiveSupport::ExecutionContext)
               ::ActiveSupport::ExecutionContext.after_change do
-                Honeybadger.context(::ActiveSupport::ExecutionContext.to_h)
+                Honeybadger.context(::ActiveSupport::ExecutionContext.to_h.except(:controller))
               end
             end
 
