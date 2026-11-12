@@ -648,8 +648,9 @@ module Honeybadger
 
       return true if sample_rate >= 100
 
-      if event[:request_id] # Send all events for a given request
-        Zlib.crc32(event[:request_id].to_s) % 100 < sample_rate
+      request_id = event[:request_id] || event["request_id"]
+      if request_id # Send all events for a given request
+        Zlib.crc32(request_id.to_s) % 100 < sample_rate
       else # Otherwise just take a random sample
         rand(100) < sample_rate
       end

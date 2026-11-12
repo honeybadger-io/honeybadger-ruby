@@ -398,6 +398,31 @@ describe Honeybadger::Agent do
         end
       end
 
+      context "with a string-keyed request_id in payload" do
+        let(:sample_rate) { 50 }
+        let(:payload) { {"some_data" => "is here", "request_id" => "test-request-id"} }
+
+        it "uses consistent sampling based on request_id" do
+          expect(Zlib).to receive(:crc32).with("test-request-id").and_return(49)
+          expect(subject).not_to receive(:rand)
+          expect(events_worker).to receive(:push)
+          subject.event(event_type, payload)
+        end
+
+        it "excludes the event when the request_id bucket is outside the sample rate" do
+          expect(Zlib).to receive(:crc32).with("test-request-id").and_return(75)
+          expect(subject).not_to receive(:rand)
+          expect(events_worker).not_to receive(:push)
+          subject.event(event_type, payload)
+        end
+
+        it "prefers the symbol-keyed request_id when both are present" do
+          expect(Zlib).to receive(:crc32).with("symbol-id").and_return(49)
+          expect(events_worker).to receive(:push)
+          subject.event(event_type, payload.merge(request_id: "symbol-id"))
+        end
+      end
+
       context "without request_id in payload" do
         let(:sample_rate) { 50 }
 
