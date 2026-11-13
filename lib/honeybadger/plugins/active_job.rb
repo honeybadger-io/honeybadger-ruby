@@ -12,7 +12,15 @@ module Honeybadger
           context = context(job)
           block.call
         rescue => e
-          if job.executions >= Honeybadger.config[:"active_job.attempt_threshold"].to_i
+          per_job = begin
+            job.class.honeybadger_attempt_threshold if job.class.respond_to?(:honeybadger_attempt_threshold)
+          rescue => threshold_error
+            Honeybadger.config.logger.error("Error reading honeybadger_attempt_threshold from #{job.class}: #{threshold_error}")
+            nil
+          end
+          threshold = (per_job.nil? ? Honeybadger.config[:"active_job.attempt_threshold"] : per_job).to_i
+
+          if job.executions >= threshold
             Honeybadger.notify(
               e,
               context: context,
