@@ -180,6 +180,22 @@ describe Honeybadger::Config do
     let(:instance) { Honeybadger::Config.new({logger: NULL_LOGGER, debug: true}.merge!(opts)) }
     let(:opts) { {} }
 
+    context "when revision is not configured" do
+      it "does not detect the revision while loading" do
+        expect(Honeybadger::Util::Revision).not_to receive(:detect)
+
+        instance.load!(env: {})
+      end
+
+      it "detects the revision when it is first accessed" do
+        instance.load!(env: {})
+        expect(Honeybadger::Util::Revision).to receive(:detect).once.and_return("detected revision")
+
+        expect(instance.get(:revision)).to eq("detected revision")
+        expect(instance.get(:revision)).to eq("detected revision")
+      end
+    end
+
     context "when a normal option doesn't exist" do
       it "returns the default option value" do
         expect(instance.get(:development_environments)).to eq Honeybadger::Config::DEFAULTS[:development_environments]
