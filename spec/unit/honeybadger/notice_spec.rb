@@ -881,6 +881,16 @@ describe Honeybadger::Notice do
       expect(backtrace.last[:number]).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT.to_s
     end
 
+    it "keeps changes made to the parsed backtrace" do
+      notice = build_notice(backtrace: build_backtrace(150))
+      notice.parsed_backtrace.each { |line| line[:method] = "[FILTERED]" }
+      notice.trim!
+
+      backtrace = notice.as_json[:error][:backtrace]
+      expect(backtrace.size).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT
+      expect(backtrace.map { |line| line[:method] }.uniq).to eq ["[FILTERED]"]
+    end
+
     it "does not raise a lower backtrace limit" do
       notice = build_notice(config: build_config("exceptions.backtrace_limit": 20), backtrace: build_backtrace(150))
       notice.trim!
@@ -905,6 +915,24 @@ describe Honeybadger::Notice do
       notice.trim!
 
       expect(notice.as_json[:error][:causes][0][:backtrace].map { |line| line[:method] }).to eq ["magic", "save"]
+    end
+
+    it "removes the shared backtrace lines when a backtrace is a single string" do
+      shared = ["app/controllers/users_controller.rb:8:in `index'", "rack.rb:5:in `call'"]
+      backtrace = [(["app/views/users.erb:1:in `render'"] + shared).join("\n")]
+      cause = build_cause([(build_backtrace(1) + shared).join("\n")])
+      notice = build_notice(backtrace: backtrace, cause: cause)
+      notice.trim!
+
+      expect(notice.as_json[:error][:causes][0][:backtrace].map { |line| line[:method] }).to eq ["magic"]
+    end
+
+    it "keeps the first line of a cause which is not filtered out" do
+      backtrace = ["/gems/honeybadger/lib/honeybadger/agent.rb:1:in `notify'"] + build_backtrace(2)
+      notice = build_notice(backtrace: backtrace, cause: build_cause(backtrace))
+      notice.trim!
+
+      expect(notice.as_json[:error][:causes][0][:backtrace].map { |line| line[:number] }).to eq ["1"]
     end
 
     it "keeps the top line of a cause with the same backtrace" do
@@ -1000,6 +1028,14 @@ describe Honeybadger::Notice do
 
       expect(notice.as_json[:request][:params]).to eq({})
       expect(notice.as_json[:request][:session]).to eq({})
+    end
+
+    it "keeps changes made to the parsed backtrace" do
+      notice = build_notice(backtrace: ["app/models/user.rb:1:in `magic'"])
+      notice.parsed_backtrace.each { |line| line[:method] = "[FILTERED]" }
+      notice.strip!
+
+      expect(notice.as_json[:error][:backtrace][0][:method]).to eq "[FILTERED]"
     end
 
     it "keeps the error class, message and the top of the backtrace" do

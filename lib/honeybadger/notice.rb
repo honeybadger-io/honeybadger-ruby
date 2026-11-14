@@ -316,13 +316,9 @@ module Honeybadger
       self.local_variables = nil
       self.params = {}
       self.session = {}
-      main = backtrace.to_a.reverse
-      causes.each do |cause|
-        lines = cause.backtrace.to_a
-        shared = lines.reverse.zip(main).take_while { |line, main_line| line == main_line }.size
-        cause.backtrace = lines.first([lines.size - shared, 1].max)
-      end
-      @parsed_backtrace = nil
+      main = backtrace_lines(backtrace)
+      causes.each { |cause| trim_cause_backtrace(cause, main) }
+      @parsed_backtrace = @parsed_backtrace&.first(TRIMMED_BACKTRACE_LIMIT)
       self.details = (details.is_a?(Hash) ? details : {}).merge(
         "Payload Trimmed" => {
           notice_id: id,
@@ -641,6 +637,31 @@ module Honeybadger
           backtrace: parse_backtrace(c.backtrace)
         }
       }
+    end
+
+    # Remove the lines a cause's backtrace shares with the end of the main
+    # backtrace, keeping at least its first line that isn't filtered out.
+    #
+    # cause - The Cause instance.
+    # main  - The Array lines of the main backtrace.
+    #
+    # Returns nothing.
+    def trim_cause_backtrace(cause, main)
+      lines = backtrace_lines(cause.backtrace)
+      shared = lines.reverse.zip(main.reverse).take_while { |line, main_line| line == main_line }.size
+      first = lines.index { |line| parse_backtrace([line]).any? } || 0
+      cause.backtrace = lines.first([lines.size - shared, first + 1].max)
+    end
+
+    # Split a backtrace into lines the way Backtrace.parse does: a single
+    # entry may hold the whole backtrace.
+    #
+    # backtrace - The Array backtrace.
+    #
+    # Returns the Array of lines.
+    def backtrace_lines(backtrace)
+      lines = backtrace.to_a
+      (lines.size == 1) ? lines.first.to_s.split(/\n\s*/) : lines
     end
 
     def params_filters
