@@ -9,7 +9,7 @@ require "honeybadger/notice"
 describe Honeybadger::Worker do
   let!(:instance) { described_class.new(config) }
   let(:config) { Honeybadger::Config.new(logger: NULL_LOGGER, debug: true, backend: "null") }
-  let(:obj) { double("Badger", id: :foo, to_json: "{}") }
+  let(:obj) { double("Badger", id: :foo, to_json: "{}", stripped?: true) }
 
   subject { instance }
 
@@ -294,6 +294,152 @@ describe Honeybadger::Worker do
       Timeout.timeout(3) { instance.shutdown }
       expect(backend).to have_received(:notify).with(:notices, obj).once
       expect(config.logger).to have_received(:warn).with(/dropping queued errors/)
+    end
+  end
+
+  describe "when the payload is too large" do
+    let(:backend) { instance.send(:backend) }
+    let(:too_large) { Honeybadger::Backend::Response.new(413, %({"error":"Payload exceeds maximum size"})) }
+    let(:success) { Honeybadger::Backend::Response.new(201) }
+    let(:notice) { Honeybadger::Notice.new(config, error_message: "boom", request_id: "req-1") }
+    let(:sends) { Queue.new }
+
+    before do
+      allow(instance).to receive(:sleep)
+    end
+
+    # Returns +responses+ in order, repeating the last, and records whether
+    # the notice was :full, :trimmed or :stripped at each send.
+    def stub_sends(*responses)
+      allow(backend).to receive(:notify) do |_feature, payload|
+        trimmed = payload.trimmed? ? :trimmed : :full
+        sends << (payload.stripped? ? :stripped : trimmed)
+        (responses.size > 1) ? responses.shift : responses.first
+      end
+    end
+
+    def sent
+      Array.new(sends.size) { sends.pop }
+    end
+
+    # Flush skips retries, so wait for the sends to happen before flushing.
+    def wait_for_sends(count)
+      Timeout.timeout(3) { Array.new(count) { sends.pop } }.tap { instance.flush }
+    end
+
+    it "resends the notice trimmed" do
+      stub_sends(too_large, success)
+      instance.send_now(notice)
+      expect(sent).to eq([:full, :trimmed])
+    end
+
+    it "resends the notice stripped when the trimmed notice is too large" do
+      stub_sends(too_large, too_large, success)
+      instance.send_now(notice)
+      expect(sent).to eq([:full, :trimmed, :stripped])
+    end
+
+    it "gives up when the stripped notice is too large" do
+      allow(config.logger).to receive(:warn)
+      stub_sends(too_large)
+      instance.send_now(notice)
+      expect(sent).to eq([:full, :trimmed, :stripped])
+      expect(config.logger).to have_received(:warn).with(/Error report failed: Payload is too large/).once
+    end
+
+    it "does not trim a notice the server accepts" do
+      stub_sends(success)
+      instance.send_now(notice)
+      expect(sent).to eq([:full])
+      expect(notice).not_to be_trimmed
+    end
+
+    it "fires after_notify hooks once with the final response" do
+      hook = spy("after notify hook", arity: 2)
+      config.configure { |config| config.after_notify(hook) }
+      stub_sends(too_large, success)
+      instance.send_now(notice)
+      expect(hook).to have_received(:call).with(notice, success).once
+    end
+
+    it "warns once with the notice id, error class and request id" do
+      allow(config.logger).to receive(:warn)
+      stub_sends(too_large, too_large, success)
+      instance.send_now(notice)
+      expect(config.logger).to have_received(:warn).with(/resending trimmed\. id=#{notice.id} code=413 error_class=Notice request_id=req-1/).once
+    end
+
+    it "leaves the request id out of the warning when there is none" do
+      notice.request_id = nil
+      allow(config.logger).to receive(:warn)
+      stub_sends(too_large, success)
+      instance.send_now(notice)
+      expect(config.logger).to have_received(:warn).with(/resending trimmed/)
+      expect(config.logger).not_to have_received(:warn).with(/request_id=/)
+    end
+
+    it "retries the trimmed notice while the server is unavailable" do
+      stub_sends(too_large, build_response(503, retry_after: 1), success)
+      instance.push(notice)
+      expect(wait_for_sends(3)).to eq([:full, :trimmed, :trimmed])
+    end
+
+    it "retries the stripped notice while the server is unavailable" do
+      stub_sends(too_large, too_large, build_response(503, retry_after: 1), success)
+      instance.push(notice)
+      expect(wait_for_sends(4)).to eq([:full, :trimmed, :stripped, :stripped])
+    end
+
+    it "suspends when the server rejects the stripped notice" do
+      allow(config.logger).to receive(:warn)
+      allow(instance).to receive(:suspend)
+      stub_sends(too_large, too_large, build_response(429, limit_reason: "rate_limited", retry_after: 30))
+      instance.push(notice)
+      wait_for_sends(3)
+      expect(instance).to have_received(:suspend).with(30)
+    end
+
+    context "with a server that rejects large payloads" do
+      # The API's limit at the time of writing. Only this stub uses it; the
+      # gem does not depend on the value.
+      let(:max_bytes) { 256 * 1024 }
+      let(:sizes) { [] }
+
+      before do
+        allow(backend).to receive(:notify) do |_feature, payload|
+          sizes << payload.to_json.bytesize
+          (sizes.last > max_bytes) ? too_large : success
+        end
+      end
+
+      def build_error(message, backtrace, cause = nil)
+        raise RuntimeError, message, backtrace, cause: cause
+      rescue => e
+        e
+      end
+
+      it "delivers an exception with a deep chain of causes after trimming it" do
+        shared = Array.new(1000) { |i| "/gems/rack/lib/rack.rb:#{i}:in `call'" }
+        cause = 5.times.reduce(nil) { |c, i| build_error("cause #{i}", ["/app/lib/deep.rb:#{i}:in `deep'"] + shared, c) }
+        notice = Honeybadger::Notice.new(config, exception: build_error("boom", ["/app/models/user.rb:1:in `save'"] + shared, cause))
+
+        instance.send_now(notice)
+
+        expect(sizes.size).to eq(2)
+        expect(sizes.first).to be > max_bytes
+        expect(sizes.last).to be <= max_bytes
+      end
+
+      it "delivers a notice with a very large context after stripping it" do
+        context = Array.new(40) { |i| ["key#{i}", "v" * 10_000] }.to_h
+        notice = Honeybadger::Notice.new(config, error_message: "boom", context: context)
+
+        instance.send_now(notice)
+
+        expect(sizes.size).to eq(3)
+        expect(sizes.last).to be <= max_bytes
+        expect(notice).to be_stripped
+      end
     end
   end
 

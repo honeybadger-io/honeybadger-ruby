@@ -801,6 +801,262 @@ describe Honeybadger::Notice do
     end
   end
 
+  describe "#trim!" do
+    def build_backtrace(size)
+      Array.new(size) { |i| "app/models/user.rb:#{i + 1}:in `magic'" }
+    end
+
+    def build_cause(backtrace)
+      ::TheCause.new("the cause").tap { |cause| cause.set_backtrace(backtrace) }
+    end
+
+    it "marks the notice as trimmed" do
+      notice = build_notice
+      expect { notice.trim! }.to change(notice, :trimmed?).from(false).to(true)
+    end
+
+    it "removes params and session" do
+      notice = build_notice(params: {id: "1"}, session: {user: "2"})
+      notice.trim!
+
+      expect(notice.as_json[:request][:params]).to eq({})
+      expect(notice.as_json[:request][:session]).to eq({})
+    end
+
+    it "removes local variables" do
+      notice = build_notice
+      notice.local_variables = {foo: "bar"}
+      notice.trim!
+
+      expect(notice.as_json[:request]).not_to have_key(:local_variables)
+    end
+
+    it "removes breadcrumbs" do
+      config[:"breadcrumbs.enabled"] = true
+      coll = Honeybadger::Breadcrumbs::Collector.new(config)
+      coll.add!(Honeybadger::Breadcrumbs::Breadcrumb.new(message: "test"))
+      notice = build_notice(config: config, breadcrumbs: coll)
+      notice.trim!
+
+      expect(notice.as_json[:breadcrumbs]).to eq(enabled: true, trail: [])
+    end
+
+    it "keeps context, cgi_data and details" do
+      notice = build_notice(context: {user_id: 42}, cgi_data: {"REQUEST_METHOD" => "GET"}, details: {"Lambda Details" => {a: 1}})
+      notice.trim!
+
+      expect(notice.as_json[:request][:context]).to eq(user_id: 42)
+      expect(notice.as_json[:request][:cgi_data]).to eq("REQUEST_METHOD" => "GET")
+      expect(notice.as_json[:details]["Lambda Details"]).to eq(a: 1)
+    end
+
+    it "keeps the error class, message, tags and fingerprint" do
+      notice = build_notice(error_class: "FooError", error_message: "boom", tags: "a, b", fingerprint: "custom")
+      fingerprint = notice.as_json[:error][:fingerprint]
+      notice.trim!
+
+      expect(notice.as_json[:error][:class]).to eq "FooError"
+      expect(notice.as_json[:error][:message]).to eq "boom"
+      expect(notice.as_json[:error][:tags]).to eq ["a", "b"]
+      expect(notice.as_json[:error][:fingerprint]).to eq fingerprint
+    end
+
+    it "keeps the url, component and action" do
+      notice = build_notice(url: "https://example.com/users", component: "users", action: "index")
+      notice.trim!
+
+      expect(notice.as_json[:request][:url]).to eq "https://example.com/users"
+      expect(notice.as_json[:request][:component]).to eq "users"
+      expect(notice.as_json[:request][:action]).to eq "index"
+    end
+
+    it "keeps the top of the backtrace" do
+      notice = build_notice(backtrace: build_backtrace(150))
+      notice.as_json
+      notice.trim!
+
+      backtrace = notice.as_json[:error][:backtrace]
+      expect(backtrace.size).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT
+      expect(backtrace.first[:number]).to eq "1"
+      expect(backtrace.last[:number]).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT.to_s
+    end
+
+    it "keeps changes made to the parsed backtrace" do
+      notice = build_notice(backtrace: build_backtrace(150))
+      notice.parsed_backtrace.each { |line| line[:method] = "[FILTERED]" }
+      notice.trim!
+
+      backtrace = notice.as_json[:error][:backtrace]
+      expect(backtrace.size).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT
+      expect(backtrace.map { |line| line[:method] }.uniq).to eq ["[FILTERED]"]
+    end
+
+    it "does not raise a lower backtrace limit" do
+      notice = build_notice(config: build_config("exceptions.backtrace_limit": 20), backtrace: build_backtrace(150))
+      notice.trim!
+
+      expect(notice.as_json[:error][:backtrace].size).to eq 20
+    end
+
+    it "removes the backtrace lines a cause shares with the end of the backtrace" do
+      shared = ["app/controllers/users_controller.rb:8:in `index'", "rack.rb:5:in `call'"]
+      notice = build_notice(backtrace: ["app/views/users.erb:1:in `render'"] + shared, cause: build_cause(build_backtrace(1) + shared))
+      notice.trim!
+
+      cause = notice.as_json[:error][:causes][0]
+      expect(cause[:class]).to eq "TheCause"
+      expect(cause[:message]).to eq "the cause"
+      expect(cause[:backtrace].map { |line| line[:method] }).to eq ["magic"]
+    end
+
+    it "keeps the backtrace lines a cause shares with the rest of the backtrace" do
+      shared = ["app/controllers/users_controller.rb:8:in `index'", "rack.rb:5:in `call'"]
+      notice = build_notice(backtrace: build_backtrace(1) + shared, cause: build_cause(build_backtrace(1) + ["app/models/user.rb:9:in `save'"] + shared))
+      notice.trim!
+
+      expect(notice.as_json[:error][:causes][0][:backtrace].map { |line| line[:method] }).to eq ["magic", "save"]
+    end
+
+    it "removes the shared backtrace lines when a backtrace is a single string" do
+      shared = ["app/controllers/users_controller.rb:8:in `index'", "rack.rb:5:in `call'"]
+      backtrace = [(["app/views/users.erb:1:in `render'"] + shared).join("\n")]
+      cause = build_cause([(build_backtrace(1) + shared).join("\n")])
+      notice = build_notice(backtrace: backtrace, cause: cause)
+      notice.trim!
+
+      expect(notice.as_json[:error][:causes][0][:backtrace].map { |line| line[:method] }).to eq ["magic"]
+    end
+
+    it "keeps the first line of a cause which is not filtered out" do
+      backtrace = ["/gems/honeybadger/lib/honeybadger/agent.rb:1:in `notify'"] + build_backtrace(2)
+      notice = build_notice(backtrace: backtrace, cause: build_cause(backtrace))
+      notice.trim!
+
+      expect(notice.as_json[:error][:causes][0][:backtrace].map { |line| line[:number] }).to eq ["1"]
+    end
+
+    it "keeps the top line of a cause with the same backtrace" do
+      notice = build_notice(backtrace: build_backtrace(3), cause: build_cause(build_backtrace(3)))
+      notice.trim!
+
+      backtrace = notice.as_json[:error][:causes][0][:backtrace]
+      expect(backtrace.size).to eq 1
+      expect(backtrace.first[:number]).to eq "1"
+    end
+
+    it "keeps the top of a cause's backtrace" do
+      notice = build_notice(backtrace: ["rack.rb:5:in `call'"], cause: build_cause(build_backtrace(150)))
+      notice.trim!
+
+      expect(notice.as_json[:error][:causes][0][:backtrace].size).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT
+    end
+
+    it "adds a details section with the notice id and request id" do
+      notice = build_notice(request_id: "req-1")
+      notice.trim!
+
+      section = notice.as_json[:details]["Payload Trimmed"]
+      expect(section[:notice_id]).to eq notice.id
+      expect(section[:request_id]).to eq "req-1"
+    end
+
+    it "leaves the request id out of the details section when there is none" do
+      notice = build_notice
+      notice.trim!
+
+      expect(notice.as_json[:details]["Payload Trimmed"]).not_to have_key(:request_id)
+    end
+
+    it "replaces details which are not a Hash" do
+      notice = build_notice
+      notice.details = "not a hash"
+      notice.trim!
+
+      expect(notice.as_json[:details].keys).to eq ["Payload Trimmed"]
+    end
+
+    it "changes nothing when called again" do
+      notice = build_notice(params: {id: "1"}, backtrace: build_backtrace(150), cause: build_cause(build_backtrace(3)))
+      notice.trim!
+
+      expect { notice.trim! }.not_to change { notice.as_json }
+    end
+  end
+
+  describe "#strip!" do
+    it "marks the notice as trimmed and stripped" do
+      notice = build_notice
+      notice.strip!
+
+      expect(notice).to be_trimmed
+      expect(notice).to be_stripped
+    end
+
+    it "is not stripped by #trim!" do
+      notice = build_notice
+      notice.trim!
+
+      expect(notice).not_to be_stripped
+    end
+
+    it "removes causes" do
+      notice = build_notice(cause: StandardError.new("the cause"))
+      notice.strip!
+
+      expect(notice.as_json[:error][:causes]).to eq([])
+    end
+
+    it "removes context and cgi_data" do
+      notice = build_notice(context: {user_id: 42}, cgi_data: {"REQUEST_METHOD" => "GET"})
+      notice.strip!
+
+      expect(notice.as_json[:request][:context]).to eq({})
+      expect(notice.as_json[:request][:cgi_data]).to eq({})
+    end
+
+    it "removes details apart from the section with the notice id" do
+      notice = build_notice(details: {"Lambda Details" => {a: 1}})
+      notice.strip!
+
+      expect(notice.as_json[:details].keys).to eq ["Payload Trimmed"]
+      expect(notice.as_json[:details]["Payload Trimmed"][:notice_id]).to eq notice.id
+    end
+
+    it "removes what #trim! removes" do
+      notice = build_notice(params: {id: "1"}, session: {user: "2"})
+      notice.strip!
+
+      expect(notice.as_json[:request][:params]).to eq({})
+      expect(notice.as_json[:request][:session]).to eq({})
+    end
+
+    it "keeps changes made to the parsed backtrace" do
+      notice = build_notice(backtrace: ["app/models/user.rb:1:in `magic'"])
+      notice.parsed_backtrace.each { |line| line[:method] = "[FILTERED]" }
+      notice.strip!
+
+      expect(notice.as_json[:error][:backtrace][0][:method]).to eq "[FILTERED]"
+    end
+
+    it "keeps the error class, message and the top of the backtrace" do
+      notice = build_notice(error_class: "FooError", error_message: "boom", backtrace: Array.new(150) { |i| "app/models/user.rb:#{i + 1}:in `magic'" })
+      notice.strip!
+
+      expect(notice.as_json[:error][:class]).to eq "FooError"
+      expect(notice.as_json[:error][:message]).to eq "boom"
+      expect(notice.as_json[:error][:backtrace].size).to eq Honeybadger::TRIMMED_BACKTRACE_LIMIT
+    end
+
+    it "keeps the url, component and action" do
+      notice = build_notice(url: "https://example.com/users", component: "users", action: "index")
+      notice.strip!
+
+      expect(notice.as_json[:request][:url]).to eq "https://example.com/users"
+      expect(notice.as_json[:request][:component]).to eq "users"
+      expect(notice.as_json[:request][:action]).to eq "index"
+    end
+  end
+
   describe "#to_json" do
     context "when local variables are found" do
       it "sends local_variables in request payload" do

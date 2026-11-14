@@ -111,6 +111,12 @@ module Honeybadger
       # `Honeybadger.notify` from this hook can trigger another after_notify call;
       # guard against self-reporting loops if a notice must be sent.
       #
+      # A notice rejected with a 413 is trimmed and sent again, and stripped to
+      # the error itself if it is still rejected. As with other resends, the
+      # hook is called once, with the last response and the notice as it was
+      # sent (see `notice.trimmed?` and `notice.stripped?`), so a 413 is only
+      # seen here when the stripped notice was rejected too.
+      #
       # @example Report oversized notice payloads
       #   config.after_notify do |notice, response|
       #     next unless response.code == 413

@@ -43,6 +43,10 @@ module Honeybadger
   MAX_EXCEPTION_CAUSES = 5
 
   # @api private
+  # The number of backtrace lines kept in a trimmed notice (see Notice#trim!).
+  TRIMMED_BACKTRACE_LIMIT = 100
+
+  # @api private
   # Binding#source_location was added in Ruby 2.6.
   BINDING_HAS_SOURCE_LOCATION = Binding.method_defined?(:source_location)
 
@@ -298,6 +302,65 @@ module Honeybadger
       !!@halted
     end
 
+    # @api private
+    # Removes data from a notice the server rejected as too large (HTTP 413):
+    # breadcrumbs, local variables, params, session, the backtrace lines
+    # causes share with the end of the main backtrace, and backtrace lines
+    # below TRIMMED_BACKTRACE_LIMIT (see #parse_backtrace).
+    #
+    # Returns nothing.
+    def trim!
+      @trimmed ||= true
+
+      self.breadcrumbs = Breadcrumbs::Collector.new(config)
+      self.local_variables = nil
+      self.params = {}
+      self.session = {}
+      main = backtrace_lines(backtrace)
+      causes.each { |cause| trim_cause_backtrace(cause, main) }
+      @parsed_backtrace = @parsed_backtrace&.first(TRIMMED_BACKTRACE_LIMIT)
+      self.details = (details.is_a?(Hash) ? details : {}).merge(
+        "Payload Trimmed" => {
+          notice_id: id,
+          request_id: request_id,
+          reason: "The full notice was rejected as too large (HTTP 413), so data was removed before it was sent again."
+        }.compact
+      )
+    end
+
+    # Determines if data was removed from this notice because the server
+    # rejected it as too large (HTTP 413). Useful in +after_notify+ hooks.
+    #
+    # @return [Boolean]
+    # @api public
+    def trimmed?
+      !!@trimmed
+    end
+
+    # @api private
+    # Removes everything but the error itself, for a notice that is still too
+    # large after #trim!: causes, context, cgi_data and details.
+    #
+    # Returns nothing.
+    def strip!
+      trim!
+      @stripped ||= true
+
+      self.cause = nil
+      self.context = {}
+      self.cgi_data = {}
+      self.details = details.slice("Payload Trimmed")
+    end
+
+    # Determines if this notice was reduced to the error itself because the
+    # server rejected it as too large (HTTP 413) even after it was trimmed.
+    #
+    # @return [Boolean]
+    # @api public
+    def stripped?
+      !!@stripped
+    end
+
     private
 
     attr_reader :config, :opts, :stats, :now, :pid, :request_sanitizer,
@@ -505,12 +568,15 @@ module Honeybadger
     #
     # Returns the Backtrace.
     def parse_backtrace(backtrace)
+      limit = config[:"exceptions.backtrace_limit"]
+      limit = [limit || TRIMMED_BACKTRACE_LIMIT, TRIMMED_BACKTRACE_LIMIT].min if trimmed?
+
       Backtrace.parse(
         backtrace,
         filters: construct_backtrace_filters(opts),
         config: config,
         source_radius: config[:"exceptions.source_radius"],
-        limit: config[:"exceptions.backtrace_limit"]
+        limit: limit
       ).to_a
     end
 
@@ -571,6 +637,31 @@ module Honeybadger
           backtrace: parse_backtrace(c.backtrace)
         }
       }
+    end
+
+    # Remove the lines a cause's backtrace shares with the end of the main
+    # backtrace, keeping at least its first line that isn't filtered out.
+    #
+    # cause - The Cause instance.
+    # main  - The Array lines of the main backtrace.
+    #
+    # Returns nothing.
+    def trim_cause_backtrace(cause, main)
+      lines = backtrace_lines(cause.backtrace)
+      shared = lines.reverse.zip(main.reverse).take_while { |line, main_line| line == main_line }.size
+      first = lines.index { |line| parse_backtrace([line]).any? } || 0
+      cause.backtrace = lines.first([lines.size - shared, first + 1].max)
+    end
+
+    # Split a backtrace into lines the way Backtrace.parse does: a single
+    # entry may hold the whole backtrace.
+    #
+    # backtrace - The Array backtrace.
+    #
+    # Returns the Array of lines.
+    def backtrace_lines(backtrace)
+      lines = backtrace.to_a
+      (lines.size == 1) ? lines.first.to_s.split(/\n\s*/) : lines
     end
 
     def params_filters
