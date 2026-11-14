@@ -43,7 +43,8 @@ module Honeybadger
       queue.push(msg)
     end
 
-    # Sends synchronously without retrying.
+    # Sends synchronously without retrying. A notice the server rejects as too
+    # large is still sent again, smaller (see #notify_backend).
     def send_now(msg)
       response = notify_backend(msg)
       run_after_notify_hooks(msg, response)
@@ -197,9 +198,23 @@ module Honeybadger
       }
     end
 
+    # A notice the server rejects as too large (413) is sent again: trimmed
+    # the first time, stripped the second.
     def notify_backend(payload)
       d { sprintf("worker notifying backend id=%s", payload.id) }
-      backend.notify(:notices, payload)
+      response = backend.notify(:notices, payload)
+      return response unless response.code == 413 && !payload.stripped?
+
+      if payload.trimmed?
+        payload.strip!
+      else
+        warn {
+          msg = sprintf("Error report rejected: Payload is too large, resending trimmed. id=%s code=%s error_class=%s", payload.id, response.code, payload.error_class)
+          payload.request_id ? "#{msg} request_id=#{payload.request_id}" : msg
+        }
+        payload.trim!
+      end
+      notify_backend(payload)
     end
 
     def run_after_notify_hooks(msg, response)
