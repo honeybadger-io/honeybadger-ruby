@@ -52,6 +52,7 @@ module Honeybadger
       data = payload.tap do |p|
         p.delete("ts")
         p[:ts] = ts
+        p.delete("event_type")
         p[:event_type] = event_type if event_type
       end
       Util::Sanitizer.sanitize(data)

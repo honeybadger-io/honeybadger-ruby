@@ -83,6 +83,13 @@ describe Honeybadger::Event do
   describe "JSON payload timestamps" do
     let(:timestamp) { "2020-01-02T03:04:05.000Z" }
 
+    it "round trips a fully string-keyed payload" do
+      event = described_class.new({"event_type" => "action", "ts" => timestamp})
+
+      expect(event.as_json).to eq({event_type: "action", ts: timestamp})
+      expect(JSON.parse(JSON.generate(event.as_json))).to eq({"event_type" => "action", "ts" => timestamp})
+    end
+
     ["ts", :ts].each do |key|
       context "with a #{key.class} timestamp key" do
         it "preserves the timestamp with an event type argument" do
