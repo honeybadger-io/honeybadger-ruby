@@ -18,6 +18,8 @@ module Honeybadger
       private
 
       def add_log_breadcrumb(severity, message = nil, progname = nil)
+        return unless log_severity_enabled?(severity)
+
         if defined?(Dry::Logger::Entry) && progname.is_a?(Dry::Logger::Entry) # Hanami uses dry-logger
           message, progname = progname.message || progname.exception, progname.progname
         elsif message.nil?
@@ -30,6 +32,25 @@ module Honeybadger
             progname: progname
           })
         end
+      end
+
+      # Logger#add discards messages below the logger's level, so they must not
+      # become breadcrumbs either.
+      def log_severity_enabled?(severity)
+        current_level = current_log_level
+        severity ||= ::Logger::UNKNOWN
+        return true unless severity.is_a?(Integer) && current_level.is_a?(Integer)
+
+        severity >= current_level
+      end
+
+      # BroadcastLogger#level reads the level of every sink, so it raises when
+      # a sink has no level or the sink levels cannot be compared. Without a
+      # usable level the breadcrumb is recorded as before.
+      def current_log_level
+        level if respond_to?(:level)
+      rescue
+        nil
       end
 
       def log_severity_label(severity)
