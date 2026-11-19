@@ -59,6 +59,25 @@ describe Honeybadger::Breadcrumbs::LogWrapper do
     expect { logger.add(Logger::ERROR, bad) }.not_to raise_error
   end
 
+  describe "with a level" do
+    let(:logger) { Logger.new(StringIO.new, level: :warn).extend(Honeybadger::Breadcrumbs::LogWrapper) }
+
+    it "does not add a breadcrumb for a message below the level" do
+      expect(Honeybadger).not_to receive(:add_breadcrumb)
+
+      logger.debug("suppressed debug line")
+      logger.info("suppressed info line")
+    end
+
+    it "adds a breadcrumb for a message at or above the level" do
+      expect(Honeybadger).to receive(:add_breadcrumb).with("visible warning", hash_including(category: :log))
+      expect(Honeybadger).to receive(:add_breadcrumb).with("visible error", hash_including(category: :log))
+
+      logger.warn("visible warning")
+      logger.error("visible error")
+    end
+  end
+
   describe "ignores messages on" do
     before { expect(Honeybadger).to_not receive(:add_breadcrumb) }
 
@@ -155,6 +174,14 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
     subject.info("Message")
 
     expect(Thread.current[:__hb_within_broadcast_logger]).to be_nil
+  end
+
+  it "does not add a breadcrumb for a message below the broadcast level" do
+    subject.define_singleton_method(:level) { ::Logger::WARN }
+    expect(Honeybadger).not_to receive(:add_breadcrumb)
+
+    subject.info("suppressed")
+    subject.add(::Logger::DEBUG, "suppressed")
   end
 
   it "labels severity using the constant fallback when format_severity is undefined" do
