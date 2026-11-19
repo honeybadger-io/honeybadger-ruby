@@ -184,6 +184,23 @@ describe Honeybadger::Breadcrumbs::BroadcastLogWrapper do
     subject.add(::Logger::DEBUG, "suppressed")
   end
 
+  it "adds the breadcrumb and dispatches the log when a sink has no level" do
+    sinks = [first_sink, Object.new]
+    subject.define_singleton_method(:level) { sinks.map(&:level).min }
+    expect(Honeybadger).to receive(:add_breadcrumb).once.with("Message", hash_including(category: :log))
+
+    expect(subject.info("Message")).to be(true)
+    expect(first_sink.entries).to eq([[::Logger::INFO, nil, "Message"]])
+  end
+
+  it "adds the breadcrumb and dispatches the log when sink levels cannot be compared" do
+    subject.define_singleton_method(:level) { [::Logger::WARN, :custom].min }
+    expect(Honeybadger).to receive(:add_breadcrumb).once.with("Message", hash_including(category: :log))
+
+    expect(subject.info("Message")).to be(true)
+    expect(first_sink.entries).to eq([[::Logger::INFO, nil, "Message"]])
+  end
+
   it "labels severity using the constant fallback when format_severity is undefined" do
     expect(Honeybadger).to receive(:add_breadcrumb).with("msg", hash_including(metadata: hash_including(severity: "WARN")))
 
