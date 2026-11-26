@@ -300,6 +300,50 @@ describe Honeybadger::RubyLLMSubscriber do
       end
     end
 
+    context "with a RubyLLM 2 payload, where token counts are in a tokens object" do
+      let(:tokens) { double("RubyLLM::Tokens", input: 10, output: 20, cache_read: 30, cache_write: 40, thinking: 5) }
+
+      it "includes chat token counts but not the tokens and cost objects" do
+        expect(
+          subscriber.format_payload("chat.ruby_llm", {provider: "openai", model: "gpt-4o-mini", tokens: tokens, cost: :object})
+        ).to eq({provider: "openai", model: "gpt-4o-mini", input_tokens: 10, output_tokens: 20, cached_tokens: 30, cache_creation_tokens: 40, thinking_tokens: 5})
+      end
+
+      it "prefers the chat call's own response_tokens over tokens, which can include fallback attempts" do
+        response_tokens = double("RubyLLM::Tokens", input: 1, output: 2, cache_read: 3, cache_write: 4, thinking: 0)
+
+        expect(
+          subscriber.format_payload("chat.ruby_llm", {provider: "openai", model: "gpt-4o-mini", tokens: tokens, response_tokens: response_tokens})
+        ).to eq({provider: "openai", model: "gpt-4o-mini", input_tokens: 1, output_tokens: 2, cached_tokens: 3, cache_creation_tokens: 4, thinking_tokens: 0})
+      end
+
+      it "leaves out counts the provider did not report" do
+        tokens = double("RubyLLM::Tokens", input: 10, output: 20, cache_read: nil, cache_write: nil, thinking: nil)
+
+        expect(
+          subscriber.format_payload("chat.ruby_llm", {provider: "openai", model: "gpt-4o-mini", tokens: tokens})
+        ).to eq({provider: "openai", model: "gpt-4o-mini", input_tokens: 10, output_tokens: 20})
+      end
+
+      it "includes embedding input tokens only" do
+        expect(
+          subscriber.format_payload("embedding.ruby_llm", {provider: "openai", model: "text-embedding-3-small", tokens: tokens, cost: :object})
+        ).to eq({provider: "openai", model: "text-embedding-3-small", input_tokens: 10})
+      end
+
+      it "includes transcription input and output tokens" do
+        expect(
+          subscriber.format_payload("transcription.ruby_llm", {provider: "openai", model: "whisper-1", tokens: tokens, cost: :object})
+        ).to eq({provider: "openai", model: "whisper-1", input_tokens: 10, output_tokens: 20})
+      end
+
+      it "does not read tokens for other events" do
+        expect(
+          subscriber.format_payload("other.ruby_llm", {provider: "openai", model: "gpt-4o-mini", tokens: tokens})
+        ).to eq({provider: "openai", model: "gpt-4o-mini"})
+      end
+    end
+
     context "with other events" do
       it "allows only safe metadata keys through" do
         expect(
